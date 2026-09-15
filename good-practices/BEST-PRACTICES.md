@@ -95,11 +95,11 @@ Aplican tanto en `features/<nombre>/components/` como en `shared/components/`.
 import { STAGE_CHIP_COLORS } from '@ibm-talent-bridge/shared-utils';
 import type { ProcessStage } from '@ibm-talent-bridge/shared-types';
 
-interface StageChipProps {
+interface IStageChipProps {
   readonly stage: ProcessStage;
 }
 
-export function StageChip({ stage }: StageChipProps) {
+export function StageChip({ stage }: IStageChipProps) {
   const { bg, text } = STAGE_CHIP_COLORS[stage];
   return (
     <span style={{ backgroundColor: bg, color: text }}
@@ -177,7 +177,7 @@ authStore.setProcesses(data); // MAL — eso es de React Query
 
 ```typescript
 // features/auth/store/auth.store.ts ✅ — máx 50 líneas
-interface AuthState {
+interface IAuthState {
   readonly token: string | null;
   readonly role: UserRole | null;
   readonly user: User | null;
@@ -185,7 +185,7 @@ interface AuthState {
   readonly logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<IAuthState>((set) => ({
   token: null,
   role: null,
   user: null,
@@ -239,7 +239,7 @@ export function ProcessList() {
 }
 
 // molecules/ProcessListView.tsx ✅ — solo props
-interface ProcessListViewProps {
+interface IProcessListViewProps {
   readonly items: ProcessResponse[];
   readonly role: UserRole;
   readonly onSearch: (q: string) => void;
@@ -317,6 +317,27 @@ export async function createProcess(dto: CreateProcessRequest): Promise<ProcessR
 **✅ Debe**: exponer funciones nombradas por operación (`findAll`, `create`, `findById`)
 **❌ No debe**: importar `useQuery`/`useState`, transformar datos para la UI, acumular lógica condicional
 
+#### Patrón mock-first (mientras el backend de la feature no existe)
+
+Si el endpoint real todavía no está construido, la función de `infrastructure/`
+se implementa igual — pero resuelve con un mock/fixture en vez de `apiClient`:
+
+```typescript
+// features/candidates/infrastructure/candidates.infrastructure.ts ✅
+const MOCK_CANDIDATES: CandidateResponse[] = [ /* ... */ ];
+
+export async function findAllCandidates(): Promise<CandidateResponse[]> {
+  return new Promise((resolve) => setTimeout(() => resolve(MOCK_CANDIDATES), 400));
+}
+```
+
+El hook (`useCandidatesQuery`) y el organism que lo consume no cambian cuando
+el backend exista — solo se reemplaza el cuerpo de esta función por la llamada
+real a `apiClient`. Por eso ningún dato "que algún día vendrá de un GET" debe
+vivir como constante `MOCK_*` dentro de una page o componente: siempre en
+`infrastructure/`. Ver `good-practices/examples/frontend/infrastructure.example.ts`
+y `hook.example.ts`.
+
 ---
 
 ### 2.5 Límites de líneas frontend (resumen)
@@ -371,8 +392,9 @@ import { useProcesses } from '../hooks/useProcesses';
 
 #### TypeScript
 
-- `interface` para props y objetos de dominio
-- `type` para uniones, aliases e intersecciones
+- `interface` para props y objetos de dominio, prefijo `I` (ver §2.7 "Nomenclatura de tipos")
+- `type` para uniones, aliases e intersecciones, prefijo `T`
+- `enum` para conjuntos fijos de valores, prefijo `E`
 - **Cero `any`** — usar `unknown` + type guard o generics
 - Props siempre con `readonly`
 - `as const` para objetos de configuración y mapas de colores/labels
@@ -406,6 +428,44 @@ for (const p of processes) {
 Señales de violación: un hook que fetchea + transforma + gestiona estado global;
 un componente que renderiza + orquesta lógica de negocio; un service que valida +
 transforma + persiste + notifica.
+
+### Nomenclatura de tipos — prefijos obligatorios (MUST)
+
+Todo tipo nuevo (frontend y backend) se prefija según su naturaleza, para
+identificar de un vistazo si algo es contrato de forma, alias/unión o conjunto
+de valores fijos, sin tener que ir a su declaración:
+
+| Prefijo | Construcción TS | Ejemplo                                            |
+| ------- | ---------------- | --------------------------------------------------- |
+| `I`     | `interface`       | `IStageChipProps`, `IAuthState`, `ICandidatePort`   |
+| `T`     | `type`            | `TUserRole`, `TProcessStage`, `TCreateInterviewDto` |
+| `E`     | `enum`            | `EProcessStatus`, `EInterviewOutcome`               |
+
+```typescript
+// ✅
+interface ICandidatePort {
+  findByEmail(email: string): Promise<Candidate | null>;
+}
+
+type TUserRole = 'recruiter' | 'technical' | 'pm';
+
+enum EInterviewOutcome {
+  Advance = 'advance',
+  Reject = 'reject',
+  Hold = 'hold',
+}
+
+// ❌ — sin prefijo, ya no cumple la convención
+interface CandidatePort { ... }
+type UserRole = 'recruiter' | 'technical' | 'pm';
+enum InterviewOutcome { ... }
+```
+
+**Aplica de aquí en adelante a todo código nuevo** (frontend y backend, incluida
+`packages/shared-types`). No es retroactivo: el código existente (`UserRole`,
+`ProcessStage`, `AuthState`, etc.) se renombra de forma incidental **solo** al
+tocar ese archivo por otra razón (ej. durante el refactor de la Etapa 1/2 del
+plan de remediación) — no se abre un PR exclusivamente para renombrar.
 
 ---
 
@@ -486,6 +546,13 @@ constructor(private readonly candidateAdapter: CandidateAdapter) {}
 | DTO              | `.dto.ts`        | `create-interview.dto.ts`            |
 | Module           | `.module.ts`     | `interviews.module.ts`               |
 
+#### TypeScript
+
+- `interface` → prefijo `I` (`ICandidatePort`, `ICreateInterviewDto`)
+- `type` → prefijo `T` (`TUserRole`, `TProcessStage`)
+- `enum` → prefijo `E` (`EInterviewOutcome`)
+- Ver §2.7 "Nomenclatura de tipos" para el detalle y ejemplos — la regla es la misma en frontend y backend.
+
 #### Error handling
 
 ```typescript
@@ -559,6 +626,39 @@ export class InterviewController {
 
 ---
 
+## 4.bis Mockups de Stitch (`DESIGN/`) — guía visual, no código fuente
+
+`DESIGN/stitch_ibm_talent_bridge_portal/**/code.html` y sus `screen.png` son
+generados por una herramienta externa (Stitch) para comunicar layout e
+intención visual. **No son código a copiar ni a transcribir.** Un ejemplo real
+de por qué esto es una regla no negociable: la versión original de
+`LoginPage.tsx` (422 líneas) fue construida pegando casi literal el
+`code.html` de `iniciar_sesi_n_ibm_talent_bridge/` — de ahí decenas de
+`style={{ backgroundColor: '#0043ce', ... }}` con hex literales, cero
+componentización, y lógica de negocio mezclada con el markup.
+
+**Proceso correcto para traducir un mockup de Stitch a código:**
+
+1. Usar el `code.html`/`screen.png` solo para identificar layout, jerarquía
+   visual, textos y qué bloques se repiten (esos bloques repetidos son
+   candidatos directos a molecule/organism).
+2. Todo color, tipografía o espaciado del mockup se resuelve con clases
+   Tailwind (`tailwind.config.ts`) o `config/design-tokens.ts` — nunca con
+   `style={{ ... }}` de valores hardcodeados, salvo que el valor sea
+   verdaderamente dinámico en runtime (ej. `StageChip` eligiendo color según
+   `stage`).
+3. Cualquier dato que el mockup muestre "ya cargado" (listas, KPIs, nombres)
+   se modela vía el patrón mock-first de `infrastructure/` (sección 2.4) —
+   nunca como constante `MOCK_*` dentro de la page.
+4. El resultado se descompone en atoms/molecules/organisms/page siguiendo los
+   límites de línea de la sección 2.5, no como un único archivo monolítico.
+
+Ver ejemplos ejecutables en `good-practices/examples/frontend/` — en
+particular `organism.example.tsx` y `page.example.tsx` documentan este
+proceso paso a paso sobre un caso concreto.
+
+---
+
 ## 5. Checklist antes de entregar cualquier tarea
 
 ```
@@ -581,6 +681,8 @@ FRONTEND
 [ ] Funciones HTTP solo en `infrastructure/` — nunca en hooks ni componentes
 [ ] Componente nuevo en la carpeta Atomic correcta (atom/molecule/organism/page)
 [ ] Si el componente aparece en 2+ features → movido a `shared/`
+[ ] Si el origen es un mockup de `DESIGN/` (Stitch): componentizado y con tokens Tailwind, nunca HTML/estilos inline copiados literal (ver sección 4.bis)
+[ ] Dato "que vendrá de un GET" modelado en `infrastructure/` (mock-first), nunca como `MOCK_*` en una page/componente
 
 BACKEND
 [ ] DTO con class-validator decorators

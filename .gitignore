@@ -3,3 +3,10 @@ node_modules/
 stitch_ibm_talent_bridge_portal/
 
 DESIGN/
+
+.clinerules
+
+node_modules/
+dist/
+
+CLAUDE.md

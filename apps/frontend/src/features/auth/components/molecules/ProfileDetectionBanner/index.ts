@@ -1,0 +1,1 @@
+export { ProfileDetectionBanner } from './ProfileDetectionBanner';

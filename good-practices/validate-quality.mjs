@@ -14,19 +14,21 @@ import { join, extname, relative } from 'path';
 // ─── Configuración de límites ────────────────────────────────────────────────
 
 const LIMITS = [
-  // Frontend
-  { pattern: /apps\/web\/src\/atoms\/.*\.tsx$/, limit: 50, level: 'error', label: '⚛️  Atom' },
-  { pattern: /apps\/web\/src\/molecules\/.*\.tsx$/, limit: 90, level: 'error', label: '🔶 Molecule' },
-  { pattern: /apps\/web\/src\/organisms\/.*\.tsx$/, limit: 100, level: 'error', label: '🔷 Organism' },
-  { pattern: /apps\/web\/src\/pages\/.*\.tsx$/, limit: 90, level: 'error', label: '📄 Page' },
-  { pattern: /apps\/web\/src\/hooks\/.*\.ts$/, limit: 30, level: 'warn', label: '🪝 Hook' },
-  // Backend
-  { pattern: /apps\/api\/src\/.*\.controller\.ts$/, limit: 55, level: 'error', label: '🎮 Controller' },
-  { pattern: /apps\/api\/src\/.*\.service\.ts$/, limit: 80, level: 'warn', label: '⚙️  Service' },
-  { pattern: /apps\/api\/src\/.*\.port\.ts$/, limit: 50, level: 'warn', label: '🔌 Port' },
-  { pattern: /apps\/api\/src\/.*\.adapter\.ts$/, limit: 100, level: 'warn', label: '🔄 Adapter' },
-  { pattern: /apps\/api\/src\/.*\.dto\.ts$/, limit: 45, level: 'error', label: '📋 DTO' },
-  { pattern: /apps\/api\/src\/.*\.module\.ts$/, limit: 60, level: 'warn', label: '📦 Module' },
+  // Frontend — Feature Slices + Atomic Design
+  { pattern: /apps\/frontend\/src\/(features\/[^/]+|shared)\/components\/atoms\/.*\.tsx$/, limit: 50, level: 'error', label: '⚛️  Atom' },
+  { pattern: /apps\/frontend\/src\/(features\/[^/]+|shared)\/components\/molecules\/.*\.tsx$/, limit: 90, level: 'error', label: '🔶 Molecule' },
+  { pattern: /apps\/frontend\/src\/(features\/[^/]+|shared)\/components\/organisms\/.*\.tsx$/, limit: 100, level: 'error', label: '🔷 Organism' },
+  { pattern: /apps\/frontend\/src\/features\/[^/]+\/components\/pages\/.*\.tsx$/, limit: 90, level: 'error', label: '📄 Page' },
+  { pattern: /apps\/frontend\/src\/features\/[^/]+\/hooks\/.*\.ts$/, limit: 60, level: 'warn', label: '🪝 Hook' },
+  { pattern: /apps\/frontend\/src\/features\/[^/]+\/infrastructure\/.*\.ts$/, limit: 50, level: 'error', label: '🔗 Infrastructure' },
+  { pattern: /apps\/frontend\/src\/features\/[^/]+\/store\/.*\.store\.ts$/, limit: 50, level: 'error', label: '🗃️  Store' },
+  // Backend — Hexagonal + DDD por capability
+  { pattern: /apps\/backend\/src\/capabilities\/[^/]+\/.*\.controller\.ts$/, limit: 55, level: 'error', label: '🎮 Controller' },
+  { pattern: /apps\/backend\/src\/capabilities\/[^/]+\/.*\.service\.ts$/, limit: 80, level: 'warn', label: '⚙️  Service' },
+  { pattern: /apps\/backend\/src\/capabilities\/[^/]+\/.*\.port\.ts$/, limit: 50, level: 'warn', label: '🔌 Port' },
+  { pattern: /apps\/backend\/src\/capabilities\/[^/]+\/.*\.adapter\.ts$/, limit: 100, level: 'warn', label: '🔄 Adapter' },
+  { pattern: /apps\/backend\/src\/capabilities\/[^/]+\/.*\.dto\.ts$/, limit: 45, level: 'error', label: '📋 DTO' },
+  { pattern: /apps\/backend\/src\/capabilities\/[^/]+\/.*\.module\.ts$/, limit: 60, level: 'warn', label: '📦 Module' },
 ];
 
 // ─── Utilidades ──────────────────────────────────────────────────────────────

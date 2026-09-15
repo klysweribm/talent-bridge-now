@@ -39,6 +39,7 @@ Domain → CERO dependencias externas (ni NestJS, ni Mongoose)
 - Sufijos obligatorios: `.controller.ts` `.service.ts` `.port.ts` `.adapter.ts` `.dto.ts` `.module.ts`
 - Nunca `any` — usar `unknown` + type guard o generics
 - Props de interfaces con `readonly`
+- Prefijos de tipos (MUST, código nuevo): `interface` → `I` · `type` → `T` · `enum` → `E` (ver `good-practices/BEST-PRACTICES.md` §2.7)
 - `Logger` de NestJS — nunca loguear passwords, tokens ni datos personales completos
 - Catch silencioso (`try {} catch {}`) prohibido
 - Controllers: solo mapean request → service → response; todo lo transversal via decoradores (Guards, Interceptors, Pipes)
@@ -144,6 +145,7 @@ son inmunes porque solo leen props.
 ### Convenciones fijas
 - Nunca `any` — usar `unknown` + type guard
 - Props con `readonly` en interfaces
+- Prefijos de tipos (MUST, código nuevo): `interface` → `I` · `type` → `T` · `enum` → `E` (ver `good-practices/BEST-PRACTICES.md` §2.7)
 - Archivos: `PascalCase.tsx` componentes, `useCamelCase.ts` hooks, `camelCase.infra.ts` infrastructure, `camelCase.store.ts` Zustand
 - Funciones HTTP solo en `infrastructure/` — nunca en hooks ni componentes directamente
 - Declarativo sobre imperativo: `.map/.filter/.reduce` en lugar de `for/push`

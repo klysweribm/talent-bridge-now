@@ -1,0 +1,188 @@
+/* ─── IBM Plex Sans — self-hosted via @fontsource (sin Google Fonts) ── */
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Reset global ──────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ─── Variables CSS (espejo de tokens Tailwind) ─────────────── */
+:root {
+  /* Colores de superficie */
+  --color-surface:              #f9f9f9;
+  --color-surface-card:         #ffffff;
+  --color-surface-low:          #f3f3f3;
+
+  /* Colores de texto */
+  --color-text-primary:         #161616;
+  --color-text-secondary:       #525252;
+
+  /* Colores primarios */
+  --color-primary:              #003099;
+  --color-primary-container:    #0043ce;
+  --color-primary-interactive:  #0f62fe;
+
+  /* Bordes */
+  --color-outline:              #747686;
+  --color-outline-variant:      #c4c5d7;
+  --color-border-card:          #e0e0e0;
+
+  /* Estados */
+  --color-status-success:       #24a148;
+  --color-status-warning:       #f1c21b;
+  --color-status-danger:        #da1e28;
+}
+
+/* ─── Base HTML / Body ───────────────────────────────────────── */
+html {
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+/* ─── Material Symbols — configuración base ─────────────────── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-size: inherit;
+  line-height: 1;
+  vertical-align: middle;
+  user-select: none;
+}
+
+/* ─── Scrollbar custom (Carbon style) ───────────────────────── */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: var(--color-surface-low); }
+::-webkit-scrollbar-thumb  { background: var(--color-outline-variant); border-radius: 3px; }
+
+/* ─── Focus visible accesible ───────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-primary-interactive);
+  outline-offset: 2px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE — Reserva espacio para bottom-nav mobile
+   ─────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* El main content necesita padding inferior para no quedar
+     tapado por el bottom-nav fijo de 56px */
+  #main-content {
+    padding-bottom: 72px;
+  }
+
+  /* Reducir padding horizontal en mobile */
+  .dashboard-container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SISTEMA DE ANIMACIONES TRANSVERSALES — IBM Talent Bridge
+   Principios:
+   - Durations semánticas: instant 0ms, fast 150ms, base 300ms, slow 1000ms
+   - Easing: ease-out para entradas, ease-in-out para estado (collapse)
+   - Reducción de movimiento respetada con @media prefers-reduced-motion
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  --anim-instant:     0ms;
+  --anim-fast:        150ms;
+  --anim-base:        300ms;
+  --anim-slow:        1000ms;
+
+  --ease-out:         cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-in-out:      cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-entrance:    cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+/* ─── Sidebar collapse ───────────────────────────────────────
+   Duración 1s (--anim-slow) con ease-in-out para el efecto
+   suave de 0→100% solicitado. Se aplica en width + opacity
+   del contenido de texto para evitar overflow visible.
+   ─────────────────────────────────────────────────────────── */
+.sidebar-collapse {
+  transition:
+    width        var(--anim-slow) var(--ease-in-out),
+    min-width    var(--anim-slow) var(--ease-in-out);
+  overflow: hidden;
+  will-change: width;
+}
+
+.sidebar-text {
+  transition:
+    opacity      calc(var(--anim-slow) * 0.4) var(--ease-in-out),
+    transform    calc(var(--anim-slow) * 0.4) var(--ease-in-out);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Collapsed: texto desaparece rápido, luego el width cierra */
+.sidebar-collapsed .sidebar-text {
+  opacity: 0;
+  transform: translateX(-8px);
+  pointer-events: none;
+}
+
+/* Expanded: texto aparece al final de la animación de apertura */
+.sidebar-expanded .sidebar-text {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: calc(var(--anim-slow) * 0.5);
+}
+
+/* ─── Hover interactivo en filas de lista ────────────────────
+   Manito (cursor pointer) + elevación sutil con translateY.
+   ─────────────────────────────────────────────────────────── */
+.row-interactive {
+  cursor: pointer;
+  transition:
+    background-color var(--anim-fast) var(--ease-out),
+    transform        var(--anim-fast) var(--ease-out),
+    box-shadow       var(--anim-fast) var(--ease-out);
+}
+
+.row-interactive:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.08);
+}
+
+.row-interactive:active {
+  transform: translateY(0);
+  box-shadow: none;
+  transition-duration: var(--anim-instant);
+}
+
+/* ─── Icono de colapso — rotación ────────────────────────────*/
+.collapse-icon {
+  transition: transform var(--anim-slow) var(--ease-in-out);
+  flex-shrink: 0;
+}
+
+.sidebar-collapsed .collapse-icon {
+  transform: rotate(180deg);
+}
+
+/* ─── Respeto a prefers-reduced-motion ───────────────────────*/
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-collapse,
+  .sidebar-text,
+  .row-interactive,
+  .collapse-icon {
+    transition: none !important;
+  }
+}

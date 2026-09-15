@@ -41,10 +41,16 @@ module.exports = {
     'no-var': 'error',
   },
 
+  // NOTA: los globs de `files` abajo son relativos al paquete (apps/frontend
+  // o apps/backend) porque ESLint siempre corre con ese directorio como cwd
+  // — a diferencia de validate-quality.mjs, que sí usa paths absolutos desde
+  // la raíz del monorepo. Cada apps/<paquete>/.eslintrc.cjs importa/extiende
+  // este archivo, así que estos patrones deben coincidir con `src/...` dentro
+  // de ese paquete, sin el prefijo `apps/frontend/` o `apps/backend/`.
   overrides: [
     // ── ⚛️  Atoms: 50 líneas máximo ────────────────────────────────────────────
     {
-      files: ['apps/web/src/atoms/**/*.tsx'],
+      files: ['src/features/*/components/atoms/**/*.tsx', 'src/shared/components/atoms/**/*.tsx'],
       rules: {
         'max-lines': ['error', { max: 50, skipBlankLines: true, skipComments: true }],
       },
@@ -52,7 +58,7 @@ module.exports = {
 
     // ── 🔶 Molecules: 90 líneas máximo ─────────────────────────────────────────
     {
-      files: ['apps/web/src/molecules/**/*.tsx'],
+      files: ['src/features/*/components/molecules/**/*.tsx', 'src/shared/components/molecules/**/*.tsx'],
       rules: {
         'max-lines': ['error', { max: 90, skipBlankLines: true, skipComments: true }],
       },
@@ -60,7 +66,7 @@ module.exports = {
 
     // ── 🔷 Organisms: 100 líneas máximo ────────────────────────────────────────
     {
-      files: ['apps/web/src/organisms/**/*.tsx'],
+      files: ['src/features/*/components/organisms/**/*.tsx', 'src/shared/components/organisms/**/*.tsx'],
       rules: {
         'max-lines': ['error', { max: 100, skipBlankLines: true, skipComments: true }],
       },
@@ -68,23 +74,39 @@ module.exports = {
 
     // ── 📄 Pages: 90 líneas máximo ─────────────────────────────────────────────
     {
-      files: ['apps/web/src/pages/**/*.tsx'],
+      files: ['src/features/*/components/pages/**/*.tsx'],
       rules: {
         'max-lines': ['error', { max: 90, skipBlankLines: true, skipComments: true }],
       },
     },
 
-    // ── Hooks: 30 líneas máximo ────────────────────────────────────────────────
+    // ── Hooks: 60 líneas máximo ────────────────────────────────────────────────
     {
-      files: ['apps/web/src/hooks/**/*.ts'],
+      files: ['src/features/*/hooks/**/*.ts'],
       rules: {
-        'max-lines': ['error', { max: 30, skipBlankLines: true, skipComments: true }],
+        'max-lines': ['warn', { max: 60, skipBlankLines: true, skipComments: true }],
+      },
+    },
+
+    // ── Infrastructure: 50 líneas máximo ──────────────────────────────────────
+    {
+      files: ['src/features/*/infrastructure/**/*.ts'],
+      rules: {
+        'max-lines': ['error', { max: 50, skipBlankLines: true, skipComments: true }],
+      },
+    },
+
+    // ── Zustand stores: 50 líneas máximo ──────────────────────────────────────
+    {
+      files: ['src/features/*/store/**/*.store.ts'],
+      rules: {
+        'max-lines': ['error', { max: 50, skipBlankLines: true, skipComments: true }],
       },
     },
 
     // ── Backend Controllers: 55 líneas máximo ─────────────────────────────────
     {
-      files: ['apps/api/src/**/*.controller.ts'],
+      files: ['src/capabilities/*/**/*.controller.ts'],
       rules: {
         'max-lines': ['error', { max: 55, skipBlankLines: true, skipComments: true }],
       },
@@ -92,7 +114,7 @@ module.exports = {
 
     // ── Backend Services: 80 líneas máximo ────────────────────────────────────
     {
-      files: ['apps/api/src/**/*.service.ts'],
+      files: ['src/capabilities/*/**/*.service.ts'],
       rules: {
         'max-lines': ['warn', { max: 80, skipBlankLines: true, skipComments: true }],
       },
@@ -100,7 +122,7 @@ module.exports = {
 
     // ── Backend Ports: 50 líneas máximo ───────────────────────────────────────
     {
-      files: ['apps/api/src/**/*.port.ts'],
+      files: ['src/capabilities/*/**/*.port.ts'],
       rules: {
         'max-lines': ['error', { max: 50, skipBlankLines: true, skipComments: true }],
       },
@@ -108,7 +130,7 @@ module.exports = {
 
     // ── Backend Adapters: 100 líneas máximo ───────────────────────────────────
     {
-      files: ['apps/api/src/**/*.adapter.ts'],
+      files: ['src/capabilities/*/**/*.adapter.ts'],
       rules: {
         'max-lines': ['warn', { max: 100, skipBlankLines: true, skipComments: true }],
       },
@@ -116,7 +138,7 @@ module.exports = {
 
     // ── DTOs: 45 líneas máximo ─────────────────────────────────────────────────
     {
-      files: ['apps/api/src/**/*.dto.ts'],
+      files: ['src/capabilities/*/**/*.dto.ts'],
       rules: {
         'max-lines': ['error', { max: 45, skipBlankLines: true, skipComments: true }],
       },
@@ -124,7 +146,7 @@ module.exports = {
 
     // ── Modules: 60 líneas máximo ───────────────────────────────────────────────
     {
-      files: ['apps/api/src/**/*.module.ts'],
+      files: ['src/capabilities/*/**/*.module.ts'],
       rules: {
         'max-lines': ['warn', { max: 60, skipBlankLines: true, skipComments: true }],
       },

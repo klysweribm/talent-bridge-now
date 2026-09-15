@@ -1,0 +1,58 @@
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { LoginForm } from './LoginForm';
+import { useAuthStore } from '@features/auth/store/auth.store';
+
+function renderWithRouter() {
+  const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <LoginForm />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+}
+
+describe('LoginForm', () => {
+  beforeEach(() => {
+    useAuthStore.getState().clearAuth();
+  });
+
+  it('should render the email, password and submit fields', () => {
+    renderWithRouter();
+    expect(screen.getByLabelText(/correo corporativo/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('Contraseña')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /iniciar sesión/i })).toBeInTheDocument();
+  });
+
+  it('should show a validation error for an invalid email format', async () => {
+    renderWithRouter();
+    await userEvent.type(screen.getByLabelText(/correo corporativo/i), 'not-an-email');
+    await userEvent.type(screen.getByLabelText('Contraseña'), '123456');
+    await userEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }));
+    expect(await screen.findByText('Ingresa un correo válido.')).toBeInTheDocument();
+  });
+
+  it('should show a mutation error for valid-format but wrong credentials', async () => {
+    renderWithRouter();
+    await userEvent.type(screen.getByLabelText(/correo corporativo/i), 'user@gmail.com');
+    await userEvent.type(screen.getByLabelText('Contraseña'), '123456');
+    await userEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }));
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Credenciales incorrectas');
+    }, { timeout: 2000 });
+  });
+
+  it('should set auth on valid IBM credentials', async () => {
+    renderWithRouter();
+    await userEvent.type(screen.getByLabelText(/correo corporativo/i), 'ana@ibm.com');
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'password123');
+    await userEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }));
+    await waitFor(() => {
+      expect(useAuthStore.getState().token).toBe('mock-jwt-token');
+    }, { timeout: 2000 });
+  });
+});

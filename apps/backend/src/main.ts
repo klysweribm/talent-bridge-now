@@ -1,11 +1,19 @@
+import { Logger, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+const DEFAULT_PORT = 3000;
+const DEFAULT_FRONTEND_URL = 'http://localhost:5173';
 
+async function bootstrap(): Promise<void> {
+  const logger = new Logger('Bootstrap');
+  const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+
+  app.use(helmet());
   app.setGlobalPrefix('api/v1');
 
   app.useGlobalPipes(
@@ -17,7 +25,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:5173',
+    origin: configService.get<string>('FRONTEND_URL', DEFAULT_FRONTEND_URL),
     credentials: true,
   });
 
@@ -31,11 +39,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.PORT ?? 3000;
+  const port = configService.get<number>('PORT', DEFAULT_PORT);
   await app.listen(port);
 
-  console.log(`🚀 IBM Talent Bridge API corriendo en http://localhost:${port}/api/v1`);
-  console.log(`📖 Swagger docs en http://localhost:${port}/api/docs`);
+  logger.log(`IBM Talent Bridge API corriendo en http://localhost:${port}/api/v1`);
+  logger.log(`Swagger docs en http://localhost:${port}/api/docs`);
 }
 
-bootstrap();
+void bootstrap();

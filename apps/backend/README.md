@@ -52,57 +52,24 @@ npm run test:cov      # Coverage report
 
 ## API Docs
 
-Con el servidor corriendo, visita: `http://localhost:3000/api/docs`
+Con el servidor corriendo, visita: `http://localhost:3000/api/docs` (prefijo
+global de API: `/api/v1`).
 
-## Endpoints por Capability
+## Endpoints existentes
 
-### Auth (`/auth`)
 | Método | Ruta | Descripción |
 |--------|------|-------------|
-| POST | `/auth/login` | Login con correo + password |
-| POST | `/auth/refresh` | Renovar access token |
-| POST | `/auth/logout` | Invalidar sesión |
+| GET | `/api/v1/health` | Health check (estado del servicio) |
 
-### Candidates (`/candidates`)
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/candidates` | Listar candidatos (paginado) |
-| POST | `/candidates` | Crear candidato (valida duplicado por email) |
-| GET | `/candidates/:id` | Obtener candidato por ID |
-| PATCH | `/candidates/:id` | Actualizar datos del candidato |
-| DELETE | `/candidates/:id` | Eliminar candidato |
+## Endpoints planeados (ver `ROADMAP.md`)
 
-### Processes (`/processes`)
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/processes` | Listar procesos activos |
-| POST | `/processes` | Crear nuevo proceso |
-| GET | `/processes/:id` | Obtener detalle del proceso |
-| PATCH | `/processes/:id` | Actualizar proceso |
-| POST | `/processes/:id/referents` | Asignar referente técnico |
-| DELETE | `/processes/:id/referents/:userId` | Remover referente |
-
-### Interviews (`/interviews`)
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| POST | `/interviews` | Crear/agendar entrevista |
-| PATCH | `/interviews/:id/confirm` | Confirmar entrevista |
-| GET | `/interviews/:id/ics` | Descargar archivo .ics |
-| GET | `/interviews/availability/:userId` | Ver disponibilidad de referente |
-
-### Feedback (`/feedback`)
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| POST | `/feedback` | Crear feedback post-entrevista |
-| GET | `/feedback/:interviewId` | Obtener feedback (Reclutador/PM) |
-| GET | `/feedback/template/suggest` | Template sugerido por IA |
-
-### Reports (`/reports`)
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| POST | `/reports/generate` | Generar PDF del proceso |
-| POST | `/reports/:id/send` | Enviar reporte por correo |
-| GET | `/reports/:processId` | Listar reportes del proceso |
+El resto de `capabilities/` (`auth`, `candidates`, `processes`, `interviews`,
+`feedback`, `reports`, `notifications`, `cv-analysis`) todavía no tiene
+controllers — son skeleton. Las rutas y su orden de implementación están en
+`ROADMAP.md` (`AUTH-1`, `AUTH-2`, `PROC-2`, `CAND-1`, `INT-1`, `FEED-1`,
+`REP-1`, `CV-1`); no las documentamos aquí para evitar que esta tabla quede
+desincronizada del código — una vez que un endpoint exista, se agrega a la
+tabla de arriba.
 
 ---
 

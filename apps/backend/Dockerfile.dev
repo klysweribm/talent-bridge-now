@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:22-alpine
 
 # Puerto configurable en build time — default 3000
 ARG BACKEND_PORT=3000

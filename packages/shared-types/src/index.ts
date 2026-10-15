@@ -14,6 +14,17 @@ export type ProcessStage =
 
 export type ProcessStatus = 'active' | 'paused' | 'closed';
 
+/**
+ * Estado de una transición de etapa (ver `StageHistoryEntry`). Cada transición
+ * se registra una sola vez: `completed` si se avanzó con normalidad desde esa
+ * etapa, `cancelled` si el proceso se cerró/abortó estando en ella (ver ADR-013
+ * en docs/architecture/README.md).
+ */
+export type StageStatus = 'pending' | 'in_progress' | 'completed' | 'cancelled';
+
+/** Rol de un referente técnico dentro de un proceso — ver regla "mínimo 1 principal + 1 validador" (ADR-013). */
+export type ProcessReferentRole = 'principal' | 'validador';
+
 // ─── Interview ────────────────────────────────────────────────────────────────
 
 export type InterviewDuration = 30 | 45 | 60 | 90;
@@ -28,8 +39,6 @@ export type FeedbackScore = 1 | 2 | 3 | 4 | 5;
 
 export type FeedbackRecommendation = 'advance' | 'reject' | 'hold';
 
-export type FeedbackVisibility = 'recruiter' | 'pm';
-
 // ─── Seniority ────────────────────────────────────────────────────────────────
 
 export type SeniorityLevel = 'junior' | 'mid' | 'senior' | 'lead' | 'architect';
@@ -43,6 +52,8 @@ export interface User {
   role: UserRole;
   timezone: string;
   avatarUrl?: string;
+  /** Solo tiene sentido para `role: 'technical_ref'`. Taxonomía (texto libre vs. catálogo) — abierto, ver ADR-013. */
+  specialty?: readonly string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -54,10 +65,16 @@ export interface Candidate {
   phone?: string;
   linkedIn?: string;
   cvUrl: string;           // URL en IBM COS
-  cvAnalysis?: WatsonNLUResult;
-  processIds: string[];    // Puede estar en N procesos simultáneos
+  cvAnalysis?: CvAnalysisResult;
+  processIds: string[];    // Puede estar en N procesos simultáneos — mantenido en sync con Process.candidateIds (ver ADR-013)
   createdAt: string;
   updatedAt: string;
+}
+
+/** Un referente técnico asignado a un proceso, con el rol que ocupa en él (ver ADR-013). */
+export interface ProcessTechnicalRef {
+  readonly userId: string;
+  readonly roleInProcess: ProcessReferentRole;
 }
 
 export interface Process {
@@ -65,7 +82,8 @@ export interface Process {
   title: string;
   clientName: string;
   recruiterId: string;
-  technicalRefIds: string[];  // Mínimo 2: principal + validador
+  /** Mínimo 1 `principal` + 1 `validador` — validado en el DTO de PROC-2, no por el tipo (ver ADR-013). */
+  technicalRefs: readonly ProcessTechnicalRef[];
   candidateIds: string[];
   currentStage: ProcessStage;
   stageHistory: StageHistoryEntry[];
@@ -81,8 +99,16 @@ export interface Process {
 
 export interface StageHistoryEntry {
   stage: ProcessStage;
+  status: StageStatus;
   changedAt: string;
   changedBy: string;
+}
+
+/** Un cambio de horario sobre una entrevista ya agendada (ver ADR-013). */
+export interface InterviewRescheduleEvent {
+  readonly previousScheduledAt: string;
+  readonly changedAt: string;
+  readonly changedBy: string;
 }
 
 export interface Interview {
@@ -97,12 +123,25 @@ export interface Interview {
   status: InterviewStatus;
   icsExported: boolean;
   meetingLink?: string;
+  /**
+   * Historial de reprogramaciones. Al reprogramar, `status` vuelve a `pending`
+   * (limitación conocida: no distingue "nunca confirmada" de "reprogramada,
+   * pendiente de reconfirmar" — la UI puede diferenciarlo revisando si este
+   * array tiene elementos. Ver ADR-013).
+   */
+  rescheduleHistory?: readonly InterviewRescheduleEvent[];
   createdAt: string;
 }
 
+/**
+ * Quién puede leer un `Feedback` es una regla de autorización estática (igual
+ * para todo documento), no un dato persistido — por eso no hay un campo
+ * `visibleTo` aquí. Escribe solo el referente autor (`referentId`); leen el
+ * reclutador/PM del proceso, o el propio referente autor. Ver ADR-013.
+ */
 export interface Feedback {
   id: string;
-  interviewId: string;
+  interviewId: string;      // 1:1 con la entrevista — único por diseño (ver ADR-013)
   referentId: string;
   candidateId: string;
   processId: string;
@@ -111,7 +150,6 @@ export interface Feedback {
   recommendation: FeedbackRecommendation;
   comments: string;
   aiSuggestedTemplate?: string;
-  visibleTo: FeedbackVisibility[];
   createdAt: string;
 }
 
@@ -129,17 +167,38 @@ export interface AvailabilitySlot {
   isAvailable: boolean;
 }
 
-// ─── Watson NLU ───────────────────────────────────────────────────────────────
+/** Un evento de envío de un `Report` a un destinatario (ver ADR-013 — cardinalidad abierta). */
+export interface ReportSendEvent {
+  sentAt: string;
+  sentBy: string;
+  sentTo: string;
+}
 
-export interface WatsonNLUResult {
+/** Reporte ejecutivo de un candidato dentro de un proceso (ver REP-1 en ROADMAP.md). */
+export interface Report {
+  id: string;
+  processId: string;
+  candidateId: string;
+  generatedBy: string;       // recruiterId
+  generatedAt: string;
+  pdfUrl: string;            // IBM COS
+  sentHistory: readonly ReportSendEvent[];
+  createdAt: string;
+}
+
+// ─── Análisis de CV (watsonx.ai) ──────────────────────────────────────────────
+// Renombrado desde WatsonNLUResult/NLUEntity — Watson NLU fue reemplazado por
+// watsonx.ai vía CvAnalysisPort (ver ADR-009 en docs/architecture/README.md).
+
+export interface CvAnalysisResult {
   keywords: string[];
-  entities: NLUEntity[];
+  entities: CvAnalysisEntity[];
   concepts: string[];
   categories: string[];
   analyzedAt: string;
 }
 
-export interface NLUEntity {
+export interface CvAnalysisEntity {
   type: string;
   text: string;
   relevance: number;

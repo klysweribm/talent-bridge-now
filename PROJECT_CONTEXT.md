@@ -12,7 +12,7 @@
 Plataforma centralizada de coordinación del proceso de selección para **IBM Consulting LatAm**.  
 Conecta Reclutadores, Referentes Técnicos y PMs para gestionar entrevistas, candidatos, feedback con IA y reportes al cliente.
 
-Es una SPA (Single Page Application) con autenticación por roles, agendamiento de entrevistas con calendario interactivo, análisis de CVs con IBM Watson NLU, y generación de reportes PDF para clientes.
+Es una SPA (Single Page Application) con autenticación por roles, agendamiento de entrevistas con calendario interactivo, análisis de CVs con watsonx.ai, y generación de reportes PDF para clientes.
 
 ---
 
@@ -54,8 +54,8 @@ Cada etapa tiene un estado (`pending`, `in_progress`, `completed`, `cancelled`) 
 - ✅ **Banco de perfiles:** solo Reclutador y PM tienen acceso
 
 ### 🔐 Autenticación
-- ✅ **MVP:** Correo IBM + Password
-- ✅ **Fase 2:** SSO con IBM App ID
+- ✅ **MVP:** `AUTH-1` dev-login (JWT sobre usuarios sembrados, deshabilitado si `NODE_ENV=production`) → `AUTH-2` reemplaza la emisión con OTP real por correo (Mongo TTL + `EmailSenderPort`)
+- ✅ **Fase 2:** SSO corporativo (w3id) — proveedor a confirmar: IBM App ID está en camino de reemplazo por IBM Security Verify, verificar antes de implementar
 
 ### 📊 Feedback y Reportes
 - ✅ **Feedback visible** solo para Reclutador y PM (internamente)
@@ -68,16 +68,17 @@ Cada etapa tiene un estado (`pending`, `in_progress`, `completed`, `cancelled`) 
 
 | Capa | Tecnología | Infraestructura | Propósito |
 |------|-----------|-----------------|-----------|
-| **Frontend** | React + Vite + TypeScript | Render (Static Site) | SPA con roles |
-| **Backend** | NestJS + Arquitectura Hexagonal | IBM Code Engine (Docker) | API REST |
-| **Base de Datos** | MongoDB | IBM Cloud MongoDB | Colecciones flexibles |
-| **Cache** | Redis | IBM Cloud Redis | Sesiones + cache de disponibilidad |
-| **Email** | IBM Event Notifications | HTTP API (sin SMTP) | Notificaciones |
-| **IA CV** | IBM Watson NLU | API Watson | Extracción datos CV |
-| **Storage** | IBM Cloud Object Storage | COS | PDFs y WORD de CVs |
-| **Auth** | JWT + IBM App ID | IBM Cloud | Roles + tokens |
-| **Slack** | Incoming Webhooks | Slack API | Notificaciones sin disponibilidad |
+| **Frontend** | React + Vite + TypeScript | IBM Code Engine (nginx, SPA + proxy `/api`) | SPA con roles |
+| **Backend** | NestJS + Arquitectura Hexagonal | IBM Code Engine (Docker, `project-only`) | API REST |
+| **Base de Datos** | MongoDB | Databases for MongoDB (`br-sao`) | Colecciones flexibles + TTL para OTP |
+| **Email** | `EmailSenderPort` + adapter SMTP | Relay SMTP corporativo (a validar) | OTP, invitaciones, feedback, reportes |
+| **IA CV** | watsonx.ai (`CvAnalysisPort`) | API watsonx.ai (región a validar) | Extracción de datos de CV |
+| **Storage** | IBM Cloud Object Storage | COS (`br-sao`) | PDFs y WORD de CVs |
+| **Auth** | JWT (dev-login MVP → OTP) | IBM Cloud | Roles + tokens — SSO Fase 2 |
+| **Slack** | Incoming Webhooks | Slack API | Notificaciones sin disponibilidad (si se retoma en `INT-1`) |
 | **Calendario** | ical.js (.ics generation) | Client-side | Importable en cualquier cliente |
+
+> No hay Redis en el MVP (ver ADR-008 en `docs/architecture/README.md`): OTP hasheado en MongoDB con índice TTL, rate limiting con el throttler en memoria de NestJS.
 
 ---
 
@@ -151,14 +152,14 @@ src/
 
 | Capability | Responsabilidad |
 |-----------|-----------------|
-| `auth` | JWT, login, refresh token, roles, IBM App ID (Fase 2) |
+| `auth` | JWT, dev-login (MVP) / OTP (`AUTH-2`), refresh token, roles, SSO (Fase 2 — proveedor a confirmar) |
 | `candidates` | CRUD candidatos, validación duplicados, banco de perfiles |
 | `processes` | Procesos de selección, etapas, asignación de referentes |
 | `interviews` | Agendamiento, disponibilidad, bloques horarios, exportación .ics |
 | `feedback` | Templates, llenado post-entrevista, visibilidad por rol |
 | `reports` | Generación PDF, envío por correo, historial |
-| `notifications` | Email (IBM Event Notifications), Slack Webhooks |
-| `cv-analysis` | Upload a COS, análisis Watson NLU, extracción de datos |
+| `notifications` | Email (`EmailSenderPort` + adapter SMTP), Slack Webhooks |
+| `cv-analysis` | Upload a COS, análisis con watsonx.ai (`CvAnalysisPort`), extracción de datos |
 
 ---
 
@@ -203,7 +204,7 @@ src/
   phone?: string,
   linkedIn?: string,
   cvUrl: string,           // URL en IBM COS
-  cvAnalysis?: WatsonNLUResult,
+  cvAnalysis?: CvAnalysisResult,  // resultado del CvAnalysisPort (watsonx.ai)
   processes: ProcessRef[], // Procesos en los que participa
   createdAt: Date,
   updatedAt: Date
@@ -279,29 +280,29 @@ JWT_SECRET=
 JWT_EXPIRATION=1h
 JWT_REFRESH_EXPIRATION=7d
 
-# MongoDB (IBM Cloud)
+# MongoDB (Databases for MongoDB, br-sao)
 MONGODB_URI=
 
-# Redis (IBM Cloud)
-REDIS_URL=
+# watsonx.ai (análisis de CV — CvAnalysisPort)
+WATSONX_URL=
+WATSONX_PROJECT_ID=
+WATSONX_API_KEY=
+WATSONX_MODEL_ID=
 
-# IBM Watson NLU
-WATSON_NLU_URL=
-WATSON_NLU_API_KEY=
-WATSON_NLU_VERSION=2021-08-01
-
-# IBM Cloud Object Storage
+# IBM Cloud Object Storage (br-sao)
 COS_ENDPOINT=
 COS_API_KEY=
 COS_INSTANCE_CRN=
 COS_BUCKET_CVS=
 
-# IBM Event Notifications
-EVENT_NOTIFICATIONS_GUID=
-EVENT_NOTIFICATIONS_API_KEY=
-EVENT_NOTIFICATIONS_URL=
+# SMTP (EmailSenderPort — OTP, invitaciones, feedback, reportes)
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=
 
-# IBM App ID (Fase 2)
+# IBM App ID (Fase 2 — en camino de reemplazo por IBM Security Verify, verificar antes de usar)
 APPID_TENANT_ID=
 APPID_CLIENT_ID=
 APPID_SECRET=
@@ -310,6 +311,8 @@ APPID_OAUTH_SERVER_URL=
 # Slack
 SLACK_WEBHOOK_URL=
 ```
+
+> Sin Redis en el MVP (ver ADR-008 en `docs/architecture/README.md`).
 
 ---
 
@@ -329,11 +332,11 @@ SLACK_WEBHOOK_URL=
 
 | MVP (v1.0) | Fase 2 |
 |-----------|--------|
-| Auth email+password | SSO IBM App ID |
+| Auth dev-login → OTP | SSO corporativo (w3id / IBM Security Verify, a confirmar) |
 | Candidato sin acceso | Portal candidato |
 | Slack webhook básico | Slack App completa |
 | PDF manual | Dashboard Analytics |
-| Watson NLU básico | Scoring automático de candidatos |
+| watsonx.ai básico | Scoring automático de candidatos |
 
 ---
 

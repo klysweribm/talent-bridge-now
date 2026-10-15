@@ -35,7 +35,7 @@ Reclutador
             │
             ├─→ Paso 3: Cargar Candidatos
             │       • Upload CV (PDF/DOCX → IBM COS)
-            │       • Watson NLU analiza el CV automáticamente
+            │       • watsonx.ai sugiere skills desde el CV (acción explícita)
             │       • Validación: no duplicar candidato por email
             │       • Si duplicado → modal de alerta con proceso existente
             │       └─→ Click "Continuar"
@@ -67,7 +67,7 @@ Referente Técnico
             ├─→ Ver datos: candidato, proceso, fecha, duración, timezone
             ├─→ Click "Confirmar Entrevista"
             │       └─→ Backend actualiza status → 'confirmed'
-            │           └─→ Email automático al candidato (vía IBM Event Notifications)
+            │           └─→ Email automático al candidato (vía EmailSenderPort / SMTP)
             │               └─→ .ics adjunto para agregar al calendario
             │
             └─→ Post-entrevista: Click "Cargar Feedback"
@@ -103,7 +103,7 @@ PM
                             • Recomendaciones finales
                             • Línea de tiempo de etapas
                     └─→ Opción "Enviar por correo al cliente"
-                            └─→ IBM Event Notifications → correo al cliente
+                            └─→ EmailSenderPort (SMTP) → correo al cliente
 ```
 
 ---

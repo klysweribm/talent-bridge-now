@@ -78,11 +78,11 @@ Verificar TypeScript:
 | Decisión | Alternativas consideradas | Razón |
 | --- | --- | --- |
 | React Query (server state) + Zustand (client state), dominios separados | Solo React Query, Redux RTK, Context | El wizard/sesión/preferencias son estado cliente real; separarlos evita duplicar datos del servidor |
-| MongoDB (Mongoose) + Redis | PostgreSQL | Definido en `PROJECT_CONTEXT.md` (IBM Cloud Databases) |
+| MongoDB (Mongoose), sin Redis en el MVP | PostgreSQL; Redis para OTP/caché | Una sola base gestionada; OTP con índice TTL (ADR-002, ADR-008) |
 | Monorepo sin herramienta de workspace | Turborepo, Nx | Simplicidad en MVP (`docs/architecture/README.md`) |
 | Frontend mock-first, backend después | Backend primero | Golden path de UI validado antes de fijar contratos (plan de remediación) |
 | Login OTP por correo `@ibm.com` | Password, SSO w3id directo | Menor superficie de ataque; migración futura a App ID/w3id sin romper el JWT interno (`ROADMAP.md` FE-OTP-1/AUTH-2) |
 
 ---
 
-_Proyecto: IBM Talent Bridge · Stack: NestJS 10 / React 18 / TypeScript 5 / MongoDB / Redis / IBM Cloud_
+_Proyecto: IBM Talent Bridge · Stack: NestJS 10 / React 18 / TypeScript 5 / MongoDB / IBM Code Engine (br-sao)_

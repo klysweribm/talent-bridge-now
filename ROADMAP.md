@@ -12,7 +12,7 @@
 > deploy) a nivel de producto, y es donde se anota una idea nueva cuando
 > surge, aunque todavía no tenga hueco en ningún plan de ejecución.
 >
-> **Última actualización:** 2026-10-15 (reordenado para demo al sponsor: QW-1 + vertical de procesos real antes de FE-OTP-1; agregados QW-1 y AUTH-1)
+> **Última actualización:** 2026-10-15 (arquitectura objetivo IBM Cloud: Code Engine en `br-sao`, watsonx.ai, sin Redis, email por `EmailSenderPort`/SMTP — ver `docs/architecture/README.md`; reordenado para demo al sponsor: QW-1 + vertical de procesos real antes de FE-OTP-1; agregados QW-1 y AUTH-1)
 
 ---
 
@@ -40,7 +40,7 @@ Iteración 3  →  FE-OTP-1 · Login OTP por correo (frontend, mock-first)      
 Iteración 4  →  AUTH-2 · Backend real OTP (reemplaza emisión de AUTH-1)       📌 sin arrancar
 Iteración 5  →  CAND-1 · Feature Candidatos (frontend + backend)              📌 sin arrancar
 Iteración 6  →  FEED-1 · Feature Feedback (frontend + backend)                📌 sin arrancar
-Iteración 7  →  CV-1   · Análisis de CV (Watson NLU + IBM COS) — candidato a adelantarse si el sponsor pide IA  📌 sin arrancar
+Iteración 7  →  CV-1   · Análisis de CV (watsonx.ai + IBM COS) — candidato a adelantarse si el sponsor pide IA  📌 sin arrancar
 Iteración 8  →  INT-1  · Feature Entrevistas (frontend + backend)             📌 sin arrancar
 Iteración 9  →  REP-1  · Feature Reportes (frontend + backend)                📌 sin arrancar
 Iteración 10 →  HARDEN-1 · Endurecimiento transversal final                   📌 sin arrancar
@@ -176,8 +176,8 @@ Ninguna — es la base de todo lo demás.
 
 - [x] Etapa 0 — fundaciones de calidad (lint/typecheck/tests/validate-quality funcionando)
 - [x] Etapa 1 — refactor `LoginPage.tsx` (golden path `auth`, DT-001 resuelto, verificado visualmente con Playwright)
-- [ ] Etapa 2 — refactor `DashboardPage.tsx` + `SidebarNav.tsx`
-- [ ] Etapas 3-7 — wizard/detalle de procesos + features `candidates`/`interviews`/`feedback`/`reports` desde cero (solo UI, sobre mocks)
+- [ ] Etapa 2 — refactor `DashboardPage.tsx` + `SidebarNav.tsx`. Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre los mockups).
+- [ ] Etapas 3-7 — wizard/detalle de procesos + features `candidates`/`interviews`/`feedback`/`reports` desde cero (solo UI, sobre mocks). Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre los mockups).
 - [ ] Etapa 8 — endurecimiento transversal (CI gate, decisión `@carbon/react`, env config, error boundary)
 
 ---
@@ -213,12 +213,13 @@ en el mockup:
   además de SSO, consistente con el argumento de seguridad original
   (eliminar contraseñas, no mantener dos flujos paralelos). No se construye
   ese link ni un modo "password" en `LoginForm`.
-- ✅ **Panel de marca (hero) sí se construye**, con el testimonial/stats
-  del mockup ("Elena Morales", "94% coincidencia técnica", "+1,200 procesos
-  2024") **marcados explícitamente como contenido placeholder** en el
-  código (comentario `// PLACEHOLDER: contenido de ejemplo, reemplazar
-  antes de un ambiente visible fuera del equipo`) y en este ítem del
-  roadmap — no se documenta como copy final aprobado.
+- ✅ **Panel de marca (hero) sí se construye, pero recortado** (ver
+  `docs/design/UX-GUIDELINES.md` §3.1 — manda sobre el mockup): solo logo +
+  título + **una** frase de valor. El testimonial ("Elena Morales", badge
+  "IBM Verified") y el "mockup dentro del mockup" con stats ("94%
+  coincidencia técnica", "+1,200 procesos 2024") **no se construyen** —
+  son KPIs de vanidad / datos que no existen, igual que el resto de
+  elementos recortados por `docs/design/UX-GUIDELINES.md`.
 - ✅ **Un solo task** — el panel de marca entra en este mismo `FE-OTP-1`
   (no se separa en un task aparte), aunque es funcionalmente independiente
   del flujo de autenticación.
@@ -237,6 +238,11 @@ en el mockup:
 
 **B. Nuevo organism `AuthBrandPanel`** (`features/auth/components/organisms/AuthBrandPanel/`)
 
+**Especificación de UX:** `docs/design/UX-GUIDELINES.md` §3.1 (manda sobre
+el mockup) — alcance recortado a logo + título + una frase de valor,
+**sin** `TestimonialCard` ni `ProductPreviewMock` (KPIs de vanidad / datos
+inexistentes, descartados).
+
 Puramente presentacional — no toca stores ni React Query, todo por
 composición estática (podría ser Page-level directamente, pero se deja como
 organism para poder testear su render por separado y por consistencia con
@@ -246,19 +252,11 @@ el resto del árbol). Compone:
   "Global Talent Cloud" (header del panel).
 - **Molecule nueva `BrandHeroHeadline`** — tag "Plataforma de Talento
   Estratégico" + titular "Conectando el mejor talento tecnológico con el
-  futuro de IBM Consulting."
-- **Molecule nueva `TestimonialCard`** — avatar iniciales + nombre + rol +
-  badge "IBM Verified". **Contenido placeholder marcado en código.**
-- **Molecule nueva `ProductPreviewMock`** — el "mockup dentro del mockup"
-  (panel oscuro simulando un dashboard) + overlay de stats (`StatChip`
-  ×2: "94% +4.2% Coincidencia técnica promedio", "+1,200 Procesos 2024").
-  Puramente decorativo — imagen o composición CSS, no datos reales, no
-  `useQuery`. **Contenido placeholder marcado en código.**
-- **Molecule nueva `AuthBrandFooter`** — "Impulsado por IBM Watson
-  Orchestrate & Carbon Design" + "Enterprise Auth Guard · 256-bit".
+  futuro de IBM Consulting." + una sola frase de valor (sin testimonial,
+  sin stats, sin mockup-dentro-del-mockup).
 - Límite de 100 líneas de organism — si no entra componiendo directo,
-  repartir en los 5 molecules de arriba (que sí es el plan) y dejar el
-  organism solo como composición.
+  repartir en los molecules de arriba y dejar el organism solo como
+  composición.
 
 **C. `LoginForm` — máquina de 2 pasos (mismo archivo, se reemplaza el contenido):**
 
@@ -338,9 +336,9 @@ el resto del árbol). Compone:
 
 ### Explícitamente fuera de alcance (va a AUTH-2, backend, ver abajo)
 
-Generación real de OTP, hashing/almacenamiento en Redis con TTL, rate
-limiting, lockout por intentos fallidos, envío real vía IBM Event
-Notifications, y el mecanismo de provisión de usuarios/roles (whitelist de
+Generación real de OTP, hashing/almacenamiento en MongoDB con índice TTL, rate
+limiting, lockout por intentos fallidos, envío real por correo vía
+`EmailSenderPort` (SMTP), y el mecanismo de provisión de usuarios/roles (whitelist de
 correos con rol asignado). Nada de esto se toca en este task — el mock en
 `infrastructure/` es la interfaz que ese trabajo backend va a implementar
 después, sin tocar componentes ni hooks de este task (mismo principio
@@ -356,10 +354,10 @@ nuevo. No depende de AUTH-2 ni de ningún backend.
 Reabre parcialmente un organism que se dio por cerrado (DT-001) y agrega una
 página/layout nuevo (`AuthBrandPanel`). Es una decisión de producto
 consciente, no deuda técnica — se documenta aquí y no en `DEBT_TECH.md` para
-no mezclar "cambio de alcance aprobado" con "código que quedó mal". El
-contenido placeholder del panel de marca (testimonial/stats) es un recordatorio
-pendiente — no cerrar este ítem del roadmap como 100% terminado en producción
-sin volver a decidir ese copy. Al cerrar este task, actualizar `CLAUDE.md` →
+no mezclar "cambio de alcance aprobado" con "código que quedó mal". El panel
+de marca quedó recortado a logo + título + una frase de valor
+(`docs/design/UX-GUIDELINES.md` §3.1); `TestimonialCard` y
+`ProductPreviewMock` no se construyen. Al cerrar este task, actualizar `CLAUDE.md` →
 "Estado actual / próximo paso" para reflejar que Etapa 1 ahora incluye este
 ajuste, y `good-practices/DEBT_TECH.md` si algún archivo nuevo queda por
 sobre su límite de línea.
@@ -381,8 +379,9 @@ sobre su límite de línea.
       árbol renderizado.
 - [ ] No existen badges/links de "IBM Verify" ni "YubiKey / IBM Push" en el
       árbol renderizado (fuera de alcance de este MVP).
-- [ ] Panel de marca (`AuthBrandPanel`) visible en desktop, con contenido
-      placeholder marcado con comentario en el código.
+- [ ] Panel de marca (`AuthBrandPanel`) visible en desktop: logo + título +
+      una frase de valor, sin `TestimonialCard` ni `ProductPreviewMock`
+      (`docs/design/UX-GUIDELINES.md` §3.1).
 - [ ] Layout de 2 columnas no rompe en mobile (~400px) — el panel de marca
       se oculta o reordena sin generar scroll horizontal.
 - [ ] Ningún archivo nuevo excede su límite de línea (`validate-quality.mjs --strict`).
@@ -410,13 +409,16 @@ Zustand.
 - `capability/auth`: `POST /auth/otp/request`, `POST /auth/otp/verify`,
   `POST /auth/refresh`, `POST /auth/logout`.
 - **Generación y almacenamiento de OTP**: código de 6 dígitos criptográficamente
-  aleatorio, **hasheado** antes de guardar en Redis (no texto plano), TTL de
+  aleatorio, **hasheado** antes de guardar en **MongoDB con índice TTL**
+  (sin Redis — ver ADR-008 en `docs/architecture/README.md`), TTL de
   ~10 min, invalidar el código anterior al solicitar uno nuevo para el mismo
   correo.
-- **Rate limiting / anti-brute-force**: máximo N solicitudes de OTP por
-  email/IP en X minutos; lockout tras M intentos de verificación fallidos
-  para el mismo código/sesión.
-- **Envío real**: IBM Event Notifications (HTTP API, ya en el stack) con
+- **Rate limiting / anti-brute-force**: throttler en memoria de NestJS
+  (`@nestjs/throttler`, ya configurado en `app.module.ts`) para el máximo N
+  de solicitudes de OTP por email/IP en X minutos; lockout tras M intentos
+  de verificación fallidos para el mismo código/sesión (contador en el mismo
+  documento Mongo del OTP, no en Redis).
+- **Envío real**: `EmailSenderPort` + adapter SMTP (ver ADR-010) con
   template de email dedicado en `packages/email-templates` (HTML plano, sin
   scripts, según regla del monorepo).
 - **Provisión de usuarios/roles**: mecanismo para pre-registrar correos con
@@ -448,7 +450,8 @@ problema en el diseño anterior.
 ### Criterios de éxito
 
 - [ ] `POST /auth/otp/request` genera un código real, lo hashea antes de
-      guardar en Redis, y lo envía por IBM Event Notifications.
+      guardar en MongoDB (índice TTL), y lo envía por `EmailSenderPort`
+      (adapter SMTP).
 - [ ] `POST /auth/otp/verify` rechaza código incorrecto/expirado/reusado con
       401, y aplica lockout tras N intentos fallidos.
 - [ ] Rate limiting verificado: solicitar OTP repetidamente en un corto
@@ -533,8 +536,8 @@ referente confirma, PM observa).
 ### Alcance
 
 - Backend `capability/interviews`: `POST /availability`, `GET /availability/:referentId`, `POST /interviews`, `PATCH /interviews/:id/confirm`, `PATCH /interviews/:id/reschedule`, `GET /interviews/:id/ics`.
-- Backend `capability/notifications`: email al referente al agendar (IBM Event Notifications HTTP API), email de confirmación al reclutador, webhook Slack si el referente no tiene disponibilidad.
-- Redis: cache de disponibilidad por referente.
+- Backend `capability/notifications`: email al referente al agendar (`EmailSenderPort` + adapter SMTP), email de confirmación al reclutador, webhook Slack si el referente no tiene disponibilidad.
+- Sin cache de disponibilidad (sin Redis en el MVP — ADR-008); la disponibilidad se lee directo de MongoDB. Si el volumen lo justifica más adelante, se revisita con un store compartido, no antes.
 - Frontend (Etapa 5 del plan FE): calendario reclutador, dashboard de disponibilidad del referente (vista matriz + lista), export `.ics` con `ical.js` (ya instalado).
 
 ### Dependencias
@@ -563,7 +566,7 @@ sugerido por IA según el perfil del rol, score por dimensión.
 ### Alcance
 
 - Backend `capability/feedback`: `POST /feedback`, `GET /feedback/:processId`, `POST /feedback/:id/send-email`.
-- Frontend (Etapa 6 del plan FE): formulario con dimensiones técnicas + soft skills, score 1-5, recomendación final (avanza / no avanza / hold).
+- Frontend (Etapa 6 del plan FE): formulario con dimensiones técnicas + soft skills, score 1-5, recomendación final (avanza / no avanza / hold). Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre los mockups).
 
 ### Dependencias
 
@@ -603,7 +606,7 @@ FEED-1 (el reporte consolida feedback + entrevistas + datos del candidato).
 
 ---
 
-## CV-1 — Análisis de CV asistido (Watson NLU + IBM COS)
+## CV-1 — Análisis de CV asistido (watsonx.ai + IBM COS)
 
 **Estado:** 📌 sin arrancar · **Complejidad:** 🔴 Alta
 
@@ -612,12 +615,14 @@ FEED-1 (el reporte consolida feedback + entrevistas + datos del candidato).
 Idea capturada de `plan-arquitectonico.md` (semana 4): al cargar el CV de
 un candidato, pre-llenar el perfil automáticamente en vez de captura manual
 completa. No es bloqueante para el flujo — CAND-1 funciona con carga manual
-— pero mejora significativamente la experiencia del reclutador.
+— pero mejora significativamente la experiencia del reclutador, y es el
+momento IA de la demo (ver ADR-009 en `docs/architecture/README.md`).
 
 ### Alcance
 
-- Backend `capability/cv-analysis`: `POST /cv/upload` (PDF/WORD a IBM COS), `POST /cv/analyze` (Watson NLU extrae datos estructurados).
-- Frontend: upload en el flujo de carga de candidato (Etapa 3/CAND-1), spinner de análisis, pre-llenado del formulario con los datos extraídos (editable, nunca autocompletado silencioso).
+- Backend `capability/cv-analysis`: `POST /cv/upload` (PDF/WORD a IBM COS), `POST /cv/analyze` detrás de un `CvAnalysisPort` con adapter para watsonx.ai (prompt + `WATSONX_MODEL_ID` configurable) que extrae datos estructurados.
+- **Antes de implementar:** verificar si watsonx.ai está disponible en `br-sao` (ver "Abierto" en `docs/architecture/README.md`). Si no, el adapter envía el texto del CV de forma transitoria a la región más cercana disponible, **sin email ni teléfono** (enmascarados antes de enviar) y sin persistir nada fuera de `br-sao` — validar con sponsor/compliance antes de habilitarlo.
+- Frontend: en el wizard paso 3, un único elemento "Sugerir skills desde el CV" (ver `docs/design/UX-GUIDELINES.md` §4), spinner de análisis, pre-llenado del formulario con los datos extraídos (editable, nunca autocompletado silencioso).
 
 ### Dependencias
 
@@ -625,7 +630,7 @@ CAND-1 (se integra en el flujo de carga de candidato existente, no lo reemplaza)
 
 ### Complejidad y tamaño
 
-**Alta** — integración con dos servicios de IBM Cloud (COS + Watson NLU) más el manejo de archivos binarios, hoy sin ningún wiring existente en el proyecto.
+**Alta** — integración con dos servicios de IBM Cloud (COS + watsonx.ai) más el manejo de archivos binarios, hoy sin ningún wiring existente en el proyecto, más la verificación de disponibilidad regional pendiente.
 
 ### Criterios de éxito
 
@@ -673,14 +678,21 @@ Todas las features de UI deben existir para que la decisión de `@carbon/react` 
 ### Motivación
 
 El MVP corre hoy solo en Docker/Podman local. Falta el despliegue real
-contra los servicios de IBM Cloud (Mongo, Redis, Watson, COS) documentados
-en `.env.example`.
+contra IBM Cloud. Arquitectura objetivo definida y registrada como ADRs en
+`docs/architecture/README.md` (ADR-006 a ADR-012): todo en Code Engine,
+región `br-sao`, un solo ambiente demo/prod.
 
 ### Alcance
 
-- Infra IBM Cloud provisionada (Mongo Atlas/Cloud Databases, Redis, COS, Watson NLU, Event Notifications).
-- Variables de entorno reales en el entorno de deploy (nunca committeadas — ya cubierto por `.gitignore`).
-- Pipeline de deploy (a definir: IBM Code Engine, Kubernetes Service, u otro — pendiente de decisión).
+- **Infra IBM Cloud provisionada en `br-sao`:** Databases for MongoDB, Cloud Object Storage, un proyecto de Code Engine con dos apps (`tb-web`, `tb-api`), IBM Container Registry.
+- **`tb-web`:** `apps/frontend/Dockerfile` de producción (multi-stage, nginx no-root) sirviendo la SPA + proxy `/api` hacia `tb-api` (visibilidad `project-only`, sin CORS).
+- **`tb-api`:** visibilidad `project-only`, health check contra `GET /api/v1/health`.
+- **Secretos:** secrets de Code Engine (no Secrets Manager — queda para Fase 2); variables de entorno reales nunca committeadas (ya cubierto por `.gitignore`).
+- **CI/CD:** job de deploy en `backend-ci.yml` y `frontend-ci.yml`, solo en `main`: build → push a ICR → `ibmcloud ce app update`, autenticado con un API key de IBM Cloud guardado como secret de GitHub.
+- **Observabilidad:** IBM Cloud Logs para `tb-web` y `tb-api`.
+- **Backups:** backup automático de Databases for MongoDB (función nativa del servicio).
+- **Retención de CVs en COS:** política a definir (no bloqueante para el primer deploy).
+- **Pendiente de validar antes de cerrar** (ver "Abierto" en `docs/architecture/README.md`): disponibilidad de watsonx.ai en `br-sao`, owner/billing de la cuenta IBM Cloud, deliverability del relay SMTP corporativo, exposición internet vs. VPN IBM + dominio propio.
 
 ### Dependencias
 
@@ -690,7 +702,10 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 
 - [ ] La app es accesible por URL pública/interna IBM sin depender de `localhost`.
 - [ ] Los 3 flujos críticos (crear proceso, agendar entrevista, feedback) funcionan contra servicios reales de IBM Cloud, no mocks.
-- [ ] Credenciales de servicios IBM Cloud nunca en logs, responses, ni el repo.
+- [ ] Credenciales de servicios IBM Cloud nunca en logs, responses, ni el repo (secrets de Code Engine).
+- [ ] `tb-web` sirve la SPA y el proxy `/api` llega a `tb-api` sin CORS.
+- [ ] El pipeline de GitHub Actions despliega automáticamente en cada push a `main`.
+- [ ] `GET /api/v1/health` responde `database: "up"` contra Databases for MongoDB real.
 
 ---
 
@@ -708,6 +723,7 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 | 2026-09-13 | Etapa 1 de FE marcada como cerrada (`LoginPage.tsx`/DT-001 resuelto, ver `DEBT_TECH.md`). | Cierre de etapa verificado (lint/typecheck/97 tests/`validate-quality.mjs`/verificación visual con Playwright) — próximo paso es Etapa 2 (`DashboardPage.tsx`/`SidebarNav.tsx`). |
 | 2026-09-13 | Agregado `FE-OTP-1` (login OTP por correo, frontend mock-first) con prioridad Alta, insertado antes de AUTH-2 y de Etapa 2 del plan FE; `AUTH-2` actualizado de "JWT sobre password" a "JWT sobre OTP" (complejidad Media → Alta por rate limiting/lockout/provisión de roles). | Decisión de producto: reemplazar password por OTP/magic code (`@ibm.com` como factor de autenticación) para reducir superficie de ataque en una plataforma interna sin login de candidatos; migración futura a IBM App ID/SSO w3id sin romper el contrato de JWT interno. Reabre parcialmente el organism `LoginForm` de Etapa 1 — documentado como ajuste de alcance, no como deuda técnica nueva. |
 | 2026-10-15 | Reordenado: `QW-1` (nuevo) + Etapas 2-3 + `AUTH-1` (nuevo) + `PROC-2` delante de `FE-OTP-1`; `CV-1` marcado como candidato a adelantarse. | Demo a un futuro sponsor IBM con un vertical real con backend (decisión del usuario): priorizar el flujo de negocio sobre el login. Validación del 2026-10-15 encontró CI frontend y backend en rojo y navegación de demo rota — se atacan primero como quick wins. |
+| 2026-10-15 | Arquitectura objetivo IBM Cloud definida (`docs/architecture/README.md`, ADR-006 a ADR-012): todo en Code Engine (`tb-web`/`tb-api`, se descarta Render), región única `br-sao`, sin Redis (OTP en MongoDB con TTL), watsonx.ai reemplaza Watson NLU (`CvAnalysisPort`), email detrás de `EmailSenderPort` + adapter SMTP (se descarta Event Notifications), secretos de Code Engine + CI/CD por GitHub Actions. `DEPLOY-1` recibe alcance concreto; `CV-1`, `AUTH-2` e `INT-1` actualizados; `FE-OTP-1` recorta `TestimonialCard`/`ProductPreviewMock` del panel de marca (`docs/design/UX-GUIDELINES.md` §3.1). | Decisiones del usuario (sesión 2026-10-15) sobre deploy target, región, y reemplazo de Watson NLU/Event Notifications/Redis, que nunca tuvieron un ADR propio y contradecían el código real (`PROJECT_CONTEXT.md` daba Code Engine por decidido, `ROADMAP.md` lo reabría; Redis planificado sin ningún uso en código). |
 
 ---
 

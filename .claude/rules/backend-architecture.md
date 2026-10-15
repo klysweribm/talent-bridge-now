@@ -18,7 +18,7 @@ State today: only `main.ts`, `app.module.ts` and `monitoring/health.*` exist —
 - `Controller → Service → Port (abstract) ← Adapter`. Controllers never import an adapter; services depend only on `application/ports/*.port.ts`, injected by token.
 - `domain/` has **zero** external dependencies — no `@nestjs/*`, no `mongoose`, no HTTP client. Pure TypeScript.
 - Controllers contain no logic: one service call, then shape the response. Validation via `ValidationPipe` + DTOs; auth/roles via Guards in `shared/`.
-- IBM Cloud integrations (Watson NLU, COS, Event Notifications, App ID, Slack) are always an outbound Port + Adapter — a service must never know which vendor is behind it.
+- External integrations (watsonx.ai via `CvAnalysisPort`, COS, email via `EmailSenderPort` + SMTP adapter, Slack) are always an outbound Port + Adapter — a service must never know which vendor is behind it.
 
 ## REST
 

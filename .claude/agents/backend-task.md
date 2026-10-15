@@ -1,6 +1,6 @@
 ---
 name: backend-task
-description: Implements backend work in apps/backend (NestJS 10, Hexagonal + DDD per capability, Mongoose/MongoDB, Redis, IBM Cloud integrations via ports) — the backend half of ROADMAP.md features (AUTH-2, PROC-2, CV-1, and the API part of CAND-1/INT-1/FEED-1/REP-1). Invoke via /roadmap-task or directly for backend-scoped work.
+description: Implements backend work in apps/backend (NestJS 10, Hexagonal + DDD per capability, Mongoose/MongoDB, external integrations via ports — watsonx.ai, COS, SMTP) — the backend half of ROADMAP.md features (AUTH-2, PROC-2, CV-1, and the API part of CAND-1/INT-1/FEED-1/REP-1). Invoke via /roadmap-task or directly for backend-scoped work.
 ---
 
 # Backend task agent
@@ -18,7 +18,7 @@ You implement backend tasks end-to-end in `apps/backend`: read the task, write c
 
 - The backend is a skeleton (only `main.ts`, `app.module.ts`, `monitoring/`). The first capability you build sets the pattern — keep it exemplary: port token injection, adapter mapping Mongoose → domain, thin controller, DTO per input, fake-port unit tests.
 - `Controller → Service → Port ← Adapter`; `domain/` has zero NestJS/Mongoose imports (only `class-validator`/`class-transformer` in `domain/dto/`).
-- Every IBM Cloud service (Watson NLU, COS, Event Notifications, App ID) and Slack goes behind an outbound port, configured via `ConfigService` + `.env.example`.
+- Every external service (watsonx.ai via `CvAnalysisPort`, COS, email via `EmailSenderPort` + SMTP, Slack) goes behind an outbound port; no Redis in the MVP (OTP in Mongo with TTL — ADR-008), configured via `ConfigService` + `.env.example`.
 - Paginate every list query; unique `candidate.email`; index `processId` on interviews/feedback; `timestamps: true`.
 - Throw typed Nest exceptions with context, log with `Logger`, never log tokens/OTP/PII.
 

@@ -484,7 +484,7 @@ src/
 │       │   ├── dto/        # Validación con class-validator — cero NestJS en domain
 │       │   └── interfaces/ # Entidades, value objects — cero deps externas
 │       └── infrastructure/
-│           ├── adapters/   # Implementa ports (MongoDB, Redis, HTTP externo)
+│           ├── adapters/   # Implementa ports (MongoDB, watsonx.ai, SMTP, HTTP externo)
 │           └── controllers/# Entry point HTTP — solo mapea request → service → response
 ├── shared/                 # Guards, interceptors, pipes, filtros cross-cutting
 ├── monitoring/             # Health checks
@@ -496,7 +496,7 @@ src/
 ```
 Controller → Service → Port (abstracto)
                            ↑
-                        Adapter (implementa Port, conoce MongoDB/Redis/HTTP)
+                        Adapter (implementa Port, conoce MongoDB/HTTP/SMTP)
 
 Domain → CERO dependencias externas (ni NestJS, ni Mongoose)
 ```

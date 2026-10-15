@@ -31,20 +31,20 @@ npm run start:dev | build | typecheck | lint | test | test:cov | test:e2e
 npx jest path/to/file.spec.ts                 # single test (jest rootDir = src)
 
 # apps/frontend
-npm run dev | build | typecheck | lint        # dev → localhost:5173
+npm run dev | build | typecheck | lint        # dev → localhost:5174
 npm test -- --run                             # vitest (plain `npm test` = watch mode)
 npx vitest run path/to/file.test.tsx          # single test
 
 # repo root
 node good-practices/validate-quality.mjs --strict   # line-limit gate (must run from root)
-cp .env.example .env && docker-compose up -d        # full stack; or: podman-compose up -d mongodb redis
+cp .env.example .env && podman-compose up -d        # full stack; or: podman-compose up -d mongodb (+ apps locally)
 ```
 
-Services: frontend `:5173`, backend `:3000`, Swagger `:3000/api/docs`, MongoDB `:27017`, Redis `:6379`.
+Services: frontend `:5174`, API `:3000/api/v1`, Swagger `:3000/api/docs`, MongoDB `:27017`. Demo users: `ana@`/`carlos@`/`mariana@ibm.com`.
 
 ## Architecture invariants (detail in the path-scoped rules below)
 
-- **Backend:** `Controller → Service → Port ← Adapter`. `domain/` imports nothing from NestJS/Mongoose (only `class-validator`/`class-transformer` in `domain/dto/`). Every external service (Watson NLU, COS, Event Notifications, App ID, Slack) sits behind a port.
+- **Backend:** `Controller → Service → Port ← Adapter`. `domain/` imports nothing from NestJS/Mongoose (only `class-validator`/`class-transformer` in `domain/dto/`). Every external service (watsonx.ai, COS, SMTP email, Slack) sits behind a port. Target cloud: IBM Code Engine `br-sao`, no Redis (`docs/architecture/README.md` ADR-006…012).
 - **Frontend:** `Page → Organism → Molecule → Atom`; only organisms/pages call React Query or Zustand. React Query = server state, Zustand = client-only state, never mixed or mirrored. HTTP only in `features/<f>/infrastructure/*.infra.ts`, mock-first until the backend exists.
 - **Line limits** are hard: one numeric source of truth, `LIMITS` in `good-practices/validate-quality.mjs`. Over the limit = missing abstraction; unavoidable debt goes to `good-practices/DEBT_TECH.md` with an ID before commit.
 

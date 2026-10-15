@@ -1,7 +1,7 @@
 import { Icon } from '@shared/components/atoms/Icon';
 import { IbmLogoMark } from '@features/auth/components/atoms/IbmLogoMark';
 
-export function SsoLoginButton() {
+export function SsoLoginButton(): JSX.Element {
   return (
     <button
       type="button"

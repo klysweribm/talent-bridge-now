@@ -7,7 +7,7 @@ export interface StageChipProps {
   readonly className?: string;
 }
 
-export function StageChip({ stage, className = '' }: StageChipProps) {
+export function StageChip({ stage, className = '' }: StageChipProps): JSX.Element {
   const { bg, text, label } = STAGE_CHIP_STYLES[stage];
 
   return (

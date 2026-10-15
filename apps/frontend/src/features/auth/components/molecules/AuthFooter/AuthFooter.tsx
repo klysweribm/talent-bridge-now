@@ -1,6 +1,6 @@
 const FOOTER_LINKS = ['Términos de servicio', 'Política de Privacidad', 'Soporte w3 Help'] as const;
 
-export function AuthFooter() {
+export function AuthFooter(): JSX.Element {
   return (
     <footer className="flex flex-col items-center gap-sm text-center select-none max-w-[480px] w-full mt-lg">
       <div className="flex items-center gap-sm text-text-secondary">

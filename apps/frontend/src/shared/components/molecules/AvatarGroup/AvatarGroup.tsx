@@ -12,14 +12,36 @@ export interface AvatarGroupProps {
   readonly className?: string;
 }
 
+interface IOverflowBadgeProps {
+  readonly count: number;
+  readonly size:  AvatarSize;
+}
+
+function OverflowBadge({ count, size }: IOverflowBadgeProps): JSX.Element | null {
+  if (count <= 0) return null;
+
+  return (
+    <span
+      aria-label={`+${count} más`}
+      className={[
+        '-ml-2 rounded-full ring-2 ring-surface-card',
+        'inline-flex items-center justify-center',
+        'bg-surface-highest text-text-secondary font-medium',
+        size === 'sm' ? 'w-6 h-6 text-[10px]' : 'w-8 h-8 text-[12px]',
+      ].join(' ')}
+    >
+      +{count}
+    </span>
+  );
+}
+
 export function AvatarGroup({
   avatars,
   max       = 4,
   size      = 'sm',
   className = '',
-}: AvatarGroupProps) {
-  const visible    = avatars.slice(0, max);
-  const overflowCount = avatars.length - visible.length;
+}: AvatarGroupProps): JSX.Element {
+  const visible = avatars.slice(0, max);
 
   return (
     <div
@@ -34,20 +56,7 @@ export function AvatarGroup({
           <Avatar name={avatar.name} imageUrl={avatar.imageUrl} size={size} />
         </span>
       ))}
-
-      {overflowCount > 0 && (
-        <span
-          aria-label={`+${overflowCount} más`}
-          className={[
-            '-ml-2 rounded-full ring-2 ring-surface-card',
-            'inline-flex items-center justify-center',
-            'bg-surface-highest text-text-secondary font-medium',
-            size === 'sm' ? 'w-6 h-6 text-[10px]' : 'w-8 h-8 text-[12px]',
-          ].join(' ')}
-        >
-          +{overflowCount}
-        </span>
-      )}
+      <OverflowBadge count={avatars.length - visible.length} size={size} />
     </div>
   );
 }

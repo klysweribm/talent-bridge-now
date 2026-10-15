@@ -22,10 +22,6 @@ Cuando un archivo excede su límite, agregar en **línea 1**:
 | ID | Archivo | Actual | Límite | % | Plan de acción | Etapa |
 |----|---------|--------|--------|---|----------------|-------|
 | DT-002 | `apps/frontend/src/features/processes/components/pages/DashboardPage.tsx` | 291 | 90 | 323% | Descomponer en `DashboardHeader`/`KpiSection`/`ActiveProcessesList`/`UpcomingInterviewsList`, mover mocks a `infrastructure/` | Etapa 2 |
-| DT-003 | `apps/frontend/src/shared/components/atoms/Icon/Icon.tsx` | 89 | 50 | 178% | Extraer el mapa de íconos SVG a un archivo de datos separado (`icon-paths.ts`), dejar el componente solo con el `switch`/render | Etapa 1-2 |
-| DT-004 | `apps/frontend/src/shared/components/atoms/InputField/InputField.tsx` | 77 | 50 | 154% | Extraer lógica de icono/error a subcomponente o simplificar variantes condicionales | Etapa 1-2 |
-| DT-005 | `apps/frontend/src/shared/components/atoms/Avatar/Avatar.tsx` | 64 | 50 | 128% | Extraer helper de iniciales/color a `avatar.utils.ts` | Etapa 1-2 |
-| DT-006 | `apps/frontend/src/shared/components/atoms/Button/Button.tsx` | 64 | 50 | 128% | Extraer mapas de variante/tamaño a constantes fuera del componente | Etapa 1-2 |
 
 ---
 
@@ -43,6 +39,10 @@ Cuando un archivo excede su límite, agregar en **línea 1**:
 |----|---------|-------------|-------|
 | — | `AppRouter.tsx`, `StageChip.tsx`, `AvatarGroup.tsx`, `InterviewCard.tsx`, `SidebarNav.tsx` | Etapa 0 | `no-duplicate-imports`: imports de tipo duplicados consolidados en una sola línea (`import { x, type Y } from '...'`) |
 | DT-001 | `LoginPage.tsx` (402 líneas) | Etapa 1 | Descompuesto en `features/auth/components/{atoms,molecules,organisms}` (golden path), validación migrada a `react-hook-form`+`zod` (`useLoginForm.ts`, ≤60 líneas), login simulado movido a `infrastructure/auth.infra.ts` (mock-first, `useMutation`). `LoginPage.tsx` queda en 12 líneas. Se agregó `@hookform/resolvers` como dependencia nueva. |
+| DT-003 | `apps/frontend/src/shared/components/atoms/Icon/Icon.tsx` (89 líneas) | QW-1 | Mapa de íconos SVG extraído a `icon-paths.ts` como datos puros (sin JSX, para no contar como `.tsx` de atom); `Icon.tsx` renderiza con `React.createElement` y queda en el límite. Se agregó `Icon.test.tsx` (no existía). |
+| DT-004 | `apps/frontend/src/shared/components/atoms/InputField/InputField.tsx` (77 líneas) | QW-1 | Extraído `InputFieldIcon.tsx` (prefijo), `InputFieldMessage.tsx` (error/hint) e `inputField.utils.ts` (clases/id); `InputField.tsx` queda en composición pura. |
+| DT-005 | `apps/frontend/src/shared/components/atoms/Avatar/Avatar.tsx` (64 líneas) | QW-1 | Helpers de iniciales/color y clases extraídos a `avatar.utils.ts`. |
+| DT-006 | `apps/frontend/src/shared/components/atoms/Button/Button.tsx` (64 líneas) | QW-1 | Mapas de variante/tamaño extraídos a `button.constants.ts`; spinner/ícono prefijo extraído a `ButtonAffix.tsx`. |
 
 ---
 

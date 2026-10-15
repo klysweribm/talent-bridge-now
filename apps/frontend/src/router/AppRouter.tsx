@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import type { JSX, ReactNode } from 'react';
 import { AppLayout } from '@shared/layouts/AppLayout';
+import { ComingSoon } from '@shared/components/organisms/ComingSoon';
+import { NotFoundView } from '@shared/components/organisms/NotFoundView';
+import { NAVIGATION_ITEMS } from '@shared/config/navigation';
 import { useAuthStore, type UserRole } from '@features/auth/store/auth.store';
-import type { ReactNode } from 'react';
-
 import { LoginPage } from '@features/auth/components/pages/LoginPage';
 import { DashboardPage } from '@features/processes/components/pages/DashboardPage';
 
@@ -11,9 +13,9 @@ interface ProtectedRouteProps {
   readonly allowedRoles?: readonly UserRole[];
 }
 
-function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
+function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps): JSX.Element {
   const token = useAuthStore(state => state.token);
-  const role = useAuthStore(state => state.user?.role);
+  const role  = useAuthStore(state => state.user?.role);
 
   if (!token) return <Navigate to="/login" replace />;
   if (allowedRoles && (!role || !allowedRoles.includes(role))) {
@@ -23,32 +25,72 @@ function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   return <AppLayout>{children}</AppLayout>;
 }
 
-// Placeholders — se reemplazan en fases posteriores
-function ProcessesPage()  { return <p className="p-base text-text-primary">Procesos</p>; }
-function CandidatesPage() { return <p className="p-base text-text-primary">Candidatos</p>; }
-function InterviewsPage() { return <p className="p-base text-text-primary">Entrevistas</p>; }
-function FeedbackPage()   { return <p className="p-base text-text-primary">Feedback</p>; }
-function ReportsPage()    { return <p className="p-base text-text-primary">Reportes</p>; }
-function NotFoundPage()   { return <p className="p-base text-text-primary">404 — Página no encontrada</p>; }
+// 404 dentro del layout cuando hay sesión — nunca una pantalla pelada para
+// un usuario autenticado; sin sesión, ofrece volver a /login.
+function NotFoundRoute(): JSX.Element {
+  const token = useAuthStore(state => state.token);
 
-export function AppRouter() {
+  if (!token) {
+    return <NotFoundView backTo="/login" backLabel="Ir a iniciar sesión" />;
+  }
+  return (
+    <AppLayout>
+      <NotFoundView backTo="/dashboard" backLabel="Volver al dashboard" />
+    </AppLayout>
+  );
+}
+
+// Rutas protegidas que no son items de sidebar (detalle/alta de proceso) —
+// mismos roles que la sección padre (/processes), sin pantalla real aún.
+interface IExtraRoute {
+  readonly path:  string;
+  readonly label: string;
+  readonly roles: readonly UserRole[];
+}
+
+const EXTRA_PROTECTED_ROUTES: readonly IExtraRoute[] = [
+  { path: '/processes/new', label: 'Nuevo Proceso',       roles: ['recruiter', 'pm'] },
+  { path: '/processes/:id', label: 'Detalle del Proceso', roles: ['recruiter', 'pm'] },
+];
+
+// Items de navegación sin pantalla real todavía (todo salvo /dashboard) +
+// rutas protegidas sin item de sidebar propio — ambos renderizan `ComingSoon`
+// dentro del layout, nunca un 404.
+function ComingSoonRoutes(): JSX.Element {
+  return (
+    <>
+      {NAVIGATION_ITEMS.filter(item => item.path !== '/dashboard').map(item => (
+        <Route
+          key={item.path}
+          path={item.path}
+          element={<ProtectedRoute allowedRoles={item.roles}><ComingSoon label={item.label} /></ProtectedRoute>}
+        />
+      ))}
+      {EXTRA_PROTECTED_ROUTES.map(route => (
+        <Route
+          key={route.path}
+          path={route.path}
+          element={<ProtectedRoute allowedRoles={route.roles}><ComingSoon label={route.label} /></ProtectedRoute>}
+        />
+      ))}
+    </>
+  );
+}
+
+export function AppRouter(): JSX.Element {
+  const dashboardRoles = NAVIGATION_ITEMS.find(item => item.path === '/dashboard')?.roles;
+
   return (
     <BrowserRouter>
       <Routes>
-        {/* Pública */}
         <Route path="/login" element={<LoginPage />} />
-
-        {/* Protegidas */}
-        <Route path="/dashboard"  element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-        <Route path="/processes"  element={<ProtectedRoute><ProcessesPage /></ProtectedRoute>} />
-        <Route path="/candidates" element={<ProtectedRoute><CandidatesPage /></ProtectedRoute>} />
-        <Route path="/interviews" element={<ProtectedRoute><InterviewsPage /></ProtectedRoute>} />
-        <Route path="/feedback"   element={<ProtectedRoute allowedRoles={['recruiter', 'pm']}><FeedbackPage /></ProtectedRoute>} />
-        <Route path="/reports"    element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
-
-        {/* Raíz → dashboard */}
+        <Route
+          path="/dashboard"
+          element={<ProtectedRoute allowedRoles={dashboardRoles}><DashboardPage /></ProtectedRoute>}
+        />
+        {ComingSoonRoutes()}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="*" element={<NotFoundPage />} />
+        <Route path="*" element={<NotFoundRoute />} />
       </Routes>
     </BrowserRouter>
   );

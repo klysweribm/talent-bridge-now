@@ -1,6 +1,6 @@
 import { Icon } from '@shared/components/atoms/Icon';
 
-export function ProfileDetectionBanner() {
+export function ProfileDetectionBanner(): JSX.Element {
   return (
     <section className="flex items-start gap-sm bg-surface-low rounded-lg p-md">
       <Icon name="psychology" size={20} className="flex-shrink-0 text-primary-interactive mt-2xs" />

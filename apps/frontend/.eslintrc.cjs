@@ -20,13 +20,25 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
   },
-  ignorePatterns: ['dist', 'node_modules', 'coverage'],
+  // *.tsbuildinfo, vite.config.d.ts y vite.config.js son artefactos de `tsc -b`
+  // (tsconfig.node.json es composite, sin `noEmit`) — no están en
+  // tsconfig.eslint.json y no son código fuente versionado.
+  ignorePatterns: ['dist', 'node_modules', 'coverage', '*.tsbuildinfo', 'vite.config.d.ts', 'vite.config.js'],
   overrides: [
     ...qualityConfig.overrides,
     {
       files: ['**/*.spec.ts', '**/*.test.ts', '**/*.test.tsx'],
       rules: {
         '@typescript-eslint/no-explicit-any': 'off', // mocks pueden necesitarlo
+        // Los archivos de test priorizan legibilidad del escenario (arrange/act/assert)
+        // sobre el límite de líneas por función que aplica al código de producción.
+        'max-lines-per-function': 'off',
+      },
+    },
+    {
+      files: ['src/test/**'],
+      rules: {
+        'no-console': 'off', // setup de test suprime warnings conocidos de librerías
       },
     },
   ],

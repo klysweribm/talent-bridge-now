@@ -20,7 +20,7 @@ export function StatusBadge({
   label,
   dot     = false,
   className = '',
-}: StatusBadgeProps) {
+}: StatusBadgeProps): JSX.Element {
   const { bg, text } = VARIANT_STYLES[variant];
 
   return (

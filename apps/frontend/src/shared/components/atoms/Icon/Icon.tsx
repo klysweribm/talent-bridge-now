@@ -1,97 +1,53 @@
-import type React from 'react';
+import { createElement, type CSSProperties, type JSX } from 'react';
+import { AUTH_ICON_DEFS, type ISvgIconDef } from './icon-paths';
+import { NAV_ICON_DEFS } from './nav-icon-paths';
+
+const SVG_ICON_DEFS: Readonly<Record<string, ISvgIconDef>> = { ...AUTH_ICON_DEFS, ...NAV_ICON_DEFS };
 
 /**
  * Icon — wrapper unificado para iconos del sistema.
  *
  * Estrategia dual:
- * - Material Symbols Outlined (font icon) cuando la fuente está disponible.
- * - SVG inline como fallback para iconos críticos en entornos offline.
+ * - SVG inline (datos en `icon-paths.ts`) para iconos críticos offline.
+ * - Material Symbols Outlined (font icon) como fallback.
  *
  * Uso: <Icon name="mail" size={20} className="text-outline" />
  */
-
-const SVG_ICONS: Record<string, (size: number) => JSX.Element> = {
-  mail: (s) => (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="4" width="20" height="16" rx="2" />
-      <path d="m22 7-10 7L2 7" />
-    </svg>
-  ),
-  lock: (s) => (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  ),
-  visibility: (s) => (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  ),
-  visibility_off: (s) => (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-      <line x1="1" y1="1" x2="23" y2="23" />
-    </svg>
-  ),
-  psychology: (s) => (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M13 2c-3.87 0-7 3.13-7 7 0 2.45 1.27 4.6 3.19 5.87L9 17h6l-.19-2.13C16.73 13.6 18 11.45 18 9c0-3.87-3.13-7-5-7zm-1 13h2v2h-2zm0 4h2v2h-2zm4.5-9H13V8h-2v2H7.5C7.22 10 7 9.78 7 9.5v-1C7 6.57 8.57 5 10.5 5h3C15.43 5 17 6.57 17 8.5v1c0 .28-.22.5-.5.5z"/>
-    </svg>
-  ),
-  verified_user: (s) => (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
-    </svg>
-  ),
-  arrow_forward: (s) => (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 12h14M12 5l7 7-7 7" />
-    </svg>
-  ),
-  lock_open: (s) => (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" />
-      <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-    </svg>
-  ),
-  error: (s) => (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-    </svg>
-  ),
-  progress_activity: (s) => (
-    <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-      <path d="M12 2a10 10 0 0 1 10 10" />
-    </svg>
-  ),
-};
 
 export interface IconProps {
   readonly name:       string;
   readonly size?:      number;
   readonly className?: string;
-  readonly style?:     React.CSSProperties;
+  readonly style?:     CSSProperties;
 }
 
-export function Icon({ name, size = 20, className = '', style }: IconProps) {
-  const svgFallback = SVG_ICONS[name];
+function renderSvgIcon(def: ISvgIconDef, size: number): JSX.Element {
+  return createElement(
+    'svg',
+    {
+      width: size, height: size, viewBox: def.viewBox, fill: def.fill,
+      stroke: def.stroke, strokeWidth: def.strokeWidth,
+      strokeLinecap: def.strokeLinecap, strokeLinejoin: def.strokeLinejoin,
+    },
+    def.children.map((child, i) => createElement(child.tag, { ...child.attrs, key: i })),
+  );
+}
 
-  if (svgFallback) {
+export function Icon({ name, size = 20, className = '', style }: IconProps): JSX.Element {
+  const def = SVG_ICON_DEFS[name];
+
+  if (def) {
     return (
       <span
         aria-hidden="true"
         className={`inline-flex items-center justify-center flex-shrink-0 ${className}`}
         style={{ width: size, height: size, ...style }}
       >
-        {svgFallback(size)}
+        {renderSvgIcon(def, size)}
       </span>
     );
   }
 
-  // Fallback: Material Symbols font icon
   return (
     <span
       aria-hidden="true"

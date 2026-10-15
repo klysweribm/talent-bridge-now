@@ -9,6 +9,7 @@ export default defineConfig({
       '@':        resolve(__dirname, 'src'),
       '@shared':  resolve(__dirname, 'src/shared'),
       '@features': resolve(__dirname, 'src/features'),
+      '@ibm-talent-bridge/shared-types': resolve(__dirname, '../../packages/shared-types/src/index.ts'),
     },
   },
   test: {

@@ -1,4 +1,4 @@
-ios# Frontend — IBM Talent Bridge
+# Frontend — IBM Talent Bridge
 
 > React + Vite + TypeScript  
 > Deploy: Render (Static Site)
@@ -36,8 +36,10 @@ src/
 
 ## Variables de entorno
 
+Ver [`.env.example`](../../.env.example) en la raíz del monorepo. Resumen:
+
 ```env
-VITE_API_URL=http://localhost:3000
+VITE_API_URL=/api/v1   # relativo: el proxy de Vite (ver vite.config.ts) reenvía /api al backend
 VITE_APP_ENV=development
 ```
 

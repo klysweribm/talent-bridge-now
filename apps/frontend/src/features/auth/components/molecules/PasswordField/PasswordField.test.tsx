@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { PasswordField } from './PasswordField';
 import type { TLoginFormValues } from '@features/auth/hooks/useLoginForm';
 
-function Wrapper() {
+function Wrapper(): JSX.Element {
   const { register } = useForm<TLoginFormValues>();
   return <PasswordField register={register} />;
 }

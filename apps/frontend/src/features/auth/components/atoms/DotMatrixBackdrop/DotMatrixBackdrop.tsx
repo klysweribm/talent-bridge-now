@@ -1,4 +1,4 @@
-export function DotMatrixBackdrop() {
+export function DotMatrixBackdrop(): JSX.Element {
   return (
     <div className="absolute inset-0 pointer-events-none opacity-40" aria-hidden="true">
       <svg className="w-full h-full text-outline-variant" height="100%" width="100%" xmlns="http://www.w3.org/2000/svg">

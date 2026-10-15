@@ -50,7 +50,7 @@ const MOCK_INTERVIEWS = [
   { id: '3', candidate: 'Pablo Ramírez',  role: 'Data Engineer',   time: '16:00', stage: 'Inicial' as const },
 ] as const;
 
-export function DashboardPage() {
+export function DashboardPage(): JSX.Element {
   const user = useAuthStore(state => state.user);
   const navigate = useNavigate();
   const [search, setSearch] = useState('');

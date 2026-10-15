@@ -13,6 +13,25 @@ const TREND_STYLES = {
   neutral: { icon: 'trending_flat', color: 'text-text-secondary' },
 } as const;
 
+interface IKpiTrendProps {
+  readonly trend?:      'up' | 'down' | 'neutral';
+  readonly trendLabel?: string;
+}
+
+function KpiTrend({ trend, trendLabel }: IKpiTrendProps): JSX.Element | null {
+  const trendConfig = trend ? TREND_STYLES[trend] : null;
+  if (!trendConfig || !trendLabel) return null;
+
+  return (
+    <div className={`flex items-center gap-2xs text-label-md ${trendConfig.color}`}>
+      <span aria-hidden="true" className="material-symbols-outlined text-[14px]">
+        {trendConfig.icon}
+      </span>
+      <span>{trendLabel}</span>
+    </div>
+  );
+}
+
 export function KpiCard({
   label,
   value,
@@ -20,27 +39,18 @@ export function KpiCard({
   trend,
   trendLabel,
   className = '',
-}: KpiCardProps) {
-  const trendConfig = trend ? TREND_STYLES[trend] : null;
-
+}: KpiCardProps): JSX.Element {
   return (
     <article
       aria-label={`${label}: ${value}`}
-      className={[
-        'bg-surface-card border border-[#e0e0e0] rounded-lg p-base',
-        'flex flex-col gap-xs',
-        className,
-      ].join(' ')}
+      className={['bg-surface-card border border-[#e0e0e0] rounded-lg p-base', 'flex flex-col gap-xs', className].join(' ')}
     >
       <div className="flex items-center justify-between">
         <span className="text-label-md text-text-secondary uppercase tracking-wide">
           {label}
         </span>
         {icon && (
-          <span
-            aria-hidden="true"
-            className="material-symbols-outlined text-[20px] text-primary-container"
-          >
+          <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary-container">
             {icon}
           </span>
         )}
@@ -50,14 +60,7 @@ export function KpiCard({
         {value}
       </span>
 
-      {trendConfig && trendLabel && (
-        <div className={`flex items-center gap-2xs text-label-md ${trendConfig.color}`}>
-          <span aria-hidden="true" className="material-symbols-outlined text-[14px]">
-            {trendConfig.icon}
-          </span>
-          <span>{trendLabel}</span>
-        </div>
-      )}
+      <KpiTrend trend={trend} trendLabel={trendLabel} />
     </article>
   );
 }

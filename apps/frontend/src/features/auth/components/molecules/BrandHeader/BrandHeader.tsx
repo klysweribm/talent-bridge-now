@@ -1,6 +1,6 @@
 import { Icon } from '@shared/components/atoms/Icon';
 
-export function BrandHeader() {
+export function BrandHeader(): JSX.Element {
   return (
     <header className="flex flex-col gap-xs">
       <div className="flex items-center justify-between gap-sm">

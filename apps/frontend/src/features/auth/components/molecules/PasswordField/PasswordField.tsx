@@ -8,20 +8,52 @@ export interface PasswordFieldProps {
   readonly error?: string;
 }
 
-export function PasswordField({ register, error }: PasswordFieldProps) {
+function buildClassName(hasError: boolean): string {
+  return [
+    'w-full h-10 pl-8 pr-8 rounded text-body-md text-text-primary bg-surface-card outline-none',
+    hasError ? 'border-2 border-status-danger' : 'border border-[#8d8d8d]',
+    'focus:outline-2 focus:outline-primary-interactive focus:border-transparent',
+  ].join(' ');
+}
+
+function PasswordFieldLabel(): JSX.Element {
+  return (
+    <div className="flex items-center justify-between">
+      <label htmlFor="corporate-password" className="text-body-md-medium text-text-primary">
+        Contraseña
+      </label>
+      <a href="#" className="text-label-md text-primary underline underline-offset-2">
+        ¿Olvidaste tu contraseña?
+      </a>
+    </div>
+  );
+}
+
+interface IVisibilityToggleProps {
+  readonly visible:   boolean;
+  readonly onToggle:  () => void;
+}
+
+function VisibilityToggle({ visible, onToggle }: IVisibilityToggleProps): JSX.Element {
+  return (
+    <button
+      type="button"
+      aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+      onClick={onToggle}
+      className="absolute flex items-center justify-center right-xs p-2xs text-outline bg-transparent border-none cursor-pointer"
+    >
+      <Icon name={visible ? 'visibility_off' : 'visibility'} size={20} />
+    </button>
+  );
+}
+
+export function PasswordField({ register, error }: PasswordFieldProps): JSX.Element {
   const [visible, setVisible] = useState(false);
   const hasError = Boolean(error);
 
   return (
     <div className="flex flex-col gap-2xs">
-      <div className="flex items-center justify-between">
-        <label htmlFor="corporate-password" className="text-body-md-medium text-text-primary">
-          Contraseña
-        </label>
-        <a href="#" className="text-label-md text-primary underline underline-offset-2">
-          ¿Olvidaste tu contraseña?
-        </a>
-      </div>
+      <PasswordFieldLabel />
       <div className="relative flex items-center">
         <span className="absolute pointer-events-none select-none flex items-center left-sm text-outline">
           <Icon name="lock" size={20} />
@@ -33,20 +65,9 @@ export function PasswordField({ register, error }: PasswordFieldProps) {
           placeholder="••••••••••••"
           autoComplete="current-password"
           aria-invalid={hasError || undefined}
-          className={[
-            'w-full h-10 pl-8 pr-8 rounded text-body-md text-text-primary bg-surface-card outline-none',
-            hasError ? 'border-2 border-status-danger' : 'border border-[#8d8d8d]',
-            'focus:outline-2 focus:outline-primary-interactive focus:border-transparent',
-          ].join(' ')}
+          className={buildClassName(hasError)}
         />
-        <button
-          type="button"
-          aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-          onClick={() => setVisible(v => !v)}
-          className="absolute flex items-center justify-center right-xs p-2xs text-outline bg-transparent border-none cursor-pointer"
-        >
-          <Icon name={visible ? 'visibility_off' : 'visibility'} size={20} />
-        </button>
+        <VisibilityToggle visible={visible} onToggle={() => setVisible(v => !v)} />
       </div>
       {hasError && (
         <span role="alert" className="text-label-md text-status-danger">{error}</span>

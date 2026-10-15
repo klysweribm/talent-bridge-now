@@ -19,7 +19,8 @@
     "paths": {
       "@/*": ["src/*"],
       "@shared/*": ["src/shared/*"],
-      "@features/*": ["src/features/*"]
+      "@features/*": ["src/features/*"],
+      "@ibm-talent-bridge/shared-types": ["../../packages/shared-types/src/index.ts"]
     }
   },
   "include": ["src"],

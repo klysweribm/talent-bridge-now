@@ -2,7 +2,7 @@ export interface IbmLogoMarkProps {
   readonly className?: string;
 }
 
-export function IbmLogoMark({ className = '' }: IbmLogoMarkProps) {
+export function IbmLogoMark({ className = '' }: IbmLogoMarkProps): JSX.Element {
   return (
     <svg
       className={`w-5 h-5 flex-shrink-0 text-primary ${className}`}

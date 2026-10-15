@@ -4,7 +4,10 @@ FROM node:22-alpine
 ARG FRONTEND_PORT=5174
 ENV VITE_PORT=${FRONTEND_PORT}
 
-WORKDIR /app
+# WORKDIR replica la ruta del monorepo (apps/frontend) para que el alias de
+# Vite hacia ../../packages/shared-types resuelva igual dentro y fuera del
+# contenedor (ver docker-compose.yml: monta ./packages en /app/packages).
+WORKDIR /app/apps/frontend
 
 COPY package*.json ./
 COPY package-lock.json ./

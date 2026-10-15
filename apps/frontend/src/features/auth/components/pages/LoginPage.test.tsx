@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, type RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,7 +7,7 @@ import { useAuthStore } from '@features/auth/store/auth.store';
 
 // Wrap con MemoryRouter (LoginPage usa useNavigate) y QueryClientProvider
 // (LoginForm usa useMutation vía useLoginForm)
-function renderWithRouter() {
+function renderWithRouter(): RenderResult {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
   return render(
     <QueryClientProvider client={queryClient}>

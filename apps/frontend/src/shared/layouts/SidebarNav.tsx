@@ -1,52 +1,29 @@
-import type React from 'react';
+import type { CSSProperties, JSX, MouseEvent, ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuthStore, type UserRole } from '@features/auth/store/auth.store';
+import { useAuthStore } from '@features/auth/store/auth.store';
 import { useUiStore } from '@shared/store/ui.store';
+import { Icon } from '@shared/components/atoms/Icon';
+import { NAVIGATION_ITEMS } from '@shared/config/navigation';
 
-interface NavItem {
-  readonly to:          string;
-  readonly icon:        JSX.Element;
-  readonly label:       string;
-  readonly mobileLabel: string;  // label corto para bottom-nav
-  readonly roles:       ReadonlyArray<UserRole>;
-}
-
-// ─── Iconos SVG inline ────────────────────────────────────────
+// Íconos propios de controles del sidebar (no son items de navegación, por
+// lo que no viven en `navigation.ts`) — DT-007 moverá el resto a Etapa 2.
 const Icons = {
-  dashboard:   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
-  processes:   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>,
-  candidates:  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
-  referents:   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
-  reports:     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
-  interviews:  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>,
-  feedback:    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
-  config:      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>,
   logout:      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
   paintBucket: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" width="16" height="16"><path d="M19 11V4a2 2 0 0 0-2-2H6L2 6l4 4h9"/><path d="m19 11-7 7-4-4 7-7"/><path d="M18 22a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>,
-  menu:        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
 } as const;
 
-const NAV_ITEMS: ReadonlyArray<NavItem> = [
-  { to: '/dashboard',  icon: Icons.dashboard,  label: 'Inicio',           mobileLabel: 'Inicio',     roles: ['recruiter', 'pm', 'technical'] },
-  { to: '/processes',  icon: Icons.processes,  label: 'Procesos de Selección', mobileLabel: 'Procesos',   roles: ['recruiter', 'pm'] },
-  { to: '/candidates', icon: Icons.candidates, label: 'Candidatos',       mobileLabel: 'Candidatos', roles: ['recruiter', 'pm'] },
-  { to: '/referents',  icon: Icons.referents,  label: 'Buscar Referentes',mobileLabel: 'Referentes', roles: ['recruiter'] },
-  { to: '/reports',    icon: Icons.reports,    label: 'Reportes',         mobileLabel: 'Reportes',   roles: ['recruiter', 'pm'] },
-  { to: '/interviews', icon: Icons.interviews, label: 'Entrevistas',      mobileLabel: 'Agenda',     roles: ['technical'] },
-  { to: '/feedback',   icon: Icons.feedback,   label: 'Feedback',         mobileLabel: 'Feedback',   roles: ['technical'] },
-  { to: '/config',     icon: Icons.config,     label: 'Configuración',    mobileLabel: 'Config',     roles: ['recruiter', 'pm', 'technical'] },
-] as const;
-
 // ─── Botón de control reutilizable ────────────────────────────
+interface ICtrlBtnProps {
+  readonly label:     string;
+  readonly onClick:   () => void;
+  readonly children:  ReactNode;
+  readonly ctrlIcon:  string;
+  readonly ctrlHover: string;
+}
+
 function CtrlBtn({
   label, onClick, children, ctrlIcon, ctrlHover,
-}: {
-  label: string;
-  onClick: () => void;
-  children: React.ReactNode;
-  ctrlIcon: string;
-  ctrlHover: string;
-}) {
+}: ICtrlBtnProps): JSX.Element {
   return (
     <button
       type="button"
@@ -59,25 +36,25 @@ function CtrlBtn({
         padding: '4px', color: ctrlIcon, borderRadius: '4px',
         transition: 'color 150ms',
       }}
-      onMouseEnter={e => (e.currentTarget.style.color = ctrlHover)}
-      onMouseLeave={e => (e.currentTarget.style.color = ctrlIcon)}
+      onMouseEnter={(e: MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.color = ctrlHover; }}
+      onMouseLeave={(e: MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.color = ctrlIcon; }}
     >
       {children}
     </button>
   );
 }
 
-export function SidebarNav() {
+export function SidebarNav(): JSX.Element {
   const { user, clearAuth }                            = useAuthStore();
   const { sidebarCollapsed, sidebarDark,
           toggleSidebarCollapsed, toggleSidebarTheme } = useUiStore();
   const navigate = useNavigate();
 
-  const visibleItems = NAV_ITEMS.filter(
+  const visibleItems = NAVIGATION_ITEMS.filter(
     item => user?.role && item.roles.includes(user.role),
   );
 
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     clearAuth();
     navigate('/login', { replace: true });
   };
@@ -106,7 +83,7 @@ export function SidebarNav() {
       };
 
   // ─── NavLink style helper ─────────────────────────────────
-  const navLinkStyle = (isActive: boolean) => ({
+  const navLinkStyle = (isActive: boolean): CSSProperties => ({
     color:           isActive ? T.navActiveText : T.navText,
     backgroundColor: isActive ? T.navActiveBg  : 'transparent',
     fontSize: '13px', textDecoration: 'none',
@@ -128,8 +105,8 @@ export function SidebarNav() {
     >
       {visibleItems.slice(0, 5).map(item => (
         <NavLink
-          key={item.to}
-          to={item.to}
+          key={item.path}
+          to={item.path}
           aria-label={item.label}
           title={item.label}
           className="flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors duration-150"
@@ -155,7 +132,7 @@ export function SidebarNav() {
                 className="flex items-center justify-center"
                 style={{ color: isActive ? T.navActiveText : T.iconColor }}
               >
-                {item.icon}
+                <Icon name={item.icon} size={20} />
               </span>
               <span
                 style={{
@@ -315,9 +292,9 @@ export function SidebarNav() {
         }}
       >
         {visibleItems.map(item => (
-          <li key={item.to}>
+          <li key={item.path}>
             <NavLink
-              to={item.to}
+              to={item.path}
               aria-label={item.label}
               title={item.label}
               className="flex items-center rounded-lg transition-colors duration-150"
@@ -345,7 +322,7 @@ export function SidebarNav() {
                       color: isActive ? T.navActiveText : T.iconColor,
                     }}
                   >
-                    {item.icon}
+                    <Icon name={item.icon} size={20} />
                   </span>
                   {/* Label — siempre montado, transiciona con CSS */}
                   <span

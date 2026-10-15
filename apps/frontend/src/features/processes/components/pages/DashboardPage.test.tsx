@@ -1,11 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, type RenderResult } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { DashboardPage } from './DashboardPage';
 import { useAuthStore } from '@features/auth/store/auth.store';
 
 const MOCK_USER = { id: '1', name: 'Mariana López', email: 'mariana@ibm.com', role: 'recruiter' as const };
 
-function renderWithRouter() {
+function renderWithRouter(): RenderResult {
   return render(
     <MemoryRouter>
       <DashboardPage />

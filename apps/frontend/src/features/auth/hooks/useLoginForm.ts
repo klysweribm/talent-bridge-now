@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, type FieldErrors, type UseFormRegister } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -14,7 +14,15 @@ export const loginSchema = z.object({
 
 export type TLoginFormValues = z.infer<typeof loginSchema>;
 
-export function useLoginForm() {
+export interface IUseLoginFormResult {
+  readonly register:      UseFormRegister<TLoginFormValues>;
+  readonly errors:        FieldErrors<TLoginFormValues>;
+  readonly handleSubmit:  (event: FormEvent) => void;
+  readonly loading:       boolean;
+  readonly error:         string | null;
+}
+
+export function useLoginForm(): IUseLoginFormResult {
   const { register, handleSubmit: buildSubmit, formState: { errors } } = useForm<TLoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },

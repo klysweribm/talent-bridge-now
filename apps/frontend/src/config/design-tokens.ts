@@ -4,6 +4,7 @@
  * Estos valores se usan en componentes que necesitan acceso programático
  * (ej: StageChip, StatusBadge con variantes dinámicas).
  */
+import type { UserRole } from '@ibm-talent-bridge/shared-types';
 
 // ─── Etapas del proceso de selección ─────────────────────────
 export const PROCESS_STAGES = [
@@ -30,14 +31,13 @@ export const STAGE_CHIP_STYLES: Record<
   'Retroalimentación':      { bg: '#ffebeb', text: '#da1e28', label: 'Retroalimentación' },
 } as const;
 
-// ─── Roles del sistema ────────────────────────────────────────
-export const USER_ROLES = ['recruiter', 'technical', 'pm'] as const;
-export type UserRole = (typeof USER_ROLES)[number];
-
+// ─── Roles del sistema ──────────────────────────────────────────
+// Fuente única: `UserRole` de `@ibm-talent-bridge/shared-types` — no se
+// redefine aquí para evitar un segundo enum de roles (anti-hardcoding).
 export const ROLE_LABELS: Record<UserRole, string> = {
-  recruiter:  'Reclutador',
-  technical:  'Referente Técnico',
-  pm:         'Project Manager',
+  recruiter:     'Reclutador',
+  technical_ref: 'Referente Técnico',
+  pm:            'Project Manager',
 } as const;
 
 // ─── Duraciones de entrevista (minutos) ──────────────────────

@@ -3,6 +3,6 @@
   "compilerOptions": {
     "types": ["vitest/globals", "node"]
   },
-  "include": ["src", "*.config.ts", "*.config.cjs"],
+  "include": ["src", "*.config.ts", "*.config.cjs", "tailwind.colors.ts"],
   "exclude": []
 }

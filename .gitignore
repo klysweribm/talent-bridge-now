@@ -3,7 +3,8 @@
 node_modules/
 stitch_ibm_talent_bridge_portal/
 
-DESIGN/
+# Anclado a la raíz: sin "/" inicial, con core.ignorecase (macOS) también ignoraba docs/design/
+/DESIGN/
 
 .clinerules
 

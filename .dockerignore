@@ -1,0 +1,17 @@
+# Contexto de build en la raíz (apps/frontend/Dockerfile). apps/backend tiene su propio .dockerignore.
+**/node_modules
+**/dist
+**/coverage
+**/.env
+**/.env.*
+!.env.example
+.git
+.claude
+DESIGN
+docs
+*.pptx
+*.png
+!apps/**/*.png
+**/*.tsbuildinfo
+apps/frontend/vite.config.js
+apps/frontend/vite.config.d.ts

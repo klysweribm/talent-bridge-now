@@ -1,15 +1,22 @@
+# Imagen de producción del backend (app "tb-api" en IBM Code Engine).
+#
+# El contexto de build es la RAÍZ del repo, porque el backend importa
+# `packages/shared-types` vía alias (../../packages/shared-types):
+#   docker build -f apps/backend/Dockerfile -t tb-api .
+
 # ─── Stage 1: build (devDependencies + TypeScript compiler) ──────────────────
 FROM node:22-alpine AS build
 
-WORKDIR /app
+WORKDIR /repo
 
-COPY package*.json ./
-RUN npm ci
+COPY packages/shared-types ./packages/shared-types
+COPY apps/backend/package*.json ./apps/backend/
+RUN cd apps/backend && npm ci
 
-COPY tsconfig.json ./
-COPY src ./src
+COPY apps/backend/tsconfig.json ./apps/backend/
+COPY apps/backend/src ./apps/backend/src
 
-RUN npm run build
+RUN cd apps/backend && npm run build
 
 # ─── Stage 2: runtime (prod dependencies only, non-root user) ────────────────
 FROM node:22-alpine AS runtime
@@ -20,10 +27,10 @@ ENV PORT=${BACKEND_PORT}
 
 WORKDIR /app
 
-COPY package*.json ./
+COPY apps/backend/package*.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 
-COPY --from=build /app/dist ./dist
+COPY --from=build /repo/apps/backend/dist ./dist
 
 RUN addgroup -S talentbridge && adduser -S talentbridge -G talentbridge
 USER talentbridge

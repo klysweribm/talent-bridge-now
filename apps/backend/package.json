@@ -75,7 +75,8 @@
     "testEnvironment": "node",
     "moduleNameMapper": {
       "^@capabilities/(.*)$": "<rootDir>/capabilities/$1",
-      "^@shared/(.*)$": "<rootDir>/shared/$1"
+      "^@shared/(.*)$": "<rootDir>/shared/$1",
+      "^@ibm-talent-bridge/shared-types$": "<rootDir>/../../../packages/shared-types/src/index.ts"
     }
   }
 }

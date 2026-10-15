@@ -79,5 +79,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t talent-bridge-backend:${{ github.sha }} .
-        working-directory: apps/backend
+        run: docker build -f apps/backend/Dockerfile -t talent-bridge-backend:${{ github.sha }} .

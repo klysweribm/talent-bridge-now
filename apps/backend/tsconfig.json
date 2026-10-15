@@ -20,7 +20,8 @@
     "strict": true,
     "paths": {
       "@capabilities/*": ["src/capabilities/*"],
-      "@shared/*": ["src/shared/*"]
+      "@shared/*": ["src/shared/*"],
+      "@ibm-talent-bridge/shared-types": ["../../packages/shared-types/src/index.ts"]
     }
   },
   "include": ["src/**/*"],

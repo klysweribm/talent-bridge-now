@@ -8,6 +8,7 @@
   },
   "moduleNameMapper": {
     "^@capabilities/(.*)$": "<rootDir>/../src/capabilities/$1",
-    "^@shared/(.*)$": "<rootDir>/../src/shared/$1"
+    "^@shared/(.*)$": "<rootDir>/../src/shared/$1",
+    "^@ibm-talent-bridge/shared-types$": "<rootDir>/../../../packages/shared-types/src/index.ts"
   }
 }

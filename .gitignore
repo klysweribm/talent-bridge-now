@@ -1,4 +1,5 @@
 .env
+.DS_Store
 node_modules/
 stitch_ibm_talent_bridge_portal/
 
@@ -10,3 +11,12 @@ node_modules/
 dist/
 
 CLAUDE.md
+# Claude Code — personal/ephemeral
+.claude/settings.local.json
+.claude/scratchpads/*
+!.claude/scratchpads/README.md
+
+# Frontend: byproducts of `tsc -b` (tsconfig.node.json is composite)
+apps/frontend/vite.config.js
+apps/frontend/vite.config.d.ts
+apps/frontend/*.tsbuildinfo

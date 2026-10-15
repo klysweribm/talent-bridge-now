@@ -16,16 +16,34 @@ on:
       - 'packages/shared-utils/**'
 
 jobs:
+  quality-gate:
+    name: Quality (line limits)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Informational only while Etapa 2 (DT-002) is open: 5 critical violations
+      # (DT-002...DT-006) are known debt tracked in good-practices/DEBT_TECH.md.
+      # Switch to `--strict` and drop continue-on-error once Etapa 2 closes DT-002.
+      - name: Validate line-limit quality gate
+        run: node good-practices/validate-quality.mjs
+        continue-on-error: true
+
   lint-typecheck:
     name: Lint & Typecheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: apps/frontend/package-lock.json
 
@@ -48,10 +66,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: apps/frontend/package-lock.json
 
@@ -70,10 +88,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: apps/frontend/package-lock.json
 

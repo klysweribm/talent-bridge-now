@@ -28,10 +28,12 @@ ibm-talent-bridge/
 │   ├── shared-utils/      → Formatters, validators, helpers
 │   └── email-templates/   → Templates HTML de correos (sin scripts)
 ├── docs/
-│   ├── architecture/      → Diagramas C4, ADRs
+│   ├── architecture/      → ADRs y diagramas C4 en ASCII
 │   ├── api/               → Swagger exportado
 │   └── flows/             → Flujos de usuario
-├── stitch_ibm_talent_bridge_portal/  → Diseños de referencia (HTML + PNG)
+├── C4/                    → Diagramas C4 fuente (diagram.drawio + export .png)
+├── DESIGN/                → Mockups Stitch (gitignored, solo referencia local)
+│   └── stitch_ibm_talent_bridge_portal/
 ├── docker-compose.yml
 ├── docker-compose.test.yml
 ├── .env.example
@@ -43,8 +45,8 @@ ibm-talent-bridge/
 ## Quickstart (Desarrollo Local)
 
 ### Pre-requisitos
-- Node.js 20+
-- Docker + Docker Compose
+- Node.js 22+ (Node 20 llegó a EOL)
+- Docker + Docker Compose (o Podman + podman-compose)
 - Credenciales IBM Cloud (ver `.env.example`)
 
 ### Levantar todo con Docker
@@ -68,8 +70,8 @@ podman-compose up -d mongodb redis
 ```
 
 Servicios disponibles:
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:3000
+- Frontend: http://localhost:5174 (configurable con `FRONTEND_PORT` en `.env`)
+- Backend API: http://localhost:3000/api/v1 (prefijo global `/api/v1`; configurable con `BACKEND_PORT`)
 - API Docs (Swagger): http://localhost:3000/api/docs
 - MongoDB: localhost:27017
 - Redis: localhost:6379
@@ -102,7 +104,9 @@ npm run dev
 
 ## Diseños de Referencia
 
-Los mockups están en `stitch_ibm_talent_bridge_portal/`:
+Los mockups están en `DESIGN/stitch_ibm_talent_bridge_portal/` — **gitignored** (no se
+commitean; son referencia visual local, nunca se copian como código, ver
+`CLAUDE.md`):
 
 | Pantalla | Archivo |
 |---------|---------|

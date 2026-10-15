@@ -501,6 +501,14 @@ Controller → Service → Port (abstracto)
 Domain → CERO dependencias externas (ni NestJS, ni Mongoose)
 ```
 
+#### Entidades compartidas vs. `domain/interfaces/`
+
+Las entidades que consume también el frontend (`User`, `Candidate`, `Process`, `Interview`, `Feedback`, `Report`...) se importan directo de `@ibm-talent-bridge/shared-types` — no se redefinen por capability. `domain/interfaces/` queda solo para value objects **locales**, que no son parte del contrato entre apps. Decisiones de modelo (qué se embebe, qué se referencia): ADR-013 en `docs/architecture/README.md`.
+
+#### Consistencia entre capabilities
+
+Cuando una operación de una capability necesita mantener consistente un dato de otra (ej. `Candidate.processIds` al agregar un candidato a un `Process`), la forma correcta es una **llamada en memoria** del servicio de una capability al servicio de aplicación de la otra (inyección de Nest normal entre módulos) — nunca un adapter de una capability tocando directamente la colección Mongo de otra, y nunca una transacción multi-documento de Mongo (el Mongo de desarrollo/CI es standalone, sin replica set — las transacciones fallarían en runtime). Ver ADR-013.
+
 ### 3.2 Límites de líneas por tipo de archivo
 
 | Tipo                     | Límite         |

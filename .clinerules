@@ -45,6 +45,8 @@ Domain → CERO dependencias externas (ni NestJS, ni Mongoose)
 - Controllers: solo mapean request → service → response; todo lo transversal via decoradores (Guards, Interceptors, Pipes)
 - Services: inyectan Ports, nunca Adapters directamente
 - DTOs: validación con `class-validator` decorators siempre
+- Entidades compartidas con el frontend (`User`, `Candidate`, `Process`, `Interview`, `Feedback`, `Report`...) se importan de `@ibm-talent-bridge/shared-types`, nunca se redefinen en `domain/interfaces/` — esa carpeta es solo para value objects locales a la capability. Decisiones de modelo (embeber vs. referenciar): ADR-013 en `docs/architecture/README.md`.
+- Consistencia entre capabilities (ej. `Candidate.processIds` ↔ `Process.candidateIds`): llamada en memoria entre servicios de aplicación (Nest DI normal), nunca un adapter de una capability tocando la colección de otra, nunca una transacción multi-documento de Mongo (el Mongo de dev/CI es standalone, sin replica set) — ver ADR-013.
 
 ### Naming
 - Endpoints en plural: `/candidates`, `/processes`, `/interviews`

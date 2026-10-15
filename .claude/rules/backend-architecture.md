@@ -5,7 +5,7 @@ paths:
 
 # Backend architecture — Hexagonal + DDD, vertical slice per capability
 
-Detail and examples: `good-practices/BEST-PRACTICES.md` §3 (read only the section you need). Domain model (Candidate/Process/Interview/Feedback fields, stages, roles): `PROJECT_CONTEXT.md`.
+Detail and examples: `good-practices/BEST-PRACTICES.md` §3 (read only the section you need). Domain model (Candidate/Process/Interview/Feedback/Report fields, stages, roles): `PROJECT_CONTEXT.md`; embed-vs-reference decisions and cross-aggregate consistency: ADR-013 in `docs/architecture/README.md`.
 
 ## Layout
 
@@ -19,6 +19,8 @@ State today: only `main.ts`, `app.module.ts` and `monitoring/health.*` exist —
 - `domain/` has **zero** external dependencies — no `@nestjs/*`, no `mongoose`, no HTTP client. Pure TypeScript.
 - Controllers contain no logic: one service call, then shape the response. Validation via `ValidationPipe` + DTOs; auth/roles via Guards in `shared/`.
 - External integrations (watsonx.ai via `CvAnalysisPort`, COS, email via `EmailSenderPort` + SMTP adapter, Slack) are always an outbound Port + Adapter — a service must never know which vendor is behind it.
+- Entities shared with the frontend (`User`, `Candidate`, `Process`, `Interview`, `Feedback`, `Report`, …) are imported directly from `@ibm-talent-bridge/shared-types` — never redefined in `domain/interfaces/`. That directory holds only value objects **local** to the capability, not part of the cross-app contract. `shared-types` keeps its own unprefixed naming convention (it's a cross-app contract, also consumed unprefixed by the frontend) — the `I`/`T`/`E` prefix rule applies only to backend-local types.
+- **Consistency across capabilities (e.g. keeping `Candidate.processIds` in sync with `Process.candidateIds`) is a same-process, in-memory call from one capability's service to another's application service** (normal Nest DI across modules) — never a port+adapter reaching into another capability's Mongoose model, and never a multi-document Mongo transaction (the dev/CI Mongo in `docker-compose.yml` is a standalone instance, no replica set — transactions would fail at runtime). A failed second write must be logged and re-thrown as a typed exception, never swallowed. See ADR-013 for the full reasoning — this is the general pattern for every future cross-capability consistency need, not a one-off.
 
 ## REST
 

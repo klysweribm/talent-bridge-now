@@ -195,6 +195,8 @@ src/
 
 ## Modelos de Datos Principales
 
+> Fuente de verdad del **tipo**: `packages/shared-types/src/index.ts` (consumido por frontend y backend). El modelo debajo es la misma forma, en notación Mongo (`_id: ObjectId`, `Date`); `shared-types` serializa esos mismos campos como `id: string`/`*Id: string` y fechas ISO `string` — es una diferencia de serialización, no un modelo distinto. Decisiones de embeber vs. referenciar, consistencia entre agregados e índices: ver **ADR-013** en `docs/architecture/README.md`.
+
 ### Candidate
 ```typescript
 {
@@ -205,7 +207,7 @@ src/
   linkedIn?: string,
   cvUrl: string,           // URL en IBM COS
   cvAnalysis?: CvAnalysisResult,  // resultado del CvAnalysisPort (watsonx.ai)
-  processes: ProcessRef[], // Procesos en los que participa
+  processIds: ProcessId[], // Procesos en los que participa — mantenido en sync con Process.candidateIds (ADR-013)
   createdAt: Date,
   updatedAt: Date
 }
@@ -218,14 +220,28 @@ src/
   title: string,
   clientName: string,
   recruiterId: UserId,
-  technicalRefs: UserId[],  // Mínimo 2
-  candidates: CandidateRef[],
+  technicalRefs: { userId: UserId, roleInProcess: 'principal' | 'validador' }[], // Mínimo 1 de cada rol — embebido, ADR-013
+  candidateIds: CandidateId[],       // Referencia — Candidate tiene vida propia
   currentStage: Stage,
-  stages: StageHistory[],
+  stageHistory: StageHistoryEntry[], // Embebido, append-only
   interviewDuration: 30 | 45 | 60 | 90, // minutos
+  requiredTechnologies: string[],
+  seniority: 'junior' | 'mid' | 'senior' | 'lead' | 'architect',
+  profileDescription?: string,
+  clientExpectations?: string,
   status: 'active' | 'paused' | 'closed',
   createdAt: Date,
   updatedAt: Date
+}
+```
+
+`StageHistoryEntry`:
+```typescript
+{
+  stage: Stage,
+  status: 'pending' | 'in_progress' | 'completed' | 'cancelled', // ver semántica exacta en ADR-013
+  changedAt: Date,
+  changedBy: UserId
 }
 ```
 
@@ -243,15 +259,19 @@ src/
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled',
   icsExported: boolean,
   meetingLink?: string,
+  rescheduleHistory?: { previousScheduledAt: Date, changedAt: Date, changedBy: UserId }[], // embebido, append-only — ADR-013
   createdAt: Date
 }
 ```
 
 ### Feedback
+
+> Relación 1:1:1 — un feedback por entrevista, candidato y proceso (todas las FK son escalares, nunca arrays; hoy no se considera más de un referente por entrevista). Índice único en `interviewId` para forzarlo también en la base. **Sin campo `visibleTo`**: la visibilidad (escribe solo el referente autor; leen reclutador/PM del proceso) es una regla de autorización estática aplicada en código, no un dato persistido — ver ADR-013.
+
 ```typescript
 {
   _id: ObjectId,
-  interviewId: InterviewId,
+  interviewId: InterviewId,  // único — un feedback por entrevista
   referentId: UserId,
   candidateId: CandidateId,
   processId: ProcessId,
@@ -260,7 +280,23 @@ src/
   recommendation: 'advance' | 'reject' | 'hold',
   comments: string,
   aiSuggestedTemplate?: string,
-  visibleTo: ('recruiter' | 'pm')[],
+  createdAt: Date
+}
+```
+
+### Report
+
+> Nueva entidad (ADR-013) — no existía antes aunque `REP-1` ya definía sus endpoints.
+
+```typescript
+{
+  _id: ObjectId,
+  processId: ProcessId,
+  candidateId: CandidateId,
+  generatedBy: UserId,       // recruiterId
+  generatedAt: Date,
+  pdfUrl: string,            // IBM COS
+  sentHistory: { sentAt: Date, sentBy: UserId, sentTo: string }[], // embebido, append-only — cardinalidad de sentTo abierta, ver REP-1 en ROADMAP.md
   createdAt: Date
 }
 ```

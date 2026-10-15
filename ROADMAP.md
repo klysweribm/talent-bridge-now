@@ -12,7 +12,7 @@
 > deploy) a nivel de producto, y es donde se anota una idea nueva cuando
 > surge, aunque todavía no tenga hueco en ningún plan de ejecución.
 >
-> **Última actualización:** 2026-10-15 (arquitectura objetivo IBM Cloud: Code Engine en `br-sao`, watsonx.ai, sin Redis, email por `EmailSenderPort`/SMTP — ver `docs/architecture/README.md`; reordenado para demo al sponsor: QW-1 + vertical de procesos real antes de FE-OTP-1; agregados QW-1 y AUTH-1)
+> **Última actualización:** 2026-10-15 (modelo de dominio y persistencia — ADR-013 en `docs/architecture/README.md`: resuelta la contradicción de acceso a Feedback, `Report` como entidad nueva, `technicalRefs` con rol, consistencia Candidate↔Process; arquitectura objetivo IBM Cloud: Code Engine en `br-sao`, watsonx.ai, sin Redis, email por `EmailSenderPort`/SMTP; reordenado para demo al sponsor: QW-1 + vertical de procesos real antes de FE-OTP-1; agregados QW-1 y AUTH-1)
 
 ---
 
@@ -482,7 +482,10 @@ de duplicado por email.
 - `capability/processes`: `POST /processes`, `PATCH /processes/:id`, `GET /processes`, `GET /processes/:id`.
 - `GET /users/referents?specialty=...` — listar referentes filtrables por especialidad (consumido por el paso 2 del wizard).
 - `POST /candidates` con validación de duplicado por email (índice único ya definido en `PROJECT_CONTEXT.md`).
+- Modelo de datos: ver ADR-013 en `docs/architecture/README.md` — `technicalRefs` embebido con rol (`principal`/`validador`, mínimo 1 de cada uno, validado en el DTO), sincronización `Candidate.processIds` ↔ `Process.candidateIds` por llamada en memoria entre servicios (nunca adapter cruzado ni transacción Mongo — Mongo corre standalone).
 - Frontend: `processes.infra.ts` y `wizard.store.ts` (Etapa 3) pasan de mock a `fetch` real.
+
+**Abierto (resolver al implementar, ver ADR-013):** taxonomía de `User.specialty` (texto libre vs. catálogo controlado); manejo explícito del fallo parcial al sincronizar `Candidate.processIds` (loguear + excepción tipada, nunca `catch {}` silencioso).
 
 ### Dependencias
 
@@ -538,6 +541,7 @@ referente confirma, PM observa).
 - Backend `capability/interviews`: `POST /availability`, `GET /availability/:referentId`, `POST /interviews`, `PATCH /interviews/:id/confirm`, `PATCH /interviews/:id/reschedule`, `GET /interviews/:id/ics`.
 - Backend `capability/notifications`: email al referente al agendar (`EmailSenderPort` + adapter SMTP), email de confirmación al reclutador, webhook Slack si el referente no tiene disponibilidad.
 - Sin cache de disponibilidad (sin Redis en el MVP — ADR-008); la disponibilidad se lee directo de MongoDB. Si el volumen lo justifica más adelante, se revisita con un store compartido, no antes.
+- `reschedule` apenda a `Interview.rescheduleHistory` (embebido) y repone `status` a `pending` (ver ADR-013 — limitación conocida: no distingue "nunca confirmada" de "reprogramada"). Índices a crear: `processId`, compuesto `{referentId, scheduledAt}`.
 - Frontend (Etapa 5 del plan FE): calendario reclutador, dashboard de disponibilidad del referente (vista matriz + lista), export `.ics` con `ical.js` (ya instalado).
 
 ### Dependencias
@@ -559,13 +563,21 @@ PROC-2 · CAND-1 (no se agenda una entrevista sin proceso ni candidato existente
 
 ### Motivación
 
-Formulario de feedback post-entrevista, visible solo para Reclutador y PM
-(regla ya enforced en el guard de `AppRouter.tsx` desde Etapa 0). Template
-sugerido por IA según el perfil del rol, score por dimensión.
+Formulario de feedback post-entrevista. **Quién escribe vs. quién lee** (aclarado
+2026-10-15, ver ADR-013 — antes había una contradicción real entre este documento,
+`docs/flows/README.md` y `navigation.ts` sobre esto):
+- **Escribe** el `technical_ref` que hizo la entrevista — es el único con acceso a
+  `/feedback` (el formulario), regla ya correcta en `navigation.ts`/`AppRouter.tsx`
+  desde Etapa 0. No se toca.
+- **Leen** `recruiter` y `pm` los resultados ya guardados, desde el detalle del
+  proceso (`/processes/:id`, tab "Feedback"), nunca desde `/feedback`.
+
+Template sugerido por IA según el perfil del rol, score por dimensión.
 
 ### Alcance
 
-- Backend `capability/feedback`: `POST /feedback`, `GET /feedback/:processId`, `POST /feedback/:id/send-email`.
+- Backend `capability/feedback`: `POST /feedback` (solo el `referentId` autor de la entrevista puede crear/editar su propio feedback), `GET /feedback/:processId` (reclutador/PM del proceso, o el propio referente autor para su registro), `POST /feedback/:id/send-email`.
+- Modelo de datos: ver ADR-013 — `Feedback` sin campo `visibleTo` (la visibilidad se aplica en código, no se persiste); índice único en `interviewId` para forzar 1 feedback por entrevista a nivel de base.
 - Frontend (Etapa 6 del plan FE): formulario con dimensiones técnicas + soft skills, score 1-5, recomendación final (avanza / no avanza / hold). Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre los mockups).
 
 ### Dependencias
@@ -574,7 +586,9 @@ INT-1 (el feedback se dispara post-entrevista) · AUTH-2 (guard de rol real, hoy
 
 ### Criterios de éxito
 
-- [ ] Solo `recruiter`/`pm` pueden acceder a `/feedback` (verificado con backend real, no solo el guard de frontend).
+- [ ] `/feedback` (el formulario) sigue siendo exclusivo de `technical_ref`, verificado con backend real — `recruiter`/`pm` no pueden escribir feedback.
+- [ ] `recruiter`/`pm` pueden leer el feedback guardado de un proceso desde su detalle, verificado con backend real.
+- [ ] Intentar crear un segundo feedback para la misma entrevista falla (índice único en `interviewId`), no solo por validación de aplicación.
 - [ ] Feedback enviado por email al candidato usa `packages/email-templates` (HTML plano, sin scripts).
 - [ ] Reclutador ve resultados agregados por proceso.
 
@@ -592,6 +606,7 @@ enviar al cliente — el punto de salida del flujo completo.
 ### Alcance
 
 - Backend `capability/reports`: `GET /reports/:processId/candidate/:id` (genera PDF), `POST /reports/:id/send` (envía por correo al cliente).
+- Modelo de datos: entidad `Report` (ver ADR-013 en `docs/architecture/README.md`) con `sentHistory` embebido (append-only) como registro auditable de envíos. Índice `processId`.
 - IBM COS: bucket de reportes/CVs configurado.
 - Frontend (Etapa 7 del plan FE): botón "Generar PDF" + "Enviar al cliente", historial de reportes.
 
@@ -603,6 +618,8 @@ FEED-1 (el reporte consolida feedback + entrevistas + datos del candidato).
 
 - [ ] PDF generado contiene datos reales del proceso, no placeholder.
 - [ ] Envío al cliente deja registro (auditable) de cuándo y a quién se envió.
+
+**Abierto (resolver al implementar, ver ADR-013):** cardinalidad de `ReportSendEvent.sentTo` — ¿un evento por destinatario, o un array por evento si un envío tiene varios destinatarios a la vez?
 
 ---
 
@@ -724,6 +741,7 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 | 2026-09-13 | Agregado `FE-OTP-1` (login OTP por correo, frontend mock-first) con prioridad Alta, insertado antes de AUTH-2 y de Etapa 2 del plan FE; `AUTH-2` actualizado de "JWT sobre password" a "JWT sobre OTP" (complejidad Media → Alta por rate limiting/lockout/provisión de roles). | Decisión de producto: reemplazar password por OTP/magic code (`@ibm.com` como factor de autenticación) para reducir superficie de ataque en una plataforma interna sin login de candidatos; migración futura a IBM App ID/SSO w3id sin romper el contrato de JWT interno. Reabre parcialmente el organism `LoginForm` de Etapa 1 — documentado como ajuste de alcance, no como deuda técnica nueva. |
 | 2026-10-15 | Reordenado: `QW-1` (nuevo) + Etapas 2-3 + `AUTH-1` (nuevo) + `PROC-2` delante de `FE-OTP-1`; `CV-1` marcado como candidato a adelantarse. | Demo a un futuro sponsor IBM con un vertical real con backend (decisión del usuario): priorizar el flujo de negocio sobre el login. Validación del 2026-10-15 encontró CI frontend y backend en rojo y navegación de demo rota — se atacan primero como quick wins. |
 | 2026-10-15 | Arquitectura objetivo IBM Cloud definida (`docs/architecture/README.md`, ADR-006 a ADR-012): todo en Code Engine (`tb-web`/`tb-api`, se descarta Render), región única `br-sao`, sin Redis (OTP en MongoDB con TTL), watsonx.ai reemplaza Watson NLU (`CvAnalysisPort`), email detrás de `EmailSenderPort` + adapter SMTP (se descarta Event Notifications), secretos de Code Engine + CI/CD por GitHub Actions. `DEPLOY-1` recibe alcance concreto; `CV-1`, `AUTH-2` e `INT-1` actualizados; `FE-OTP-1` recorta `TestimonialCard`/`ProductPreviewMock` del panel de marca (`docs/design/UX-GUIDELINES.md` §3.1). | Decisiones del usuario (sesión 2026-10-15) sobre deploy target, región, y reemplazo de Watson NLU/Event Notifications/Redis, que nunca tuvieron un ADR propio y contradecían el código real (`PROJECT_CONTEXT.md` daba Code Engine por decidido, `ROADMAP.md` lo reabría; Redis planificado sin ningún uso en código). |
+| 2026-10-15 | Modelo de dominio y persistencia cerrado (ADR-013): `packages/shared-types` actualizado (`Process.technicalRefs` con rol principal/validador, `StageHistoryEntry.status`, `Interview.rescheduleHistory`, nueva entidad `Report`, `User.specialty`, `WatsonNLUResult`→`CvAnalysisResult`); se elimina `Feedback.visibleTo`. Resuelta la contradicción real sobre acceso a `/feedback` entre `navigation.ts`, esta documentación y `docs/flows/README.md` (ver FEED-1). Definida la regla de consistencia `Candidate`↔`Process` (llamada en memoria entre servicios, nunca adapter cruzado ni transacción Mongo — Mongo corre standalone). | El usuario pidió validar la separación de roles; al resolver la contradicción de Feedback surgió que el modelo de dominio nunca se completó (sin `Report`, sin rol de referente, sin campo de especialidad) — se modeló todo antes de que PROC-2/CAND-1/INT-1/FEED-1/REP-1 empiecen a construir sobre vacíos. |
 
 ---
 

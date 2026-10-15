@@ -56,9 +56,9 @@ Reclutador
 Referente Técnico
     │
     ├─→ Login (/login)
-    │       └─→ Redirigir a /my-interviews
+    │       └─→ Redirigir a /dashboard (home de referente — ver docs/design/UX-GUIDELINES.md §3.2)
     │
-    ├─→ Mis Entrevistas (/my-interviews)
+    ├─→ Entrevistas (/interviews)
     │       └─→ Ver entrevistas pendientes de confirmación
     │           └─→ Click en entrevista pendiente
     │
@@ -71,14 +71,17 @@ Referente Técnico
             │               └─→ .ics adjunto para agregar al calendario
             │
             └─→ Post-entrevista: Click "Cargar Feedback"
-                    └─→ Formulario de Feedback (/feedback/new?interviewId=:id)
+                    └─→ Formulario de Feedback (/feedback) — exclusivo del referente
+                        que hizo la entrevista (ver ADR-013 en docs/architecture/README.md)
                             • Score técnico (1-5)
                             • Score soft skills (1-5)
                             • Recomendación (advance/hold/reject)
                             • Comentarios libres
-                            • Sugerencia de template por IA (Watson)
+                            • Sugerencia de template por IA (watsonx.ai)
                             └─→ Click "Guardar Feedback"
-                                └─→ Visible solo para Reclutador y PM
+                                └─→ El reclutador y el PM lo leen después desde el
+                                    detalle del proceso (/processes/:id, tab
+                                    "Feedback") — no entran al mismo formulario
 ```
 
 ---
@@ -89,7 +92,8 @@ Referente Técnico
 PM
     │
     ├─→ Login (/login)
-    │       └─→ Redirigir a /reports (vista ejecutiva, solo lectura)
+    │       └─→ Redirigir a /dashboard (home de PM — ver docs/design/UX-GUIDELINES.md §3.2)
+    │           └─→ Desde ahí, Reportes (/reports), vista ejecutiva de solo lectura
     │
     └─→ Reportes (/reports)
             │
@@ -143,6 +147,6 @@ Reclutador
 | Mínimo 2 referentes | Todo proceso necesita Técnico Principal + Validador |
 | Email único por candidato | Validación antes de crear en BD |
 | Un candidato en N procesos | Sin restricción, procesos independientes |
-| Feedback solo interno | Reclutador y PM — no el candidato ni el referente |
+| Feedback: quién escribe y quién lee | Escribe solo el referente que hizo la entrevista (`/feedback`); leen reclutador y PM desde el detalle del proceso. El candidato nunca accede (ver ADR-013) |
 | Timezone siempre visible | En todo componente de calendario o agenda |
 | Correos HTML plano | Sin scripts ni estilos externos |

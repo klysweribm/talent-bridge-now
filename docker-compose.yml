@@ -14,20 +14,22 @@ services:
       PORT: ${BACKEND_PORT:-3000}
       FRONTEND_URL: http://localhost:${FRONTEND_PORT:-5174}
       MONGODB_URI: mongodb://admin:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/talent-bridge?authSource=admin
-      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
       JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
-      WATSON_NLU_URL: ${WATSON_NLU_URL}
-      WATSON_NLU_API_KEY: ${WATSON_NLU_API_KEY}
-      WATSON_NLU_VERSION: ${WATSON_NLU_VERSION}
+      WATSONX_URL: ${WATSONX_URL}
+      WATSONX_PROJECT_ID: ${WATSONX_PROJECT_ID}
+      WATSONX_API_KEY: ${WATSONX_API_KEY}
+      WATSONX_MODEL_ID: ${WATSONX_MODEL_ID}
       COS_ENDPOINT: ${COS_ENDPOINT}
       COS_API_KEY: ${COS_API_KEY}
       COS_INSTANCE_CRN: ${COS_INSTANCE_CRN}
       COS_BUCKET_CVS: ${COS_BUCKET_CVS}
-      EVENT_NOTIFICATIONS_GUID: ${EVENT_NOTIFICATIONS_GUID}
-      EVENT_NOTIFICATIONS_API_KEY: ${EVENT_NOTIFICATIONS_API_KEY}
-      EVENT_NOTIFICATIONS_URL: ${EVENT_NOTIFICATIONS_URL}
+      SMTP_HOST: ${SMTP_HOST}
+      SMTP_PORT: ${SMTP_PORT}
+      SMTP_USER: ${SMTP_USER}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_FROM: ${SMTP_FROM}
       SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
     volumes:
       - ./apps/backend/src:/app/src
@@ -39,8 +41,6 @@ services:
       start_period: 20s
     depends_on:
       mongodb:
-        condition: service_healthy
-      redis:
         condition: service_healthy
     networks:
       - talent-bridge-net
@@ -86,29 +86,12 @@ services:
     volumes:
       - mongodb_data:/data/db
     healthcheck:
-      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')", '--quiet']
+      # CMD-SHELL con comillas: la forma CMD con paréntesis rompe /bin/sh en podman-compose
+      test: ['CMD-SHELL', 'mongosh --quiet --eval "db.adminCommand(''ping'').ok" || exit 1']
       interval: 15s
       timeout: 10s
       retries: 10
       start_period: 30s
-    networks:
-      - talent-bridge-net
-    restart: unless-stopped
-
-  # ─── Redis ─────────────────────────────────────
-  redis:
-    image: redis:7.2-alpine
-    container_name: talent-bridge-redis
-    ports:
-      - '${REDIS_PORT:-6379}:6379'
-    command: redis-server --requirepass ${REDIS_PASSWORD}
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ['CMD', 'redis-cli', '--no-auth-warning', '-a', '${REDIS_PASSWORD}', 'ping']
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - talent-bridge-net
     restart: unless-stopped
@@ -134,7 +117,6 @@ services:
 
 volumes:
   mongodb_data:
-  redis_data:
 
 networks:
   talent-bridge-net:

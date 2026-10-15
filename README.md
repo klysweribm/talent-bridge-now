@@ -21,17 +21,18 @@ IBM Talent Bridge conecta **Reclutadores, Referentes Técnicos y PMs** en una pl
 ```
 ibm-talent-bridge/
 ├── apps/
-│   ├── frontend/          → React + Vite + TypeScript  (Render Static Site)
+│   ├── frontend/          → React + Vite + TypeScript  (IBM Code Engine, nginx)
 │   └── backend/           → NestJS + Hexagonal Arch    (IBM Code Engine)
 ├── packages/
 │   ├── shared-types/      → Interfaces y tipos TS compartidos
 │   ├── shared-utils/      → Formatters, validators, helpers
 │   └── email-templates/   → Templates HTML de correos (sin scripts)
 ├── docs/
-│   ├── architecture/      → ADRs y diagramas C4 en ASCII
+│   ├── architecture/      → ADRs y diagramas C4 en Mermaid
+│   ├── design/            → UX-GUIDELINES.md (fuente única de UX del MVP)
 │   ├── api/               → Swagger exportado
-│   └── flows/             → Flujos de usuario
-├── C4/                    → Diagramas C4 fuente (diagram.drawio + export .png)
+│   ├── flows/             → Flujos de usuario
+│   └── archive/           → Documentos descartados (ej. C4 de otro producto)
 ├── DESIGN/                → Mockups Stitch (gitignored, solo referencia local)
 │   └── stitch_ibm_talent_bridge_portal/
 ├── docker-compose.yml
@@ -44,50 +45,56 @@ ibm-talent-bridge/
 
 ## Quickstart (Desarrollo Local)
 
+> No hay `package.json` en la raíz ni Turborepo: `apps/backend` y `apps/frontend`
+> son proyectos npm independientes. No existe `npm start` en la raíz.
+
 ### Pre-requisitos
 - Node.js 22+ (Node 20 llegó a EOL)
-- Docker + Docker Compose (o Podman + podman-compose)
-- Credenciales IBM Cloud (ver `.env.example`)
+- Podman + podman-compose (o Docker + Docker Compose)
 
-### Levantar todo con Docker
+### Configuración (una sola vez)
 
 ```bash
 cp .env.example .env
-# Completar variables en .env
-
-# -----------Levantar todo el stack completo con DOCKER-----------
-
-docker-compose up -d
-# ------------------------------------------------------------------
-
-# -----------Levantar todo el stack completo con PODMAN-----------
-podman-compose up -d
-
-# O solo la infra (MongoDB + Redis) mientras desarrollas sin Docker
-podman-compose up -d mongodb redis
-# ------------------------------------------------------------------
-
+# Definir MONGO_INITDB_ROOT_PASSWORD y usar la misma contraseña en MONGODB_URI.
+# Para desarrollo local no se necesitan credenciales de IBM Cloud.
+(cd apps/backend && npm install)
+(cd apps/frontend && npm install)
 ```
 
-Servicios disponibles:
-- Frontend: http://localhost:5174 (configurable con `FRONTEND_PORT` en `.env`)
-- Backend API: http://localhost:3000/api/v1 (prefijo global `/api/v1`; configurable con `BACKEND_PORT`)
-- API Docs (Swagger): http://localhost:3000/api/docs
-- MongoDB: localhost:27017
-- Redis: localhost:6379
-
-### Desarrollo sin Docker
+### Opción A — Infra en contenedor, apps en local (recomendado para desarrollar)
 
 ```bash
-# Backend
-cd apps/backend
-npm install
-npm run start:dev
+podman-compose up -d mongodb          # o: docker-compose up -d mongodb
+cd apps/backend && npm run start:dev  # terminal 1 — lee el .env de la raíz
+cd apps/frontend && npm run dev       # terminal 2 — hot reload
+```
 
-# Frontend (otra terminal)
-cd apps/frontend
-npm install
-npm run dev
+### Opción B — Todo en contenedores
+
+```bash
+podman-compose up -d                  # o: docker-compose up -d
+```
+
+### Servicios
+
+| Servicio | URL |
+| --- | --- |
+| Frontend | http://localhost:5174 (`FRONTEND_PORT`) |
+| API | http://localhost:3000/api/v1 — health: `/api/v1/health` |
+| Swagger | http://localhost:3000/api/docs |
+| MongoDB | localhost:27017 (mongo-express en :8081 con `--profile tools`) |
+
+### Usuarios demo (mock temporal, se reemplaza en AUTH-1)
+
+`ana@ibm.com` (reclutadora) · `carlos@ibm.com` (referente técnico) · `mariana@ibm.com` (PM) — cualquier contraseña de 6+ caracteres.
+
+### Calidad (antes de cada commit)
+
+```bash
+(cd apps/frontend && npm run lint && npm run typecheck && npm test -- --run)
+(cd apps/backend && npm run lint && npm run typecheck && npm test && npm run test:e2e)
+node good-practices/validate-quality.mjs --strict
 ```
 
 ---
@@ -102,18 +109,9 @@ npm run dev
 
 ---
 
-## Diseños de Referencia
+## Diseño
 
-Los mockups están en `DESIGN/stitch_ibm_talent_bridge_portal/` — **gitignored** (no se
-commitean; son referencia visual local, nunca se copian como código, ver
-`CLAUDE.md`):
-
-| Pantalla | Archivo |
-|---------|---------|
-| Login | `iniciar_sesi_n_ibm_talent_bridge/screen.png` |
-| Dashboard Reclutador | `dashboard_reclutador_ibm_talent_bridge/screen.png` |
-| Crear Proceso (Wizard) | `crear_nuevo_proceso_ibm_talent_bridge/screen.png` |
-| Sistema de diseño | `ibm_talent_bridge/DESIGN.md` |
+La especificación de UX del MVP es [`docs/design/UX-GUIDELINES.md`](docs/design/UX-GUIDELINES.md): app shell, navegación por rol, alcance de cada pantalla y tokens. Los mockups de Stitch en `DESIGN/stitch_ibm_talent_bridge_portal/` (gitignored, copia local) son solo referencia visual y nunca se copian como código. Donde contradigan la guía, manda la guía.
 
 ---
 

@@ -1,7 +1,7 @@
 # Frontend — IBM Talent Bridge
 
 > React + Vite + TypeScript  
-> Deploy: Render (Static Site)
+> Deploy: IBM Code Engine (`apps/frontend/Dockerfile`, nginx; ver ADR-006)
 
 ## Stack
 

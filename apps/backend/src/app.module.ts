@@ -12,7 +12,9 @@ const DEFAULT_THROTTLE_LIMIT = 100;
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      // apps/backend/.env (si existe) y luego el .env de la raíz del monorepo,
+      // para que `npm run start:dev` funcione fuera de Docker sin duplicar archivos.
+      envFilePath: ['.env', '../../.env'],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],

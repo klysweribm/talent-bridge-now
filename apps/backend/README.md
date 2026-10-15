@@ -8,7 +8,6 @@
 - **NestJS 10** + **TypeScript 5** (strict)
 - **Arquitectura Hexagonal** con **Vertical Slice** por capability
 - **Mongoose** — ODM para MongoDB (IBM Cloud)
-- **ioredis** — cliente Redis (IBM Cloud)
 - **Passport + JWT** — autenticación con roles
 - **class-validator + class-transformer** — validación de DTOs
 - **Swagger (@nestjs/swagger)** — documentación automática de API
@@ -25,8 +24,8 @@ src/
 │   ├── interviews/      # Agendamiento, disponibilidad, .ics
 │   ├── feedback/        # Templates, scoring, visibilidad
 │   ├── reports/         # PDF, envío por correo
-│   ├── notifications/   # IBM Event Notifications, Slack
-│   └── cv-analysis/     # Watson NLU, upload COS
+│   ├── notifications/   # EmailSenderPort (SMTP), Slack
+│   └── cv-analysis/     # watsonx.ai (CvAnalysisPort), upload COS
 ├── shared/              # Guards, interceptors, decorators
 ├── monitoring/          # Health checks
 └── main.ts

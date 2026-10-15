@@ -41,6 +41,21 @@ describe('AppRouter — navigation/route consistency', () => {
     expect(screen.getByText('Dashboard de Reclutamiento')).toBeInTheDocument();
   });
 
+  it('should redirect a pm away from /interviews, which is only for recruiter and technical_ref', () => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'pm' }, 'token');
+    renderAt('/interviews');
+    expect(screen.getByText('Dashboard de Reclutamiento')).toBeInTheDocument();
+  });
+
+  it('should let a technical_ref reach /interviews and /feedback without redirecting', () => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'technical_ref' }, 'token');
+    renderAt('/interviews');
+    expect(screen.queryByText('Dashboard de Reclutamiento')).not.toBeInTheDocument();
+
+    renderAt('/feedback');
+    expect(screen.queryByText('Dashboard de Reclutamiento')).not.toBeInTheDocument();
+  });
+
   it('should render the real DashboardPage, not ComingSoon, for /dashboard', () => {
     useAuthStore.getState().setAuth(DEMO_USER, 'token');
     renderAt('/dashboard');

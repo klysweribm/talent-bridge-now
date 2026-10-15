@@ -22,14 +22,11 @@ export interface INavItem {
 }
 
 export const NAVIGATION_ITEMS: readonly INavItem[] = [
-  { path: '/dashboard',  label: 'Inicio',                   mobileLabel: 'Inicio',     icon: 'dashboard',  roles: ['recruiter', 'pm', 'technical_ref'] },
-  { path: '/processes',  label: 'Procesos de Selección',    mobileLabel: 'Procesos',   icon: 'processes',  roles: ['recruiter', 'pm'] },
-  { path: '/candidates', label: 'Candidatos',               mobileLabel: 'Candidatos', icon: 'candidates', roles: ['recruiter', 'pm'] },
-  { path: '/referents',  label: 'Buscar Referentes',        mobileLabel: 'Referentes', icon: 'referents',  roles: ['recruiter'] },
-  { path: '/reports',    label: 'Reportes',                 mobileLabel: 'Reportes',   icon: 'reports',    roles: ['recruiter', 'pm'] },
-  { path: '/interviews', label: 'Entrevistas',               mobileLabel: 'Agenda',     icon: 'interviews', roles: ['recruiter', 'technical_ref'] },
-  { path: '/feedback',   label: 'Feedback',                 mobileLabel: 'Feedback',   icon: 'feedback',   roles: ['technical_ref'] },
-  { path: '/config',     label: 'Configuración',            mobileLabel: 'Config',     icon: 'config',     roles: ['recruiter', 'pm', 'technical_ref'] },
+  { path: '/dashboard',  label: 'Inicio',      mobileLabel: 'Inicio',   icon: 'dashboard',  roles: ['recruiter', 'pm', 'technical_ref'] },
+  { path: '/processes',  label: 'Procesos',    mobileLabel: 'Procesos', icon: 'processes',  roles: ['recruiter', 'pm'] },
+  { path: '/interviews', label: 'Entrevistas', mobileLabel: 'Agenda',   icon: 'interviews', roles: ['recruiter', 'technical_ref'] },
+  { path: '/feedback',   label: 'Feedback',    mobileLabel: 'Feedback', icon: 'feedback',   roles: ['technical_ref'] },
+  { path: '/reports',    label: 'Reportes',    mobileLabel: 'Reportes', icon: 'reports',    roles: ['recruiter', 'pm'] },
 ] as const;
 
 /** Rutas protegidas que aún no tienen pantalla real — renderizan `ComingSoon`. */
@@ -37,10 +34,7 @@ export const COMING_SOON_PATHS: readonly string[] = [
   '/processes',
   '/processes/new',
   '/processes/:id',
-  '/candidates',
   '/interviews',
   '/feedback',
   '/reports',
-  '/referents',
-  '/config',
 ] as const;

@@ -12,7 +12,7 @@
 > deploy) a nivel de producto, y es donde se anota una idea nueva cuando
 > surge, aunque todavía no tenga hueco en ningún plan de ejecución.
 >
-> **Última actualización:** 2026-09-13 (agregado FE-OTP-1 — login OTP por correo)
+> **Última actualización:** 2026-10-15 (reordenado para demo al sponsor: QW-1 + vertical de procesos real antes de FE-OTP-1; agregados QW-1 y AUTH-1)
 
 ---
 
@@ -32,18 +32,28 @@
 ## Orden de implementación recomendado
 
 ```
-En curso     →  FE  · Remediación frontend (auth + processes)       🚧 Etapa 1/8 cerrada, ver CLAUDE.md
-Iteración 0  →  FE-OTP-1 · Login OTP por correo (frontend, mock-first) 📌 sin arrancar — PRIORIDAD ALTA
-Iteración 1  →  AUTH-2 · Backend real de autenticación OTP (JWT)     📌 sin arrancar (backlog, ver alcance)
-Iteración 2  →  PROC-2 · Backend de procesos + wizard                📌 sin arrancar
-Iteración 3  →  CAND-1 · Feature Candidatos (frontend + backend)     📌 sin arrancar
-Iteración 4  →  INT-1  · Feature Entrevistas (frontend + backend)    📌 sin arrancar
-Iteración 5  →  FEED-1 · Feature Feedback (frontend + backend)       📌 sin arrancar
-Iteración 6  →  REP-1  · Feature Reportes (frontend + backend)       📌 sin arrancar
-Iteración 7  →  CV-1   · Análisis de CV (Watson NLU + IBM COS)       📌 sin arrancar
-Iteración 8  →  HARDEN-1 · Endurecimiento transversal final          📌 sin arrancar
-Iteración 9  →  DEPLOY-1 · Deploy real en IBM Cloud                   📌 sin arrancar
+Ahora        →  QW-1 · Quick wins: gates verdes, demo robusta, fundaciones   🚧 en progreso
+En curso     →  FE   · Remediación frontend — Etapa 2 (dashboard) y 3 (wizard + detalle)  🚧 Etapa 1/8 cerrada
+Iteración 1  →  AUTH-1 · Login de desarrollo con JWT real (usuarios sembrados)  📌 sin arrancar
+Iteración 2  →  PROC-2 · Backend de procesos + wizard (vertical real demo)   📌 sin arrancar
+Iteración 3  →  FE-OTP-1 · Login OTP por correo (frontend, mock-first)       📌 sin arrancar
+Iteración 4  →  AUTH-2 · Backend real OTP (reemplaza emisión de AUTH-1)       📌 sin arrancar
+Iteración 5  →  CAND-1 · Feature Candidatos (frontend + backend)              📌 sin arrancar
+Iteración 6  →  FEED-1 · Feature Feedback (frontend + backend)                📌 sin arrancar
+Iteración 7  →  CV-1   · Análisis de CV (Watson NLU + IBM COS) — candidato a adelantarse si el sponsor pide IA  📌 sin arrancar
+Iteración 8  →  INT-1  · Feature Entrevistas (frontend + backend)             📌 sin arrancar
+Iteración 9  →  REP-1  · Feature Reportes (frontend + backend)                📌 sin arrancar
+Iteración 10 →  HARDEN-1 · Endurecimiento transversal final                   📌 sin arrancar
+Iteración 11 →  DEPLOY-1 · Deploy real en IBM Cloud                           📌 sin arrancar
 ```
+
+> **Reordenamiento 2026-10-15 (demo al sponsor):** el objetivo inmediato es un
+> **vertical real con backend** del flujo de procesos (dashboard → crear
+> proceso → detalle, persistido en MongoDB). Por eso QW-1 + Etapas 2-3 +
+> AUTH-1 + PROC-2 pasan delante de FE-OTP-1: el login es la pantalla menos
+> diferenciadora, y AUTH-1 entrega el JWT real que PROC-2 necesita sin esperar
+> OTP + Event Notifications. La justificación original de abajo se conserva
+> como referencia; donde contradice este bloque, manda este bloque.
 
 **Justificación del orden:**
 
@@ -80,6 +90,69 @@ Iteración 9  →  DEPLOY-1 · Deploy real en IBM Cloud                   📌 s
 - **HARDEN-1 antes de DEPLOY-1** — gate de CI, decisión sobre `@carbon/react`,
   env config tipado y error boundary deben cerrarse antes de exponer la app
   fuera de local/Docker.
+
+---
+
+## QW-1 — Quick wins previos a la demo (gates, robustez, fundaciones)
+
+**Estado:** 🚧 en progreso · **Complejidad:** 🟢 Baja (2-3 días)
+
+**Implementado (2026-10-15):** gates (atoms DT-003…DT-006, ESLint + specs + e2e + Dockerfile de prod en backend, CI en Node 22 con `validate-quality` informativo), demo robusta (navegación única, `ComingSoon`/404 en layout, `ErrorBoundary`, sesión persistida, usuarios demo `ana@`/`carlos@`/`mariana@ibm.com`), fundaciones (`shared-types` en frontend, `env.ts`, `httpClient`, Mongoose/helmet/throttler/health con DB), higiene. Frontend 97 → 143 tests; backend 0 → 5 tests. **Pendiente:** recorrido manual en navegador (F5, 3 roles, sin 404) y health contra Mongo real. `shared-types` en backend se movió a PROC-2 (el contexto Docker del backend no incluye `packages/`). El lint del frontend en CI sigue en rojo hasta la Etapa 2 (DT-002 + warnings de `SidebarNav`).
+
+### Motivación
+
+Validación 2026-10-15: lint frontend en rojo (5 errores `max-lines`), CI backend
+roto (sin ESLint config, sin specs, sin Dockerfile de prod), botones de la demo
+que terminan en 404, sesión que se pierde con F5, login mock con un único rol,
+`packages/shared-types` sin consumir. Nada de eso resiste una demo en vivo.
+
+### Alcance
+
+- Gates: atoms DT-003…DT-006 bajo límite; backend con ESLint, primer spec, e2e y Dockerfile de prod; `validate-quality` en CI; Node alineado; sin passwords hardcodeadas en `docker-compose.test.yml`.
+- Demo robusta: config de navegación única (router + sidebar), `ComingSoon`/404 dentro del layout, `ErrorBoundary`, sesión persistida en `sessionStorage`, usuarios demo por rol.
+- Fundaciones: `shared-types` conectado en ambas apps, `config/env.ts` + `httpClient` en frontend, Mongoose/helmet/throttler/Logger/health con DB en backend.
+- Higiene: READMEs correctos, `.DS_Store` fuera de git, decisión `@carbon/react` registrada (ver HARDEN-1).
+
+### Dependencias
+
+Ninguna.
+
+### Criterios de éxito
+
+- [x] Lint frontend con solo el error de `DashboardPage` (DT-002, se cierra en Etapa 2); lint/typecheck/test backend verdes.
+- [ ] Ningún link de sidebar/dashboard lleva a 404; ruta inexistente muestra 404 dentro del layout (✅ por tests de `AppRouter`; falta recorrido en navegador).
+- [ ] F5 no cierra sesión; se puede entrar con los 3 roles demo (✅ por tests; falta recorrido en navegador).
+- [x] `shared-types` importado desde el frontend con typecheck verde (backend → PROC-2).
+- [ ] `httpClient` + `config/env.ts` con tests ✅; backend conecta a Mongo y `/api/v1/health` reporta su estado (verificado con Mongo caído vía podman; falta con Mongo arriba).
+
+---
+
+## AUTH-1 — Login de desarrollo con JWT real (usuarios sembrados)
+
+**Estado:** 📌 sin arrancar · **Complejidad:** 🟢 Baja
+
+### Motivación
+
+PROC-2 necesita endpoints protegidos con un JWT real. Esperar a AUTH-2 (OTP +
+Redis + Event Notifications) bloquearía el vertical de la demo. AUTH-1 entrega
+el contrato de JWT/roles definitivo; AUTH-2 solo cambia **cómo** se emite.
+
+### Alcance
+
+- `POST /api/v1/auth/dev-login` (email de un usuario sembrado → JWT con rol), **deshabilitado si `NODE_ENV=production`**.
+- `JwtAuthGuard` + decorador `@Roles` en `shared/`, reutilizables por todas las capabilities.
+- Seed de usuarios demo (recruiter / technical / pm).
+- Frontend: `auth.infra.ts` pasa de mock a `httpClient` manteniendo la UI de Etapa 1.
+
+### Dependencias
+
+QW-1 (Mongoose + `httpClient` + `shared-types`).
+
+### Criterios de éxito
+
+- [ ] Login con los 3 usuarios sembrados devuelve JWT con el rol correcto.
+- [ ] El endpoint responde 404 con `NODE_ENV=production` (test).
+- [ ] Endpoint protegido sin token → 401; rol incorrecto → 403 (tests).
 
 ---
 
@@ -579,6 +652,7 @@ cerrarse antes de DEPLOY-1.
 - `config/env.ts` tipado sobre `import.meta.env`.
 - Error boundary global en `AppLayout`.
 - Tests faltantes (`useLoginForm`, `ui.store.ts`, hooks nuevos de cada feature).
+- Decisión pendiente (registrada 2026-10-15): `@carbon/react` está instalado y tiene 0 imports — mantener (y adoptar componentes) o quitar la dependencia.
 
 ### Dependencias
 
@@ -633,6 +707,7 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 | 2026-09-13 | Roadmap inicial. Migrado el contenido de `plan-arquitectonico.md` (archivado, ver abajo). | Se necesitaba un backlog vivo por feature (motivación/alcance/dependencias/estado) distinto del plan de ejecución etapa-por-etapa del refactor frontend actual. |
 | 2026-09-13 | Etapa 1 de FE marcada como cerrada (`LoginPage.tsx`/DT-001 resuelto, ver `DEBT_TECH.md`). | Cierre de etapa verificado (lint/typecheck/97 tests/`validate-quality.mjs`/verificación visual con Playwright) — próximo paso es Etapa 2 (`DashboardPage.tsx`/`SidebarNav.tsx`). |
 | 2026-09-13 | Agregado `FE-OTP-1` (login OTP por correo, frontend mock-first) con prioridad Alta, insertado antes de AUTH-2 y de Etapa 2 del plan FE; `AUTH-2` actualizado de "JWT sobre password" a "JWT sobre OTP" (complejidad Media → Alta por rate limiting/lockout/provisión de roles). | Decisión de producto: reemplazar password por OTP/magic code (`@ibm.com` como factor de autenticación) para reducir superficie de ataque en una plataforma interna sin login de candidatos; migración futura a IBM App ID/SSO w3id sin romper el contrato de JWT interno. Reabre parcialmente el organism `LoginForm` de Etapa 1 — documentado como ajuste de alcance, no como deuda técnica nueva. |
+| 2026-10-15 | Reordenado: `QW-1` (nuevo) + Etapas 2-3 + `AUTH-1` (nuevo) + `PROC-2` delante de `FE-OTP-1`; `CV-1` marcado como candidato a adelantarse. | Demo a un futuro sponsor IBM con un vertical real con backend (decisión del usuario): priorizar el flujo de negocio sobre el login. Validación del 2026-10-15 encontró CI frontend y backend en rojo y navegación de demo rota — se atacan primero como quick wins. |
 
 ---
 

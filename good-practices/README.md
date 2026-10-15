@@ -1,6 +1,6 @@
 # /good-practices — Documentación de Calidad
 
-> Esta carpeta es la **fuente de verdad de calidad** del proyecto Architecture Reviewer App.
+> Esta carpeta es la **fuente de verdad de calidad** del proyecto IBM Talent Bridge.
 > Aplica tanto a colaboradores humanos como a agentes IA que contribuyan al código.
 
 ---
@@ -30,15 +30,17 @@
 > Las siguientes reglas son **no negociables** y se verifican automáticamente:
 
 ```
-1. Nunca crear un archivo que exceda su límite sin agregar etiqueta DEBT_TECH
+1. Nunca crear un archivo que exceda su límite sin registrarlo en DEBT_TECH.md
 2. Nunca usar `any` en TypeScript
-3. Nunca importar desde infrastructure en domain
-4. Nunca importar desde adapters en services (solo ports)
-5. Respetar límites: atoms≤50, molecules≤80, organisms≤100, pages≤80
-6. Controllers≤50, services≤80, adapters≤100, ports≤50, dtos≤40
+3. Nunca importar NestJS/Mongoose ni infrastructure desde domain
+4. Nunca importar adapters desde services (solo ports)
+5. Límites por tipo de archivo: única fuente de verdad en validate-quality.mjs (LIMITS)
+6. Solo organisms/pages usan React Query o Zustand; molecules/atoms solo props
 7. Preferir declarativo (.map/.filter/.reduce) sobre imperativo (for/push/mutación)
 8. Single Responsibility por archivo — si necesita "y" para describirlo, extraer
 ```
+
+Claude Code carga estas reglas en forma condensada desde `.claude/rules/*.md` (por ruta); Bob desde `.clinerules`. Si una regla cambia aquí, actualizar ambos en el mismo commit.
 
 ### Para una revisión de PR
 
@@ -55,9 +57,8 @@ node good-practices/validate-quality.mjs --strict
 Verificar TypeScript:
 
 ```bash
-cd apps/api && npx tsc --noEmit && echo "API ✅"
-cd apps/web && npx tsc --noEmit && echo "WEB ✅"
-cd packages/contracts && npx tsc && echo "CONTRACTS ✅"
+(cd apps/backend && npm run typecheck) && echo "BACKEND ✅"
+(cd apps/frontend && npm run typecheck) && echo "FRONTEND ✅"
 ```
 
 ---
@@ -74,14 +75,14 @@ cd packages/contracts && npx tsc && echo "CONTRACTS ✅"
 
 ## Decisiones arquitectónicas registradas
 
-| Decisión                             | Alternativas consideradas                 | Razón                                                            |
-| ------------------------------------ | ----------------------------------------- | ---------------------------------------------------------------- |
-| React Query para estado del servidor | Redux RTK, Context+Reducer, Zustand       | 95% del estado es server-state; ya instalado; mínimo boilerplate |
-| SQLite como BD principal             | PostgreSQL, MongoDB                       | Simplicidad para fase actual; Prisma facilita migración futura   |
-| Bull + Redis para cola de análisis   | BullMQ, SQS, Kafka                        | Integración nativa con NestJS; análisis puede durar 30-120s      |
-| Soft-delete con `visible: boolean`   | DELETE físico, tabla de papelera separada | Preserva historial; sin JOIN adicional; reversible               |
-| `source: "auto"                      | "manual"` en Scan                         | Tabla separada ManualScan                                        | Evita duplicación de esquema; filtrado simple por campo |
+| Decisión | Alternativas consideradas | Razón |
+| --- | --- | --- |
+| React Query (server state) + Zustand (client state), dominios separados | Solo React Query, Redux RTK, Context | El wizard/sesión/preferencias son estado cliente real; separarlos evita duplicar datos del servidor |
+| MongoDB (Mongoose) + Redis | PostgreSQL | Definido en `PROJECT_CONTEXT.md` (IBM Cloud Databases) |
+| Monorepo sin herramienta de workspace | Turborepo, Nx | Simplicidad en MVP (`docs/architecture/README.md`) |
+| Frontend mock-first, backend después | Backend primero | Golden path de UI validado antes de fijar contratos (plan de remediación) |
+| Login OTP por correo `@ibm.com` | Password, SSO w3id directo | Menor superficie de ataque; migración futura a App ID/w3id sin romper el JWT interno (`ROADMAP.md` FE-OTP-1/AUTH-2) |
 
 ---
 
-_Proyecto: Architecture Reviewer App · Stack: NestJS 10 / React 18 / TypeScript 5 / Prisma / SQLite_
+_Proyecto: IBM Talent Bridge · Stack: NestJS 10 / React 18 / TypeScript 5 / MongoDB / Redis / IBM Cloud_

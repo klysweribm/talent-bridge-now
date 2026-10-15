@@ -1,93 +1,68 @@
 # Métricas de Calidad
 
-## Architecture Reviewer App
+## IBM Talent Bridge
 
-> Herramienta de medición objetiva del estado del proyecto.
-> **Frecuencia de revisión**: mensual o post-release.
+> Medición objetiva del estado del proyecto.
+> **Frecuencia de revisión**: al cierre de cada etapa del plan de remediación y antes de cada deploy.
 
 ---
 
 ## Métricas de Código
 
-### Complejidad Ciclomática
+### Límites de líneas por tipo de archivo
+
+Fuente única de verdad: `LIMITS` en [`validate-quality.mjs`](./validate-quality.mjs). Resumen legible en `BEST-PRACTICES.md` §2.5 (frontend) y §3.2 (backend). Deuda registrada en [`DEBT_TECH.md`](./DEBT_TECH.md).
+
+### Complejidad ciclomática
 
 | Target          | Máximo aceptable | Herramienta              |
 | --------------- | ---------------- | ------------------------ |
-| < 5 por función | 10               | ESLint `complexity` rule |
+| < 5 por función | 10               | ESLint `complexity` rule (`.eslintrc-quality.js`) |
 
-**Estado actual**: No medido automáticamente (pendiente configurar ESLint).
-
-### Profundidad de anidación JSX / nesting TS
+### Profundidad de anidación
 
 | Target                     | Máximo | Acción                      |
 | -------------------------- | ------ | --------------------------- |
-| ≤ 2 niveles propios en JSX | 3      | Refactor a sub-componente   |
+| ≤ 2 niveles propios en JSX | 3      | Extraer sub-componente      |
 | ≤ 3 niveles en código TS   | 4      | Early return / guard clause |
 
-### Acoplamiento entre módulos
+### Acoplamiento — direcciones permitidas
 
-**Regla vigente** (verificable con `tsc --noEmit`):
-
-| Dirección permitida                             | Estado                                |
-| ----------------------------------------------- | ------------------------------------- |
-| `pages` → `organisms` → `molecules` → `atoms`   | ✅                                    |
-| `application/services` → `application/ports`    | ✅                                    |
-| `infrastructure/adapters` → `application/ports` | ✅                                    |
-| `domain` → ninguna dependencia externa          | ✅ (objetivo, 1 violación en billing) |
-| `pages` → `atoms` directo                       | ✅ permitido                          |
-| `atoms` → `organisms`                           | ❌ prohibido                          |
-| `domain` → `@nestjs/common`                     | ❌ prohibido                          |
+| Dirección                                                  | Estado      |
+| ---------------------------------------------------------- | ----------- |
+| `pages` → `organisms` → `molecules` → `atoms`              | ✅          |
+| Solo `organisms`/`pages` usan React Query / Zustand        | ✅          |
+| `hooks` → `infrastructure` (nunca `fetch` en hooks)        | ✅          |
+| `application/services` → `application/ports`               | ✅          |
+| `infrastructure/adapters` → implementa `application/ports` | ✅          |
+| `atoms`/`molecules` → hooks de datos o stores              | ❌ prohibido |
+| `domain` → `@nestjs/*` / `mongoose`                        | ❌ prohibido |
 
 ---
 
 ## Métricas de Tests
 
-> Tests no configurados aún. Este bloque define los targets para cuando se implementen.
+### Coverage targets (propuesta — confirmar al activar el gate en HARDEN-1)
 
-### Coverage targets
+| Categoría  | Target código nuevo | Mínimo aceptable |
+| ---------- | ------------------- | ---------------- |
+| Statements | 90%                 | 80%              |
+| Branches   | 85%                 | 70%              |
+| Functions  | 90%                 | 80%              |
+| Lines      | 90%                 | 80%              |
 
-| Categoría  | Target | Mínimo aceptable |
-| ---------- | ------ | ---------------- |
-| Statements | 100%   | 90%              |
-| Branches   | 95%    | 85%              |
-| Functions  | 100%   | 90%              |
-| Lines      | 100%   | 90%              |
+### Tipo de test por capa
 
-### Distribución por capa (backend)
+| Capa                                   | Tipo de test                                   |
+| -------------------------------------- | ---------------------------------------------- |
+| Frontend atoms/molecules               | Vitest + Testing Library (render + props)      |
+| Frontend organisms/pages               | Vitest + Testing Library + `QueryClient` + `MemoryRouter`, infra mockeada |
+| Backend `domain/`                      | Jest unit, sin mocks                           |
+| Backend `application/services/`        | Jest unit con fake ports                       |
+| Backend `infrastructure/adapters/`     | Integración (`docker-compose.test.yml`)        |
+| Backend `infrastructure/controllers/`  | E2E (`npm run test:e2e`, supertest)            |
 
-| Capa                          | Tipo de test requerido          |
-| ----------------------------- | ------------------------------- |
-| `domain/`                     | Unit (sin mocks)                |
-| `application/services/`       | Unit (puertos mockeados)        |
-| `infrastructure/adapters/`    | Integration (BD real en memory) |
-| `infrastructure/controllers/` | E2E (supertest)                 |
-
-### Estructura de test (patrón AAA)
-
-```typescript
-// ✅ patrón correcto
-describe('ReportImportService', () => {
-  describe('importReport', () => {
-    it('should create project when projectName does not exist', async () => {
-      // Arrange
-      const mockPort = { findProjectByName: jest.fn().mockResolvedValue(null), ... };
-      const service = new ReportImportService(mockPort as ReportImportPort);
-      const report = buildMockReport({ projectName: 'nuevo-proyecto' });
-
-      // Act
-      const result = await service.importReport(report);
-
-      // Assert
-      expect(mockPort.createProject).toHaveBeenCalledWith({
-        name: 'nuevo-proyecto',
-        repositoryPath: 'imported',
-        description: 'Auto-created from manual report import',
-      });
-      expect(result.success).toBe(true);
-    });
-  });
-});
-```
+Patrón AAA (Arrange / Act / Assert) y nombres `should <X> when <condición>` — ver `.claude/rules/testing.md`.
 
 ---
 
@@ -95,60 +70,36 @@ describe('ReportImportService', () => {
 
 ### Frontend
 
-| Métrica                | Target  | Herramienta         |
-| ---------------------- | ------- | ------------------- |
-| First Contentful Paint | < 1.5s  | Lighthouse          |
-| Time to Interactive    | < 3.5s  | Lighthouse          |
-| Bundle size (gzipped)  | < 300KB | `vite build` output |
-
-**Estado actual**: bundle de producción generado en `apps/web/dist/assets/`. Ejecutar `ls -lh dist/assets/` para verificar tamaño.
+| Métrica                | Target  | Herramienta                                         |
+| ---------------------- | ------- | --------------------------------------------------- |
+| First Contentful Paint | < 1.5s  | Lighthouse                                          |
+| Time to Interactive    | < 3.5s  | Lighthouse                                          |
+| Bundle size (gzipped)  | < 300KB | `npm run build` en `apps/frontend` → `dist/assets/` |
 
 ### Backend
 
-| Métrica                | Target  | Herramienta                |
-| ---------------------- | ------- | -------------------------- |
-| Response time p95      | < 200ms | Logs / APM                 |
-| Response time p99      | < 500ms | Logs / APM                 |
-| Import de reporte JSON | < 2s    | `POST /api/reports/import` |
+| Métrica           | Target  | Herramienta |
+| ----------------- | ------- | ----------- |
+| Response time p95 | < 200ms | Logs / APM  |
+| Response time p99 | < 500ms | Logs / APM  |
 
 ---
 
-## Métricas de Deuda Técnica
+## Evolución (llenar al cierre de cada etapa)
 
-Estado al **2025-07** (datos reales del proyecto):
-
-| Indicador                                 | Valor actual | Target |
-| ----------------------------------------- | ------------ | ------ |
-| Archivos sobre límite (crítico > 200%)    | 2            | 0      |
-| Archivos sobre límite (moderado 150-200%) | 5            | 0      |
-| Archivos en límite o bajo (≤ 100%)        | 46+          | 100%   |
-| Horas estimadas de deuda activa           | ~11.5h       | 0h     |
-| Archivos con `any` en web                 | 0            | 0 ✅   |
-| Archivos con `any` en api                 | 0            | 0 ✅   |
-
-### Evolución (llenar mensualmente)
-
-| Mes     | Críticos | Moderados | Horas deuda | Notas            |
-| ------- | -------- | --------- | ----------- | ---------------- |
-| 2025-07 | 2        | 5         | 11.5h       | Baseline inicial |
-| 2025-08 | —        | —         | —           | —                |
-| 2025-09 | —        | —         | —           | —                |
+| Fecha      | Hito     | Archivos analizados | Críticos | Moderados | Tests (frontend / backend) | Notas |
+| ---------- | -------- | ------------------- | -------- | --------- | -------------------------- | ----- |
+| 2026-09-13 | Etapa 0  | 14                  | 6        | 0         | 84 / 0                     | Baseline real |
+| 2026-09-13 | Etapa 1  | 24                  | 5        | 0         | 97 / 0                     | DT-001 resuelto |
 
 ---
 
-## Script de verificación rápida
+## Verificación rápida (desde la raíz)
 
 ```bash
-# Verificar límites de líneas — ejecutar desde raíz del monorepo
-find apps/web/src apps/api/src -name "*.ts" -o -name "*.tsx" \
-  | xargs wc -l \
-  | sort -rn \
-  | head -20
-
-# Verificar TypeScript sin errores
-cd apps/api && npx tsc --noEmit && echo "API ✅"
-cd apps/web && npx tsc --noEmit && echo "WEB ✅"
-cd packages/contracts && npx tsc --noEmit && echo "CONTRACTS ✅"
+node good-practices/validate-quality.mjs --strict
+(cd apps/frontend && npm run lint && npm run typecheck && npm test -- --run)
+(cd apps/backend && npm run lint && npm run typecheck && npm test)
 ```
 
 ---

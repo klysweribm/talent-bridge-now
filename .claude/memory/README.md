@@ -3,6 +3,7 @@
 Curated, git-committed, team-shared reference knowledge about **how to work** in this repo with Claude Code. It is not loaded automatically — files here are read on demand when `CLAUDE.md` points to them.
 
 - `context-engineering-guide.md` — when to continue / fork / summarize / start a new session, and the `/context-health` → `/generate-relevant-report` → `/import-relevant-report` handoff workflow.
+- `agentic-architecture.md` — the hub-and-spoke sub-agent model (`.claude/agents/*.md`), concurrency/per-task limits, and the per-agent `model:` convention.
 
 Domain and architecture knowledge does **not** live here: it lives in `PROJECT_CONTEXT.md` (domain, data models, design system), `good-practices/BEST-PRACTICES.md` (conventions, long form) and `.claude/rules/*.md` (conventions, condensed, path-scoped). Don't duplicate them here.
 

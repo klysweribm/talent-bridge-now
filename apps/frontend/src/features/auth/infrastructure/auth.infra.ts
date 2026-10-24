@@ -1,5 +1,5 @@
 import type { AuthUser } from '@features/auth/store/auth.store';
-import { DEMO_USERS } from './authDemoUsers';
+import { httpClient } from '@shared/infrastructure/httpClient';
 
 export interface ILoginCredentials {
   readonly email: string;
@@ -11,30 +11,32 @@ export interface ILoginResult {
   readonly token: string;
 }
 
-const SIMULATED_LATENCY_MS = 800;
+// Respuesta de `POST /auth/dev-login` (AUTH-1, backend verificado) — subconjunto
+// local de `IAuthToken`/`User` de `@ibm-talent-bridge/shared-types`, solo los
+// campos que esta infra consume.
+interface IDevLoginResponse {
+  readonly accessToken: string;
+  readonly user: {
+    readonly id:    string;
+    readonly email: string;
+    readonly fullName: AuthUser['name'];
+    readonly role:  AuthUser['role'];
+  };
+}
 
-// MVP (temporal — ver AUTH-1): login mock contra `DEMO_USERS`. Cuando exista
-// el backend, este cuerpo cambia a POST /api/auth/login; el hook y los
-// componentes que lo consumen no se tocan (misma firma).
-export function loginUser({ email, password }: ILoginCredentials): Promise<ILoginResult> {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (password.length < 6) {
-        reject(new Error('Credenciales incorrectas. Verifica tu correo y contraseña.'));
-        return;
-      }
-      if (!email.endsWith('@ibm.com')) {
-        reject(new Error('Credenciales incorrectas. Verifica tu correo y contraseña.'));
-        return;
-      }
+// AUTH-1: dev-login real contra el backend. Solo se envía `email` — el
+// endpoint no tiene concepto de contraseña; `password` se mantiene en
+// `ILoginCredentials` únicamente para que `useLoginForm` no cambie de firma.
+export async function loginUser({ email }: ILoginCredentials): Promise<ILoginResult> {
+  const { accessToken, user } = await httpClient.post<IDevLoginResponse>('/auth/dev-login', { email });
 
-      const demoUser = DEMO_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (!demoUser) {
-        reject(new Error('Usuario no provisionado. Contacta a tu administrador IBM.'));
-        return;
-      }
-
-      resolve({ user: demoUser, token: 'mock-jwt-token' });
-    }, SIMULATED_LATENCY_MS);
-  });
+  return {
+    token: accessToken,
+    user: {
+      id:    user.id,
+      email: user.email,
+      role:  user.role,
+      name:  user.fullName,
+    },
+  };
 }

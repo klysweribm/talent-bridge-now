@@ -1,33 +1,47 @@
 import { loginUser } from './auth.infra';
-import { DEMO_USERS } from './authDemoUsers';
+import { httpClient } from '@shared/infrastructure/httpClient';
+import { HttpError } from '@shared/infrastructure/httpError';
+
+vi.mock('@shared/infrastructure/httpClient', () => ({
+  httpClient: { post: vi.fn() },
+}));
+
+const mockedPost = httpClient.post as ReturnType<typeof vi.fn>;
 
 describe('loginUser', () => {
-  it('should resolve with the matching demo user and a token for a provisioned email', async () => {
-    const demoUser = DEMO_USERS[0];
-    const result = await loginUser({ email: demoUser.email, password: 'password123' });
-    expect(result.user).toEqual(demoUser);
-    expect(result.token).toBe('mock-jwt-token');
+  beforeEach(() => {
+    mockedPost.mockReset();
   });
 
-  it('should resolve with the correct role for each demo user', async () => {
-    const results = await Promise.all(
-      DEMO_USERS.map(user => loginUser({ email: user.email, password: 'password123' })),
-    );
-    expect(results.map(r => r.user.role)).toEqual(DEMO_USERS.map(u => u.role));
+  it('should resolve with the mapped user and token on a successful dev-login', async () => {
+    mockedPost.mockResolvedValue({
+      accessToken: 'jwt-abc',
+      user: { id: '1', email: 'ana@ibm.com', fullName: 'Ana García', role: 'recruiter' },
+    });
+
+    const result = await loginUser({ email: 'ana@ibm.com', password: 'password123' });
+
+    expect(result).toEqual({
+      token: 'jwt-abc',
+      user: { id: '1', email: 'ana@ibm.com', role: 'recruiter', name: 'Ana García' },
+    });
   });
 
-  it('should reject with "usuario no provisionado" for an unknown @ibm.com email', async () => {
+  it('should reject with the propagated HttpError when the email is not provisioned', async () => {
+    mockedPost.mockRejectedValue(new HttpError(401, 'Usuario no provisionado'));
+
     await expect(loginUser({ email: 'desconocido@ibm.com', password: 'password123' }))
-      .rejects.toThrow('Usuario no provisionado');
+      .rejects.toMatchObject({ name: 'HttpError', status: 401, message: 'Usuario no provisionado' });
   });
 
-  it('should reject with a generic error for a non-ibm.com email', async () => {
-    await expect(loginUser({ email: 'ana@gmail.com', password: 'password123' }))
-      .rejects.toThrow('Credenciales incorrectas');
-  });
+  it('should call httpClient.post with only the email, never the password', async () => {
+    mockedPost.mockResolvedValue({
+      accessToken: 'jwt-xyz',
+      user: { id: '2', email: 'carlos@ibm.com', fullName: 'Carlos Londoño', role: 'technical_ref' },
+    });
 
-  it('should reject with a generic error when the password is too short', async () => {
-    await expect(loginUser({ email: DEMO_USERS[0].email, password: '123' }))
-      .rejects.toThrow('Credenciales incorrectas');
+    await loginUser({ email: 'carlos@ibm.com', password: 'password123' });
+
+    expect(mockedPost).toHaveBeenCalledWith('/auth/dev-login', { email: 'carlos@ibm.com' });
   });
 });

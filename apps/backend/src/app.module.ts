@@ -3,10 +3,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { AuthModule } from './capabilities/auth/auth.module';
 import { HealthModule } from './monitoring/health.module';
+import { SharedAuthModule } from './shared/auth/shared-auth.module';
 
-const DEFAULT_THROTTLE_TTL_MS = 60_000;
+const DEFAULT_THROTTLE_TTL_SECONDS = 60;
 const DEFAULT_THROTTLE_LIMIT = 100;
+const MS_PER_SECOND = 1000;
 
 @Module({
   imports: [
@@ -29,13 +32,18 @@ const DEFAULT_THROTTLE_LIMIT = 100;
       useFactory: (configService: ConfigService) => ({
         throttlers: [
           {
-            ttl: configService.get<number>('THROTTLE_TTL', DEFAULT_THROTTLE_TTL_MS),
+            // THROTTLE_TTL se documenta en segundos (.env.example); throttler v5 espera ms.
+            ttl:
+              configService.get<number>('THROTTLE_TTL', DEFAULT_THROTTLE_TTL_SECONDS) *
+              MS_PER_SECOND,
             limit: configService.get<number>('THROTTLE_LIMIT', DEFAULT_THROTTLE_LIMIT),
           },
         ],
       }),
     }),
+    SharedAuthModule,
     HealthModule,
+    AuthModule,
   ],
   providers: [
     {

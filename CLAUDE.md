@@ -9,6 +9,7 @@ IBM Talent Bridge — internal MVP for IBM Consulting LatAm that centralizes rec
 Sources of truth — read **by section**, never whole, unless the task is about the doc itself:
 
 - `PROJECT_CONTEXT.md` — domain (roles, stages, data models), stack, env vars, design system tokens and screens.
+- `docs/use-cases/` — per-feature use cases by role (what each role can/can't do, edge cases, authz rules) — source of truth for `@Roles` guards and authz tests, more granular than `docs/flows/README.md`.
 - `good-practices/BEST-PRACTICES.md` — conventions in long form with examples (§2 frontend, §2.7 cross-cutting, §3 backend, §4.bis Stitch mockups).
 - `.clinerules` — same rules for the other agent (Bob). Keep it consistent with `.claude/rules/` when a rule changes.
 
@@ -17,7 +18,8 @@ Sources of truth — read **by section**, never whole, unless the task is about 
 ```
 apps/backend/    NestJS 10 · Hexagonal + DDD, vertical slice per capability (skeleton: only main/app.module/monitoring exist)
 apps/frontend/   React 18 + Vite · Feature Slices + Atomic Design · React Query + Zustand · Carbon + Tailwind
-packages/shared-types | shared-utils | email-templates   (not wired into any app yet)
+packages/shared-types   wired into both apps (frontend since QW-1, backend since the shared-types wiring commit)
+packages/shared-utils | email-templates   (not wired into any app yet)
 DESIGN/          Stitch mockups — visual reference only, never copied as code
 ```
 
@@ -153,4 +155,6 @@ GeneratedAt: 2026-10-16T00:00:00Z
 
 - **Cerradas:** Etapa 0 y Etapa 1 (golden path en `features/auth/`).
 - **QW-1 casi cerrado (2026-10-15):** gates, demo robusta y fundaciones implementados (frontend 143 tests, backend 5 tests, `validate-quality --strict` = 1 crítico, DT-002). Falta el recorrido en navegador (F5, roles `ana@`/`carlos@`/`mariana@ibm.com`, sin 404) y el health contra un Mongo real — ver `ROADMAP.md` → QW-1.
-- **Orden acordado para la demo al sponsor** (vertical real con backend, flujo de negocio primero): Etapa 2 (dashboard, cierra DT-002/DT-007 y deja verde el lint de CI) → Etapa 3 (wizard + detalle) → AUTH-1 (dev-login JWT) → PROC-2 (incluye conectar `shared-types` al backend) → FE-OTP-1. Plan: `~/.claude/plans/realiza-una-validaci-n-del-polished-reddy.md`.
+- **`docs/use-cases/` creado (2026-10-18):** catálogo de casos de uso por rol/feature, enlazado desde `ROADMAP.md`. Discrepancia abierta señalada (no resuelta): PM tiene acceso de ruta a `/processes/new`/`:id` en `AppRouter.tsx` pero debería ser solo lectura — resolver al implementar PROC-2.
+- **AUTH-1 backend cerrado y verificado en vivo (2026-10-18):** `capability/auth` + guards `JwtAuthGuard`/`RolesGuard`/`@Roles` reutilizables + seed idempotente de los 3 usuarios demo. Primer consumidor real de `@ibm-talent-bridge/shared-types` en el backend. Bug real encontrado y corregido durante la verificación independiente (no solo por los tests, que pasaban igual): `UserModel.role` necesitaba `@Prop({type: String, ...})` explícito o Mongoose crashea el proceso en runtime al no poder inferir el tipo desde una unión TS — aplica a cualquier futuro `@Prop` sobre un campo de tipo unión de `shared-types`. **Pendiente:** swap de `features/auth/infrastructure/auth.infra.ts` de mock a `httpClient` (es trabajo de `frontend-task`, no se tocó en este pase backend-only).
+- **Próximo paso:** swap de `auth.infra.ts` (frontend-task) para cerrar AUTH-1 por completo, luego seguir el orden ya acordado: Etapa 2 (dashboard) → Etapa 3 (wizard + detalle) → PROC-2 (incluye conectar `shared-types` al backend, y extraer `MOCK_KPI`/`MOCK_PROCESSES`/`MOCK_INTERVIEWS` de `DashboardPage.tsx` a un `processes.infra.ts` nuevo) → FE-OTP-1. Plan: `~/.claude/plans/realiza-una-validaci-n-del-polished-reddy.md`.

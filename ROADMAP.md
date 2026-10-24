@@ -129,7 +129,9 @@ Ninguna.
 
 ## AUTH-1 — Login de desarrollo con JWT real (usuarios sembrados)
 
-**Estado:** 📌 sin arrancar · **Complejidad:** 🟢 Baja
+**Estado:** 🚧 en progreso — backend cerrado y verificado (2026-10-18), falta el swap de frontend · **Complejidad:** 🟢 Baja
+
+**Implementado (2026-10-18):** `capability/auth` completa (`domain/dto`, `application/{ports,services}`, `infrastructure/{adapters,controllers,seed}`), `shared/auth/` con `JwtAuthGuard`/`RolesGuard`/`@Roles` reutilizables por el resto de capabilities, seed idempotente de los 3 usuarios demo (`ana@`/`carlos@`/`mariana@ibm.com`). Verificado de forma independiente contra el backend corriendo (no solo tests): los 3 logins devuelven JWT con el rol correcto, email no sembrado → 401, `NODE_ENV=production` → 404, `/whoami` (ruta de prueba del guard) → 401 sin token / 403 con rol incorrecto / 200 con rol correcto, dos reinicios consecutivos del proceso dejan exactamente 3 usuarios en Mongo (seed idempotente confirmado en vivo, no solo por lógica de upsert). Un bug real se encontró y corrigió durante esta verificación — ver nota abajo.
 
 ### Motivación
 
@@ -139,10 +141,15 @@ el contrato de JWT/roles definitivo; AUTH-2 solo cambia **cómo** se emite.
 
 ### Alcance
 
+- Casos de uso detallados: [`docs/use-cases/auth.md`](./docs/use-cases/auth.md).
 - `POST /api/v1/auth/dev-login` (email de un usuario sembrado → JWT con rol), **deshabilitado si `NODE_ENV=production`**.
 - `JwtAuthGuard` + decorador `@Roles` en `shared/`, reutilizables por todas las capabilities.
 - Seed de usuarios demo (recruiter / technical / pm).
-- Frontend: `auth.infra.ts` pasa de mock a `httpClient` manteniendo la UI de Etapa 1.
+- Frontend: `auth.infra.ts` pasa de mock a `httpClient` manteniendo la UI de Etapa 1. **Pendiente** — no se tocó en este pase (routing de `CLAUDE.md`: `AUTH-*` → `backend-task` únicamente; el swap de frontend es un pase de `frontend-task` aparte).
+
+### Nota — bug encontrado en verificación independiente
+
+Los tests (unit + e2e) pasaban en verde, pero el servidor real **crasheaba al arrancar**: `UserModel.role` (tipo `UserRole`, una unión de strings) no tenía `@Prop({ type: String, ... })` explícito, y Mongoose no puede inferir el tipo de una unión TypeScript — `CannotDetermineTypeError` en runtime, nunca en el pipeline de tests porque ninguno levanta el proceso completo contra el schema real sin mockear. Corregido en `user.schema.ts` agregando `type: String` al `@Prop` de `role`. **Lección para el resto de capabilities:** todo `@Prop` sobre un campo de tipo unión (`UserRole`, `ProcessStage`, `FeedbackRecommendation`, etc. de `shared-types`) necesita `type: String` explícito — los tests con fakes/mocks no lo detectan, solo un arranque real del proceso lo revela.
 
 ### Dependencias
 
@@ -150,9 +157,10 @@ QW-1 (Mongoose + `httpClient` + `shared-types`).
 
 ### Criterios de éxito
 
-- [ ] Login con los 3 usuarios sembrados devuelve JWT con el rol correcto.
-- [ ] El endpoint responde 404 con `NODE_ENV=production` (test).
-- [ ] Endpoint protegido sin token → 401; rol incorrecto → 403 (tests).
+- [x] Login con los 3 usuarios sembrados devuelve JWT con el rol correcto (verificado en vivo, no solo por test).
+- [x] El endpoint responde 404 con `NODE_ENV=production` (verificado en vivo).
+- [x] Endpoint protegido sin token → 401; rol incorrecto → 403 (verificado en vivo vía `/whoami`).
+- [ ] Frontend `auth.infra.ts` conectado a `httpClient` — pendiente, siguiente paso.
 
 ---
 
@@ -406,6 +414,7 @@ Zustand.
 
 ### Alcance
 
+- Casos de uso detallados: [`docs/use-cases/auth.md`](./docs/use-cases/auth.md).
 - `capability/auth`: `POST /auth/otp/request`, `POST /auth/otp/verify`,
   `POST /auth/refresh`, `POST /auth/logout`.
 - **Generación y almacenamiento de OTP**: código de 6 dígitos criptográficamente
@@ -479,6 +488,7 @@ de duplicado por email.
 
 ### Alcance
 
+- Casos de uso detallados: [`docs/use-cases/processes.md`](./docs/use-cases/processes.md).
 - `capability/processes`: `POST /processes`, `PATCH /processes/:id`, `GET /processes`, `GET /processes/:id`.
 - `GET /users/referents?specialty=...` — listar referentes filtrables por especialidad (consumido por el paso 2 del wizard).
 - `POST /candidates` con validación de duplicado por email (índice único ya definido en `PROJECT_CONTEXT.md`).
@@ -510,6 +520,7 @@ renombrado en Etapa 0). Es el banco de perfiles que consumen reclutador y PM.
 
 ### Alcance
 
+- Casos de uso detallados: [`docs/use-cases/candidates.md`](./docs/use-cases/candidates.md).
 - Frontend: estructura completa `components/{atoms,molecules,organisms,pages}`, banco de perfiles + detalle de candidato, filtros de UI (client-state en `store/` solo si aplica).
 - Backend: `GET /candidates` (paginado, nunca query sin límite — regla de `.clinerules`), `GET /candidates/:id`, `PATCH /candidates/:id`.
 
@@ -538,6 +549,7 @@ referente confirma, PM observa).
 
 ### Alcance
 
+- Casos de uso detallados: [`docs/use-cases/interviews.md`](./docs/use-cases/interviews.md).
 - Backend `capability/interviews`: `POST /availability`, `GET /availability/:referentId`, `POST /interviews`, `PATCH /interviews/:id/confirm`, `PATCH /interviews/:id/reschedule`, `GET /interviews/:id/ics`.
 - Backend `capability/notifications`: email al referente al agendar (`EmailSenderPort` + adapter SMTP), email de confirmación al reclutador, webhook Slack si el referente no tiene disponibilidad.
 - Sin cache de disponibilidad (sin Redis en el MVP — ADR-008); la disponibilidad se lee directo de MongoDB. Si el volumen lo justifica más adelante, se revisita con un store compartido, no antes.
@@ -576,6 +588,7 @@ Template sugerido por IA según el perfil del rol, score por dimensión.
 
 ### Alcance
 
+- Casos de uso detallados: [`docs/use-cases/feedback.md`](./docs/use-cases/feedback.md).
 - Backend `capability/feedback`: `POST /feedback` (solo el `referentId` autor de la entrevista puede crear/editar su propio feedback), `GET /feedback/:processId` (reclutador/PM del proceso, o el propio referente autor para su registro), `POST /feedback/:id/send-email`.
 - Modelo de datos: ver ADR-013 — `Feedback` sin campo `visibleTo` (la visibilidad se aplica en código, no se persiste); índice único en `interviewId` para forzar 1 feedback por entrevista a nivel de base.
 - Frontend (Etapa 6 del plan FE): formulario con dimensiones técnicas + soft skills, score 1-5, recomendación final (avanza / no avanza / hold). Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre los mockups).
@@ -605,6 +618,7 @@ enviar al cliente — el punto de salida del flujo completo.
 
 ### Alcance
 
+- Casos de uso detallados: [`docs/use-cases/reports.md`](./docs/use-cases/reports.md).
 - Backend `capability/reports`: `GET /reports/:processId/candidate/:id` (genera PDF), `POST /reports/:id/send` (envía por correo al cliente).
 - Modelo de datos: entidad `Report` (ver ADR-013 en `docs/architecture/README.md`) con `sentHistory` embebido (append-only) como registro auditable de envíos. Índice `processId`.
 - IBM COS: bucket de reportes/CVs configurado.
@@ -742,6 +756,8 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 | 2026-10-15 | Reordenado: `QW-1` (nuevo) + Etapas 2-3 + `AUTH-1` (nuevo) + `PROC-2` delante de `FE-OTP-1`; `CV-1` marcado como candidato a adelantarse. | Demo a un futuro sponsor IBM con un vertical real con backend (decisión del usuario): priorizar el flujo de negocio sobre el login. Validación del 2026-10-15 encontró CI frontend y backend en rojo y navegación de demo rota — se atacan primero como quick wins. |
 | 2026-10-15 | Arquitectura objetivo IBM Cloud definida (`docs/architecture/README.md`, ADR-006 a ADR-012): todo en Code Engine (`tb-web`/`tb-api`, se descarta Render), región única `br-sao`, sin Redis (OTP en MongoDB con TTL), watsonx.ai reemplaza Watson NLU (`CvAnalysisPort`), email detrás de `EmailSenderPort` + adapter SMTP (se descarta Event Notifications), secretos de Code Engine + CI/CD por GitHub Actions. `DEPLOY-1` recibe alcance concreto; `CV-1`, `AUTH-2` e `INT-1` actualizados; `FE-OTP-1` recorta `TestimonialCard`/`ProductPreviewMock` del panel de marca (`docs/design/UX-GUIDELINES.md` §3.1). | Decisiones del usuario (sesión 2026-10-15) sobre deploy target, región, y reemplazo de Watson NLU/Event Notifications/Redis, que nunca tuvieron un ADR propio y contradecían el código real (`PROJECT_CONTEXT.md` daba Code Engine por decidido, `ROADMAP.md` lo reabría; Redis planificado sin ningún uso en código). |
 | 2026-10-15 | Modelo de dominio y persistencia cerrado (ADR-013): `packages/shared-types` actualizado (`Process.technicalRefs` con rol principal/validador, `StageHistoryEntry.status`, `Interview.rescheduleHistory`, nueva entidad `Report`, `User.specialty`, `WatsonNLUResult`→`CvAnalysisResult`); se elimina `Feedback.visibleTo`. Resuelta la contradicción real sobre acceso a `/feedback` entre `navigation.ts`, esta documentación y `docs/flows/README.md` (ver FEED-1). Definida la regla de consistencia `Candidate`↔`Process` (llamada en memoria entre servicios, nunca adapter cruzado ni transacción Mongo — Mongo corre standalone). | El usuario pidió validar la separación de roles; al resolver la contradicción de Feedback surgió que el modelo de dominio nunca se completó (sin `Report`, sin rol de referente, sin campo de especialidad) — se modeló todo antes de que PROC-2/CAND-1/INT-1/FEED-1/REP-1 empiecen a construir sobre vacíos. |
+| 2026-10-18 | `docs/use-cases/` creado: catálogo de casos de uso por rol y feature (`auth`, `processes`, `candidates`, `interviews`, `feedback`, `reports`), enlazado desde la sección "Alcance" de cada feature en este roadmap. Discrepancia detectada (sin resolver): `AppRouter.tsx` da acceso a `pm` en `/processes/new`/`/processes/:id`, pero `PROJECT_CONTEXT.md` y `docs/flows/README.md` asumen que PM es solo lectura — señalada en `docs/use-cases/processes.md` para resolver al implementar PROC-2. | Especificación funcional "quién puede hacer qué" vivía repartida e incompleta entre 3 documentos sin cubrir casos negativos — mismo tipo de vacío que causó la contradicción real de Feedback. |
+| 2026-10-18 | `AUTH-1` backend cerrado: `capability/auth` completa + `shared/auth/` (`JwtAuthGuard`/`RolesGuard`/`@Roles`) + seed idempotente de usuarios demo. Verificado de forma independiente contra el backend corriendo (no solo tests): 3 logins con rol correcto, 401/403/404 en los casos de borde, seed estable tras 2 reinicios. Bug real encontrado y corregido en la verificación: `UserModel.role` (tipo unión) sin `@Prop({type: String})` explícito crasheaba el proceso en runtime aunque todos los tests (unit+e2e) pasaran en verde — ninguno levanta el proceso completo contra Mongoose sin mockear. Swap de `auth.infra.ts` (frontend) queda pendiente para un pase de `frontend-task` aparte. | Primer backend real del proyecto — desbloquea el swap de mock a `httpClient` en frontend y es el prerequisito de endpoints protegidos para PROC-2. El bug de Mongoose es la razón concreta de por qué la "Definición de done" del repo exige verificación independiente del reporte de un sub-agente, no solo confiar en que sus tests pasaron. |
 
 ---
 

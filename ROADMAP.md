@@ -34,7 +34,7 @@
 ```
 Ahora        →  QW-1 · Quick wins: gates verdes, demo robusta, fundaciones   🚧 en progreso
 En curso     →  FE   · Remediación frontend — Etapa 2 (dashboard) y 3 (wizard + detalle)  🚧 Etapa 1/8 cerrada
-Iteración 1  →  AUTH-1 · Login de desarrollo con JWT real (usuarios sembrados)  📌 sin arrancar
+Iteración 1  →  AUTH-1 · Login de desarrollo con JWT real (usuarios sembrados)  ✅ cerrado en código (falta recorrido en navegador, DT-010)
 Iteración 2  →  PROC-2 · Backend de procesos + wizard (vertical real demo)   📌 sin arrancar
 Iteración 3  →  FE-OTP-1 · Login OTP por correo (frontend, mock-first)       📌 sin arrancar
 Iteración 4  →  AUTH-2 · Backend real OTP (reemplaza emisión de AUTH-1)       📌 sin arrancar
@@ -129,7 +129,7 @@ Ninguna.
 
 ## AUTH-1 — Login de desarrollo con JWT real (usuarios sembrados)
 
-**Estado:** 🚧 en progreso — backend cerrado y verificado (2026-10-18), falta el swap de frontend · **Complejidad:** 🟢 Baja
+**Estado:** ✅ cerrado en código (2026-10-24) — backend + swap de frontend + test de integración contra Mongo real + DT-008/DT-009 resueltos. **Pendiente solo el recorrido manual en navegador (DT-010)** · **Complejidad:** 🟢 Baja
 
 **Implementado (2026-10-18):** `capability/auth` completa (`domain/dto`, `application/{ports,services}`, `infrastructure/{adapters,controllers,seed}`), `shared/auth/` con `JwtAuthGuard`/`RolesGuard`/`@Roles` reutilizables por el resto de capabilities, seed idempotente de los 3 usuarios demo (`ana@`/`carlos@`/`mariana@ibm.com`). Verificado de forma independiente contra el backend corriendo (no solo tests): los 3 logins devuelven JWT con el rol correcto, email no sembrado → 401, `NODE_ENV=production` → 404, `/whoami` (ruta de prueba del guard) → 401 sin token / 403 con rol incorrecto / 200 con rol correcto, dos reinicios consecutivos del proceso dejan exactamente 3 usuarios en Mongo (seed idempotente confirmado en vivo, no solo por lógica de upsert). Un bug real se encontró y corrigió durante esta verificación — ver nota abajo.
 
@@ -142,10 +142,15 @@ el contrato de JWT/roles definitivo; AUTH-2 solo cambia **cómo** se emite.
 ### Alcance
 
 - Casos de uso detallados: [`docs/use-cases/auth.md`](./docs/use-cases/auth.md).
-- `POST /api/v1/auth/dev-login` (email de un usuario sembrado → JWT con rol), **deshabilitado si `NODE_ENV=production`**.
+- `POST /api/v1/auth/dev-login` (email de un usuario sembrado → JWT con rol). **Falla cerrado (DT-008):** solo existe con `AUTH_DEV_LOGIN_ENABLED=true` exacto, y nunca con `NODE_ENV=production`; el seed de usuarios demo obedece el mismo flag.
 - `JwtAuthGuard` + decorador `@Roles` en `shared/`, reutilizables por todas las capabilities.
 - Seed de usuarios demo (recruiter / technical / pm).
-- Frontend: `auth.infra.ts` pasa de mock a `httpClient` manteniendo la UI de Etapa 1. **Pendiente** — no se tocó en este pase (routing de `CLAUDE.md`: `AUTH-*` → `backend-task` únicamente; el swap de frontend es un pase de `frontend-task` aparte).
+- Frontend: `auth.infra.ts` pasa de mock a `httpClient` manteniendo la UI de Etapa 1. **Hecho (2026-10-24).** Además `httpClient` limpia la sesión ante un 401 con token activo (DT-009) y `ProtectedRoute` redirige a `/login`.
+
+### Cierre (2026-10-24)
+
+- Test de integración `apps/backend/test/auth.integration.e2e-spec.ts` contra Mongo real: seed, login de los 3 roles, 400/401/403/404, tokens manipulados/expirados, flag apagado.
+- **No verificado aún:** recorrido manual en navegador (F5 conserva sesión, 3 roles, sin 404) — DT-010 en `good-practices/DEBT_TECH.md`. AUTH-1 no se da por 100 % cerrado hasta registrarlo.
 
 ### Nota — bug encontrado en verificación independiente
 
@@ -758,6 +763,9 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 | 2026-10-15 | Modelo de dominio y persistencia cerrado (ADR-013): `packages/shared-types` actualizado (`Process.technicalRefs` con rol principal/validador, `StageHistoryEntry.status`, `Interview.rescheduleHistory`, nueva entidad `Report`, `User.specialty`, `WatsonNLUResult`→`CvAnalysisResult`); se elimina `Feedback.visibleTo`. Resuelta la contradicción real sobre acceso a `/feedback` entre `navigation.ts`, esta documentación y `docs/flows/README.md` (ver FEED-1). Definida la regla de consistencia `Candidate`↔`Process` (llamada en memoria entre servicios, nunca adapter cruzado ni transacción Mongo — Mongo corre standalone). | El usuario pidió validar la separación de roles; al resolver la contradicción de Feedback surgió que el modelo de dominio nunca se completó (sin `Report`, sin rol de referente, sin campo de especialidad) — se modeló todo antes de que PROC-2/CAND-1/INT-1/FEED-1/REP-1 empiecen a construir sobre vacíos. |
 | 2026-10-18 | `docs/use-cases/` creado: catálogo de casos de uso por rol y feature (`auth`, `processes`, `candidates`, `interviews`, `feedback`, `reports`), enlazado desde la sección "Alcance" de cada feature en este roadmap. Discrepancia detectada (sin resolver): `AppRouter.tsx` da acceso a `pm` en `/processes/new`/`/processes/:id`, pero `PROJECT_CONTEXT.md` y `docs/flows/README.md` asumen que PM es solo lectura — señalada en `docs/use-cases/processes.md` para resolver al implementar PROC-2. | Especificación funcional "quién puede hacer qué" vivía repartida e incompleta entre 3 documentos sin cubrir casos negativos — mismo tipo de vacío que causó la contradicción real de Feedback. |
 | 2026-10-18 | `AUTH-1` backend cerrado: `capability/auth` completa + `shared/auth/` (`JwtAuthGuard`/`RolesGuard`/`@Roles`) + seed idempotente de usuarios demo. Verificado de forma independiente contra el backend corriendo (no solo tests): 3 logins con rol correcto, 401/403/404 en los casos de borde, seed estable tras 2 reinicios. Bug real encontrado y corregido en la verificación: `UserModel.role` (tipo unión) sin `@Prop({type: String})` explícito crasheaba el proceso en runtime aunque todos los tests (unit+e2e) pasaran en verde — ninguno levanta el proceso completo contra Mongoose sin mockear. Swap de `auth.infra.ts` (frontend) queda pendiente para un pase de `frontend-task` aparte. | Primer backend real del proyecto — desbloquea el swap de mock a `httpClient` en frontend y es el prerequisito de endpoints protegidos para PROC-2. El bug de Mongoose es la razón concreta de por qué la "Definición de done" del repo exige verificación independiente del reporte de un sub-agente, no solo confiar en que sus tests pasaron. |
+
+| 2026-10-24 | `AUTH-1` cerrado en código: swap de `auth.infra.ts` a `POST /auth/dev-login`, test de integración contra Mongo real (33 e2e / 16 unit backend, 146 frontend), y resueltos **DT-008** (`dev-login` y seed ahora fallan cerrado con `AUTH_DEV_LOGIN_ENABLED`, nuevo en `.env.example`/compose) y **DT-009** (`httpClient` limpia la sesión ante 401 con token activo). Corregido de paso `THROTTLE_TTL` (segundos en `.env.example`, `@nestjs/throttler` v5 espera ms: la ventana real era de 60 ms). Verificado además contra el proceso real (`node dist/main`): flag on → 201 y seed; flag ausente → 404 y sin seed; `production` + flag on → 404 y sin seed. Pendiente: recorrido en navegador (DT-010). | La revisión de AUTH-1 encontró que `dev-login` quedaba abierto si el despliegue omitía `NODE_ENV` y que un token vencido dejaba al usuario con sesión muerta; ambos se resolvieron antes de PROC-2/DEPLOY-1 como se recomendó. |
+| 2026-10-24 | Hardening de sesión del frontend (post-revisión de AUTH-1), 3 tramos secuenciales con `frontend-task`: **DT-017** carrera del 401 (token capturado al enviar), **DT-015** caché de React Query vaciada al terminar/cambiar la sesión (`QueryClient` único + `sessionCacheGuard`), **DT-016** sesión vencida tras F5 (`tokenExpiry` + `useSessionExpiry` + `ProtectedRoute`, falla cerrado). Frontend 146 → 178 tests. Cada arreglo verificado con sabotaje (se quita el arreglo y el test correspondiente falla). Restricción nueva para Etapa 2 / PROC-2: todo `useQuery` bajo el árbol de rutas protegido. Pendiente: recorrido en navegador (DT-010). | La revisión de AUTH-1 señaló tres casos latentes que se vuelven reales con los primeros `useQuery`; se cierran antes de que existan datos que filtrar. En el primer intento un subagente falló con `E003` porque heredó `claude-opus-5-5`, que el gateway no admite para agentes de código: se relanzó con `model: sonnet`. |
 
 ---
 

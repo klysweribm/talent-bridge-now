@@ -4,7 +4,10 @@ FROM node:22-alpine
 ARG BACKEND_PORT=3000
 ENV PORT=${BACKEND_PORT}
 
-WORKDIR /app
+# WORKDIR replica la ruta del monorepo (apps/backend) para que el alias de
+# tsconfig hacia ../../packages/shared-types resuelva igual dentro y fuera del
+# contenedor (ver docker-compose.yml: monta ./packages en /app/packages).
+WORKDIR /app/apps/backend
 
 COPY package*.json ./
 RUN npm ci

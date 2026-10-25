@@ -103,7 +103,7 @@ jobs:
         run: npm run build
         working-directory: apps/frontend
         env:
-          VITE_API_URL: ${{ vars.VITE_API_URL || 'http://localhost:3000' }}
+          VITE_API_URL: ${{ vars.VITE_API_URL || '/api/v1' }}
           VITE_APP_ENV: production
 
       - name: Upload build artifact

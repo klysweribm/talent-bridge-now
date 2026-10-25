@@ -37,4 +37,6 @@ USER talentbridge
 
 EXPOSE ${BACKEND_PORT}
 
-CMD ["node", "dist/main"]
+# Al importar shared-types (fuera de apps/backend) tsc emite desde la raíz del
+# repo: la entrada queda en dist/apps/backend/src/main, no en dist/main.
+CMD ["node", "dist/apps/backend/src/main"]

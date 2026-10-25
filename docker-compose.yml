@@ -17,6 +17,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
       JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
+      AUTH_DEV_LOGIN_ENABLED: ${AUTH_DEV_LOGIN_ENABLED:-true}
       WATSONX_URL: ${WATSONX_URL}
       WATSONX_PROJECT_ID: ${WATSONX_PROJECT_ID}
       WATSONX_API_KEY: ${WATSONX_API_KEY}
@@ -32,7 +33,11 @@ services:
       SMTP_FROM: ${SMTP_FROM}
       SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
     volumes:
-      - ./apps/backend/src:/app/src
+      - ./apps/backend/src:/app/apps/backend/src
+      # Read-only: habilita el alias @ibm-talent-bridge/shared-types (tsconfig
+      # paths → ../../packages/shared-types/src/index.ts), que resuelve relativo
+      # a /app/apps/backend dentro del contenedor.
+      - ./packages:/app/packages:ro
     healthcheck:
       test: ['CMD-SHELL', 'wget -q -O /dev/null http://localhost:${BACKEND_PORT:-3000}/api/v1/health || exit 1']
       interval: 15s
@@ -59,7 +64,11 @@ services:
     environment:
       VITE_PORT: ${FRONTEND_PORT:-5174}
       VITE_BACKEND_PORT: ${BACKEND_PORT:-3000}
-      VITE_API_URL: http://localhost:${BACKEND_PORT:-3000}
+      # Dentro de la red de compose el backend se llama `backend`, no `localhost`.
+      VITE_PROXY_TARGET: http://backend:${BACKEND_PORT:-3000}
+      # Sin VITE_API_URL a propósito: el frontend usa el default `/api/v1` (mismo
+      # origen) y el proxy de Vite reenvía al backend, igual que nginx en producción.
+      # Un valor absoluto sin `/api/v1` hacía que el login pegara a `/auth/dev-login` (404).
       VITE_APP_ENV: development
     volumes:
       - ./apps/frontend/src:/app/apps/frontend/src

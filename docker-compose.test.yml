@@ -8,6 +8,10 @@ services:
       dockerfile: Dockerfile.dev
     container_name: talent-bridge-backend-test
     command: npm run test:e2e
+    volumes:
+      # Mismo motivo que en docker-compose.yml: el alias de shared-types (tsconfig
+      # y moduleNameMapper de Jest) resuelve a /app/packages desde /app/apps/backend.
+      - ./packages:/app/packages:ro
     environment:
       NODE_ENV: test
       PORT: 3001
@@ -15,6 +19,7 @@ services:
       JWT_SECRET: test_secret_key_for_ci_only_32chars
       JWT_EXPIRATION: 1h
       JWT_REFRESH_EXPIRATION: 7d
+      AUTH_DEV_LOGIN_ENABLED: 'true'
     depends_on:
       mongodb-test:
         condition: service_healthy

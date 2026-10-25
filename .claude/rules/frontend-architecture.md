@@ -27,6 +27,8 @@ No upward imports (an atom never imports a molecule/organism). Molecules and ato
 - **React Query** owns everything that comes from the server (GET) and every mutation (POST/PATCH/DELETE). One hook per domain operation (`useProcessesQuery`, `useCreateProcessMutation`).
 - **Zustand** owns only client-generated state that never comes from a GET: auth session (JWT/role/profile), wizard step before final submit, UI prefs. Many small per-feature stores (`features/<f>/store/<name>.store.ts`), never one global store.
 - Never copy React Query data into Zustand or `useState`; never fetch in `useEffect`; derive with `useMemo` if expensive.
+- **One `QueryClient`**, the singleton in `shared/infrastructure/queryClient.ts` (never `new QueryClient` in app code). Its cache is emptied by `installSessionCacheGuard` (`shared/infrastructure/sessionCacheGuard.ts`) whenever the auth store's session ends or the user changes — that responsibility belongs to the guard, not to each logout/401 caller. `client.clear()` does not re-fetch a component that stays mounted, so **every `useQuery` must live under the protected route tree** (which unmounts on logout), never above it.
+- The session is also time-bound: `ProtectedRoute` treats `!token || isTokenExpired(token)` (`features/auth/utils/tokenExpiry.ts`, fails closed) as unauthenticated during render, and `useSessionExpiry` ends the session at the JWT's `exp`. The backend 401 stays the authority; this only avoids painting protected UI with a dead token.
 
 ## Infrastructure
 

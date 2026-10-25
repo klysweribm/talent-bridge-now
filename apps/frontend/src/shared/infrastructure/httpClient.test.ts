@@ -10,6 +10,23 @@ function mockFetchOnce(status: number, body: unknown): void {
   }));
 }
 
+interface IDeferredFetch {
+  readonly respond: (status: number, body: unknown) => void;
+}
+
+// Variante controlable: fetch queda pendiente hasta que el test lo resuelve a mano.
+function mockFetchDeferred(): IDeferredFetch {
+  let resolveFetch: (value: unknown) => void = () => undefined;
+  vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise((resolve) => { resolveFetch = resolve; })));
+  return {
+    respond: (status, body) => resolveFetch({
+      ok: status >= 200 && status < 300,
+      status,
+      text: () => Promise.resolve(JSON.stringify(body)),
+    }),
+  };
+}
+
 describe('httpClient', () => {
   beforeEach(() => {
     useAuthStore.getState().clearAuth();
@@ -60,6 +77,75 @@ describe('httpClient', () => {
       name: 'HttpError',
       status: 404,
       message: 'Process not found',
+    });
+  });
+
+  describe('401 handling', () => {
+    const SESSION_USER = { id: '1', name: 'Ana', email: 'ana@ibm.com', role: 'recruiter' as const };
+
+    it('should clear the session and still reject with HttpError when a 401 arrives with an active session', async () => {
+      useAuthStore.getState().setAuth(SESSION_USER, 'expired-token');
+      mockFetchOnce(401, { message: 'Unauthorized' });
+
+      await expect(httpClient.get('/processes')).rejects.toMatchObject({ status: 401 });
+
+      expect(useAuthStore.getState().token).toBeNull();
+      expect(useAuthStore.getState().user).toBeNull();
+    });
+
+    it('should leave the empty session untouched when a 401 arrives without a session (e.g. unknown login email)', async () => {
+      mockFetchOnce(401, { message: 'Usuario no provisionado' });
+
+      await expect(httpClient.post('/auth/dev-login', { email: 'x@ibm.com' })).rejects.toMatchObject({
+        status: 401,
+        message: 'Usuario no provisionado',
+      });
+    });
+
+    it('should keep the new session and still reject with 401 when a late 401 belongs to a previous token', async () => {
+      useAuthStore.getState().setAuth(SESSION_USER, 'token-A');
+      const deferred = mockFetchDeferred();
+      const pending = httpClient.get('/processes');
+      const assertion = expect(pending).rejects.toMatchObject({ status: 401 });
+
+      useAuthStore.getState().setAuth(SESSION_USER, 'token-B');
+      deferred.respond(401, { message: 'Unauthorized' });
+      await assertion;
+
+      expect(useAuthStore.getState().token).toBe('token-B');
+      expect(useAuthStore.getState().user).toEqual(SESSION_USER);
+    });
+
+    it('should clear the session when the 401 belongs to the token that is still current', async () => {
+      useAuthStore.getState().setAuth(SESSION_USER, 'token-A');
+      const deferred = mockFetchDeferred();
+      const pending = httpClient.get('/processes');
+      const assertion = expect(pending).rejects.toMatchObject({ status: 401 });
+
+      deferred.respond(401, { message: 'Unauthorized' });
+      await assertion;
+
+      expect(useAuthStore.getState().token).toBeNull();
+    });
+
+    it('should end with a cleared session and no exception when two concurrent requests get a 401 for the same token', async () => {
+      useAuthStore.getState().setAuth(SESSION_USER, 'token-A');
+      mockFetchOnce(401, { message: 'Unauthorized' });
+
+      const results = await Promise.allSettled([httpClient.get('/a'), httpClient.get('/b')]);
+
+      expect(results.map((r) => r.status)).toEqual(['rejected', 'rejected']);
+      expect(results.every((r) => r.status === 'rejected' && (r.reason as HttpError).status === 401)).toBe(true);
+      expect(useAuthStore.getState().token).toBeNull();
+    });
+
+    it.each([[403], [404], [500]])('should keep the session when the response is %i', async (status) => {
+      useAuthStore.getState().setAuth(SESSION_USER, 'valid-token');
+      mockFetchOnce(status, { message: 'nope' });
+
+      await expect(httpClient.get('/processes')).rejects.toMatchObject({ status });
+
+      expect(useAuthStore.getState().token).toBe('valid-token');
     });
   });
 

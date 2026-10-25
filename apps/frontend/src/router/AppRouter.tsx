@@ -5,6 +5,8 @@ import { ComingSoon } from '@shared/components/organisms/ComingSoon';
 import { NotFoundView } from '@shared/components/organisms/NotFoundView';
 import { NAVIGATION_ITEMS } from '@shared/config/navigation';
 import { useAuthStore, type UserRole } from '@features/auth/store/auth.store';
+import { isTokenExpired } from '@features/auth/utils/tokenExpiry';
+import { useSessionExpiry } from '@features/auth/hooks/useSessionExpiry';
 import { LoginPage } from '@features/auth/components/pages/LoginPage';
 import { DashboardPage } from '@features/processes/components/pages/DashboardPage';
 
@@ -16,8 +18,10 @@ interface ProtectedRouteProps {
 function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps): JSX.Element {
   const token = useAuthStore(state => state.token);
   const role  = useAuthStore(state => state.user?.role);
+  useSessionExpiry(token);
 
-  if (!token) return <Navigate to="/login" replace />;
+  // Token vencido = sin sesión durante el render: nunca se pinta contenido protegido.
+  if (!token || isTokenExpired(token)) return <Navigate to="/login" replace />;
   if (allowedRoles && (!role || !allowedRoles.includes(role))) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -30,7 +34,7 @@ function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps): JSX.El
 function NotFoundRoute(): JSX.Element {
   const token = useAuthStore(state => state.token);
 
-  if (!token) {
+  if (!token || isTokenExpired(token)) {
     return <NotFoundView backTo="/login" backLabel="Ir a iniciar sesión" />;
   }
   return (

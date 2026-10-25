@@ -118,6 +118,8 @@ No necesita Provider — se importa el hook directamente en cualquier archivo.
 - **Nunca** copiar datos de React Query a Zustand ni a `useState`
 - **Nunca** llamar API en `useEffect` — siempre React Query
 - Si un dato viene de un GET HTTP → React Query, nunca Zustand
+- **Un solo `QueryClient`** (singleton en `shared/infrastructure/queryClient.ts`). La caché se vacía en `sessionCacheGuard` cuando la sesión termina o cambia de usuario — responsabilidad del guard, no de cada logout/401. `clear()` no re-consulta un componente que sigue montado: **todo `useQuery` debe vivir dentro del árbol de rutas protegido** (se desmonta al hacer logout).
+- La sesión también vence por tiempo: `ProtectedRoute` trata `!token || isTokenExpired(token)` como no autenticado en el render y `useSessionExpiry` cierra la sesión en el `exp` del JWT. El 401 del backend sigue siendo la autoridad.
 
 ### Flujo de datos — quién puede hablar con los stores
 

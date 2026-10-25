@@ -35,6 +35,21 @@ const ALREADY_EXPIRED_SECONDS = -10;
 
 jest.setTimeout(30_000);
 
+function setEnv(key: string, value: string | undefined): void {
+  if (value === undefined) {
+    delete process.env[key];
+  } else {
+    process.env[key] = value;
+  }
+}
+
+async function closeApp(context: ITestContext): Promise<void> {
+  await context.app.get<Connection>(getConnectionToken()).dropDatabase();
+  await context.app.close();
+  delete process.env.NODE_ENV;
+  delete process.env.AUTH_DEV_LOGIN_ENABLED;
+}
+
 type TDecodedJwt = IJwtPayload & { readonly exp: number; readonly iat: number };
 
 interface ITestContext {
@@ -42,8 +57,9 @@ interface ITestContext {
   readonly jwtService: JwtService;
 }
 
-async function buildApp(nodeEnv: string): Promise<ITestContext> {
-  process.env.NODE_ENV = nodeEnv;
+async function buildApp(nodeEnv: string | undefined, devLoginFlag?: string): Promise<ITestContext> {
+  setEnv('NODE_ENV', nodeEnv);
+  setEnv('AUTH_DEV_LOGIN_ENABLED', devLoginFlag);
   process.env.JWT_SECRET = TEST_JWT_SECRET;
 
   const moduleRef = await Test.createTestingModule({
@@ -87,14 +103,10 @@ describe('Auth integration (real Mongo adapter + seeder + HTTP pipeline)', () =>
     let context: ITestContext;
 
     beforeAll(async () => {
-      context = await buildApp('development');
+      context = await buildApp('development', 'true');
     });
 
-    afterAll(async () => {
-      await context.app.get<Connection>(getConnectionToken()).dropDatabase();
-      await context.app.close();
-      delete process.env.NODE_ENV;
-    });
+    afterAll(() => closeApp(context));
 
     describe('seed', () => {
       it('should persist the three demo users with their roles on module init', async () => {
@@ -219,26 +231,32 @@ describe('Auth integration (real Mongo adapter + seeder + HTTP pipeline)', () =>
     });
   });
 
-  describe('production', () => {
+  describe.each([
+    ['NODE_ENV=production even with the flag on', 'production', 'true'],
+    ['the flag is false', 'development', 'false'],
+    ['the flag is not exactly "true"', 'development', 'TRUE'],
+  ])('dev-login disabled when %s', (_label, nodeEnv, devLoginFlag) => {
     let context: ITestContext;
 
     beforeAll(async () => {
-      context = await buildApp('production');
+      context = await buildApp(nodeEnv, devLoginFlag);
     });
 
-    afterAll(async () => {
-      await context.app.get<Connection>(getConnectionToken()).dropDatabase();
-      await context.app.close();
-      delete process.env.NODE_ENV;
-    });
+    afterAll(() => closeApp(context));
 
-    it('should return 404 on dev-login even for a seeded user, issuing no token', async () => {
+    it('should return 404 on dev-login, issuing no token', async () => {
       const response = await request(context.app.getHttpServer())
         .post(LOGIN_PATH)
         .send({ email: 'ana@ibm.com' })
         .expect(404);
 
       expect(response.body).not.toHaveProperty('accessToken');
+    });
+
+    it('should not seed any demo user', async () => {
+      const userModel = context.app.get<Model<UserDocument>>(getModelToken(UserModel.name));
+
+      expect(await userModel.countDocuments().exec()).toBe(0);
     });
   });
 });

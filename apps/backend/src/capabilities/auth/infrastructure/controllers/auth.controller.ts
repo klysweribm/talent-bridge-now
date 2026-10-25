@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '../../../../shared/auth/jwt-auth.guard';
 import { Roles } from '../../../../shared/auth/roles.decorator';
 import { RolesGuard } from '../../../../shared/auth/roles.guard';
 import { AuthService } from '../../application/services/auth.service';
+import { isDevLoginEnabled } from '../config/dev-login.config';
 import { DevLoginDto } from '../../domain/dto/dev-login.dto';
 import type { IAuthToken } from '../../domain/interfaces/auth-token.interface';
 
@@ -21,9 +22,12 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'JWT emitido con el rol del usuario' })
   @ApiResponse({ status: 400, description: 'Email inválido o propiedades no permitidas' })
   @ApiResponse({ status: 401, description: 'Email sin usuario sembrado' })
-  @ApiResponse({ status: 404, description: 'Deshabilitado cuando NODE_ENV=production' })
+  @ApiResponse({
+    status: 404,
+    description: 'Deshabilitado salvo AUTH_DEV_LOGIN_ENABLED=true (y nunca con NODE_ENV=production)',
+  })
   async devLogin(@Body() dto: DevLoginDto): Promise<IAuthToken> {
-    if (this.configService.get<string>('NODE_ENV') === 'production') {
+    if (!isDevLoginEnabled(this.configService)) {
       throw new NotFoundException();
     }
 

@@ -9,6 +9,7 @@ describe('AuthController', () => {
   let controller: AuthController;
   let fakeAuthService: Pick<AuthService, 'devLogin'>;
   let fakeConfigService: Pick<ConfigService, 'get'>;
+  let fakeConfig: Record<string, string | undefined>;
 
   const AUTH_TOKEN: IAuthToken = {
     accessToken: 'signed-jwt',
@@ -25,7 +26,8 @@ describe('AuthController', () => {
 
   beforeEach(async () => {
     fakeAuthService = { devLogin: jest.fn().mockResolvedValue(AUTH_TOKEN) };
-    fakeConfigService = { get: jest.fn().mockReturnValue('development') };
+    fakeConfig = { NODE_ENV: 'development', AUTH_DEV_LOGIN_ENABLED: 'true' };
+    fakeConfigService = { get: jest.fn((key: string) => fakeConfig[key]) };
 
     const moduleRef = await Test.createTestingModule({
       controllers: [AuthController],
@@ -45,8 +47,13 @@ describe('AuthController', () => {
     expect(result).toEqual(AUTH_TOKEN);
   });
 
-  it('should throw NotFoundException without calling AuthService when NODE_ENV is production', async () => {
-    (fakeConfigService.get as jest.Mock).mockReturnValue('production');
+  it.each([
+    ['NODE_ENV is production even with the flag on', { NODE_ENV: 'production', AUTH_DEV_LOGIN_ENABLED: 'true' }],
+    ['the flag is not defined', { NODE_ENV: 'development' }],
+    ['NODE_ENV is not defined (fail closed)', {}],
+    ['the flag is not exactly "true"', { NODE_ENV: 'development', AUTH_DEV_LOGIN_ENABLED: 'TRUE' }],
+  ])('should throw NotFoundException without calling AuthService when %s', async (_label, env) => {
+    fakeConfig = env;
 
     await expect(controller.devLogin({ email: AUTH_TOKEN.user.email })).rejects.toThrow(
       NotFoundException,

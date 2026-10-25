@@ -38,6 +38,7 @@ describe('Auth (e2e)', () => {
 
   async function buildApp(nodeEnv: string): Promise<INestApplication<Server>> {
     process.env.NODE_ENV = nodeEnv;
+    process.env.AUTH_DEV_LOGIN_ENABLED = 'true';
     process.env.JWT_SECRET = 'test_secret_key_for_ci_only_32chars';
 
     const moduleRef = await Test.createTestingModule({
@@ -67,6 +68,7 @@ describe('Auth (e2e)', () => {
 
   afterEach(() => {
     delete process.env.NODE_ENV;
+    delete process.env.AUTH_DEV_LOGIN_ENABLED;
   });
 
   it('should return a JWT with the correct role for a seeded demo email', async () => {

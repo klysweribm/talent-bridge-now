@@ -21,3 +21,6 @@ CLAUDE.md
 apps/frontend/vite.config.js
 apps/frontend/vite.config.d.ts
 apps/frontend/*.tsbuildinfo
+
+# Decks de presentación del proyecto (no se versionan por ahora)
+*.pptx

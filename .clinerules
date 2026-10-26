@@ -9,6 +9,12 @@
 
 ---
 
+## 🚫 Fuera de alcance
+
+- **`legacy_docs/` está fuera de alcance: no leer, no citar, no usar para decisiones. Si una tarea parece requerirlo, preguntar al usuario.**
+
+---
+
 ## 🏛 Arquitectura General
 
 - Monorepo: `apps/backend` (NestJS) + `apps/frontend` (React + Vite)

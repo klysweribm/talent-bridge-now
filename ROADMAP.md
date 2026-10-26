@@ -201,8 +201,7 @@ Ninguna — es la base de todo lo demás.
 
 ### Motivación
 
-Análisis arquitectónico (sesión 2026-09-13, ver historial de conversación /
-`plan-arquitectonico.md`): para una plataforma interna IBM sin candidatos con
+Análisis arquitectónico (sesión 2026-09-13): para una plataforma interna IBM sin candidatos con
 login, autenticar por posesión del correo `@ibm.com` (OTP/magic code) es más
 simple y reduce superficie de ataque frente a usuario+contraseña — sin hashing,
 sin reset flows, sin credenciales débiles. Decisión: implementar OTP propio
@@ -569,7 +568,7 @@ PROC-2 · CAND-1 (no se agenda una entrevista sin proceso ni candidato existente
 
 - [ ] Reclutador agenda → referente recibe email → confirma o reprograma.
 - [ ] `.ics` descargado abre correctamente en un cliente de calendario real.
-- [ ] Sin disponibilidad cargada, el webhook de Slack se dispara (fallback documentado en `plan-arquitectonico.md`, migrado aquí).
+- [ ] Sin disponibilidad cargada, el webhook de Slack se dispara (fallback documentado aquí).
 - [ ] Timezone del referente visible en todos los componentes de horario.
 
 ---
@@ -648,7 +647,7 @@ FEED-1 (el reporte consolida feedback + entrevistas + datos del candidato).
 
 ### Motivación
 
-Idea capturada de `plan-arquitectonico.md` (semana 4): al cargar el CV de
+Idea capturada del plan original (semana 4): al cargar el CV de
 un candidato, pre-llenar el perfil automáticamente en vez de captura manual
 completa. No es bloqueante para el flujo — CAND-1 funciona con carga manual
 — pero mejora significativamente la experiencia del reclutador, y es el
@@ -755,7 +754,7 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 
 | Fecha      | Cambio                                                                                   | Razón                                                                                                                                                          |
 | ---------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-13 | Roadmap inicial. Migrado el contenido de `plan-arquitectonico.md` (archivado, ver abajo). | Se necesitaba un backlog vivo por feature (motivación/alcance/dependencias/estado) distinto del plan de ejecución etapa-por-etapa del refactor frontend actual. |
+| 2026-09-13 | Roadmap inicial. Migrado el contenido del plan de arquitectura original (archivado). | Se necesitaba un backlog vivo por feature (motivación/alcance/dependencias/estado) distinto del plan de ejecución etapa-por-etapa del refactor frontend actual. |
 | 2026-09-13 | Etapa 1 de FE marcada como cerrada (`LoginPage.tsx`/DT-001 resuelto, ver `DEBT_TECH.md`). | Cierre de etapa verificado (lint/typecheck/97 tests/`validate-quality.mjs`/verificación visual con Playwright) — próximo paso es Etapa 2 (`DashboardPage.tsx`/`SidebarNav.tsx`). |
 | 2026-09-13 | Agregado `FE-OTP-1` (login OTP por correo, frontend mock-first) con prioridad Alta, insertado antes de AUTH-2 y de Etapa 2 del plan FE; `AUTH-2` actualizado de "JWT sobre password" a "JWT sobre OTP" (complejidad Media → Alta por rate limiting/lockout/provisión de roles). | Decisión de producto: reemplazar password por OTP/magic code (`@ibm.com` como factor de autenticación) para reducir superficie de ataque en una plataforma interna sin login de candidatos; migración futura a IBM App ID/SSO w3id sin romper el contrato de JWT interno. Reabre parcialmente el organism `LoginForm` de Etapa 1 — documentado como ajuste de alcance, no como deuda técnica nueva. |
 | 2026-10-15 | Reordenado: `QW-1` (nuevo) + Etapas 2-3 + `AUTH-1` (nuevo) + `PROC-2` delante de `FE-OTP-1`; `CV-1` marcado como candidato a adelantarse. | Demo a un futuro sponsor IBM con un vertical real con backend (decisión del usuario): priorizar el flujo de negocio sobre el login. Validación del 2026-10-15 encontró CI frontend y backend en rojo y navegación de demo rota — se atacan primero como quick wins. |
@@ -766,6 +765,7 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 
 | 2026-10-24 | `AUTH-1` cerrado en código: swap de `auth.infra.ts` a `POST /auth/dev-login`, test de integración contra Mongo real (33 e2e / 16 unit backend, 146 frontend), y resueltos **DT-008** (`dev-login` y seed ahora fallan cerrado con `AUTH_DEV_LOGIN_ENABLED`, nuevo en `.env.example`/compose) y **DT-009** (`httpClient` limpia la sesión ante 401 con token activo). Corregido de paso `THROTTLE_TTL` (segundos en `.env.example`, `@nestjs/throttler` v5 espera ms: la ventana real era de 60 ms). Verificado además contra el proceso real (`node dist/main`): flag on → 201 y seed; flag ausente → 404 y sin seed; `production` + flag on → 404 y sin seed. Pendiente: recorrido en navegador (DT-010). | La revisión de AUTH-1 encontró que `dev-login` quedaba abierto si el despliegue omitía `NODE_ENV` y que un token vencido dejaba al usuario con sesión muerta; ambos se resolvieron antes de PROC-2/DEPLOY-1 como se recomendó. |
 | 2026-10-24 | Hardening de sesión del frontend (post-revisión de AUTH-1), 3 tramos secuenciales con `frontend-task`: **DT-017** carrera del 401 (token capturado al enviar), **DT-015** caché de React Query vaciada al terminar/cambiar la sesión (`QueryClient` único + `sessionCacheGuard`), **DT-016** sesión vencida tras F5 (`tokenExpiry` + `useSessionExpiry` + `ProtectedRoute`, falla cerrado). Frontend 146 → 178 tests. Cada arreglo verificado con sabotaje (se quita el arreglo y el test correspondiente falla). Restricción nueva para Etapa 2 / PROC-2: todo `useQuery` bajo el árbol de rutas protegido. Pendiente: recorrido en navegador (DT-010). | La revisión de AUTH-1 señaló tres casos latentes que se vuelven reales con los primeros `useQuery`; se cierran antes de que existan datos que filtrar. En el primer intento un subagente falló con `E003` porque heredó `claude-opus-5-5`, que el gateway no admite para agentes de código: se relanzó con `model: sonnet`. |
+| 2026-10-25 | Limpieza de documentación legacy (alcance A): `plan-arquitectonico.md` y 10 mockups Stitch movidos a `legacy_docs/` (fuera del contexto del agente: regla en `CLAUDE.md`/`.clinerules` + `deny` de lectura en `.claude/settings.json`); `docs/archive/c4-otro-producto/` eliminado (otro producto); `*.pptx` fuera de git (`.gitignore`); ADR-004/009/013 marcados PENDIENTE DE REEMPLAZO (encuadre Bench First); despliegue/IBM Cloud Logs/health check pasados a "objetivo, no implementado". | Aislar lo obsoleto antes de rediseñar el dominio (alcance B, pendiente: casos de uso, ROADMAP y `shared-types`). Turborepo descartado: la POC levanta sin él. |
 
 ---
 

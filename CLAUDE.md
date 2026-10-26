@@ -13,6 +13,10 @@ Sources of truth — read **by section**, never whole, unless the task is about 
 - `good-practices/BEST-PRACTICES.md` — conventions in long form with examples (§2 frontend, §2.7 cross-cutting, §3 backend, §4.bis Stitch mockups).
 - `.clinerules` — same rules for the other agent (Bob). Keep it consistent with `.claude/rules/` when a rule changes.
 
+## Out of scope
+
+- **`legacy_docs/` está fuera de alcance: no leer, no citar, no usar para decisiones. Si una tarea parece requerirlo, preguntar al usuario.**
+
 ## Monorepo layout
 
 ```
@@ -113,4 +117,5 @@ ImportedAt: 2026-10-25T12:22:17Z
 - **AUTH-1 backend cerrado y verificado en vivo (2026-10-18):** `capability/auth` + guards `JwtAuthGuard`/`RolesGuard`/`@Roles` reutilizables + seed idempotente de los 3 usuarios demo. Primer consumidor real de `@ibm-talent-bridge/shared-types` en el backend. Bug real encontrado y corregido durante la verificación independiente (no solo por los tests, que pasaban igual): `UserModel.role` necesitaba `@Prop({type: String, ...})` explícito o Mongoose crashea el proceso en runtime al no poder inferir el tipo desde una unión TS — aplica a cualquier futuro `@Prop` sobre un campo de tipo unión de `shared-types`. **Pendiente:** swap de `features/auth/infrastructure/auth.infra.ts` de mock a `httpClient` (es trabajo de `frontend-task`, no se tocó en este pase backend-only).
 - **AUTH-1 cerrado en código (2026-10-24):** swap de `auth.infra.ts` a `POST /auth/dev-login` hecho; test de integración `apps/backend/test/auth.integration.e2e-spec.ts` contra Mongo real (backend 16 unit / 33 e2e, frontend 146 tests). Resueltos DT-008 (`dev-login` y seed fallan cerrado: requieren `AUTH_DEV_LOGIN_ENABLED=true` exacto y nunca corren con `NODE_ENV=production`) y DT-009 (`httpClient` limpia la sesión ante 401 con token activo). **Pendiente:** recorrido manual en navegador (DT-010) — hasta registrarlo no se da por 100 % cerrado. Deuda abierta de AUTH-1: DT-010 a DT-014 en `good-practices/DEBT_TECH.md`.
 - **Hardening de sesión del frontend (2026-10-24):** resueltos DT-015 (caché de React Query vaciada al terminar/cambiar sesión), DT-016 (JWT vencido tras F5 → `/login` sin pintar contenido) y DT-017 (401 tardío ya no cierra una sesión nueva). Frontend 178 tests. **Regla para Etapa 2 / PROC-2:** todo `useQuery` debe vivir bajo el árbol de rutas protegido (`client.clear()` no re-consulta componentes que siguen montados) — ver `.claude/rules/frontend-architecture.md`. Los `*-task` no tienen `model:` fijado: con la sesión en Opus, el gateway rechaza al subagente con `E003`; pasar `model: sonnet` al lanzarlos hasta fijarlo en `.claude/agents/*.md`.
+- **Limpieza de documentación legacy (2026-10-25):** lo obsoleto se movió a `legacy_docs/` (fuera de alcance, bloqueado por `deny`); ADR-004/009/013 quedan PENDIENTE DE REEMPLAZO (encuadre Bench First, aún sin ADR nuevos). Pendiente: alcance B (rediseño del dominio, casos de uso, ROADMAP, `shared-types`).
 - **Próximo paso:** recorrido en navegador de AUTH-1 (DT-010), luego seguir el orden ya acordado: Etapa 2 (dashboard) → Etapa 3 (wizard + detalle) → PROC-2 (incluye conectar `shared-types` al backend, y extraer `MOCK_KPI`/`MOCK_PROCESSES`/`MOCK_INTERVIEWS` de `DashboardPage.tsx` a un `processes.infra.ts` nuevo) → FE-OTP-1. Plan: `~/.claude/plans/realiza-una-validaci-n-del-polished-reddy.md`.

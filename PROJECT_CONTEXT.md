@@ -68,9 +68,9 @@ Cada etapa tiene un estado (`pending`, `in_progress`, `completed`, `cancelled`) 
 
 | Capa | Tecnología | Infraestructura | Propósito |
 |------|-----------|-----------------|-----------|
-| **Frontend** | React + Vite + TypeScript | IBM Code Engine (nginx, SPA + proxy `/api`) | SPA con roles |
-| **Backend** | NestJS + Arquitectura Hexagonal | IBM Code Engine (Docker, `project-only`) | API REST |
-| **Base de Datos** | MongoDB | Databases for MongoDB (`br-sao`) | Colecciones flexibles + TTL para OTP |
+| **Frontend** | React + Vite + TypeScript | Objetivo, no implementado: IBM Code Engine (nginx, SPA + proxy `/api`) | SPA con roles |
+| **Backend** | NestJS + Arquitectura Hexagonal | Objetivo, no implementado: IBM Code Engine (Docker, `project-only`) | API REST |
+| **Base de Datos** | MongoDB | Objetivo, no implementado: Databases for MongoDB (`br-sao`) | Colecciones flexibles + TTL para OTP |
 | **Email** | `EmailSenderPort` + adapter SMTP | Relay SMTP corporativo (a validar) | OTP, invitaciones, feedback, reportes |
 | **IA CV** | watsonx.ai (`CvAnalysisPort`) | API watsonx.ai (región a validar) | Extracción de datos de CV |
 | **Storage** | IBM Cloud Object Storage | COS (`br-sao`) | PDFs y WORD de CVs |

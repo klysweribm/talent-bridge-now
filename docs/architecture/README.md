@@ -4,7 +4,7 @@
 
 IBM Talent Bridge sigue una arquitectura de **monorepo con vertical slices**. El backend usa **Arquitectura Hexagonal + DDD**, el frontend usa **Feature Slices**. Despliegue objetivo: **IBM Cloud, un solo ambiente (demo/prod), región `br-sao` (São Paulo), todo en Code Engine**.
 
-> Los diagramas C4 anteriores (`C4/diagram.drawio` + `C4/talent-bridge-ibm.png`) describían otro producto (movilidad interna de empleados, PostgreSQL, .NET) y se archivaron en `docs/archive/c4-otro-producto/` con una nota. Los diagramas Mermaid de abajo son los válidos.
+> Los diagramas vigentes (C1, C2 y despliegue objetivo) son los Mermaid de abajo.
 
 ---
 
@@ -70,7 +70,7 @@ flowchart TB
 
 **Notas:**
 - `tb-web` es el único punto expuesto; `tb-api` tiene visibilidad `project-only` (no accesible fuera del proyecto Code Engine), por lo que no necesita CORS ni autenticación de red adicional entre los dos.
-- Imágenes en **IBM Container Registry (ICR)**, secretos como **secrets de Code Engine**, logs en **IBM Cloud Logs**.
+- Imágenes en **IBM Container Registry (ICR)**, secretos como **secrets de Code Engine**, logs en **IBM Cloud Logs** _(objetivo, no implementado: DEPLOY-1 sin arrancar)_.
 
 ---
 
@@ -172,6 +172,7 @@ flowchart TB
 - **Beneficio:** Testabilidad por capa, inversión de dependencias garantizada.
 
 ### ADR-004: Candidato identificado por email
+- **Estado:** PENDIENTE DE REEMPLAZO (encuadre Bench First). Fija el dominio anterior; se sustituirá por ADRs nuevos. No tomar como base para trabajo nuevo.
 - **Decisión:** El email es el campo único de un candidato.
 - **Razón:** Evita duplicados y es el identificador natural en procesos de RRHH.
 
@@ -198,6 +199,7 @@ flowchart TB
 - **Consecuencias:** Válido mientras `tb-api` corra como una sola instancia. Si se escala horizontalmente, el throttler en memoria deja de ser consistente entre instancias y se necesita un store compartido (Redis u otro) — se revisita en ese momento, no antes. Se elimina Redis de `docker-compose*.yml`, `.env.example`, la dependencia `ioredis` de `apps/backend/package.json`, y toda mención en la documentación.
 
 ### ADR-009: watsonx.ai para análisis de CV (reemplaza Watson NLU)
+- **Estado:** PENDIENTE DE REEMPLAZO (encuadre Bench First). Fija el dominio anterior; se sustituirá por ADRs nuevos. No tomar como base para trabajo nuevo.
 
 - **Contexto:** Watson NLU nunca fue un parser de CV (es análisis de sentimiento/entidades de texto genérico); watsonx.ai (modelos generativos) es la herramienta correcta para extraer datos estructurados de un CV no estructurado, y es la pieza central de la demo con el sponsor del watsonx Challenge.
 - **Decisión:** `cv-analysis` expone un `CvAnalysisPort` detrás del cual se implementa un adapter para watsonx.ai (prompt + modelo configurable). Reemplaza toda mención a Watson NLU en `PROJECT_CONTEXT.md`, `ROADMAP.md` (`CV-1`), `.env.example` (`WATSONX_URL`, `WATSONX_PROJECT_ID`, `WATSONX_API_KEY`, `WATSONX_MODEL_ID`) y en el paso 3 del wizard ("Sugerir skills desde el CV").
@@ -216,8 +218,8 @@ flowchart TB
   - Imágenes en **IBM Container Registry (ICR)**.
   - Secretos como **secrets de Code Engine** (Secrets Manager queda para Fase 2).
   - `backend-ci.yml` / `frontend-ci.yml` agregan un job de deploy que corre **solo en `main`**: build → push a ICR → `ibmcloud ce app update`, autenticado con un API key de IBM Cloud guardado como secret de GitHub.
-  - Health checks de Code Engine contra `GET /api/v1/health`.
-  - Logs centralizados en **IBM Cloud Logs**.
+  - Health checks de Code Engine contra `GET /api/v1/health` _(objetivo, no implementado)_.
+  - Logs centralizados en **IBM Cloud Logs** _(objetivo, no implementado)_.
   - Backup automático de Databases for MongoDB (función nativa del servicio).
   - Política de retención de CVs en COS — **a definir** (no bloqueante para el MVP, se revisita en `DEPLOY-1`).
 - **Consecuencias:** `DEPLOY-1` queda con alcance concreto (ver `ROADMAP.md`) en vez de "pendiente de decisión".
@@ -229,6 +231,7 @@ flowchart TB
 - **Consecuencias:** Cualquier mención futura a "IBM App ID" en código o docs debe leerse como "Fase 2, pendiente de verificar si sigue siendo App ID o pasa a IBM Security Verify" — no implementar wiring real contra App ID hasta esa verificación.
 
 ### ADR-013: Modelo de dominio y persistencia (embeber vs. referenciar, MongoDB)
+- **Estado:** PENDIENTE DE REEMPLAZO (encuadre Bench First). Fija el dominio anterior; se sustituirá por ADRs nuevos. No tomar como base para trabajo nuevo.
 
 - **Contexto:** `packages/shared-types` tenía una base razonable pero con vacíos reales: `Process.technicalRefIds` no modelaba la regla "mínimo 1 Principal + 1 Validador"; `StageHistoryEntry` no tenía el campo `status` que la propia documentación ya mencionaba; no existía ninguna entidad `Report` aunque REP-1 ya define sus endpoints; `User` no tenía cómo filtrar referentes por especialidad aunque PROC-2 ya define ese endpoint; `Feedback.visibleTo` persistía como dato una regla de autorización que en realidad es estática — y fue la causa raíz de una contradicción real encontrada entre `navigation.ts`, esta misma documentación y `ROADMAP.md` sobre quién puede acceder a `/feedback` (resuelta: el **referente técnico escribe** el feedback de la entrevista que hizo; **reclutador y PM leen** los resultados guardados desde el detalle del proceso, nunca desde el mismo formulario — `/feedback` sigue siendo exclusivo de `technical_ref`, eso ya era correcto en el código). Como el paradigma (Hexagonal + DDD + Vertical Slice sobre MongoDB) ya estaba decidido y no se reabre, el trabajo real no es "normalizar" sino decidir qué se embebe y qué se referencia, con el límite de agregado como límite de consistencia.
 - **Decisión — una colección por agregado raíz:** `users`, `candidates`, `processes`, `interviews`, `feedback`, `reports`, `availabilities` (un documento por `userId`). Cada uno tiene ciclo de vida independiente y se consulta por sí solo.

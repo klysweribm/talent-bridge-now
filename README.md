@@ -21,8 +21,8 @@ IBM Talent Bridge conecta **Reclutadores, Referentes Técnicos y PMs** en una pl
 ```
 ibm-talent-bridge/
 ├── apps/
-│   ├── frontend/          → React + Vite + TypeScript  (IBM Code Engine, nginx)
-│   └── backend/           → NestJS + Hexagonal Arch    (IBM Code Engine)
+│   ├── frontend/          → React + Vite + TypeScript  (objetivo: IBM Code Engine, nginx — no desplegado)
+│   └── backend/           → NestJS + Hexagonal Arch    (objetivo: IBM Code Engine — no desplegado)
 ├── packages/
 │   ├── shared-types/      → Interfaces y tipos TS compartidos
 │   ├── shared-utils/      → Formatters, validators, helpers

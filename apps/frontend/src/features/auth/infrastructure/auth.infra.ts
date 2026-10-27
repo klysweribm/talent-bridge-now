@@ -40,3 +40,14 @@ export async function loginUser({ email }: ILoginCredentials): Promise<ILoginRes
     },
   };
 }
+
+// Motivo del cierre de sesión que el backend registra en `auth_events`.
+// Única definición: el idle timer reutilizará `'idle'`.
+export type TLogoutReason = 'manual' | 'idle' | 'expired';
+
+// QW-2: `POST /auth/logout` responde 204 sin cuerpo. Si el token ya venció el
+// backend responde 401 y `httpClient` limpia la sesión (idempotente con el
+// `clearAuth` posterior del hook).
+export async function logoutUser(reason: TLogoutReason): Promise<void> {
+  await httpClient.post<null>('/auth/logout', { reason });
+}

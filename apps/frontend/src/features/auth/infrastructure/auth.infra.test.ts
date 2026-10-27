@@ -1,4 +1,4 @@
-import { loginUser } from './auth.infra';
+import { loginUser, logoutUser } from './auth.infra';
 import { httpClient } from '@shared/infrastructure/httpClient';
 import { HttpError } from '@shared/infrastructure/httpError';
 
@@ -43,5 +43,30 @@ describe('loginUser', () => {
     await loginUser({ email: 'carlos@ibm.com', password: 'password123' });
 
     expect(mockedPost).toHaveBeenCalledWith('/auth/dev-login', { email: 'carlos@ibm.com' });
+  });
+});
+
+describe('logoutUser', () => {
+  beforeEach(() => {
+    mockedPost.mockReset();
+  });
+
+  it('should POST the reason to /auth/logout and resolve on 204', async () => {
+    mockedPost.mockResolvedValue(null);
+
+    await expect(logoutUser('idle')).resolves.toBeUndefined();
+    expect(mockedPost).toHaveBeenCalledWith('/auth/logout', { reason: 'idle' });
+  });
+
+  it('should propagate the HttpError when the token is expired (401)', async () => {
+    mockedPost.mockRejectedValue(new HttpError(401, 'Unauthorized'));
+
+    await expect(logoutUser('manual')).rejects.toMatchObject({ name: 'HttpError', status: 401 });
+  });
+
+  it('should propagate the HttpError on a network failure', async () => {
+    mockedPost.mockRejectedValue(new HttpError(0, 'Failed to fetch'));
+
+    await expect(logoutUser('manual')).rejects.toMatchObject({ name: 'HttpError', status: 0 });
   });
 });

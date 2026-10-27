@@ -1,6 +1,7 @@
 import type { CSSProperties, JSX, MouseEvent, ReactNode } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useAuthStore } from '@features/auth/store/auth.store';
+import { useLogoutMutation } from '@features/auth/hooks/useLogoutMutation';
 import { useUiStore } from '@shared/store/ui.store';
 import { Icon } from '@shared/components/atoms/Icon';
 import { NAVIGATION_ITEMS } from '@shared/config/navigation';
@@ -45,18 +46,17 @@ function CtrlBtn({
 }
 
 export function SidebarNav(): JSX.Element {
-  const { user, clearAuth }                            = useAuthStore();
+  const user                                           = useAuthStore(state => state.user);
+  const logout                                         = useLogoutMutation();
   const { sidebarCollapsed, sidebarDark,
           toggleSidebarCollapsed, toggleSidebarTheme } = useUiStore();
-  const navigate = useNavigate();
 
   const visibleItems = NAVIGATION_ITEMS.filter(
     item => user?.role && item.roles.includes(user.role),
   );
 
   const handleLogout = (): void => {
-    clearAuth();
-    navigate('/login', { replace: true });
+    logout.mutate('manual');
   };
 
   // ─── Paleta según tema ────────────────────────────────────

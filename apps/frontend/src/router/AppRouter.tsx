@@ -7,6 +7,7 @@ import { NAVIGATION_ITEMS } from '@shared/config/navigation';
 import { useAuthStore, type UserRole } from '@features/auth/store/auth.store';
 import { isTokenExpired } from '@features/auth/utils/tokenExpiry';
 import { useSessionExpiry } from '@features/auth/hooks/useSessionExpiry';
+import { IdleWarningModal } from '@features/auth/components/organisms/IdleWarningModal';
 import { LoginPage } from '@features/auth/components/pages/LoginPage';
 import { DashboardPage } from '@features/processes/components/pages/DashboardPage';
 
@@ -26,7 +27,12 @@ function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps): JSX.El
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <AppLayout>{children}</AppLayout>;
+  return (
+    <>
+      <AppLayout>{children}</AppLayout>
+      <IdleWarningModal />
+    </>
+  );
 }
 
 // 404 dentro del layout cuando hay sesión — nunca una pantalla pelada para

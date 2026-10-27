@@ -593,6 +593,8 @@ this.logger.error('Failed to send .ics', error);
 this.logger.log(JSON.stringify(fullRequestBody)); // FORBIDDEN
 ```
 
+**Excepción explícita — FlowLog** (`shared/observability/`, decorador `@TraceFlow()`): ayuda de depuración que imprime request → adapters → response. Solo se activa con `FLOW_LOG_ENABLED=true` exacto y nunca con `NODE_ENV=production`; redacta secretos (tokens, passwords, OTP, headers de auth) y muestra PII (emails, nombres) a propósito. Usar `@TraceFlow()` solo en métodos públicos de puertos, no en controllers ni helpers privados.
+
 ### 3.5 Controllers — composición, no lógica
 
 Un controller **solo** debe: recibir la request, llamar un método de un service,

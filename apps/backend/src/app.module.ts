@@ -5,6 +5,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './capabilities/auth/auth.module';
 import { HealthModule } from './monitoring/health.module';
+import { FlowLogModule } from './shared/observability/flow-log.module';
 import { SharedAuthModule } from './shared/auth/shared-auth.module';
 
 const DEFAULT_THROTTLE_TTL_SECONDS = 60;
@@ -41,6 +42,7 @@ const MS_PER_SECOND = 1000;
         ],
       }),
     }),
+    FlowLogModule,
     SharedAuthModule,
     HealthModule,
     AuthModule,

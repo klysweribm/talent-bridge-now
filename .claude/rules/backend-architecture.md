@@ -36,3 +36,5 @@ Plural resources (`/candidates`, `/processes`), standard verbs/status codes, fil
 ## Logging
 
 NestJS `Logger` only (`new Logger(ClassName.name)`), never `console.*`. Log ids and outcomes, never request bodies, tokens, OTP codes or PII.
+
+Only exception: FlowLog (`shared/observability/`, `@TraceFlow()`), a debugging aid that prints request/adapter/response flow. It runs only with `FLOW_LOG_ENABLED=true` exact and never when `NODE_ENV=production`, redacts secrets (tokens, passwords, OTP, auth headers) and deliberately shows PII such as emails and names. Use `@TraceFlow()` only on public port methods, never on controllers or private helpers.

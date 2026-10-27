@@ -12,7 +12,7 @@ Delegates a task to the sub-agent whose own definition (`.claude/agents/*-task.m
 
 1. **Resolve the target.**
    - `Etapa N` → read that stage's section in the remediation plan (path in `CLAUDE.md` → "Estado actual"; today `~/.claude/plans/breezy-moseying-plum.md`).
-   - A feature ID (`FE-OTP-1`, `AUTH-2`, `PROC-2`, `CAND-1`, `INT-1`, `FEED-1`, `REP-1`, `CV-1`, `HARDEN-1`, `DEPLOY-1`) → read its `## <ID> — ...` section in root `ROADMAP.md` in full (Motivación/Alcance/Dependencias/Criterios de éxito).
+   - A feature ID (`QW-2`, `FE-OTP-1`, `AUTH-2`, `AUTH-3`, `AUTH-4`, `PROC-2`, `CAND-1`, `INT-1`, `FEED-1`, `REP-1`, `CV-1`, `HARDEN-1`, `DEPLOY-1`) → read its `## <ID> — ...` section in root `ROADMAP.md` in full (Motivación/Alcance/Dependencias/Criterios de éxito).
    - `next` / no id → `CLAUDE.md` → "Estado actual / próximo paso" says what's next; cross-check with the first non-✅ line of `ROADMAP.md` → "Orden de implementación recomendado". If they disagree, show both and ask.
 2. **Check dependencies.** If the section's `### Dependencias` names something not ✅, tell the user before delegating — don't silently start a blocked task.
 3. **Map to a sub-agent:**
@@ -22,6 +22,8 @@ Delegates a task to the sub-agent whose own definition (`.claude/agents/*-task.m
    | `Etapa 0-7`, `FE`, `FE-*` | `frontend-task` |
    | `AUTH-*`, `PROC-*`, `CV-*` | `backend-task` |
    | `CAND-1`, `INT-1`, `FEED-1`, `REP-1` (frontend + backend) | `frontend-task` first, then `backend-task` — see step 4 |
+   | `QW-2` | `config-task` (env vars), `frontend-task` (idle timer), `backend-task` then `frontend-task` (logout) — run sequentially |
+   | `AUTH-3`, `AUTH-4` | `backend-task` first, then `frontend-task` — see step 4 |
    | `Etapa 8`, `HARDEN-*`, `DEPLOY-*` | `config-task` (plus `frontend-task` if the stage's scope includes UI code) |
    | Anything else / new prefix | Read its Alcance and ask the user which layer(s) it touches |
 

@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { IJwtPayload } from '../../../../shared/auth/jwt-payload.interface';
+import { TraceFlow } from '../../../../shared/observability/trace-flow.decorator';
 import { USER_REPOSITORY_PORT, type IUserRepositoryPort } from '../ports/user-repository.port';
 import type { IAuthToken } from '../../domain/interfaces/auth-token.interface';
 
@@ -13,6 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  @TraceFlow()
   async devLogin(email: string): Promise<IAuthToken> {
     const user = await this.userRepository.findByEmail(email);
 

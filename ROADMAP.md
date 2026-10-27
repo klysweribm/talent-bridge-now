@@ -34,10 +34,14 @@
 ```
 Ahora        →  QW-1 · Quick wins: gates verdes, demo robusta, fundaciones   🚧 en progreso
 En curso     →  FE   · Remediación frontend — Etapa 2 (dashboard) y 3 (wizard + detalle)  🚧 Etapa 1/8 cerrada
+Hecho        →  OBS-1 · FlowLog: trazas request → adapters → response (solo no-producción)  ✅ cerrado en código (2026-10-27)
+Siguiente    →  QW-2  · Higiene de sesión y entorno (env vars, idle timer, auditoría de logout, verificación de BD)  📌 sin arrancar · prioridad ALTA
 Iteración 1  →  AUTH-1 · Login de desarrollo con JWT real (usuarios sembrados)  ✅ cerrado en código (falta recorrido en navegador, DT-010)
 Iteración 2  →  PROC-2 · Backend de procesos + wizard (vertical real demo)   📌 sin arrancar
 Iteración 3  →  FE-OTP-1 · Login OTP por correo (frontend, mock-first)       📌 sin arrancar
 Iteración 4  →  AUTH-2 · Backend real OTP (reemplaza emisión de AUTH-1)       📌 sin arrancar
+Iteración 4b →  AUTH-3 · Sesión corta + refresh + expiración por inactividad    📌 sin arrancar (después de AUTH-2: ambos cambian la emisión de tokens)
+Iteración 4c →  AUTH-4 · Tokens de sesión en cookies httpOnly                   📌 sin arrancar (después de AUTH-3)
 Iteración 5  →  CAND-1 · Feature Candidatos (frontend + backend)              📌 sin arrancar
 Iteración 6  →  FEED-1 · Feature Feedback (frontend + backend)                📌 sin arrancar
 Iteración 7  →  CV-1   · Análisis de CV (watsonx.ai + IBM COS) — candidato a adelantarse si el sponsor pide IA  📌 sin arrancar
@@ -166,6 +170,81 @@ QW-1 (Mongoose + `httpClient` + `shared-types`).
 - [x] El endpoint responde 404 con `NODE_ENV=production` (verificado en vivo).
 - [x] Endpoint protegido sin token → 401; rol incorrecto → 403 (verificado en vivo vía `/whoami`).
 - [ ] Frontend `auth.infra.ts` conectado a `httpClient` — pendiente, siguiente paso.
+
+---
+
+## OBS-1 — FlowLog: trazas de flujo request → adapters → response
+
+**Estado:** ✅ cerrado en código (2026-10-27) · **Complejidad:** 🟢 Baja
+
+### Qué es
+
+Ayuda de depuración que imprime en la terminal del backend cada petición con su `Request`, los pasos por servicios y adapters (`↳`), y su `Response`, indicando la capability de origen. Sin dependencias nuevas (interceptor global + middleware + decorador + `AsyncLocalStorage`). Código en `apps/backend/src/shared/observability/`.
+
+### Cómo usarlo
+
+- **Apagado por defecto** (`FLOW_LOG_ENABLED=false` en `.env.example` y en `docker-compose.yml`). Para activarlo: `FLOW_LOG_ENABLED=true` en tu `.env` local y `podman-compose up -d --force-recreate backend`; luego `podman-compose logs -f backend` (o `logs -f backend` para ver solo el backend, sin el ruido de Mongo).
+- **Falla cerrado:** solo se activa con `true` exacto y **nunca con `NODE_ENV=production`** (el arranque avisa si lo ignora). Ojo: `apps/backend/Dockerfile` fija `NODE_ENV=production`, así que un contenedor construido con él no mostrará trazas (decisión pendiente para DEPLOY-1).
+- **Trazar un adapter o servicio nuevo:** poner `@TraceFlow()` sobre métodos públicos de puertos o servicios. Nunca sobre controladores ni helpers privados. Hoy lo llevan `AuthService.devLogin` y `MongooseUserAdapter.findByEmail`; los adapters futuros (watsonx, COS, SMTP, Slack) deben llevarlo desde su primer commit.
+- **Qué oculta y qué no:** `authorization`, `cookie`, `password`, `token`, `accessToken`, `refreshToken`, `otp`, `secret`, `apiKey` y cualquier valor con forma de JWT o `Bearer` salen como `[REDACTED]`. **Los emails y nombres se muestran a propósito** (excepción acotada al flag, documentada en `backend-architecture.md`, `.clinerules` y `BEST-PRACTICES.md` §3.4). Con datos reales de candidatos habrá que enmascarar PII.
+
+### Verificado
+
+Backend: typecheck sin errores, 35 tests unitarios, 38 e2e (incluido `flow-log.e2e-spec.ts`: flag on/off, producción ignora el flag, 401 impreso por el middleware, secretos nunca en la salida). Verificado en vivo por salida real del contenedor.
+
+### Pendiente (deuda y mejoras)
+
+- **DT-020:** 7 warnings de lint nuevos (complejidad/líneas por función) en `redact.ts`, `trace-flow.decorator.ts`, interceptor, middleware y el e2e.
+- **OBS-2 (por decidir):** sección de Mongo bajo el mismo flujo (consultas con su `#id`) con flag propio `FLOW_LOG_MONGO`; y/o silenciar el ruido de conexiones del contenedor `mongod` (`--quiet`). Hoy las líneas `[mongodb] |` son la salida del contenedor, no del FlowLog.
+
+---
+
+## QW-2 — Higiene de sesión y entorno
+
+**Estado:** 📌 sin arrancar · **Prioridad:** 🔺 Alta · **Complejidad:** 🟢 Baja (1-2 días) · **Registrado:** 2026-10-27
+
+### Motivación
+
+Tras cerrar AUTH-1 y el FlowLog quedaron cuatro mejoras pequeñas y de poco riesgo: variables de entorno que nadie lee, sesión que nunca caduca por inactividad (solo por `exp` del JWT), un "logout" que solo borra el estado del cliente sin dejar rastro en el backend, y sin comprobación en vivo de qué queda guardado en Mongo.
+
+### Alcance
+
+**1. Limpiar variables de entorno sin consumidor.**
+- Verificado por búsqueda que ningún código las lee; solo aparecen en `.env.example` y en el paso a través de `docker-compose.yml`: `WATSONX_URL/PROJECT_ID/API_KEY/MODEL_ID`, `COS_ENDPOINT/API_KEY/INSTANCE_CRN/BUCKET_CVS`, `SMTP_HOST/PORT/USER/PASS/FROM`, `SLACK_WEBHOOK_URL`, `JWT_REFRESH_EXPIRATION` (esta también en `docker-compose.test.yml`) y el bloque comentado de `APPID_*`.
+- Se quitan de `.env.example` y de ambos compose. Cada una se vuelve a añadir **en el mismo commit que su adapter** (regla de `anti-hardcoding.md`: CV-1, AUTH-2, INT-1).
+- Se conservan las que sí se leen (ya incluye `FLOW_LOG_ENABLED`, añadida por OBS-1 con valor `false`): `NODE_ENV`, `PORT`, `BACKEND_PORT`, `FRONTEND_PORT`, `FRONTEND_URL`, `MONGODB_URI`, `MONGO_*`, `JWT_SECRET`, `JWT_EXPIRATION`, `THROTTLE_*`, `AUTH_DEV_LOGIN_ENABLED`, `FLOW_LOG_ENABLED`, `VITE_API_URL`.
+- `PROJECT_CONTEXT.md` y `docs/architecture/README.md` describen esas variables como configuración objetivo: se reetiquetan como "reservadas (se añaden junto a su adapter)", no se borran.
+
+**2. Idle timer con aviso (frontend).**
+- Tras **360 s (6 min)** sin actividad aparece un aviso con cuenta atrás de **60 s**; al llegar a cero se cierra la sesión (motivo `idle`).
+- Parametrizado: `VITE_IDLE_TIMEOUT_SECONDS=360` y `VITE_IDLE_WARNING_SECONDS=60`, validados en `config/env.ts` (zod, con esos valores por defecto y la regla `aviso < timeout`), documentados en `.env.example` y pasados en `docker-compose.yml`.
+- `useIdleTimer` en `features/auth/hooks/` (junto a `useSessionExpiry`): eventos `mousemove`, `mousedown`, `keydown`, `scroll`, `touchstart` con throttle; calcula con `Date.now()` y no con contadores, porque los timers de pestañas en segundo plano se frenan. `IdleWarningModal` con "Seguir conectado" y "Cerrar sesión", bajo el árbol de rutas protegido (regla de DT-015).
+- Convive con `useSessionExpiry`: la expiración del JWT sigue siendo el techo.
+
+**3. Logout literal con registro de auditoría (fase 1).**
+- Backend, `capabilities/auth`: `POST /auth/logout` protegido con `JwtAuthGuard` (cualquier rol); DTO con `reason` ∈ `manual | idle | expired`; puerto `AuthEventRepositoryPort` + adapter Mongoose a la colección `auth_events` (`userId`, `type`, `reason`, `at`, `ip`, `userAgent`); servicio que orquesta, controlador sin lógica; `@TraceFlow()` en el puerto.
+- Se registra también el **login** en la misma colección (un logout sin su login deja la auditoría ciega). Decisión a confirmar al arrancar la tarea.
+- `ip` y `userAgent` son datos personales: índice TTL con `AUTH_EVENT_RETENTION_DAYS` (por defecto 90). Detrás de Vite/nginx `req.ip` solo es fiable con `trust proxy`.
+- Frontend: `logoutUser` en `auth.infra.ts` y `useLogoutMutation` (React Query), usado por `SidebarNav.handleLogout` y por el idle timer. La llamada va **antes** de limpiar la sesión; si falla se limpia igual, sin bloquear la salida.
+- Límite conocido: el JWT sigue válido hasta `exp` tras el logout → **DT-018**, que cierra AUTH-3.
+
+**4. Verificar la integración de Mongo con login y logout.**
+- Ya confirmado: el login lee `users` en Mongo (`findByEmail` devuelve `_id` real con timestamps) y `auth.integration.e2e-spec.ts` corre contra Mongo real. El logout actual **no toca la base** (`SidebarNav.handleLogout` solo hace `clearAuth()`).
+- Pendiente de comprobar en vivo: que `users` tiene los 3 usuarios con su rol y, tras la tarea 3, que `auth_events` recibe filas `login` y `logout`. Consulta con `mongosh` dentro del contenedor leyendo credenciales del propio entorno (sin pegarlas), o con `mongo-express`.
+- Registrar el resultado aquí; si se hace en navegador, cierra **DT-010**.
+- Orden: después de la tarea 3.
+
+### Dependencias
+
+AUTH-1 cerrado. Las tareas 1 y 4 no dependen de nada; la 2 y la 3 se coordinan en el flujo de cierre de sesión. Enrutado: `config-task` (1), `frontend-task` (2), `backend-task` y luego `frontend-task` (3), verificación manual (4).
+
+### Criterios de éxito
+
+- [ ] `podman-compose config` valida sin las variables retiradas y el stack arranca; tests de backend y frontend siguen verdes.
+- [ ] Sin actividad durante 6 min aparece el aviso; a los 60 s se cierra la sesión; cualquier actividad antes de eso lo cancela. Valores cambiables por `.env` y con defaults 360/60.
+- [ ] Cerrar sesión (manual o por inactividad) crea una fila en `auth_events` con el motivo; el login también.
+- [ ] Verificado en vivo: `users` con 3 usuarios y `auth_events` con login y logout (resultado registrado aquí).
+- [ ] DT-010 actualizado o cerrado; DT-018 y DT-019 siguen abiertas (las cierran AUTH-3 y AUTH-4).
 
 ---
 
@@ -479,6 +558,63 @@ problema en el diseño anterior.
 
 ---
 
+## AUTH-3 — Sesión corta con refresh y expiración por inactividad en backend
+
+**Estado:** 📌 sin arrancar · **Prioridad:** Media · **Complejidad:** 🟡 Media · **Registrado:** 2026-10-27
+
+### Motivación
+
+Hoy el JWT dura 1 h y el logout no lo invalida (**DT-018**): un token robado sirve hasta `exp`. Se busca que el servidor también mate la sesión por inactividad y que no queden tokens huérfanos.
+
+### Alcance
+
+- **Diseño recomendado (patrón estándar):** access JWT corto + **refresh token opaco**, guardado con hash en Mongo (colección `sessions`) con índice TTL. El refresh rota en cada uso y se detecta su reutilización. Sin actividad no hay refresh, la sesión caduca y su registro desaparece solo por TTL.
+- Refresh bajo demanda (ante un 401 o cerca del vencimiento, y solo si hubo actividad) en vez de polling continuo, para no generar tráfico en reposo. "Renovar en cada petición" implica una escritura en BD por request y se evalúa al planificar.
+- Parámetros por env (se añaden a `.env.example` entonces): TTL del access token y TTL deslizante de la sesión. Regla validada al arrancar: TTL de sesión ≥ idle timeout + aviso (QW-2) + margen.
+- El logout revoca la sesión (cierra DT-018).
+- **Pregunta abierta:** se mencionó un TTL de 3 min y luego una renovación de 4 min; fijar un solo valor al planificar.
+
+### Dependencias
+
+QW-2 (`auth_events`, idle timer) y AUTH-2 (cambia la emisión de tokens; hacerlo antes obligaría a rehacerlo).
+
+### Criterios de éxito
+
+- [ ] Sin actividad el refresh no ocurre y la sesión desaparece de Mongo por TTL.
+- [ ] Tras el logout el access token deja de aceptarse (o caduca en minutos) y el refresh queda revocado.
+- [ ] Reutilizar un refresh ya rotado revoca la sesión.
+- [ ] DT-018 cerrada.
+
+---
+
+## AUTH-4 — Tokens de sesión en cookies httpOnly
+
+**Estado:** 📌 sin arrancar · **Prioridad:** Media · **Complejidad:** 🟡 Media · **Registrado:** 2026-10-27
+
+### Motivación
+
+El token vive en `sessionStorage`, legible por cualquier script si hay un XSS (**DT-019**). Una cookie `httpOnly` no es accesible desde JavaScript, y es la práctica habitual para sesiones de navegador.
+
+### Alcance
+
+- Access y refresh en cookies `httpOnly`, `Secure` (forzado en producción; configurable en local porque Safari no acepta `Secure` en `http://localhost`) y `SameSite=Lax/Strict`. La cookie de refresh con `Path=/api/v1/auth`, para que solo viaje a los endpoints de auth.
+- **Cuidados:** el navegador la envía sola, así que aparece el riesgo CSRF → `SameSite` más una cabecera personalizada obligatoria en endpoints que cambian estado. Un XSS aún puede hacer peticiones en nombre del usuario aunque no copie el token: no es una bala de plata.
+- Piezas: `cookie-parser` en el backend (**nueva dependencia: preguntar antes**), `credentials: 'include'` en `httpClient`, y CORS con credenciales (ya `true` en `main.ts`). Frontend y API comparten origen (proxy de Vite / nginx `/api`), lo que simplifica las cookies. Swagger conserva el flujo `Authorization: Bearer`.
+- El frontend deja de guardar el token en `sessionStorage`.
+
+### Dependencias
+
+AUTH-3.
+
+### Criterios de éxito
+
+- [ ] El token no es legible desde `document.cookie` ni `sessionStorage`.
+- [ ] Login, refresh y logout funcionan solo con cookies, en local y tras el proxy.
+- [ ] Una petición cross-site sin la cabecera exigida es rechazada.
+- [ ] DT-019 cerrada.
+
+---
+
 ## PROC-2 — Backend de procesos + wizard
 
 **Estado:** 📌 sin arrancar · **Complejidad:** 🔴 Alta
@@ -766,6 +902,8 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 | 2026-10-24 | `AUTH-1` cerrado en código: swap de `auth.infra.ts` a `POST /auth/dev-login`, test de integración contra Mongo real (33 e2e / 16 unit backend, 146 frontend), y resueltos **DT-008** (`dev-login` y seed ahora fallan cerrado con `AUTH_DEV_LOGIN_ENABLED`, nuevo en `.env.example`/compose) y **DT-009** (`httpClient` limpia la sesión ante 401 con token activo). Corregido de paso `THROTTLE_TTL` (segundos en `.env.example`, `@nestjs/throttler` v5 espera ms: la ventana real era de 60 ms). Verificado además contra el proceso real (`node dist/main`): flag on → 201 y seed; flag ausente → 404 y sin seed; `production` + flag on → 404 y sin seed. Pendiente: recorrido en navegador (DT-010). | La revisión de AUTH-1 encontró que `dev-login` quedaba abierto si el despliegue omitía `NODE_ENV` y que un token vencido dejaba al usuario con sesión muerta; ambos se resolvieron antes de PROC-2/DEPLOY-1 como se recomendó. |
 | 2026-10-24 | Hardening de sesión del frontend (post-revisión de AUTH-1), 3 tramos secuenciales con `frontend-task`: **DT-017** carrera del 401 (token capturado al enviar), **DT-015** caché de React Query vaciada al terminar/cambiar la sesión (`QueryClient` único + `sessionCacheGuard`), **DT-016** sesión vencida tras F5 (`tokenExpiry` + `useSessionExpiry` + `ProtectedRoute`, falla cerrado). Frontend 146 → 178 tests. Cada arreglo verificado con sabotaje (se quita el arreglo y el test correspondiente falla). Restricción nueva para Etapa 2 / PROC-2: todo `useQuery` bajo el árbol de rutas protegido. Pendiente: recorrido en navegador (DT-010). | La revisión de AUTH-1 señaló tres casos latentes que se vuelven reales con los primeros `useQuery`; se cierran antes de que existan datos que filtrar. En el primer intento un subagente falló con `E003` porque heredó `claude-opus-5-5`, que el gateway no admite para agentes de código: se relanzó con `model: sonnet`. |
 | 2026-10-25 | Limpieza de documentación legacy (alcance A): `plan-arquitectonico.md` y 10 mockups Stitch movidos a `legacy_docs/` (fuera del contexto del agente: regla en `CLAUDE.md`/`.clinerules` + `deny` de lectura en `.claude/settings.json`); `docs/archive/c4-otro-producto/` eliminado (otro producto); `*.pptx` fuera de git (`.gitignore`); ADR-004/009/013 marcados PENDIENTE DE REEMPLAZO (encuadre Bench First); despliegue/IBM Cloud Logs/health check pasados a "objetivo, no implementado". | Aislar lo obsoleto antes de rediseñar el dominio (alcance B, pendiente: casos de uso, ROADMAP y `shared-types`). Turborepo descartado: la POC levanta sin él. |
+| 2026-10-27 | Registradas **QW-2** (prioridad alta: limpieza de env vars, idle timer 360 s + aviso 60 s parametrizable, logout con auditoría en `auth_events`, verificación de Mongo con login/logout), **AUTH-3** (sesión corta + refresh con TTL, cierra DT-018) y **AUTH-4** (tokens en cookies httpOnly, cierra DT-019). Alta deuda DT-018 y DT-019. | El "logout" solo borraba el estado del cliente y la sesión no caducaba por inactividad; el JWT de 1 h seguía válido tras salir. Se separan las mejoras fáciles (QW-2) de las que cambian el modelo de sesión (AUTH-3/4) para no mezclar riesgos. |
+| 2026-10-27 | **OBS-1 cerrado en código:** FlowLog (`shared/observability/`), apagado por defecto (`FLOW_LOG_ENABLED=false`), falla cerrado y nunca en producción; `@TraceFlow()` en `AuthService.devLogin` y `MongooseUserAdapter.findByEmail`. Backend 35 unit / 38 e2e, typecheck limpio. Deuda nueva DT-020 (warnings de lint). Pendiente OBS-2 (sección Mongo con flag propio). | Ver el flujo request → adapter → response en terminal sin tocar el código de cada capability, y sin riesgo de que llegue a producción. |
 
 ---
 

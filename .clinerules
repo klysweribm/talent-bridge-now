@@ -46,7 +46,7 @@ Domain → CERO dependencias externas (ni NestJS, ni Mongoose)
 - Nunca `any` — usar `unknown` + type guard o generics
 - Props de interfaces con `readonly`
 - Prefijos de tipos (MUST, código nuevo): `interface` → `I` · `type` → `T` · `enum` → `E` (ver `good-practices/BEST-PRACTICES.md` §2.7)
-- `Logger` de NestJS — nunca loguear passwords, tokens ni datos personales completos
+- `Logger` de NestJS — nunca loguear passwords, tokens ni datos personales completos. Única excepción: FlowLog (`shared/observability/`, `@TraceFlow()`), solo con `FLOW_LOG_ENABLED=true` exacto y nunca con `NODE_ENV=production`; oculta secretos y muestra PII (emails, nombres) a propósito. `@TraceFlow()` solo en métodos públicos de puertos, nunca en controllers
 - Catch silencioso (`try {} catch {}`) prohibido
 - Controllers: solo mapean request → service → response; todo lo transversal via decoradores (Guards, Interceptors, Pipes)
 - Services: inyectan Ports, nunca Adapters directamente

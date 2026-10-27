@@ -202,13 +202,13 @@ flowchart TB
 - **Estado:** PENDIENTE DE REEMPLAZO (encuadre Bench First). Fija el dominio anterior; se sustituirá por ADRs nuevos. No tomar como base para trabajo nuevo.
 
 - **Contexto:** Watson NLU nunca fue un parser de CV (es análisis de sentimiento/entidades de texto genérico); watsonx.ai (modelos generativos) es la herramienta correcta para extraer datos estructurados de un CV no estructurado, y es la pieza central de la demo con el sponsor del watsonx Challenge.
-- **Decisión:** `cv-analysis` expone un `CvAnalysisPort` detrás del cual se implementa un adapter para watsonx.ai (prompt + modelo configurable). Reemplaza toda mención a Watson NLU en `PROJECT_CONTEXT.md`, `ROADMAP.md` (`CV-1`), `.env.example` (`WATSONX_URL`, `WATSONX_PROJECT_ID`, `WATSONX_API_KEY`, `WATSONX_MODEL_ID`) y en el paso 3 del wizard ("Sugerir skills desde el CV").
+- **Decisión:** `cv-analysis` expone un `CvAnalysisPort` detrás del cual se implementa un adapter para watsonx.ai (prompt + modelo configurable). Reemplaza toda mención a Watson NLU en `PROJECT_CONTEXT.md`, `ROADMAP.md` (`CV-1`), `.env.example` (`WATSONX_URL`, `WATSONX_PROJECT_ID`, `WATSONX_API_KEY`, `WATSONX_MODEL_ID` — reservadas, se añaden junto a su adapter) y en el paso 3 del wizard ("Sugerir skills desde el CV").
 - **Consecuencias:** El servicio nunca conoce el proveedor (watsonx.ai) directamente, solo el puerto — si watsonx.ai no está disponible en `br-sao`, cambiar el adapter o la región de la llamada no toca `cv-analysis` por fuera de `infrastructure/adapters/`. Opcionalmente reutilizable en `REP-1` para un borrador de reporte al cliente.
 
 ### ADR-010: Email detrás de un `EmailSenderPort` con adapter SMTP (reemplaza Event Notifications)
 
 - **Contexto:** IBM Event Notifications no es un servicio de envío de correo (es un bus de eventos/alertas); nunca encajó con "enviar OTP e invitaciones por email".
-- **Decisión:** `notifications` expone `EmailSenderPort` con un adapter SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`). Se quita Event Notifications de toda la documentación y de `.env.example`.
+- **Decisión:** `notifications` expone `EmailSenderPort` con un adapter SMTP (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` — reservadas, se añaden junto a su adapter). Se quita Event Notifications de toda la documentación y de `.env.example`.
 - **Consecuencias:** Actualiza el alcance de `AUTH-2` (envío de OTP) e `INT-1` (notificación al referente). Deliverability del relay SMTP corporativo queda pendiente de validar (ver "Abierto").
 
 ### ADR-011: Secretos de Code Engine + CI/CD por GitHub Actions

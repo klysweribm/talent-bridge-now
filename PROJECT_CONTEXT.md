@@ -305,6 +305,8 @@ src/
 
 ## Variables de Entorno Requeridas
 
+> Las integraciones externas (watsonx.ai, COS, SMTP, App ID, Slack) y `JWT_REFRESH_EXPIRATION` están **reservadas (se añaden junto a su adapter)**: hoy ningún código las lee y no figuran en `.env.example` ni en los compose.
+
 ```env
 # App
 NODE_ENV=development
@@ -314,37 +316,37 @@ FRONTEND_URL=http://localhost:5173
 # Auth
 JWT_SECRET=
 JWT_EXPIRATION=1h
-JWT_REFRESH_EXPIRATION=7d
+JWT_REFRESH_EXPIRATION=7d  # reservada (AUTH-3)
 
 # MongoDB (Databases for MongoDB, br-sao)
 MONGODB_URI=
 
-# watsonx.ai (análisis de CV — CvAnalysisPort)
+# [reservadas] watsonx.ai (análisis de CV — CvAnalysisPort)
 WATSONX_URL=
 WATSONX_PROJECT_ID=
 WATSONX_API_KEY=
 WATSONX_MODEL_ID=
 
-# IBM Cloud Object Storage (br-sao)
+# [reservadas] IBM Cloud Object Storage (br-sao)
 COS_ENDPOINT=
 COS_API_KEY=
 COS_INSTANCE_CRN=
 COS_BUCKET_CVS=
 
-# SMTP (EmailSenderPort — OTP, invitaciones, feedback, reportes)
+# [reservadas] SMTP (EmailSenderPort — OTP, invitaciones, feedback, reportes)
 SMTP_HOST=
 SMTP_PORT=
 SMTP_USER=
 SMTP_PASS=
 SMTP_FROM=
 
-# IBM App ID (Fase 2 — en camino de reemplazo por IBM Security Verify, verificar antes de usar)
+# [reservadas] IBM App ID (Fase 2 — en camino de reemplazo por IBM Security Verify, verificar antes de usar)
 APPID_TENANT_ID=
 APPID_CLIENT_ID=
 APPID_SECRET=
 APPID_OAUTH_SERVER_URL=
 
-# Slack
+# [reservadas] Slack
 SLACK_WEBHOOK_URL=
 ```
 

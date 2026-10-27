@@ -16,23 +16,8 @@ services:
       MONGODB_URI: mongodb://admin:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/talent-bridge?authSource=admin
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
-      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION}
       AUTH_DEV_LOGIN_ENABLED: ${AUTH_DEV_LOGIN_ENABLED:-true}
       FLOW_LOG_ENABLED: ${FLOW_LOG_ENABLED:-false}
-      WATSONX_URL: ${WATSONX_URL}
-      WATSONX_PROJECT_ID: ${WATSONX_PROJECT_ID}
-      WATSONX_API_KEY: ${WATSONX_API_KEY}
-      WATSONX_MODEL_ID: ${WATSONX_MODEL_ID}
-      COS_ENDPOINT: ${COS_ENDPOINT}
-      COS_API_KEY: ${COS_API_KEY}
-      COS_INSTANCE_CRN: ${COS_INSTANCE_CRN}
-      COS_BUCKET_CVS: ${COS_BUCKET_CVS}
-      SMTP_HOST: ${SMTP_HOST}
-      SMTP_PORT: ${SMTP_PORT}
-      SMTP_USER: ${SMTP_USER}
-      SMTP_PASS: ${SMTP_PASS}
-      SMTP_FROM: ${SMTP_FROM}
-      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
     volumes:
       - ./apps/backend/src:/app/apps/backend/src
       # Read-only: habilita el alias @ibm-talent-bridge/shared-types (tsconfig

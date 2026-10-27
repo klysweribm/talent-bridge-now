@@ -3,7 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { AuthService } from '../../application/services/auth.service';
 import type { IAuthToken } from '../../domain/interfaces/auth-token.interface';
+import type { Request } from 'express';
 import { AuthController } from './auth.controller';
+
+const FAKE_REQ = { ip: '10.0.0.1', get: () => 'jest-agent' } as unknown as Request;
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -41,9 +44,12 @@ describe('AuthController', () => {
   });
 
   it('should call AuthService.devLogin and return the token when NODE_ENV is not production', async () => {
-    const result = await controller.devLogin({ email: AUTH_TOKEN.user.email });
+    const result = await controller.devLogin({ email: AUTH_TOKEN.user.email }, FAKE_REQ);
 
-    expect(fakeAuthService.devLogin).toHaveBeenCalledWith(AUTH_TOKEN.user.email);
+    expect(fakeAuthService.devLogin).toHaveBeenCalledWith(AUTH_TOKEN.user.email, {
+      ip: '10.0.0.1',
+      userAgent: 'jest-agent',
+    });
     expect(result).toEqual(AUTH_TOKEN);
   });
 
@@ -55,7 +61,7 @@ describe('AuthController', () => {
   ])('should throw NotFoundException without calling AuthService when %s', async (_label, env) => {
     fakeConfig = env;
 
-    await expect(controller.devLogin({ email: AUTH_TOKEN.user.email })).rejects.toThrow(
+    await expect(controller.devLogin({ email: AUTH_TOKEN.user.email }, FAKE_REQ)).rejects.toThrow(
       NotFoundException,
     );
     expect(fakeAuthService.devLogin).not.toHaveBeenCalled();

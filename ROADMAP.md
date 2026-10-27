@@ -35,7 +35,7 @@
 Ahora        →  QW-1 · Quick wins: gates verdes, demo robusta, fundaciones   🚧 en progreso
 En curso     →  FE   · Remediación frontend — Etapa 2 (dashboard) y 3 (wizard + detalle)  🚧 Etapa 1/8 cerrada
 Hecho        →  OBS-1 · FlowLog: trazas request → adapters → response (solo no-producción)  ✅ cerrado en código (2026-10-27)
-Siguiente    →  QW-2  · Higiene de sesión y entorno (env vars, idle timer, auditoría de logout, verificación de BD)  📌 sin arrancar · prioridad ALTA
+Hecho        →  QW-2  · Higiene de sesión y entorno (env vars, idle timer, auditoría de logout, verificación de BD)  ✅ cerrado en código (2026-10-27); falta recorrido en navegador (DT-010)
 Iteración 1  →  AUTH-1 · Login de desarrollo con JWT real (usuarios sembrados)  ✅ cerrado en código (falta recorrido en navegador, DT-010)
 Iteración 2  →  PROC-2 · Backend de procesos + wizard (vertical real demo)   📌 sin arrancar
 Iteración 3  →  FE-OTP-1 · Login OTP por correo (frontend, mock-first)       📌 sin arrancar
@@ -201,7 +201,7 @@ Backend: typecheck sin errores, 35 tests unitarios, 38 e2e (incluido `flow-log.e
 
 ## QW-2 — Higiene de sesión y entorno
 
-**Estado:** 📌 sin arrancar · **Prioridad:** 🔺 Alta · **Complejidad:** 🟢 Baja (1-2 días) · **Registrado:** 2026-10-27
+**Estado:** ✅ cerrado en código y verificado en vivo con curl + Mongo (2026-10-27); falta el recorrido visual en navegador (aviso a 360 s, DT-010) · **Prioridad:** 🔺 Alta · **Complejidad:** 🟢 Baja (1-2 días) · **Registrado:** 2026-10-27
 
 ### Motivación
 
@@ -240,11 +240,29 @@ AUTH-1 cerrado. Las tareas 1 y 4 no dependen de nada; la 2 y la 3 se coordinan e
 
 ### Criterios de éxito
 
-- [ ] `podman-compose config` valida sin las variables retiradas y el stack arranca; tests de backend y frontend siguen verdes.
-- [ ] Sin actividad durante 6 min aparece el aviso; a los 60 s se cierra la sesión; cualquier actividad antes de eso lo cancela. Valores cambiables por `.env` y con defaults 360/60.
-- [ ] Cerrar sesión (manual o por inactividad) crea una fila en `auth_events` con el motivo; el login también.
-- [ ] Verificado en vivo: `users` con 3 usuarios y `auth_events` con login y logout (resultado registrado aquí).
-- [ ] DT-010 actualizado o cerrado; DT-018 y DT-019 siguen abiertas (las cierran AUTH-3 y AUTH-4).
+- [x] `podman-compose config` valida sin las variables retiradas y el stack arranca; tests de backend y frontend siguen verdes. (`a1c5b96`; stack recreado y backend `healthy`.)
+- [x] Sin actividad durante 6 min aparece el aviso; a los 60 s se cierra la sesión; cualquier actividad antes de eso lo cancela. Valores cambiables por `.env` y con defaults 360/60. (`71cb074`, verificado con tests de timers falsos; **falta verlo en navegador**.)
+- [x] Cerrar sesión (manual o por inactividad) crea una fila en `auth_events` con el motivo; el login también. (`1341f8a` + `666fcf0`.)
+- [x] Verificado en vivo: `users` con 3 usuarios y `auth_events` con login y logout (ver "Resultado de la verificación" abajo).
+- [x] DT-018 y DT-019 siguen abiertas (las cierran AUTH-3 y AUTH-4).
+- [ ] DT-010 sigue abierto: el recorrido en navegador (F5 conserva sesión, 3 usuarios, sin 404, aviso de inactividad) no se hizo.
+
+### Resultado de la verificación (2026-10-27)
+
+- `users`: `ana@ibm.com` → `recruiter`, `carlos@ibm.com` → `technical_ref`, `mariana@ibm.com` → `pm`.
+- `POST /auth/dev-login` + `POST /auth/logout` por curl con los 3 usuarios (ana `manual`, carlos `idle`, mariana `manual`): 204 en los tres; sin token, 401. `auth_events` recibió una fila `login` y una `logout` por usuario, con el `reason` correcto e `ip` (`::ffff:10.89.4.32`, la IP del proxy del contenedor: `trust proxy` sigue sin configurarse).
+- Índices de `auth_events`: `userId` y `at` con TTL de 7 776 000 s (= 90 días).
+- Residuo: 9 filas `login` con `userId: 'u-1'` (id de fixtures de e2e), probablemente de algún e2e contra el Mongo de desarrollo; origen sin confirmar (DT-022). Caducan por TTL.
+
+### Decisiones y límites que deja QW-2
+
+- `logout` vive en `AuthSessionController` aparte para no pasar el límite de líneas de `auth.controller.ts`.
+- Si Mongo falla al registrar el evento, `devLogin` y `logout` fallan (auditoría obligatoria); el frontend limpia la sesión igual.
+- `AUTH_EVENT_RETENTION_DAYS` inválido cae a 90 sin aviso (por decidir si debe fallar el arranque).
+- Un logout `expired` solo se registra si el JWT aún es válido (el guard devuelve 401 con uno vencido).
+- `trust proxy` sin configurar: `ip` es la del proxy hasta DEPLOY-1 (DT-023).
+- Durante el aviso de inactividad la actividad del usuario se ignora: solo "Seguir conectado" lo cancela.
+- Sin timeout en `httpClient`: con el backend caído, la salida espera a que `fetch` falle.
 
 ---
 
@@ -904,6 +922,7 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 | 2026-10-25 | Limpieza de documentación legacy (alcance A): `plan-arquitectonico.md` y 10 mockups Stitch movidos a `legacy_docs/` (fuera del contexto del agente: regla en `CLAUDE.md`/`.clinerules` + `deny` de lectura en `.claude/settings.json`); `docs/archive/c4-otro-producto/` eliminado (otro producto); `*.pptx` fuera de git (`.gitignore`); ADR-004/009/013 marcados PENDIENTE DE REEMPLAZO (encuadre Bench First); despliegue/IBM Cloud Logs/health check pasados a "objetivo, no implementado". | Aislar lo obsoleto antes de rediseñar el dominio (alcance B, pendiente: casos de uso, ROADMAP y `shared-types`). Turborepo descartado: la POC levanta sin él. |
 | 2026-10-27 | Registradas **QW-2** (prioridad alta: limpieza de env vars, idle timer 360 s + aviso 60 s parametrizable, logout con auditoría en `auth_events`, verificación de Mongo con login/logout), **AUTH-3** (sesión corta + refresh con TTL, cierra DT-018) y **AUTH-4** (tokens en cookies httpOnly, cierra DT-019). Alta deuda DT-018 y DT-019. | El "logout" solo borraba el estado del cliente y la sesión no caducaba por inactividad; el JWT de 1 h seguía válido tras salir. Se separan las mejoras fáciles (QW-2) de las que cambian el modelo de sesión (AUTH-3/4) para no mezclar riesgos. |
 | 2026-10-27 | **OBS-1 cerrado en código:** FlowLog (`shared/observability/`), apagado por defecto (`FLOW_LOG_ENABLED=false`), falla cerrado y nunca en producción; `@TraceFlow()` en `AuthService.devLogin` y `MongooseUserAdapter.findByEmail`. Backend 35 unit / 38 e2e, typecheck limpio. Deuda nueva DT-020 (warnings de lint). Pendiente OBS-2 (sección Mongo con flag propio). | Ver el flujo request → adapter → response en terminal sin tocar el código de cada capability, y sin riesgo de que llegue a producción. |
+| 2026-10-27 | **QW-2 cerrado en código** (`a1c5b96`, `1341f8a`, `666fcf0`, `71cb074`): env vars sin consumidor retiradas; `POST /auth/logout` + `auth_events` (login y logout, TTL 90 d); `useLogoutMutation`; idle timer 360/60 s. Verificado en vivo por curl + Mongo (3 usuarios, filas login/logout, índice TTL). Backend 39 unit / 41 e2e, frontend 202 tests, `validate-quality` = 1 crítico (DT-002). Altas DT-022, DT-023, DT-024. | Falta el recorrido en navegador (aviso a 360 s, F5, 3 roles): DT-010 sigue abierto. DT-018/DT-019 siguen abiertas (AUTH-3/AUTH-4). |
 
 ---
 

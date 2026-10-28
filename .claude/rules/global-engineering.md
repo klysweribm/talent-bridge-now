@@ -13,6 +13,8 @@ Detail and examples: `good-practices/BEST-PRACTICES.md` §2.7 (read only the sec
 - Type prefixes on new code (MUST): `interface` → `I` (`ICandidate`), `type` → `T` (`TStage`), `enum` → `E` (`ERole`). Don't mass-rename existing code just to apply this — only new/touched types.
 - Declarative over imperative: `.map/.filter/.reduce`/spread instead of `for` + `push`/mutation.
 - SRP: if a file/function needs "and" to describe what it does, extract.
+- No over-engineering: build the MVP that works first, polish later; don't add abstractions for needs that don't exist yet.
+- Keep each module separable: a capability or feature should be extractable into its own service later without rewriting its callers.
 - Error handling: never a silent `catch {}`. Backend → NestJS `Logger` + typed Nest exception with context (`NotFoundException(\`Process ${id} not found\`)`). Frontend → surface the error through React Query's `error` state, don't swallow it.
 - Never log passwords, tokens, OTP codes or full PII (candidate email/phone/CV content) — log ids instead.
 - No magic values: see `.claude/rules/anti-hardcoding.md`.

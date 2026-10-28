@@ -46,9 +46,8 @@ Continue with a clean context
 `apps/backend`, `apps/frontend` and each `packages/*` are **independent npm projects** (no workspace tool), so context bleed is mostly about domain conventions, not build graphs:
 
 - Work one app at a time. Frontend and backend conventions live in separate path-scoped rules (`.claude/rules/frontend-architecture.md` / `backend-architecture.md`) that only load when you read/edit a file under that app — don't open the other app's files "just in case".
-- Full-stack features (CAND-1, INT-1, FEED-1, REP-1) are done frontend first (mock-first), backend after, ideally as two sub-agent runs via `/roadmap-task` — not both halves in one long main session.
-- `good-practices/BEST-PRACTICES.md` (~700 lines) and `PROJECT_CONTEXT.md` (~520 lines) are the long-form sources. Read them **by section**, never whole, unless the task is about those docs.
-- `DESIGN/` mockups are large HTML files — read only the screen you're implementing.
+- Full-stack features are done frontend first (mock-first), backend after, ideally as two sub-agent runs via `/roadmap-task` — not both halves in one long main session.
+- `good-practices/BEST-PRACTICES.md` and `docs/integrations/ica/openapi.yaml` are the long-form sources. Read them **by section**, never whole, unless the task is about those docs.
 - A handoff report that spans both apps should say which app each next step belongs to.
 
 ## What this guide deliberately avoids

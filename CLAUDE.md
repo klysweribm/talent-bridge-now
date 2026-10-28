@@ -8,7 +8,7 @@ IBM Talent Bridge — internal MVP for IBM Consulting LatAm that centralizes rec
 
 Sources of truth — read **by section**, never whole, unless the task is about the doc itself:
 
-- `PROJECT_CONTEXT.md` — domain (roles, stages, data models), stack, env vars, design system tokens and screens.
+- `PROJECT_CONTEXT.md` — only a pointer table to the owner of each topic (it no longer holds context). Domain: pending (`docs/domain.md`); entity and role types: `packages/shared-types`; stack and decisions: `docs/architecture/README.md`.
 - `docs/use-cases/` — per-feature use cases by role (what each role can/can't do, edge cases, authz rules) — source of truth for `@Roles` guards and authz tests, more granular than `docs/flows/README.md`.
 - `good-practices/BEST-PRACTICES.md` — conventions in long form with examples (§2 frontend, §2.7 cross-cutting, §3 backend, §4.bis Stitch mockups).
 - `.clinerules` — pointer for the other agent (Bob) to this file and `.claude/rules/`; nothing to keep in sync.
@@ -88,6 +88,7 @@ Start a task with `/roadmap-task <ID | "Etapa N" | next>`: it delegates to the m
 - Commits: Conventional Commits (`feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `perf`, `ci`, `build`), one logical change per commit.
 - **Gherkin → TDD:** a task specified as Gherkin (`Feature`/`Scenario`/`Given`/`When`/`Then`) requires plan mode first, then each Scenario written as a failing test before any implementation.
 - A decision with several valid options (new dependency, wiring `packages/*`, deploy target, a deviation from the plan) → ask, don't pick silently.
+- Auto-memory stores preferences and lessons, never project facts. If a fact lives in the repo, the memory links to it and does not copy it.
 - Sub-agents (`.claude/agents/*-task.md`) are launched one at a time and with `model: sonnet`: with the session on Opus the gateway rejects the sub-agent with `E003`.
 
 ## Definition of done

@@ -5,7 +5,7 @@ paths:
 
 # Backend architecture — Hexagonal + DDD, vertical slice per capability
 
-Detail and examples: `good-practices/BEST-PRACTICES.md` §3 (read only the section you need). Domain model (Candidate/Process/Interview/Feedback/Report fields, stages, roles): `PROJECT_CONTEXT.md`; embed-vs-reference decisions and cross-aggregate consistency: ADR-013 in `docs/architecture/README.md`.
+Detail and examples: `good-practices/BEST-PRACTICES.md` §3 (read only the section you need). Entity types and roles: `packages/shared-types` (domain doc pending, `docs/domain.md`); use cases: `docs/use-cases/`; embed-vs-reference decisions and cross-aggregate consistency: ADR-013 in `docs/architecture/README.md`.
 
 ## Layout
 

@@ -418,9 +418,10 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 | 2026-10-27 | `QW-2` cerrado en código (`a1c5b96`, `1341f8a`, `666fcf0`, `71cb074`) y verificado con curl + Mongo; altas DT-022, DT-023, DT-024. | Falta el recorrido en navegador (DT-010); DT-018 y DT-019 siguen abiertas. |
 | 2026-10-28 | Etapa 2 de FE cerrada en código (`dd77ff8`, `2ef1a5b`, `0326925`), **pendiente de revisión en navegador (DT-010)**; 264 tests y 0 críticos en `validate-quality`. | Cierra el único crítico (DT-002) y alinea el shell y el Inicio con `UX-GUIDELINES.md`; DT-002/007/024 se resuelven tras revisar las pantallas. |
 | 2026-10-28 | `ROADMAP.md` adelgazado: encuadre anterior archivado en `legacy_docs/`, FE-OTP-1 movida a `docs/use-cases/auth.md`, tabla de equivalencias Bench First. | Preparar el replanning Bench First; el detalle sigue en git, `docs/use-cases/` y `legacy_docs/`. |
+| 2026-10-28 | Fuentes de verdad consolidadas: `.clinerules` pasa a puntero, el estado actual se mueve de `CLAUDE.md` a este archivo y `PROJECT_CONTEXT.md` se reparte entre sus dueños y queda como puntero (el dominio anterior se archiva). | Una única fuente de verdad por tema; tokens de diseño: manda el código de Tailwind (DT-026). |
 
 ---
 
 _Ver también: [`CLAUDE.md`](./CLAUDE.md) para las invariantes ·
-[`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md) para el dominio ·
+[`docs/architecture/README.md`](./docs/architecture/README.md) para las decisiones ·
 [`good-practices/DEBT_TECH.md`](./good-practices/DEBT_TECH.md) para la deuda técnica._

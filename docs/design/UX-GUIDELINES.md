@@ -1,8 +1,8 @@
 # UX Guidelines — MVP IBM Talent Bridge
 
-> **Fuente única de especificación de UX del MVP.** Los mockups de Stitch
-> (`DESIGN/stitch_ibm_talent_bridge_portal/`) son solo referencia visual: donde
-> contradigan este documento, manda este documento. Principio rector: **cada
+> **Fuente única de especificación de UX del MVP.** Los mockups locales de
+> `DESIGN/` no son fuente de diseño: donde contradigan este documento, manda este
+> documento. Los valores de los tokens salen del código (§4). Principio rector: **cada
 > pantalla responde "¿qué tengo que hacer ahora?"**, no "¿cuántas métricas
 > puedo mostrar?". Si un elemento no habilita una acción o una decisión, sale.
 >
@@ -115,18 +115,26 @@ La misma fila de proceso del Inicio, con filtro por estado (activo / cerrado) y 
 
 ## 4. Tokens canónicos
 
-Si hay conflicto entre mockups, manda `DESIGN/stitch_ibm_talent_bridge_portal/ibm_talent_bridge/DESIGN.md`:
+**Manda el código tal como renderiza hoy.** Este documento explica la intención de cada token; los valores
+viven en estos archivos y no se copian aquí:
 
-| Token | Valor |
-| --- | --- |
-| Botón primario | `#0F62FE`, hover `#0043CE` (nunca al revés) |
-| Fondo de la app | `#F4F4F4` |
-| Separación de cards | borde 1px `#E0E0E0`, no sombra |
-| Radio | card 8px · chips/badges 4px (alto 24px, texto 12px medium) · avatares circulares |
-| Badges de estado | fondo tintado: éxito `#DEFBE6`/`#24A148`, pendiente `#FEF3D6`/`#8A6100`, rechazado `#FFEBEB`/`#DA1E28`, categórico `#EDF5FF`/`#0043CE` (fondo/texto) |
-| Título de página | 24px (IBM Plex Sans) |
+- `apps/frontend/tailwind.colors.ts`: colores (superficies, primario, texto, estados).
+- `apps/frontend/tailwind.config.ts`: tipografía, espaciado, radios y sombras.
+- `apps/frontend/src/config/design-tokens.ts`: etapas del proceso y estilos de chip por etapa (uso programático).
 
-Implementación: `apps/frontend/tailwind.config.ts`, `tailwind.colors.ts` y `src/config/design-tokens.ts`. Nunca hex sueltos en componentes.
+| Uso | Dónde está el token | Intención |
+| --- | --- | --- |
+| Acción primaria | `primary` (`interactive`, `container`) | Un solo botón primario por pantalla; el estado de hover es más oscuro que el reposo, nunca al revés |
+| Fondo de la app y de las cards | `surface` (`DEFAULT`, `card`, niveles `low`…`highest`) | La app usa `surface` como lienzo y `surface.card` para cards |
+| Separación de cards | borde con `surface` y sombra `raised` | Las cards se separan por borde; la sombra solo en elementos elevados |
+| Texto | `text` (`primary`, `secondary`) | Primario para contenido, secundario para ayudas y metadatos |
+| Estados (éxito, aviso, peligro, info) | `status` (color y variante `*-bg`) | Badges con fondo tintado y texto del color de estado |
+| Radios | `borderRadius` | Más cerrado en chips y badges, más amplio en cards y modales; avatares circulares (`full`) |
+| Título de página | `fontSize.headline-md` | Un título por pantalla, en IBM Plex Sans |
+| Etapas del proceso | `design-tokens.ts` (`PROCESS_STAGES`, `STAGE_CHIP_STYLES`) | Un color por etapa, definido en un solo sitio |
+
+Reglas: nunca un hex suelto en un componente, y si falta un token se añade al código antes de usarlo. Los
+desajustes conocidos entre esta guía y el código están en `good-practices/DEBT_TECH.md` (DT-026).
 
 ## 5. Reglas para cualquier pantalla nueva
 

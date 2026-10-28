@@ -84,9 +84,8 @@ guardados de ese proceso.
 `packages/email-templates` (HTML plano, sin scripts) → `EmailSenderPort`.
 **Reglas de borde / negativas:**
 - `technical_ref`/`pm` → 403 (el envío al candidato es acción exclusiva
-  del reclutador — es quien tiene la relación con el candidato, ver
-  `PROJECT_CONTEXT.md` → "El Candidato NO tiene acceso... el reclutador
-  envía feedback manual por correo").
+  del reclutador — es quien tiene la relación con el candidato; el candidato
+  no tiene acceso en el MVP y el reclutador envía el feedback manual por correo).
 - El candidato nunca tiene acceso directo a ningún endpoint de feedback
   (no tiene login en el MVP) — el envío es siempre push por email, nunca
   un link que el candidato consulte en la app.

@@ -32,7 +32,10 @@ ibm-talent-bridge/
 │   ├── design/            → UX-GUIDELINES.md (fuente única de UX del MVP)
 │   ├── api/               → Swagger exportado
 │   ├── flows/             → Flujos de usuario
+│   ├── integrations/      → Notas de integraciones externas (ICA)
 │   └── use-cases/         → Casos de uso por rol y feature
+├── good-practices/        → Convenciones, validate-quality.mjs y DEBT_TECH.md
+├── legacy_docs/           → Fuera de alcance
 ├── DESIGN/                → Mockups locales (gitignored); no son fuente de diseño
 ├── docker-compose.yml
 ├── docker-compose.test.yml
@@ -110,13 +113,13 @@ node good-practices/validate-quality.mjs --strict
 
 ## Diseño
 
-La especificación de UX del MVP es [`docs/design/UX-GUIDELINES.md`](docs/design/UX-GUIDELINES.md): app shell, navegación por rol, alcance de cada pantalla y tokens. Los mockups de Stitch en `DESIGN/stitch_ibm_talent_bridge_portal/` (gitignored, copia local) son solo referencia visual y nunca se copian como código. Donde contradigan la guía, manda la guía.
+La especificación de UX del MVP es [`docs/design/UX-GUIDELINES.md`](docs/design/UX-GUIDELINES.md): app shell, navegación por rol, alcance de cada pantalla y tokens. `DESIGN/` (gitignored) guarda mockups locales: no son fuente de diseño y nunca se copian como código. Los valores de los tokens salen de `apps/frontend/tailwind.config.ts`.
 
 ---
 
 ## Documentación Técnica
 
-- **Contexto completo del proyecto:** [`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md)
+- **Estado y backlog:** [`ROADMAP.md`](./ROADMAP.md) · **Decisiones técnicas:** [`docs/architecture/README.md`](./docs/architecture/README.md)
 - **Backend README:** [`apps/backend/README.md`](./apps/backend/README.md)
 - **Frontend README:** [`apps/frontend/README.md`](./apps/frontend/README.md)
 - **Variables de entorno:** [`.env.example`](./.env.example)

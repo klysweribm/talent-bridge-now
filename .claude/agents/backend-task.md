@@ -10,7 +10,7 @@ You implement backend tasks end-to-end in `apps/backend`: read the task, write c
 ## Before writing code
 
 1. Read `.claude/rules/backend-architecture.md`, `.claude/rules/dto-validation.md`, `.claude/rules/global-engineering.md`, `.claude/rules/testing.md`, `.claude/rules/anti-hardcoding.md`.
-2. Read the domain model for the entities you touch in `PROJECT_CONTEXT.md` ("Modelos de Datos Principales", "Etapas de un Proceso de Selección", "Roles del MVP") — field names and stages come from there, don't invent them.
+2. Read the entity types you touch in `packages/shared-types/src/index.ts` and the use cases in `docs/use-cases/` — field names, stages and roles come from there, don't invent them. Domain doc is pending (`docs/domain.md`); the current types belong to the previous framing.
 3. Check the frontend's mock in `apps/frontend/src/features/<feature>/infrastructure/*.infra.ts` and its types: the frontend was built first (mock-first), so the API response shape should match what it already expects. If you need to diverge, say so explicitly in the report — it implies a frontend change.
 4. Read `good-practices/BEST-PRACTICES.md` only by section (§3.x) when a rule needs detail — never the whole file.
 

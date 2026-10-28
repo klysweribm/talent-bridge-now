@@ -29,6 +29,7 @@ Plural resources (`/candidates`, `/processes`), standard verbs/status codes, fil
 ## MongoDB (Mongoose)
 
 - `timestamps: true` on every schema; Mongoose schemas live in `infrastructure/adapters/`, never in `domain/`.
+- Every `@Prop` on a field typed as a TS union (`UserRole`, a process stage, a feedback recommendation, `shared-types` unions) needs an explicit `@Prop({ type: String, ... })`: Mongoose cannot infer a union and the process crashes at startup with `CannotDetermineTypeError`. Unit and e2e tests with fakes do not catch it — only booting the real process does.
 - `candidate.email` unique index; index `processId` on interviews and feedback.
 - Always paginate (`skip`/`limit` with a capped default) — never an unbounded `find()`.
 - Adapters map Mongoose documents → domain interfaces before returning; a `Document` type never leaves the adapter.

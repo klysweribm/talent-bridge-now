@@ -44,8 +44,9 @@ email al referente ("tienes una entrevista pendiente").
   proceso, aunque exista en el sistema).
 - Agendar en un slot que el referente marcó como no disponible → 400.
 - Sin disponibilidad cargada para ese referente → el webhook de Slack se
-  dispara como fallback (criterio de éxito ya definido en `ROADMAP.md` →
-  INT-1), la entrevista no se bloquea pero queda señalizada.
+  dispara como fallback (criterio de éxito de INT-1, hoy fuera del roadmap
+  hasta el replanning Bench First), la entrevista no se bloquea pero queda
+  señalizada.
 - `technical_ref`/`pm` llamando `POST /interviews` → 403.
 - Duración de la entrevista se hereda del proceso (`Process.interviewDuration`),
   no es editable por entrevista individual en el MVP.

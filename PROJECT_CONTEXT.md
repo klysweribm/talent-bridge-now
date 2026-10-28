@@ -97,9 +97,16 @@ ibm-talent-bridge/
 │   └── email-templates/   ← Templates HTML de correos (sin scripts)
 │
 ├── docs/
-│   ├── architecture/      ← Diagramas C4, decisiones técnicas
+│   ├── architecture/      ← ADRs y diagramas Mermaid (C1, C2 y despliegue objetivo)
+│   ├── design/            ← UX-GUIDELINES.md (fuente única de UX del MVP; manda sobre cualquier mockup)
 │   ├── api/               ← Documentación Swagger exportada
-│   └── flows/             ← Flujos de usuario documentados
+│   ├── flows/             ← Flujos de usuario documentados
+│   ├── integrations/      ← Notas de integraciones externas
+│   └── use-cases/         ← Casos de uso por rol y feature
+│
+├── DESIGN/                ← Gitignored; solo conserva DESIGN.md (tokens). No es fuente de diseño
+├── legacy_docs/           ← Documentación obsoleta, fuera de alcance para agentes
+├── good-practices/        ← Convenciones, validate-quality.mjs y DEBT_TECH.md
 │
 ├── .github/
 │   └── workflows/         ← CI/CD pipelines (GitHub Actions)
@@ -107,9 +114,12 @@ ibm-talent-bridge/
 ├── docker-compose.yml     ← Para desarrollo local completo
 ├── docker-compose.test.yml← Para tests de integración
 ├── .env.example           ← Variables de entorno documentadas
+├── ROADMAP.md             ← Backlog de features (estado, prioridad, dependencias)
 ├── PROJECT_CONTEXT.md     ← Este archivo (contexto general del proyecto)
 └── README.md              ← Documentación principal del proyecto
 ```
+
+> No hay `package.json` en la raíz ni Turborepo: cada app y cada `packages/*` es un proyecto npm independiente.
 
 ---
 
@@ -296,7 +306,7 @@ src/
   generatedBy: UserId,       // recruiterId
   generatedAt: Date,
   pdfUrl: string,            // IBM COS
-  sentHistory: { sentAt: Date, sentBy: UserId, sentTo: string }[], // embebido, append-only — cardinalidad de sentTo abierta, ver REP-1 en ROADMAP.md
+  sentHistory: { sentAt: Date, sentBy: UserId, sentTo: string }[], // embebido, append-only — cardinalidad de sentTo abierta, ver REP-1 en legacy (encuadre anterior; revisar en el replanning)
   createdAt: Date
 }
 ```
@@ -397,15 +407,11 @@ SLACK_WEBHOOK_URL=
 
 ## Sistema de Diseño
 
-> Los diseños originales están en `stitch_ibm_talent_bridge_portal/`. Cada carpeta contiene `code.html` (HTML de referencia) y `screen.png` (captura del diseño).
+> **La fuente de UX es `docs/design/UX-GUIDELINES.md`**; donde contradiga a un mockup, manda ese documento. Los mockups de Stitch eran solo referencia visual y ya no están en el repo (se movieron a `legacy_docs/`, fuera de alcance); `DESIGN/` conserva únicamente `DESIGN.md`, de donde salen los tokens de abajo.
 
-### Pantallas disponibles
+### Pantallas
 
-| Pantalla | Carpeta | Descripción |
-|---------|---------|-------------|
-| Login | `iniciar_sesi_n_ibm_talent_bridge/` | Auth con correo IBM + password, botón SSO w3id |
-| Dashboard Reclutador | `dashboard_reclutador_ibm_talent_bridge/` | KPIs, procesos activos, próximas entrevistas, candidatos recientes |
-| Crear Proceso | `crear_nuevo_proceso_ibm_talent_bridge/` | Wizard de 4 pasos: Rol → Referentes → Candidatos → Confirmar |
+La especificación de cada pantalla (Login, Inicio, Lista de procesos, Wizard, Detalle, Feedback) está en `docs/design/UX-GUIDELINES.md` §3. Los mockups que antes se listaban aquí ya no están en el repo.
 
 ---
 

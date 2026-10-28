@@ -1,52 +1,49 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { useAuthStore } from '@features/auth/store/auth.store';
-import { logoutUser } from '@features/auth/infrastructure/auth.infra';
-import { HttpError } from '@shared/infrastructure/httpError';
+import { useAuthStore, type UserRole } from '@features/auth/store/auth.store';
+import { useUiStore } from '@shared/store/ui.store';
 import { SidebarNav } from './SidebarNav';
 
-vi.mock('@features/auth/infrastructure/auth.infra', () => ({ logoutUser: vi.fn() }));
-
-const mockedLogout = logoutUser as ReturnType<typeof vi.fn>;
-
-function renderSidebar(): ReturnType<typeof render> {
-  const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+function renderSidebar(role: UserRole): ReturnType<typeof render> {
+  useAuthStore.getState().setAuth({ id: 'a', name: 'Ana Pérez', email: 'ana@ibm.com', role }, 'fake-session-value');
   return render(
-    <QueryClientProvider client={client}>
-      <MemoryRouter><SidebarNav /></MemoryRouter>
+    <QueryClientProvider client={new QueryClient()}>
+      <MemoryRouter initialEntries={['/dashboard']}><SidebarNav /></MemoryRouter>
     </QueryClientProvider>,
   );
 }
 
-describe('SidebarNav logout', () => {
-  beforeEach(() => {
-    mockedLogout.mockReset();
-    useAuthStore.getState().setAuth(
-      { id: 'a', name: 'Ana', email: 'ana@ibm.com', role: 'recruiter' }, 'fake-session-value',
-    );
+describe('SidebarNav', () => {
+  beforeEach(() => { useUiStore.setState({ sidebarCollapsed: false }); });
+
+  it('should show the single brand, role navigation and user footer', () => {
+    renderSidebar('technical_ref');
+
+    expect(screen.getByText('IBM Talent Bridge')).toBeInTheDocument();
+    const nav = within(screen.getByRole('navigation', { name: 'Navegación principal' }));
+    expect(nav.getAllByRole('link').map(l => l.getAttribute('aria-label')))
+      .toEqual(['Inicio', 'Entrevistas', 'Feedback']);
+    expect(screen.getByText('Ana Pérez')).toBeInTheDocument();
+    expect(screen.getByText('Referente Técnico')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cerrar sesión' })).toBeInTheDocument();
   });
 
-  it('should call the backend with reason manual before clearing the session', async () => {
-    let tokenAtCall: string | null = null;
-    mockedLogout.mockImplementation(() => { tokenAtCall = useAuthStore.getState().token; return Promise.resolve(); });
-    renderSidebar();
+  it('should not render support card, theme toggle or profile card', () => {
+    renderSidebar('recruiter');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Cerrar sesión' }));
-
-    await waitFor(() => expect(useAuthStore.getState().token).toBeNull());
-    expect(mockedLogout).toHaveBeenCalledWith('manual');
-    expect(tokenAtCall).toBe('fake-session-value');
+    expect(screen.queryByText('Centro de Soporte')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /tema/i })).not.toBeInTheDocument();
   });
 
-  it('should clear the session even when the backend call fails', async () => {
-    mockedLogout.mockRejectedValue(new HttpError(401, 'Unauthorized'));
-    renderSidebar();
+  it('should collapse and expand from the header toggle', async () => {
+    renderSidebar('recruiter');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Cerrar sesión' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Colapsar menú' }));
 
-    await waitFor(() => expect(useAuthStore.getState().token).toBeNull());
-    expect(useAuthStore.getState().user).toBeNull();
+    expect(useUiStore.getState().sidebarCollapsed).toBe(true);
+    expect(screen.getByRole('button', { name: 'Expandir menú' })).toBeInTheDocument();
+    expect(screen.queryByText('IBM Talent Bridge')).toBeVisible();
   });
 });

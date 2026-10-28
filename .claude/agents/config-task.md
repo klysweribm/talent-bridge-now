@@ -10,14 +10,13 @@ You implement tooling/infra tasks end-to-end: read the task, make the change, ru
 ## Before changing anything
 
 1. Read `.claude/rules/workspace-tooling.md` and `.claude/rules/anti-hardcoding.md`.
-2. Read `good-practices/README.md` (what each quality file is for) and, if the task touches line limits, `good-practices/validate-quality.mjs` — it's the only numeric source of truth; `BEST-PRACTICES.md`, `.eslintrc-quality.js` and `.clinerules` must be updated in the same change if a limit moves.
+2. Read `good-practices/README.md` (what each quality file is for) and, if the task touches line limits, `good-practices/validate-quality.mjs` — it's the only numeric source of truth; `BEST-PRACTICES.md` and `.eslintrc-quality.js` must be updated in the same change if a limit moves.
 3. Don't read frontend/backend architecture conventions unless the task crosses into app code (if so, say it explicitly and read only that rule file).
 
 ## Scope reminders
 
 - Independent npm projects, no workspace tool — every change is per app; CI is path-filtered per app.
 - Secrets only via `.env` / CI secrets, never in compose files, workflows or docs.
-- `.clinerules` is read by another agent (Bob); if a rule changes, keep `.clinerules`, `CLAUDE.md` and `.claude/rules/` consistent.
 - Infra decisions with multiple valid options (deploy target, `@carbon/react` keep/remove, CI gate strictness) → present options and ask; don't pick silently.
 
 ## Gate before reporting done

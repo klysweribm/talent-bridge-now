@@ -12,7 +12,7 @@
 
 IBM Talent Bridge conecta **Reclutadores, Referentes Técnicos y PMs** en una plataforma web unificada para gestionar procesos de selección end-to-end: desde la creación del proceso hasta el feedback post-entrevista y los reportes al cliente.
 
-**Lee el contexto completo → [`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md)**
+**Fuentes:** estado y backlog en [`ROADMAP.md`](./ROADMAP.md) · decisiones técnicas en [`docs/architecture/README.md`](./docs/architecture/README.md) · diseño y pantallas en [`docs/design/UX-GUIDELINES.md`](./docs/design/UX-GUIDELINES.md).
 
 ---
 
@@ -28,17 +28,16 @@ ibm-talent-bridge/
 │   ├── shared-utils/      → Formatters, validators, helpers
 │   └── email-templates/   → Templates HTML de correos (sin scripts)
 ├── docs/
-│   ├── architecture/      → ADRs y diagramas C4 en Mermaid
+│   ├── architecture/      → ADRs y diagramas Mermaid (C1, C2 y despliegue objetivo)
 │   ├── design/            → UX-GUIDELINES.md (fuente única de UX del MVP)
 │   ├── api/               → Swagger exportado
 │   ├── flows/             → Flujos de usuario
-│   └── archive/           → Documentos descartados (ej. C4 de otro producto)
-├── DESIGN/                → Mockups Stitch (gitignored, solo referencia local)
-│   └── stitch_ibm_talent_bridge_portal/
+│   └── use-cases/         → Casos de uso por rol y feature
+├── DESIGN/                → Mockups locales (gitignored); no son fuente de diseño
 ├── docker-compose.yml
 ├── docker-compose.test.yml
 ├── .env.example
-└── PROJECT_CONTEXT.md     → Fuente de verdad del proyecto
+└── ROADMAP.md             → Estado y backlog de features
 ```
 
 ---

@@ -11,9 +11,9 @@ Delegates a task to the sub-agent whose own definition (`.claude/agents/*-task.m
 ## Steps
 
 1. **Resolve the target.**
-   - `Etapa N` → read that stage's section in the remediation plan (path in `CLAUDE.md` → "Estado actual"; today `~/.claude/plans/breezy-moseying-plum.md`).
+   - `Etapa N` → read that stage's section in the remediation plan (path in `ROADMAP.md` → "Estado actual"; the old `~/.claude/plans/breezy-moseying-plum.md` no longer exists — DT-025).
    - A feature ID (`QW-2`, `FE-OTP-1`, `AUTH-2`, `AUTH-3`, `AUTH-4`, `PROC-2`, `CAND-1`, `INT-1`, `FEED-1`, `REP-1`, `CV-1`, `HARDEN-1`, `DEPLOY-1`) → read its `## <ID> — ...` section in root `ROADMAP.md` in full (Motivación/Alcance/Dependencias/Criterios de éxito).
-   - `next` / no id → `CLAUDE.md` → "Estado actual / próximo paso" says what's next; cross-check with the first non-✅ line of `ROADMAP.md` → "Orden de implementación recomendado". If they disagree, show both and ask.
+   - `next` / no id → `ROADMAP.md` → "Estado actual / próximo paso" says what's next; cross-check with the first non-✅ line of `ROADMAP.md` → "Orden de implementación recomendado". If they disagree, show both and ask.
 2. **Check dependencies.** If the section's `### Dependencias` names something not ✅, tell the user before delegating — don't silently start a blocked task.
 3. **Map to a sub-agent:**
 

@@ -11,7 +11,7 @@ Sources of truth — read **by section**, never whole, unless the task is about 
 - `PROJECT_CONTEXT.md` — domain (roles, stages, data models), stack, env vars, design system tokens and screens.
 - `docs/use-cases/` — per-feature use cases by role (what each role can/can't do, edge cases, authz rules) — source of truth for `@Roles` guards and authz tests, more granular than `docs/flows/README.md`.
 - `good-practices/BEST-PRACTICES.md` — conventions in long form with examples (§2 frontend, §2.7 cross-cutting, §3 backend, §4.bis Stitch mockups).
-- `.clinerules` — same rules for the other agent (Bob). Keep it consistent with `.claude/rules/` when a rule changes.
+- `.clinerules` — pointer for the other agent (Bob) to this file and `.claude/rules/`; nothing to keep in sync.
 
 ## Out of scope
 
@@ -68,8 +68,8 @@ Services: frontend `:5174`, API `:3000/api/v1`, Swagger `:3000/api/docs`, MongoD
 
 ## Work tracking
 
-- **`ROADMAP.md`** (root) — product backlog per feature (`FE-OTP-1`, `AUTH-2`, `PROC-2`, `CAND-1`…), with "Orden de implementación", per-feature Criterios de éxito and a Historial. Every new feature idea goes here.
-- **Remediation plan** — stage-by-stage frontend refactor (`Etapa 0-8`), in `~/.claude/plans/breezy-moseying-plum.md`.
+- **`ROADMAP.md`** (root) — product backlog per feature, with status, priority, dependencies, per-feature Criterios de éxito and a Historial. Every new feature idea goes here.
+- **Estado y próximo paso: `ROADMAP.md`.**
 - **`good-practices/DEBT_TECH.md`** — line-limit/architecture debt (not features).
 
 Start a task with `/roadmap-task <ID | "Etapa N" | next>`: it delegates to the matching sub-agent (`.claude/agents/`), which reads only its own domain's rules, and reconciles `ROADMAP.md` at the end. Use `/update-roadmap` only for work that didn't go through `/roadmap-task`.
@@ -88,6 +88,7 @@ Start a task with `/roadmap-task <ID | "Etapa N" | next>`: it delegates to the m
 - Commits: Conventional Commits (`feat`, `fix`, `refactor`, `test`, `docs`, `chore`, `perf`, `ci`, `build`), one logical change per commit.
 - **Gherkin → TDD:** a task specified as Gherkin (`Feature`/`Scenario`/`Given`/`When`/`Then`) requires plan mode first, then each Scenario written as a failing test before any implementation.
 - A decision with several valid options (new dependency, wiring `packages/*`, deploy target, a deviation from the plan) → ask, don't pick silently.
+- Sub-agents (`.claude/agents/*-task.md`) are launched one at a time and with `model: sonnet`: with the session on Opus the gateway rejects the sub-agent with `E003`.
 
 ## Definition of done
 
@@ -108,19 +109,3 @@ See `.claude/memory/agentic-architecture.md` for the hub-and-spoke model (main s
 Status: imported
 ImportedAt: 2026-10-27T16:56:33Z
 <!-- END TEMPORARY_SESSION_MEMORY -->
-
-## Estado actual / próximo paso
-
-> Se **reemplaza** al cerrar cada etapa (lo hace `/update-roadmap`); el historial vive en `ROADMAP.md` → Historial y `DEBT_TECH.md` → Resueltos.
-
-- **Cerradas:** Etapa 0 y Etapa 1 (golden path en `features/auth/`).
-- **QW-1 casi cerrado (2026-10-15):** gates, demo robusta y fundaciones implementados (frontend 143 tests, backend 5 tests, `validate-quality --strict` = 1 crítico, DT-002). Falta el recorrido en navegador (F5, roles `ana@`/`carlos@`/`mariana@ibm.com`, sin 404) y el health contra un Mongo real — ver `ROADMAP.md` → QW-1.
-- **`docs/use-cases/` creado (2026-10-18):** catálogo de casos de uso por rol/feature, enlazado desde `ROADMAP.md`. Discrepancia abierta señalada (no resuelta): PM tiene acceso de ruta a `/processes/new`/`:id` en `AppRouter.tsx` pero debería ser solo lectura — resolver al implementar PROC-2.
-- **AUTH-1 backend cerrado y verificado en vivo (2026-10-18):** `capability/auth` + guards `JwtAuthGuard`/`RolesGuard`/`@Roles` reutilizables + seed idempotente de los 3 usuarios demo. Primer consumidor real de `@ibm-talent-bridge/shared-types` en el backend. Bug real encontrado y corregido durante la verificación independiente (no solo por los tests, que pasaban igual): `UserModel.role` necesitaba `@Prop({type: String, ...})` explícito o Mongoose crashea el proceso en runtime al no poder inferir el tipo desde una unión TS — aplica a cualquier futuro `@Prop` sobre un campo de tipo unión de `shared-types`. **Pendiente:** swap de `features/auth/infrastructure/auth.infra.ts` de mock a `httpClient` (es trabajo de `frontend-task`, no se tocó en este pase backend-only).
-- **AUTH-1 cerrado en código (2026-10-24):** swap de `auth.infra.ts` a `POST /auth/dev-login` hecho; test de integración `apps/backend/test/auth.integration.e2e-spec.ts` contra Mongo real (backend 16 unit / 33 e2e, frontend 146 tests). Resueltos DT-008 (`dev-login` y seed fallan cerrado: requieren `AUTH_DEV_LOGIN_ENABLED=true` exacto y nunca corren con `NODE_ENV=production`) y DT-009 (`httpClient` limpia la sesión ante 401 con token activo). **Pendiente:** recorrido manual en navegador (DT-010) — hasta registrarlo no se da por 100 % cerrado. Deuda abierta de AUTH-1: DT-010 a DT-014 en `good-practices/DEBT_TECH.md`.
-- **Hardening de sesión del frontend (2026-10-24):** resueltos DT-015 (caché de React Query vaciada al terminar/cambiar sesión), DT-016 (JWT vencido tras F5 → `/login` sin pintar contenido) y DT-017 (401 tardío ya no cierra una sesión nueva). Frontend 178 tests. **Regla para Etapa 2 / PROC-2:** todo `useQuery` debe vivir bajo el árbol de rutas protegido (`client.clear()` no re-consulta componentes que siguen montados) — ver `.claude/rules/frontend-architecture.md`. Los `*-task` no tienen `model:` fijado: con la sesión en Opus, el gateway rechaza al subagente con `E003`; pasar `model: sonnet` al lanzarlos hasta fijarlo en `.claude/agents/*.md`.
-- **Limpieza de documentación legacy (2026-10-25):** lo obsoleto se movió a `legacy_docs/` (fuera de alcance, bloqueado por `deny`); ADR-004/009/013 quedan PENDIENTE DE REEMPLAZO (encuadre Bench First, aún sin ADR nuevos). Pendiente: alcance B (rediseño del dominio, casos de uso, ROADMAP, `shared-types`).
-- **OBS-1 FlowLog cerrado en código (2026-10-27):** trazas request → adapters → response en la terminal del backend (`shared/observability/`), apagado por defecto (`FLOW_LOG_ENABLED=false`), nunca en producción. Uso, qué oculta y cómo trazar un adapter nuevo: `ROADMAP.md` → OBS-1. Backend 35 unit / 38 e2e. Deuda abierta: DT-020 (warnings de lint) y DT-021 (`NODE_ENV=production` en el Dockerfile). Pendiente OBS-2 (sección Mongo con flag propio).
-- **QW-2 cerrado en código (2026-10-27):** env vars sin consumidor retiradas (`a1c5b96`); `POST /auth/logout` + colección `auth_events` con login y logout, TTL `AUTH_EVENT_RETENTION_DAYS`=90 (`1341f8a`); `useLogoutMutation` (`666fcf0`); idle timer 360 s + aviso 60 s por `VITE_IDLE_*` (`71cb074`). Verificado en vivo por curl + Mongo (3 usuarios, filas login/logout, índice TTL). Backend 39 unit / 41 e2e, frontend 202 tests, `validate-quality --strict` = 1 crítico (DT-002), lint backend 0 errores / 14 warnings. **Pendiente:** recorrido en navegador (aviso a 360 s, F5, 3 roles → cierra DT-010). Deuda nueva: DT-022 (e2e ensucian `auth_events`), DT-023 (`trust proxy`), DT-024 (`SidebarNav` 433 líneas). `AUTH-3` (cierra DT-018) y `AUTH-4` (cierra DT-019) siguen registrados sin código.
-- **Git:** los commits `b9acfc4`, `95d4fcc`, `a4da541`, `55a87cf` y otros anteriores conservan `Co-Authored-By`; reescribirlos está pendiente (el comando `git filter-branch` fue bloqueado por permisos). Sin remote: `https://github.com/klysweribm/architecture-reviewer-app.git` no se ha añadido ni se ha hecho push; nunca `--force`; `~/.gitconfig` tiene `http.sslverify=false`; auth token vs SSH sin decidir.
-- **Próximo paso:** decidir la reescritura de commits y el remote; recorrido en navegador de QW-2/AUTH-1 (DT-010). Después, el orden acordado: Etapa 2 (dashboard, cierra DT-002 y DT-007/DT-024) → Etapa 3 (wizard + detalle) → PROC-2 (incluye conectar `shared-types` al backend y extraer los mocks de `DashboardPage.tsx` a `processes.infra.ts`) → FE-OTP-1. Opcionales: OBS-2, DT-020. Los sub-agentes se lanzan de uno en uno y con `model: sonnet`. Plan: `~/.claude/plans/realiza-una-validaci-n-del-polished-reddy.md`.

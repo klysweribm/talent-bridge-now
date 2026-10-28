@@ -61,6 +61,24 @@ anterior, a revisar en el replanning).
 
 ---
 
+## Estado actual / próximo paso
+
+> Se actualiza al cerrar cada tarea (`/roadmap-task` o `/update-roadmap`). El detalle histórico vive en el
+> Historial de abajo y en `good-practices/DEBT_TECH.md` → Resueltos.
+
+- **Gates (2026-10-28):** backend 39 unit / 41 e2e, lint 0 errores / 14 warnings; frontend 264 tests, lint 0
+  errores (2 warnings preexistentes en `sessionCacheGuard.test.tsx`), `validate-quality --strict` 0 críticos.
+- **Pendiente de verificación en navegador (DT-010):** QW-1, AUTH-1, QW-2 y la Etapa 2 (F5, los 3 roles, aviso de
+  inactividad a los 360 s). Hasta registrarlo siguen abiertas DT-002, DT-007 y DT-024.
+- **Git:** `b9acfc4`, `95d4fcc`, `a4da541`, `55a87cf` y otros commits anteriores conservan `Co-Authored-By`;
+  reescribirlos está pendiente (`git filter-branch` fue bloqueado por permisos). Sin remote: no se ha añadido
+  `https://github.com/klysweribm/architecture-reviewer-app.git` ni se ha hecho push; nunca `--force`;
+  `~/.gitconfig` tiene `http.sslverify=false`; auth por token o SSH sin decidir.
+- **Próximo paso:** decidir la reescritura de commits y el remote, y hacer el recorrido en navegador (DT-010).
+  Después, el replanning Bench First (ver "Backlog Bench First"). Opcionales: OBS-2 y DT-020.
+
+---
+
 ## QW-1 — Quick wins previos a la demo (gates, robustez, fundaciones) (HIGH)
 
 **Estado:** 🚧 implementado (2026-10-15), pendiente de verificación en vivo · **Complejidad:** 🟢 Baja
@@ -205,7 +223,7 @@ hay Redis ni IBM Event Notifications en el MVP (ambos descartados).
   template de email dedicado en `packages/email-templates` (HTML plano, sin
   scripts, según regla del monorepo).
 - **Provisión de usuarios/roles**: mecanismo para pre-registrar correos con
-  rol asignado (`recruiter` | `technical` | `pm`) — sin esto, un login OTP
+  rol asignado (`recruiter` | `technical_ref` | `pm`) — sin esto, un login OTP
   exitoso no tiene de dónde sacar el rol para el JWT. Definir si es una
   colección Mongo administrada manualmente (MVP) o una pantalla de admin
   (fuera de alcance de este task si no está ya planificada).
@@ -242,7 +260,7 @@ problema en el diseño anterior.
 - [ ] Existe un mecanismo (aunque sea manual/admin de datos) para asignar rol
       a un correo antes de su primer login.
 - [ ] Un endpoint protegido con `@Roles('recruiter', 'pm')` rechaza a
-      `technical` con 403.
+      `technical_ref` con 403.
 - [ ] Las guardas de ruta del frontend (`router/guards/`) siguen funcionando
       sin cambios de contrato (mismo `UserRole`).
 - [ ] El código OTP nunca aparece en logs ni responses en texto plano.
@@ -403,6 +421,6 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 
 ---
 
-_Ver también: [`CLAUDE.md`](./CLAUDE.md) → "Estado actual / próximo paso" ·
+_Ver también: [`CLAUDE.md`](./CLAUDE.md) para las invariantes ·
 [`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md) para el dominio ·
 [`good-practices/DEBT_TECH.md`](./good-practices/DEBT_TECH.md) para la deuda técnica._

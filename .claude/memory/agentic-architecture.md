@@ -66,7 +66,7 @@ algo que el harness haga cumplir por sí solo).
 **Estado de la implementación:** esta regla todavía no está reforzada por un
 hook (`PreToolUse` sobre la herramienta `Agent`, con contador por sesión) —
 hoy es solo esta documentación. Implementarlo es tarea pendiente, ver
-`CLAUDE.md` → "Estado actual / próximo paso" o el handoff de la sesión que lo
+`ROADMAP.md` → "Estado actual / próximo paso" o el handoff de la sesión que lo
 pidió. Se hace con la skill `update-config` (es la que sabe escribir hooks
 válidos en `settings.json`).
 

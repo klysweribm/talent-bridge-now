@@ -447,7 +447,7 @@ interface ICandidatePort {
   findByEmail(email: string): Promise<Candidate | null>;
 }
 
-type TUserRole = 'recruiter' | 'technical' | 'pm';
+type TUserRole = 'recruiter' | 'technical_ref' | 'pm';
 
 enum EInterviewOutcome {
   Advance = 'advance',
@@ -457,7 +457,7 @@ enum EInterviewOutcome {
 
 // ❌ — sin prefijo, ya no cumple la convención
 interface CandidatePort { ... }
-type UserRole = 'recruiter' | 'technical' | 'pm';
+type UserRole = 'recruiter' | 'technical_ref' | 'pm';
 enum InterviewOutcome { ... }
 ```
 

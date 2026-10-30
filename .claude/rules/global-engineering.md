@@ -10,7 +10,7 @@ Detail and examples: `good-practices/BEST-PRACTICES.md` §2.7 (read only the sec
 
 - TypeScript strict, zero `any` — use `unknown` + type guards when a shape is genuinely unknown.
 - `readonly` on every interface prop.
-- Type prefixes on new code (MUST): `interface` → `I` (`ICandidate`), `type` → `T` (`TStage`), `enum` → `E` (`ERole`). Don't mass-rename existing code just to apply this — only new/touched types.
+- Type prefixes on new code (MUST), **everywhere including `packages/shared-types`**: `interface` → `I` (`ICandidate`), `type` → `T` (`TStage`), `enum` → `E` (`ERole`). Don't mass-rename existing code just to apply this — only new/touched types; the unprefixed legacy types in `shared-types` migrate incrementally (DT in `good-practices/DEBT_TECH.md`).
 - Declarative over imperative: `.map/.filter/.reduce`/spread instead of `for` + `push`/mutation.
 - SRP: if a file/function needs "and" to describe what it does, extract.
 - No over-engineering: build the MVP that works first, polish later; don't add abstractions for needs that don't exist yet.

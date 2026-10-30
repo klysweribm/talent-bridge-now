@@ -12,8 +12,8 @@ ejemplo la referencia en vez de duplicarla:
 
 ## Regla sobre mockups de `DESIGN/` (Stitch)
 
-Los archivos `DESIGN/stitch_ibm_talent_bridge_portal/**/code.html` son **solo
-guía visual** — nunca se copian ni se transcriben literalmente. El
+Los mockups locales de `DESIGN/` no son fuente de diseño: son **solo guía
+visual** — nunca se copian ni se transcriben literalmente. El
 `LoginPage.tsx` original (422 líneas, `style={{...}}` con hex literales en
 cada nodo) es el resultado de hacerlo mal: es una transliteración casi 1:1
 del HTML de Stitch, no un componente. `page.example.tsx` y

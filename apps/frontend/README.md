@@ -66,4 +66,4 @@ npm run test      # Vitest
 
 ---
 
-Ver [`PROJECT_CONTEXT.md`](../../PROJECT_CONTEXT.md) para contexto completo.
+Ver [`ROADMAP.md`](../../ROADMAP.md) para el estado y [`docs/design/UX-GUIDELINES.md`](../../docs/design/UX-GUIDELINES.md) para el diseño.

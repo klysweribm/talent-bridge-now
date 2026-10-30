@@ -40,7 +40,7 @@
 8. Single Responsibility por archivo — si necesita "y" para describirlo, extraer
 ```
 
-Claude Code carga estas reglas en forma condensada desde `.claude/rules/*.md` (por ruta); Bob desde `.clinerules`. Si una regla cambia aquí, actualizar ambos en el mismo commit.
+Claude Code carga estas reglas en forma condensada desde `.claude/rules/*.md` (por ruta). `.clinerules` es solo un puntero a `CLAUDE.md` y a esas reglas: si una regla cambia aquí, se actualiza `.claude/rules/` y no hay nada más que sincronizar.
 
 ### Para una revisión de PR
 

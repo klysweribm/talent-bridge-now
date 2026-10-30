@@ -14,7 +14,7 @@ interface UserListItem {
 }
 
 const MOCK_USERS: readonly UserListItem[] = [
-  { id: '1', user: { id: '1', name: 'Carlos López', email: 'carlos.lopez@ibm.com', role: 'technical' } },
+  { id: '1', user: { id: '1', name: 'Carlos López', email: 'carlos.lopez@ibm.com', role: 'technical_ref' } },
   { id: '2', user: { id: '2', name: 'Ana García',   email: 'ana.garcia@ibm.com',   role: 'recruiter' } },
 ];
 

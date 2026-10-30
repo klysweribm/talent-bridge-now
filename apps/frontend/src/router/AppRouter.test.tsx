@@ -62,7 +62,7 @@ describe('AppRouter — navigation/route consistency', () => {
   it('should send the user back to /login once the session is cleared (what a 401 does)', () => {
     useAuthStore.getState().setAuth(DEMO_USER, validToken());
     renderAt('/dashboard');
-    expect(screen.getByText('Dashboard de Reclutamiento')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
 
     act(() => useAuthStore.getState().clearAuth());
 
@@ -72,28 +72,41 @@ describe('AppRouter — navigation/route consistency', () => {
   it('should redirect an unauthorized role away from a role-restricted section instead of 404ing', () => {
     useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'recruiter' }, validToken());
     renderAt('/feedback'); // feedback es solo para technical_ref
-    expect(screen.getByText('Dashboard de Reclutamiento')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
   });
 
   it('should redirect a pm away from /interviews, which is only for recruiter and technical_ref', () => {
     useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'pm' }, validToken());
     renderAt('/interviews');
-    expect(screen.getByText('Dashboard de Reclutamiento')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
   });
 
   it('should let a technical_ref reach /interviews and /feedback without redirecting', () => {
     useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'technical_ref' }, validToken());
     renderAt('/interviews');
-    expect(screen.queryByText('Dashboard de Reclutamiento')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1, name: 'Inicio' })).not.toBeInTheDocument();
 
     renderAt('/feedback');
-    expect(screen.queryByText('Dashboard de Reclutamiento')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1, name: 'Inicio' })).not.toBeInTheDocument();
+  });
+
+  it('should send a user with a valid session who opens /login to /dashboard', () => {
+    useAuthStore.getState().setAuth(DEMO_USER, validToken());
+    renderAt('/login');
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/correo corporativo/i)).not.toBeInTheDocument();
+  });
+
+  it('should send a technical_ref who opens /processes to /dashboard', () => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'technical_ref' }, validToken());
+    renderAt('/processes');
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
   });
 
   it('should render the real DashboardPage, not ComingSoon, for /dashboard', () => {
     useAuthStore.getState().setAuth(DEMO_USER, validToken());
     renderAt('/dashboard');
-    expect(screen.getByText('Dashboard de Reclutamiento')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
   });
 
   it('should render ComingSoon for a protected section without a real screen yet', () => {
@@ -124,11 +137,11 @@ describe('AppRouter — navigation/route consistency', () => {
 
     it('should show the login and never paint the dashboard when the persisted token is expired', async () => {
       await simulateReload(makeJwtExpiringIn(-ONE_HOUR_S));
-      const wasPainted = watchForPaint('Dashboard de Reclutamiento');
+      const wasPainted = watchForPaint('Nuevo Proceso');
       renderAt('/dashboard');
 
       expect(wasPainted()).toBe(false);
-      expect(screen.queryByText('Dashboard de Reclutamiento')).not.toBeInTheDocument();
+      expect(screen.queryByRole('heading', { level: 1, name: 'Inicio' })).not.toBeInTheDocument();
       expect(screen.getByLabelText(/correo corporativo/i)).toBeInTheDocument();
       expect(useAuthStore.getState().token).toBeNull();
       expect(useAuthStore.getState().user).toBeNull();
@@ -138,7 +151,7 @@ describe('AppRouter — navigation/route consistency', () => {
       await simulateReload(validToken());
       renderAt('/dashboard');
 
-      expect(screen.getByText('Dashboard de Reclutamiento')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
     });
 
     it('should redirect to /login without a reload when the token expires while the screen is open', () => {
@@ -146,7 +159,7 @@ describe('AppRouter — navigation/route consistency', () => {
       const expiresInSeconds = 60;
       useAuthStore.getState().setAuth(DEMO_USER, makeJwtExpiringIn(expiresInSeconds));
       renderAt('/dashboard');
-      expect(screen.getByText('Dashboard de Reclutamiento')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
 
       act(() => { vi.advanceTimersByTime((expiresInSeconds + 1) * 1000); });
 

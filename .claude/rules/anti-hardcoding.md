@@ -6,7 +6,7 @@ paths:
 
 # Anti-hardcoding
 
-- **IBM Cloud / external config only from env vars**, never a literal (not even "temporary"): `MONGODB_URI`, `JWT_SECRET`/`JWT_EXPIRATION`, `WATSONX_*`, `COS_*`, `SMTP_*`, `THROTTLE_*`, `SLACK_WEBHOOK_URL` (`APPID_*` = Fase 2). Full list in `.env.example` — a new var is added there in the same commit, with a placeholder value.
+- **IBM Cloud / external config only from env vars**, never a literal (not even "temporary"): `MONGODB_URI`, `JWT_SECRET`/`JWT_EXPIRATION`, `THROTTLE_*`. Reserved (not in `.env.example` until their adapter exists, then added there in the same commit): `WATSONX_*`, `COS_*`, `SMTP_*`, `SLACK_WEBHOOK_URL`, `JWT_REFRESH_EXPIRATION`, `APPID_*` (Fase 2). Full list in `.env.example` — a new var is added there in the same commit, with a placeholder value.
 - Backend reads config through `@nestjs/config` (`ConfigService`) in the adapter/module that needs it, never `process.env` scattered inside services or domain.
 - Frontend reads only `import.meta.env.VITE_*`, centralized in `src/config/` — components/hooks import from there, never `import.meta.env` directly. Never put a secret in a `VITE_*` var (it ships to the browser).
 - Never a real key/token/password in source, test fixtures, docs or `docker-compose*.yml` defaults.

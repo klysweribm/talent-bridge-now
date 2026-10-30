@@ -7,6 +7,7 @@ import * as request from 'supertest';
 import type { User } from '@ibm-talent-bridge/shared-types';
 import type { IAuthToken } from '../src/capabilities/auth/domain/interfaces/auth-token.interface';
 import { AuthModule } from '../src/capabilities/auth/auth.module';
+import { AUTH_EVENT_REPOSITORY_PORT } from '../src/capabilities/auth/application/ports/auth-event-repository.port';
 import { USER_REPOSITORY_PORT, type IUserRepositoryPort } from '../src/capabilities/auth/application/ports/user-repository.port';
 import { DemoUsersSeeder } from '../src/capabilities/auth/infrastructure/seed/demo-users.seeder';
 import { SharedAuthModule } from '../src/shared/auth/shared-auth.module';
@@ -57,6 +58,8 @@ describe('Auth (e2e)', () => {
     })
       .overrideProvider(USER_REPOSITORY_PORT)
       .useValue(fakeUserRepository)
+      .overrideProvider(AUTH_EVENT_REPOSITORY_PORT)
+      .useValue({ record: jest.fn().mockResolvedValue(undefined) })
       .overrideProvider(DemoUsersSeeder)
       .useValue({ onModuleInit: jest.fn() })
       .compile();

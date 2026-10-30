@@ -1,24 +1,17 @@
-# Roadmap — Features Planeados
+# Roadmap — Features planeados
 
-> Backlog priorizado de features. Cada feature tiene: motivación, alcance,
-> dependencias, complejidad estimada y estado. El orden refleja la secuencia
-> de implementación recomendada — feature completo en frontend primero, su
-> backend después (principio acordado en el plan de remediación) — y puede
-> reajustarse por urgencia real, no preferencia teórica.
+> Backlog de features: qué existe, su estado, prioridad y dependencias. El detalle de lo
+> cerrado vive en git, en `good-practices/DEBT_TECH.md` y en `docs/use-cases/`. El encuadre
+> anterior (procesos → candidatos → entrevistas → feedback → reportes) quedó archivado fuera
+> de este documento y espera el replanning Bench First.
 >
-> Este roadmap NO repite el detalle etapa-por-etapa del refactor frontend en
-> curso (eso vive en el plan de remediación, ver `CLAUDE.md` → "Estado actual
-> / próximo paso"). Aquí se trackea la feature completa (frontend + backend +
-> deploy) a nivel de producto, y es donde se anota una idea nueva cuando
-> surge, aunque todavía no tenga hueco en ningún plan de ejecución.
->
-> **Última actualización:** 2026-10-15 (modelo de dominio y persistencia — ADR-013 en `docs/architecture/README.md`: resuelta la contradicción de acceso a Feedback, `Report` como entidad nueva, `technicalRefs` con rol, consistencia Candidate↔Process; arquitectura objetivo IBM Cloud: Code Engine en `br-sao`, watsonx.ai, sin Redis, email por `EmailSenderPort`/SMTP; reordenado para demo al sponsor: QW-1 + vertical de procesos real antes de FE-OTP-1; agregados QW-1 y AUTH-1)
+> **Última actualización:** 2026-10-28 (adelgazamiento previo al replanning Bench First)
 
 ---
 
 ## Leyenda
 
-| Símbolo  | Significado                                                     |
+| Símbolo  | Significado                                                      |
 | -------- | ---------------------------------------------------------------- |
 | 🟢 Baja  | 1-2 días, sin dependencias fuertes                                |
 | 🟡 Media | 3-5 días, requiere diseño previo o coordinación con otra feature |
@@ -27,473 +20,189 @@
 | 🚧       | En progreso                                                       |
 | ✅       | Completado                                                        |
 
----
-
-## Orden de implementación recomendado
-
-```
-Ahora        →  QW-1 · Quick wins: gates verdes, demo robusta, fundaciones   🚧 en progreso
-En curso     →  FE   · Remediación frontend — Etapa 2 (dashboard) y 3 (wizard + detalle)  🚧 Etapa 1/8 cerrada
-Hecho        →  OBS-1 · FlowLog: trazas request → adapters → response (solo no-producción)  ✅ cerrado en código (2026-10-27)
-Siguiente    →  QW-2  · Higiene de sesión y entorno (env vars, idle timer, auditoría de logout, verificación de BD)  📌 sin arrancar · prioridad ALTA
-Iteración 1  →  AUTH-1 · Login de desarrollo con JWT real (usuarios sembrados)  ✅ cerrado en código (falta recorrido en navegador, DT-010)
-Iteración 2  →  PROC-2 · Backend de procesos + wizard (vertical real demo)   📌 sin arrancar
-Iteración 3  →  FE-OTP-1 · Login OTP por correo (frontend, mock-first)       📌 sin arrancar
-Iteración 4  →  AUTH-2 · Backend real OTP (reemplaza emisión de AUTH-1)       📌 sin arrancar
-Iteración 4b →  AUTH-3 · Sesión corta + refresh + expiración por inactividad    📌 sin arrancar (después de AUTH-2: ambos cambian la emisión de tokens)
-Iteración 4c →  AUTH-4 · Tokens de sesión en cookies httpOnly                   📌 sin arrancar (después de AUTH-3)
-Iteración 5  →  CAND-1 · Feature Candidatos (frontend + backend)              📌 sin arrancar
-Iteración 6  →  FEED-1 · Feature Feedback (frontend + backend)                📌 sin arrancar
-Iteración 7  →  CV-1   · Análisis de CV (watsonx.ai + IBM COS) — candidato a adelantarse si el sponsor pide IA  📌 sin arrancar
-Iteración 8  →  INT-1  · Feature Entrevistas (frontend + backend)             📌 sin arrancar
-Iteración 9  →  REP-1  · Feature Reportes (frontend + backend)                📌 sin arrancar
-Iteración 10 →  HARDEN-1 · Endurecimiento transversal final                   📌 sin arrancar
-Iteración 11 →  DEPLOY-1 · Deploy real en IBM Cloud                           📌 sin arrancar
-```
-
-> **Reordenamiento 2026-10-15 (demo al sponsor):** el objetivo inmediato es un
-> **vertical real con backend** del flujo de procesos (dashboard → crear
-> proceso → detalle, persistido en MongoDB). Por eso QW-1 + Etapas 2-3 +
-> AUTH-1 + PROC-2 pasan delante de FE-OTP-1: el login es la pantalla menos
-> diferenciadora, y AUTH-1 entrega el JWT real que PROC-2 necesita sin esperar
-> OTP + Event Notifications. La justificación original de abajo se conserva
-> como referencia; donde contradice este bloque, manda este bloque.
-
-**Justificación del orden:**
-
-- **FE-OTP-1 se inserta antes de AUTH-2 y antes de continuar con Etapa 2 (dashboard)** —
-  cambia el punto de entrada de toda la app (login). Conviene estabilizar ese
-  flujo ahora, con el organism `LoginForm` todavía "caliente" de la Etapa 1,
-  en vez de seguir construyendo features (dashboard, wizard) sobre un login
-  que ya se sabe se va a reemplazar. Es frontend-only (mock-first, sin
-  backend), no bloquea nada del resto del roadmap salvo el alcance de AUTH-2,
-  y su costo (🟡 Media, ~2-3 días) es bajo comparado con el riesgo de dejarlo
-  para después y tener que retrabajar dos veces el mismo organism.
-- **FE primero** — sin un golden path frontend sólido (atoms/molecules/organisms
-  correctos, `infrastructure/` mock-first, tests) cada feature nueva repetiría
-  los mismos problemas que forzaron el plan de remediación. El resto del
-  roadmap asume ese patrón ya validado.
-- **AUTH-2 después de FE-OTP-1** — el login OTP mock ya funciona en UI;
-  conectar el backend real (Redis + IBM Event Notifications + JWT) es la
-  dependencia más barata de resolver antes de que el resto de features
-  necesite un token real para sus endpoints.
-- **PROC-2 sigue a AUTH-2** — procesos es el corazón del dominio (crear
-  proceso → asignar referente → candidatos), y todo lo demás (entrevistas,
-  feedback, reportes) cuelga de un `processId` existente.
-- **CAND-1 antes de INT-1** — no se puede agendar una entrevista sin un
-  candidato cargado; el dedupe por email y el banco de perfiles son
-  prerequisito funcional.
-- **INT-1 antes de FEED-1** — el feedback técnico se llena post-entrevista;
-  sin el flujo de agendamiento no hay entrevista que dispare el feedback.
-- **REP-1 al final del ciclo de features** — el reporte al cliente consolida
-  candidatos + entrevistas + feedback; es el punto de salida del proceso.
-- **CV-1 es independiente pero de baja prioridad relativa** — mejora la
-  carga de candidatos (pre-llenado automático) pero el flujo funciona sin
-  ella (carga manual). Se puede adelantar si sobra tiempo en cualquier
-  iteración de CAND-1 en adelante.
-- **HARDEN-1 antes de DEPLOY-1** — gate de CI, decisión sobre `@carbon/react`,
-  env config tipado y error boundary deben cerrarse antes de exponer la app
-  fuera de local/Docker.
+**Prioridad (HIGH \| MEDIUM \| LOW):** en un feature cerrado refleja lo que le **queda pendiente**,
+no el feature en sí.
 
 ---
 
-## QW-1 — Quick wins previos a la demo (gates, robustez, fundaciones)
+## Backlog Bench First — pendiente de replanning
 
-**Estado:** 🚧 en progreso · **Complejidad:** 🟢 Baja (2-3 días)
+El producto se reencuadra como **Bench First**, pero aún no hay ADR, casos de uso ni `shared-types`
+nuevos (alcance B). Hasta el replanning, estas son las equivalencias acordadas:
 
-**Implementado (2026-10-15):** gates (atoms DT-003…DT-006, ESLint + specs + e2e + Dockerfile de prod en backend, CI en Node 22 con `validate-quality` informativo), demo robusta (navegación única, `ComingSoon`/404 en layout, `ErrorBoundary`, sesión persistida, usuarios demo `ana@`/`carlos@`/`mariana@ibm.com`), fundaciones (`shared-types` en frontend, `env.ts`, `httpClient`, Mongoose/helmet/throttler/health con DB), higiene. Frontend 97 → 143 tests; backend 0 → 5 tests. **Pendiente:** recorrido manual en navegador (F5, 3 roles, sin 404) y health contra Mongo real. `shared-types` en backend se movió a PROC-2 (el contexto Docker del backend no incluye `packages/`). El lint del frontend en CI sigue en rojo hasta la Etapa 2 (DT-002 + warnings de `SidebarNav`).
+| Encuadre anterior | Reemplazo Bench First |
+| --- | --- |
+| PROC-2 | Oportunidades + box mágico |
+| CAND-1 | BENCH (mock) + Talent Pool + carga de perfil |
+| INT-1 | Disponibilidad + booking top 5 + entrevistas por etapa |
+| FEED-1 | Feedback en 3 etapas asistido por IA |
+| REP-1 | Dashboard ejecutivo (PDF pasa a LOW) |
+| CV-1 | Acción del asistente "analizar perfil" vía ICA (`AiProviderPort`) |
 
-### Motivación
+Los IDs PROC-2, CAND-1, INT-1, FEED-1, REP-1 y CV-1 ya no existen como secciones; `/roadmap-task` debe
+actualizarse tras el replanning. Los casos de uso por rol y feature siguen en `docs/use-cases/` (encuadre
+anterior, a revisar en el replanning).
 
-Validación 2026-10-15: lint frontend en rojo (5 errores `max-lines`), CI backend
-roto (sin ESLint config, sin specs, sin Dockerfile de prod), botones de la demo
-que terminan en 404, sesión que se pierde con F5, login mock con un único rol,
-`packages/shared-types` sin consumir. Nada de eso resiste una demo en vivo.
+### Features vigentes
 
-### Alcance
-
-- Gates: atoms DT-003…DT-006 bajo límite; backend con ESLint, primer spec, e2e y Dockerfile de prod; `validate-quality` en CI; Node alineado; sin passwords hardcodeadas en `docker-compose.test.yml`.
-- Demo robusta: config de navegación única (router + sidebar), `ComingSoon`/404 dentro del layout, `ErrorBoundary`, sesión persistida en `sessionStorage`, usuarios demo por rol.
-- Fundaciones: `shared-types` conectado en ambas apps, `config/env.ts` + `httpClient` en frontend, Mongoose/helmet/throttler/Logger/health con DB en backend.
-- Higiene: READMEs correctos, `.DS_Store` fuera de git, decisión `@carbon/react` registrada (ver HARDEN-1).
-
-### Dependencias
-
-Ninguna.
-
-### Criterios de éxito
-
-- [x] Lint frontend con solo el error de `DashboardPage` (DT-002, se cierra en Etapa 2); lint/typecheck/test backend verdes.
-- [ ] Ningún link de sidebar/dashboard lleva a 404; ruta inexistente muestra 404 dentro del layout (✅ por tests de `AppRouter`; falta recorrido en navegador).
-- [ ] F5 no cierra sesión; se puede entrar con los 3 roles demo (✅ por tests; falta recorrido en navegador).
-- [x] `shared-types` importado desde el frontend con typecheck verde (backend → PROC-2).
-- [ ] `httpClient` + `config/env.ts` con tests ✅; backend conecta a Mongo y `/api/v1/health` reporta su estado (verificado con Mongo caído vía podman; falta con Mongo arriba).
-
----
-
-## AUTH-1 — Login de desarrollo con JWT real (usuarios sembrados)
-
-**Estado:** ✅ cerrado en código (2026-10-24) — backend + swap de frontend + test de integración contra Mongo real + DT-008/DT-009 resueltos. **Pendiente solo el recorrido manual en navegador (DT-010)** · **Complejidad:** 🟢 Baja
-
-**Implementado (2026-10-18):** `capability/auth` completa (`domain/dto`, `application/{ports,services}`, `infrastructure/{adapters,controllers,seed}`), `shared/auth/` con `JwtAuthGuard`/`RolesGuard`/`@Roles` reutilizables por el resto de capabilities, seed idempotente de los 3 usuarios demo (`ana@`/`carlos@`/`mariana@ibm.com`). Verificado de forma independiente contra el backend corriendo (no solo tests): los 3 logins devuelven JWT con el rol correcto, email no sembrado → 401, `NODE_ENV=production` → 404, `/whoami` (ruta de prueba del guard) → 401 sin token / 403 con rol incorrecto / 200 con rol correcto, dos reinicios consecutivos del proceso dejan exactamente 3 usuarios en Mongo (seed idempotente confirmado en vivo, no solo por lógica de upsert). Un bug real se encontró y corrigió durante esta verificación — ver nota abajo.
-
-### Motivación
-
-PROC-2 necesita endpoints protegidos con un JWT real. Esperar a AUTH-2 (OTP +
-Redis + Event Notifications) bloquearía el vertical de la demo. AUTH-1 entrega
-el contrato de JWT/roles definitivo; AUTH-2 solo cambia **cómo** se emite.
-
-### Alcance
-
-- Casos de uso detallados: [`docs/use-cases/auth.md`](./docs/use-cases/auth.md).
-- `POST /api/v1/auth/dev-login` (email de un usuario sembrado → JWT con rol). **Falla cerrado (DT-008):** solo existe con `AUTH_DEV_LOGIN_ENABLED=true` exacto, y nunca con `NODE_ENV=production`; el seed de usuarios demo obedece el mismo flag.
-- `JwtAuthGuard` + decorador `@Roles` en `shared/`, reutilizables por todas las capabilities.
-- Seed de usuarios demo (recruiter / technical / pm).
-- Frontend: `auth.infra.ts` pasa de mock a `httpClient` manteniendo la UI de Etapa 1. **Hecho (2026-10-24).** Además `httpClient` limpia la sesión ante un 401 con token activo (DT-009) y `ProtectedRoute` redirige a `/login`.
-
-### Cierre (2026-10-24)
-
-- Test de integración `apps/backend/test/auth.integration.e2e-spec.ts` contra Mongo real: seed, login de los 3 roles, 400/401/403/404, tokens manipulados/expirados, flag apagado.
-- **No verificado aún:** recorrido manual en navegador (F5 conserva sesión, 3 roles, sin 404) — DT-010 en `good-practices/DEBT_TECH.md`. AUTH-1 no se da por 100 % cerrado hasta registrarlo.
-
-### Nota — bug encontrado en verificación independiente
-
-Los tests (unit + e2e) pasaban en verde, pero el servidor real **crasheaba al arrancar**: `UserModel.role` (tipo `UserRole`, una unión de strings) no tenía `@Prop({ type: String, ... })` explícito, y Mongoose no puede inferir el tipo de una unión TypeScript — `CannotDetermineTypeError` en runtime, nunca en el pipeline de tests porque ninguno levanta el proceso completo contra el schema real sin mockear. Corregido en `user.schema.ts` agregando `type: String` al `@Prop` de `role`. **Lección para el resto de capabilities:** todo `@Prop` sobre un campo de tipo unión (`UserRole`, `ProcessStage`, `FeedbackRecommendation`, etc. de `shared-types`) necesita `type: String` explícito — los tests con fakes/mocks no lo detectan, solo un arranque real del proceso lo revela.
-
-### Dependencias
-
-QW-1 (Mongoose + `httpClient` + `shared-types`).
-
-### Criterios de éxito
-
-- [x] Login con los 3 usuarios sembrados devuelve JWT con el rol correcto (verificado en vivo, no solo por test).
-- [x] El endpoint responde 404 con `NODE_ENV=production` (verificado en vivo).
-- [x] Endpoint protegido sin token → 401; rol incorrecto → 403 (verificado en vivo vía `/whoami`).
-- [ ] Frontend `auth.infra.ts` conectado a `httpClient` — pendiente, siguiente paso.
+| ID | Estado | Prioridad | Depende de |
+| --- | --- | --- | --- |
+| QW-1 | 🚧 implementado, falta verificación en vivo | HIGH | — |
+| AUTH-1 | ✅ cerrado en código (falta DT-010) | HIGH | QW-1 |
+| OBS-1 | ✅ cerrado en código | LOW | — |
+| QW-2 | ✅ cerrado en código (falta DT-010) | HIGH | AUTH-1 |
+| FE | 🚧 Etapas 0-2 en código; Etapa 2 pendiente de revisión en navegador | MEDIUM | — |
+| FE-OTP-1 | 📌 sin arrancar | LOW | Etapa 1 (cerrada) |
+| AUTH-2 | 📌 sin arrancar | LOW | FE-OTP-1 |
+| AUTH-3 | 📌 sin arrancar | LOW | QW-2, AUTH-2 |
+| AUTH-4 | 📌 sin arrancar | LOW | AUTH-3 |
+| HARDEN-1 | 📌 sin arrancar | LOW | features de UI |
+| DEPLOY-1 | 📌 sin arrancar | LOW | HARDEN-1 |
 
 ---
 
-## OBS-1 — FlowLog: trazas de flujo request → adapters → response
+## Estado actual / próximo paso
+
+> Se actualiza al cerrar cada tarea (`/roadmap-task` o `/update-roadmap`). El detalle histórico vive en el
+> Historial de abajo y en `good-practices/DEBT_TECH.md` → Resueltos.
+
+- **Gates (2026-10-28):** backend 39 unit / 41 e2e, lint 0 errores / 14 warnings; frontend 264 tests, lint 0
+  errores (2 warnings preexistentes en `sessionCacheGuard.test.tsx`), `validate-quality --strict` 0 críticos.
+- **Pendiente de verificación en navegador (DT-010):** QW-1, AUTH-1, QW-2 y la Etapa 2 (F5, los 3 roles, aviso de
+  inactividad a los 360 s). Hasta registrarlo siguen abiertas DT-002, DT-007 y DT-024.
+- **Git:** `b9acfc4`, `95d4fcc`, `a4da541`, `55a87cf` y otros commits anteriores conservan `Co-Authored-By`;
+  reescribirlos está pendiente (`git filter-branch` fue bloqueado por permisos). Sin remote: no se ha añadido
+  `https://github.com/klysweribm/architecture-reviewer-app.git` ni se ha hecho push; nunca `--force`;
+  `~/.gitconfig` tiene `http.sslverify=false`; auth por token o SSH sin decidir.
+- **Próximo paso:** decidir la reescritura de commits y el remote, y hacer el recorrido en navegador (DT-010).
+  Después, el replanning Bench First (ver "Backlog Bench First"). Opcionales: OBS-2 y DT-020.
+
+---
+
+## QW-1 — Quick wins previos a la demo (gates, robustez, fundaciones) (HIGH)
+
+**Estado:** 🚧 implementado (2026-10-15), pendiente de verificación en vivo · **Complejidad:** 🟢 Baja
+
+Gates (atoms bajo límite, ESLint y specs en backend, Dockerfile de producción, CI en Node 22), demo robusta
+(navegación única, `ComingSoon`/404 dentro del layout, `ErrorBoundary`, sesión persistida, usuarios demo
+`ana@`/`carlos@`/`mariana@ibm.com`) y fundaciones (`shared-types` en el frontend, `env.ts`, `httpClient`,
+Mongoose/helmet/throttler/health). `shared-types` en el backend queda para cuando exista la vertical de
+procesos: el contexto Docker del backend no incluye `packages/`. Detalle en `git log` y `DEBT_TECH.md`.
+
+**Pendiente real:**
+- [ ] Recorrido en navegador: ningún link lleva a 404, F5 conserva la sesión y entran los 3 roles demo
+      (DT-010; ya cubierto por los tests de `AppRouter`).
+- [ ] `/api/v1/health` reporta `database: "up"` con Mongo arriba (el stack responde 200 y queda `healthy`;
+      no se inspeccionó el cuerpo).
+- [ ] `npm run lint` del frontend sale en rojo por `--max-warnings 0`: quedan 2 warnings en
+      `sessionCacheGuard.test.tsx` (0 errores desde la Etapa 2).
+
+---
+
+## AUTH-1 — Login de desarrollo con JWT real (HIGH)
+
+**Estado:** ✅ cerrado en código (2026-10-24); falta el recorrido en navegador (DT-010) · **Complejidad:** 🟢 Baja
+
+`POST /auth/dev-login` falla cerrado: solo existe con `AUTH_DEV_LOGIN_ENABLED=true` exacto y nunca con
+`NODE_ENV=production` (DT-008). `JwtAuthGuard`, `RolesGuard` y `@Roles` viven en `shared/auth/`, y el seed
+de los 3 usuarios demo es idempotente. El swap de `auth.infra.ts` de mock a `httpClient` se hizo el
+2026-10-24, y `httpClient` limpia la sesión ante un 401 con token activo (DT-009). Test de integración
+contra Mongo real en `apps/backend/test/auth.integration.e2e-spec.ts`. Casos de uso: `docs/use-cases/auth.md`.
+AUTH-2 solo cambia **cómo** se emite el JWT, no su contrato.
+
+- [x] Los 3 logins devuelven JWT con el rol correcto; 404 con `NODE_ENV=production`; 401 sin token y 403
+      con rol incorrecto en un endpoint protegido (verificado en vivo).
+- [x] `auth.infra.ts` conectado a `httpClient` (2026-10-24).
+- [ ] Recorrido manual en navegador (DT-010).
+
+---
+
+## OBS-1 — FlowLog: trazas de flujo request → adapters → response (LOW)
 
 **Estado:** ✅ cerrado en código (2026-10-27) · **Complejidad:** 🟢 Baja
 
-### Qué es
+Código en `apps/backend/src/shared/observability/`. Apagado por defecto (`FLOW_LOG_ENABLED=false`), falla
+cerrado y nunca con `NODE_ENV=production`. Para verlo: `FLOW_LOG_ENABLED=true` en el `.env` local,
+`podman-compose up -d --force-recreate backend` y `podman-compose logs -f backend`. Qué oculta y cómo trazar
+un adapter nuevo: `.claude/rules/backend-architecture.md` → Logging.
 
-Ayuda de depuración que imprime en la terminal del backend cada petición con su `Request`, los pasos por servicios y adapters (`↳`), y su `Response`, indicando la capability de origen. Sin dependencias nuevas (interceptor global + middleware + decorador + `AsyncLocalStorage`). Código en `apps/backend/src/shared/observability/`.
-
-### Cómo usarlo
-
-- **Apagado por defecto** (`FLOW_LOG_ENABLED=false` en `.env.example` y en `docker-compose.yml`). Para activarlo: `FLOW_LOG_ENABLED=true` en tu `.env` local y `podman-compose up -d --force-recreate backend`; luego `podman-compose logs -f backend` (o `logs -f backend` para ver solo el backend, sin el ruido de Mongo).
-- **Falla cerrado:** solo se activa con `true` exacto y **nunca con `NODE_ENV=production`** (el arranque avisa si lo ignora). Ojo: `apps/backend/Dockerfile` fija `NODE_ENV=production`, así que un contenedor construido con él no mostrará trazas (decisión pendiente para DEPLOY-1).
-- **Trazar un adapter o servicio nuevo:** poner `@TraceFlow()` sobre métodos públicos de puertos o servicios. Nunca sobre controladores ni helpers privados. Hoy lo llevan `AuthService.devLogin` y `MongooseUserAdapter.findByEmail`; los adapters futuros (watsonx, COS, SMTP, Slack) deben llevarlo desde su primer commit.
-- **Qué oculta y qué no:** `authorization`, `cookie`, `password`, `token`, `accessToken`, `refreshToken`, `otp`, `secret`, `apiKey` y cualquier valor con forma de JWT o `Bearer` salen como `[REDACTED]`. **Los emails y nombres se muestran a propósito** (excepción acotada al flag, documentada en `backend-architecture.md`, `.clinerules` y `BEST-PRACTICES.md` §3.4). Con datos reales de candidatos habrá que enmascarar PII.
-
-### Verificado
-
-Backend: typecheck sin errores, 35 tests unitarios, 38 e2e (incluido `flow-log.e2e-spec.ts`: flag on/off, producción ignora el flag, 401 impreso por el middleware, secretos nunca en la salida). Verificado en vivo por salida real del contenedor.
-
-### Pendiente (deuda y mejoras)
-
-- **DT-020:** 7 warnings de lint nuevos (complejidad/líneas por función) en `redact.ts`, `trace-flow.decorator.ts`, interceptor, middleware y el e2e.
-- **OBS-2 (por decidir):** sección de Mongo bajo el mismo flujo (consultas con su `#id`) con flag propio `FLOW_LOG_MONGO`; y/o silenciar el ruido de conexiones del contenedor `mongod` (`--quiet`). Hoy las líneas `[mongodb] |` son la salida del contenedor, no del FlowLog.
+**Pendiente:** OBS-2 (sección Mongo con flag propio `FLOW_LOG_MONGO` y/o `mongod --quiet`, por decidir),
+DT-020 (warnings de lint del FlowLog) y DT-021 (el `Dockerfile` fija `NODE_ENV=production`; decidir en DEPLOY-1).
 
 ---
 
-## QW-2 — Higiene de sesión y entorno
+## QW-2 — Higiene de sesión y entorno (HIGH)
 
-**Estado:** 📌 sin arrancar · **Prioridad:** 🔺 Alta · **Complejidad:** 🟢 Baja (1-2 días) · **Registrado:** 2026-10-27
+**Estado:** ✅ cerrado en código y verificado en vivo con curl + Mongo (2026-10-27) · **Complejidad:** 🟢 Baja
 
-### Motivación
+Commits: `a1c5b96` (variables de entorno sin consumidor retiradas; `WATSONX_*`, `COS_*`, `SMTP_*`,
+`SLACK_WEBHOOK_URL`, `JWT_REFRESH_EXPIRATION` y `APPID_*` vuelven junto con su adapter), `1341f8a`
+(`POST /auth/logout` y colección `auth_events` con login y logout, TTL `AUTH_EVENT_RETENTION_DAYS`=90),
+`666fcf0` (`useLogoutMutation`) y `71cb074` (idle timer: aviso a los 360 s y cuenta atrás de 60 s por
+`VITE_IDLE_TIMEOUT_SECONDS`/`VITE_IDLE_WARNING_SECONDS`). Verificado: los 3 usuarios con su rol, una fila
+`login` y una `logout` por usuario con su `reason`, e índice TTL de 90 días. Al cerrar: backend 39 unit /
+41 e2e, frontend 202 tests.
 
-Tras cerrar AUTH-1 y el FlowLog quedaron cuatro mejoras pequeñas y de poco riesgo: variables de entorno que nadie lee, sesión que nunca caduca por inactividad (solo por `exp` del JWT), un "logout" que solo borra el estado del cliente sin dejar rastro en el backend, y sin comprobación en vivo de qué queda guardado en Mongo.
+**Límites que deja:** `logout` vive en `AuthSessionController` aparte (límite de líneas); si Mongo falla al
+auditar, `devLogin` y `logout` fallan y el frontend limpia la sesión igual; `AUTH_EVENT_RETENTION_DAYS`
+inválido cae a 90 sin aviso (por decidir si debe fallar el arranque); un logout `expired` solo se registra si
+el JWT aún es válido; sin `trust proxy`, `ip` es la del proxy (DT-023); durante el aviso de inactividad solo
+"Seguir conectado" lo cancela; `httpClient` no tiene timeout.
 
-### Alcance
-
-**1. Limpiar variables de entorno sin consumidor.**
-- Verificado por búsqueda que ningún código las lee; solo aparecen en `.env.example` y en el paso a través de `docker-compose.yml`: `WATSONX_URL/PROJECT_ID/API_KEY/MODEL_ID`, `COS_ENDPOINT/API_KEY/INSTANCE_CRN/BUCKET_CVS`, `SMTP_HOST/PORT/USER/PASS/FROM`, `SLACK_WEBHOOK_URL`, `JWT_REFRESH_EXPIRATION` (esta también en `docker-compose.test.yml`) y el bloque comentado de `APPID_*`.
-- Se quitan de `.env.example` y de ambos compose. Cada una se vuelve a añadir **en el mismo commit que su adapter** (regla de `anti-hardcoding.md`: CV-1, AUTH-2, INT-1).
-- Se conservan las que sí se leen (ya incluye `FLOW_LOG_ENABLED`, añadida por OBS-1 con valor `false`): `NODE_ENV`, `PORT`, `BACKEND_PORT`, `FRONTEND_PORT`, `FRONTEND_URL`, `MONGODB_URI`, `MONGO_*`, `JWT_SECRET`, `JWT_EXPIRATION`, `THROTTLE_*`, `AUTH_DEV_LOGIN_ENABLED`, `FLOW_LOG_ENABLED`, `VITE_API_URL`.
-- `PROJECT_CONTEXT.md` y `docs/architecture/README.md` describen esas variables como configuración objetivo: se reetiquetan como "reservadas (se añaden junto a su adapter)", no se borran.
-
-**2. Idle timer con aviso (frontend).**
-- Tras **360 s (6 min)** sin actividad aparece un aviso con cuenta atrás de **60 s**; al llegar a cero se cierra la sesión (motivo `idle`).
-- Parametrizado: `VITE_IDLE_TIMEOUT_SECONDS=360` y `VITE_IDLE_WARNING_SECONDS=60`, validados en `config/env.ts` (zod, con esos valores por defecto y la regla `aviso < timeout`), documentados en `.env.example` y pasados en `docker-compose.yml`.
-- `useIdleTimer` en `features/auth/hooks/` (junto a `useSessionExpiry`): eventos `mousemove`, `mousedown`, `keydown`, `scroll`, `touchstart` con throttle; calcula con `Date.now()` y no con contadores, porque los timers de pestañas en segundo plano se frenan. `IdleWarningModal` con "Seguir conectado" y "Cerrar sesión", bajo el árbol de rutas protegido (regla de DT-015).
-- Convive con `useSessionExpiry`: la expiración del JWT sigue siendo el techo.
-
-**3. Logout literal con registro de auditoría (fase 1).**
-- Backend, `capabilities/auth`: `POST /auth/logout` protegido con `JwtAuthGuard` (cualquier rol); DTO con `reason` ∈ `manual | idle | expired`; puerto `AuthEventRepositoryPort` + adapter Mongoose a la colección `auth_events` (`userId`, `type`, `reason`, `at`, `ip`, `userAgent`); servicio que orquesta, controlador sin lógica; `@TraceFlow()` en el puerto.
-- Se registra también el **login** en la misma colección (un logout sin su login deja la auditoría ciega). Decisión a confirmar al arrancar la tarea.
-- `ip` y `userAgent` son datos personales: índice TTL con `AUTH_EVENT_RETENTION_DAYS` (por defecto 90). Detrás de Vite/nginx `req.ip` solo es fiable con `trust proxy`.
-- Frontend: `logoutUser` en `auth.infra.ts` y `useLogoutMutation` (React Query), usado por `SidebarNav.handleLogout` y por el idle timer. La llamada va **antes** de limpiar la sesión; si falla se limpia igual, sin bloquear la salida.
-- Límite conocido: el JWT sigue válido hasta `exp` tras el logout → **DT-018**, que cierra AUTH-3.
-
-**4. Verificar la integración de Mongo con login y logout.**
-- Ya confirmado: el login lee `users` en Mongo (`findByEmail` devuelve `_id` real con timestamps) y `auth.integration.e2e-spec.ts` corre contra Mongo real. El logout actual **no toca la base** (`SidebarNav.handleLogout` solo hace `clearAuth()`).
-- Pendiente de comprobar en vivo: que `users` tiene los 3 usuarios con su rol y, tras la tarea 3, que `auth_events` recibe filas `login` y `logout`. Consulta con `mongosh` dentro del contenedor leyendo credenciales del propio entorno (sin pegarlas), o con `mongo-express`.
-- Registrar el resultado aquí; si se hace en navegador, cierra **DT-010**.
-- Orden: después de la tarea 3.
-
-### Dependencias
-
-AUTH-1 cerrado. Las tareas 1 y 4 no dependen de nada; la 2 y la 3 se coordinan en el flujo de cierre de sesión. Enrutado: `config-task` (1), `frontend-task` (2), `backend-task` y luego `frontend-task` (3), verificación manual (4).
-
-### Criterios de éxito
-
-- [ ] `podman-compose config` valida sin las variables retiradas y el stack arranca; tests de backend y frontend siguen verdes.
-- [ ] Sin actividad durante 6 min aparece el aviso; a los 60 s se cierra la sesión; cualquier actividad antes de eso lo cancela. Valores cambiables por `.env` y con defaults 360/60.
-- [ ] Cerrar sesión (manual o por inactividad) crea una fila en `auth_events` con el motivo; el login también.
-- [ ] Verificado en vivo: `users` con 3 usuarios y `auth_events` con login y logout (resultado registrado aquí).
-- [ ] DT-010 actualizado o cerrado; DT-018 y DT-019 siguen abiertas (las cierran AUTH-3 y AUTH-4).
+**Pendiente:**
+- [ ] Ver en navegador el aviso a los 360 s y la salida a `/login` (DT-010).
+- [ ] DT-022 (los e2e dejan filas `u-1` en `auth_events`, origen sin confirmar), DT-023 y DT-024 (esta última
+      resuelta en código por la Etapa 2; se cierra tras revisar las pantallas).
+- DT-018 y DT-019 siguen abiertas: las cierran AUTH-3 y AUTH-4.
 
 ---
 
-## FE — Remediación frontend (auth + processes)
+## FE — Remediación frontend (auth + processes) (MEDIUM)
 
-**Estado:** 🚧 en progreso (Etapa 1/8 cerrada) · **Complejidad:** 🔴 Alta (multi-etapa)
+**Estado:** 🚧 Etapas 0-2 en código · **Complejidad:** 🔴 Alta (multi-etapa)
 
-### Motivación
+Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre cualquier mockup). Condición vigente: todo
+`useQuery` bajo el árbol de rutas protegido (DT-015, `.claude/rules/frontend-architecture.md`).
 
-Ver plan de remediación (`~/.claude/plans/breezy-moseying-plum.md`) y
-`CLAUDE.md` → "Estado actual / próximo paso" para el detalle completo. Este
-roadmap no lo duplica porque es un plan de ejecución vivo, no un feature
-discreto — se referencia aquí solo para dar contexto de por qué el resto de
-features esperan a que cierre.
-
-### Dependencias
-
-Ninguna — es la base de todo lo demás.
-
-### Criterios de éxito
-
-- [x] Etapa 0 — fundaciones de calidad (lint/typecheck/tests/validate-quality funcionando)
-- [x] Etapa 1 — refactor `LoginPage.tsx` (golden path `auth`, DT-001 resuelto, verificado visualmente con Playwright)
-- [ ] Etapa 2 — refactor `DashboardPage.tsx` + `SidebarNav.tsx`. Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre los mockups).
-- [ ] Etapas 3-7 — wizard/detalle de procesos + features `candidates`/`interviews`/`feedback`/`reports` desde cero (solo UI, sobre mocks). Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre los mockups).
-- [ ] Etapa 8 — endurecimiento transversal (CI gate, decisión `@carbon/react`, env config, error boundary)
+- [x] Etapa 0 — fundaciones de calidad.
+- [x] Etapa 1 — `LoginPage.tsx` (golden path `features/auth`, DT-001).
+- [ ] Etapa 2 — cerrada en código, **pendiente de revisión en navegador (DT-010)**: shell y `SidebarNav`
+      (`dd77ff8`), Inicio del reclutador (`2ef1a5b`), guardas de ruta y `PublicRoute` (`0326925`). Frontend 264
+      tests y `validate-quality` con 0 críticos. DT-002, DT-007 y DT-024 siguen abiertas hasta esa revisión.
+- [ ] Etapas 3-7 — wizard/detalle de procesos y features de candidatos, entrevistas, feedback y reportes
+      (solo UI sobre mocks). Esperan el replanning Bench First.
+- [ ] Etapa 8 — endurecimiento transversal (ver HARDEN-1).
 
 ---
 
-## FE-OTP-1 — Login OTP por correo corporativo + panel de marca (Frontend, mock-first)
+## FE-OTP-1 — Login OTP por correo corporativo + panel de marca (LOW)
 
-**Estado:** 📌 sin arrancar · **Complejidad:** 🟡 Media-Alta (3-4 días) · **Prioridad:** Alta — próximo paso recomendado, antes de continuar con Etapa 2 (dashboard)
+**Estado:** 📌 sin arrancar · **Complejidad:** 🟡 Media-Alta (3-4 días)
 
-### Motivación
+Sustituye el login por contraseña por correo `@ibm.com` → código de 6 dígitos (frontend mock-first:
+`requestOtp`/`verifyOtp` en `auth.infra.ts`) y añade un panel de marca recortado a logo, título y una frase
+de valor (`docs/design/UX-GUIDELINES.md` §3.1). Sin fallback a contraseña y sin "IBM Verify"/YubiKey. Reabre
+`LoginForm` como cambio de alcance, no como deuda. Depende solo de la Etapa 1 (cerrada). Prioridad baja: el
+login no es la pantalla diferenciadora y AUTH-1 ya entrega el JWT real.
 
-Análisis arquitectónico (sesión 2026-09-13): para una plataforma interna IBM sin candidatos con
-login, autenticar por posesión del correo `@ibm.com` (OTP/magic code) es más
-simple y reduce superficie de ataque frente a usuario+contraseña — sin hashing,
-sin reset flows, sin credenciales débiles. Decisión: implementar OTP propio
-ahora (Redis + IBM Event Notifications, ambos ya en el stack) y dejar la
-migración a IBM App ID/SSO w3id para Fase 2, sin romper el contrato de JWT
-interno cuando eso ocurra.
-
-Este task **reemplaza** el flujo de contraseña construido en la Etapa 1 del
-plan de remediación frontend (DT-001, ya cerrado) — no es trabajo aditivo,
-es un ajuste de alcance sobre un organism ya cerrado (`LoginForm`), más un
-rediseño de layout de `LoginPage` (panel de marca). Se documenta aquí como
-feature de producto porque cambia el flujo y la página, no como deuda
-técnica nueva.
-
-**Mockup recibido y confirmado** (sesión 2026-09-13, 2 capturas: estado
-inicial "correo" y estado "código"). Decisiones cerradas sobre lo mostrado
-en el mockup:
-
-- ❌ **Sin fallback a contraseña.** El mockup incluye un link "¿Prefieres
-  usar contraseña tradicional?" — **se descarta**. OTP es el único método
-  además de SSO, consistente con el argumento de seguridad original
-  (eliminar contraseñas, no mantener dos flujos paralelos). No se construye
-  ese link ni un modo "password" en `LoginForm`.
-- ✅ **Panel de marca (hero) sí se construye, pero recortado** (ver
-  `docs/design/UX-GUIDELINES.md` §3.1 — manda sobre el mockup): solo logo +
-  título + **una** frase de valor. El testimonial ("Elena Morales", badge
-  "IBM Verified") y el "mockup dentro del mockup" con stats ("94%
-  coincidencia técnica", "+1,200 procesos 2024") **no se construyen** —
-  son KPIs de vanidad / datos que no existen, igual que el resto de
-  elementos recortados por `docs/design/UX-GUIDELINES.md`.
-- ✅ **Un solo task** — el panel de marca entra en este mismo `FE-OTP-1`
-  (no se separa en un task aparte), aunque es funcionalmente independiente
-  del flujo de autenticación.
-
-### Alcance (estrictamente frontend, sobre mocks — sin backend real)
-
-**A. `LoginPage.tsx` — nuevo layout de dos columnas (`components/pages/`)**
-
-- Grid de 2 columnas en desktop (`lg:grid-cols-2`), colapsa a una sola
-  columna en mobile (el panel de marca se oculta u ordena debajo — decidir
-  al implementar cuál es menos disruptivo; el mockup no cubre el breakpoint
-  mobile). Columna izquierda: `AuthBrandPanel`. Columna derecha: `LoginForm`
-  + `AuthFooter` (composición ya existente, sin cambios de esa parte).
-  `DotMatrixBackdrop` se mantiene solo detrás de la columna derecha (el
-  panel izquierdo ya tiene su propio fondo degradado).
-
-**B. Nuevo organism `AuthBrandPanel`** (`features/auth/components/organisms/AuthBrandPanel/`)
-
-**Especificación de UX:** `docs/design/UX-GUIDELINES.md` §3.1 (manda sobre
-el mockup) — alcance recortado a logo + título + una frase de valor,
-**sin** `TestimonialCard` ni `ProductPreviewMock` (KPIs de vanidad / datos
-inexistentes, descartados).
-
-Puramente presentacional — no toca stores ni React Query, todo por
-composición estática (podría ser Page-level directamente, pero se deja como
-organism para poder testear su render por separado y por consistencia con
-el resto del árbol). Compone:
-
-- **Molecule nueva `ConsultingBadge`** — logo "CONSULTING" + badge
-  "Global Talent Cloud" (header del panel).
-- **Molecule nueva `BrandHeroHeadline`** — tag "Plataforma de Talento
-  Estratégico" + titular "Conectando el mejor talento tecnológico con el
-  futuro de IBM Consulting." + una sola frase de valor (sin testimonial,
-  sin stats, sin mockup-dentro-del-mockup).
-- Límite de 100 líneas de organism — si no entra componiendo directo,
-  repartir en los molecules de arriba y dejar el organism solo como
-  composición.
-
-**C. `LoginForm` — máquina de 2 pasos (mismo archivo, se reemplaza el contenido):**
-
-- **Paso "email"**: banner nuevo "Acceso sin contraseña mediante código
-  OTP" (reemplaza `ProfileDetectionBanner` en este flujo — evaluar si
-  `ProfileDetectionBanner` queda sin uso o se generaliza), `EmailField`
-  (sin cambios, reusa icono + sufijo `@ibm.com`), texto ayuda "Se enviará
-  un código temporal de 6 dígitos válido por 10 minutos", checkbox
-  **"Recordar este correo en este dispositivo corporativo"** (`remember-email`
-  — solo autocompletar el email la próxima vez, no afecta el requerimiento
-  de OTP), botón "Enviar código de verificación". Al enviar, dispara
-  `requestOtp` y avanza de paso si el mock resuelve OK.
-- **Paso "código"**: chip de cuenta (avatar iniciales + email + "Cambiar
-  cuenta" — vuelve al paso "email", limpia el código), banner "Verificación
-  en dos pasos (2FA / OTP)", `OtpCodeField` (nueva molecule, 6 casillas)
-  + `ResendOtpControl` (nueva molecule, countdown "Reenviar en 00:45"),
-  checkbox **"Confiar en este dispositivo corporativo por 30 días"**
-  (`trust-device` — distinto del checkbox del paso 1, ver nota abajo),
-  botón "Verificar y Acceder". Al enviar, dispara `verifyOtp`; en éxito,
-  mismo contrato de siempre (`setAuth` + `navigate('/dashboard')`).
-- **`PasswordField` se retira del árbol de `LoginForm`** sin fallback (ver
-  decisión cerrada arriba) — el archivo puede quedar sin uso; revisar
-  referencias antes de decidir si se borra o se conserva para un eventual
-  login de administración fuera de este flujo.
-- **Nota — no confundir los dos checkboxes**: `remember-email` (paso 1,
-  cosmético, solo autocompletar) vs `trust-device` (paso 2, afecta si se
-  vuelve a pedir OTP en el próximo login) son estados distintos con
-  distinto impacto funcional — nombrarlos así en el código para que la
-  diferencia sea obvia a quien lea el organism.
-- **Elementos del mockup que NO se construyen en este MVP** (prometen
-  capacidades que no existen todavía — SSO/App ID es Fase 2): badge
-  "IBM Verify" junto a "Código de verificación", el link "Probar otro
-  método de verificación (YubiKey / IBM Push)", y la frase "enviado a tu
-  aplicación de autenticación o correo corporativo" (se ajusta el copy a
-  "enviado a tu correo corporativo" — solo email, sin insinuar canal app).
-  No se ocultan disabled ni se dejan a medias: simplemente no forman parte
-  de esta versión del componente.
-- Límite de 100 líneas de organism aplica igual — si la máquina de 2 pasos
-  no entra, extraer el paso "código" a un sub-organism (`OtpVerificationStep`)
-  en vez de forzar el límite.
-
-**Hooks nuevos en `features/auth/hooks/`:**
-
-- `useRequestOtp.ts` — `useMutation` sobre `requestOtp(email)`; ≤ 60 líneas.
-- `useVerifyOtp.ts` — `useMutation` sobre `verifyOtp({email, code})`; en éxito
-  `setAuth` + `navigate`; ≤ 60 líneas.
-- Estado de paso (`'email' | 'otp'`), el `email` ya ingresado, y los dos
-  checkboxes (`remember-email`, `trust-device`) son **client-generated y
-  efímeros** — `useState` local dentro de `LoginForm` (organism, capa
-  permitida para estado), **no** amerita un Zustand store nuevo.
-
-**Infrastructure — extender `features/auth/infrastructure/auth.infra.ts`:**
-
-- `requestOtp({ email }): Promise<{ sent: true }>` — mock-first, simula
-  latencia (`setTimeout` ~600ms), valida dominio `@ibm.com` (mismo mensaje de
-  error que hoy), rechaza si no es `@ibm.com`.
-- `verifyOtp({ email, code }): Promise<{ user, token }>` — mock-first, simula
-  latencia, código mock fijo para pruebas (ej. `'123456'` siempre válido, o
-  cualquier secuencia de 6 dígitos que empiece en un rango — decidir el mock
-  más simple), resuelve `{user, token}` igual que el `loginUser` actual o
-  rechaza con `Error('Código incorrecto o expirado.')`.
-- `loginUser` (password) queda sin consumidor tras retirar el fallback —
-  eliminarlo del archivo si al implementar se confirma que nada más lo usa
-  (no dejar código muerto sin razón, a diferencia de la decisión anterior).
-
-**Tests:**
-
-- Reemplazar (no sumar) los tests de password en `LoginForm.test.tsx` /
-  `LoginPage.test.tsx` por el flujo de 2 pasos: envío de correo válido/inválido,
-  avance de paso, código incorrecto (sin avanzar), código correcto (redirect
-  + `setAuth`), reenvío respeta cooldown, "cambiar correo"/"cambiar cuenta"
-  vuelve al paso 1, los dos checkboxes cambian de estado independientemente.
-- Tests unitarios nuevos para `OtpCodeField` (paste de 6 dígitos, solo
-  numérico, avance de foco), `ResendOtpControl` (countdown, disabled state),
-  y render de `AuthBrandPanel` (smoke test — que renderice sin crashear,
-  no hay lógica que testear más allá de eso).
-
-### Explícitamente fuera de alcance (va a AUTH-2, backend, ver abajo)
-
-Generación real de OTP, hashing/almacenamiento en MongoDB con índice TTL, rate
-limiting, lockout por intentos fallidos, envío real por correo vía
-`EmailSenderPort` (SMTP), y el mecanismo de provisión de usuarios/roles (whitelist de
-correos con rol asignado). Nada de esto se toca en este task — el mock en
-`infrastructure/` es la interfaz que ese trabajo backend va a implementar
-después, sin tocar componentes ni hooks de este task (mismo principio
-mock-first que ya se siguió en Etapa 1).
-
-### Dependencias
-
-Etapa 1 de FE (cerrada) — reemplaza parte de su organism, no depende de nada
-nuevo. No depende de AUTH-2 ni de ningún backend.
-
-### Riesgo / nota de arquitecto
-
-Reabre parcialmente un organism que se dio por cerrado (DT-001) y agrega una
-página/layout nuevo (`AuthBrandPanel`). Es una decisión de producto
-consciente, no deuda técnica — se documenta aquí y no en `DEBT_TECH.md` para
-no mezclar "cambio de alcance aprobado" con "código que quedó mal". El panel
-de marca quedó recortado a logo + título + una frase de valor
-(`docs/design/UX-GUIDELINES.md` §3.1); `TestimonialCard` y
-`ProductPreviewMock` no se construyen. Al cerrar este task, actualizar `CLAUDE.md` →
-"Estado actual / próximo paso" para reflejar que Etapa 1 ahora incluye este
-ajuste, y `good-practices/DEBT_TECH.md` si algún archivo nuevo queda por
-sobre su límite de línea.
-
-### Criterios de éxito
-
-- [ ] Flujo completo mockeado: ingresar `@ibm.com` → "código enviado" →
-      ingresar código válido → redirige a `/dashboard` con `setAuth` (mismo
-      contrato de salida que el login actual).
-- [ ] Correo no `@ibm.com` bloquea el paso 1 con error de validación (zod),
-      igual que hoy.
-- [ ] Código incorrecto muestra error sin avanzar de paso ni perder el email
-      ingresado.
-- [ ] "Reenviar código" respeta un cooldown visual — no se puede spamear el
-      mock en loop.
-- [ ] "Cambiar correo"/"Cambiar cuenta" vuelve al paso 1 limpiando el estado
-      del código.
-- [ ] No existe ningún link ni UI de "iniciar sesión con contraseña" en el
-      árbol renderizado.
-- [ ] No existen badges/links de "IBM Verify" ni "YubiKey / IBM Push" en el
-      árbol renderizado (fuera de alcance de este MVP).
-- [ ] Panel de marca (`AuthBrandPanel`) visible en desktop: logo + título +
-      una frase de valor, sin `TestimonialCard` ni `ProductPreviewMock`
-      (`docs/design/UX-GUIDELINES.md` §3.1).
-- [ ] Layout de 2 columnas no rompe en mobile (~400px) — el panel de marca
-      se oculta o reordena sin generar scroll horizontal.
-- [ ] Ningún archivo nuevo excede su límite de línea (`validate-quality.mjs --strict`).
-- [ ] `npm run typecheck` / `npm run lint` / `npm test` en verde en `apps/frontend`.
-- [ ] Verificación visual manual o con Playwright del flujo completo (2
-      pasos, error, éxito, panel de marca en desktop y mobile) antes de
-      cerrar — mismo criterio aplicado en Etapa 1.
+La especificación completa (alcance A-C, hooks, infraestructura, tests, riesgos y sus 12 criterios de éxito
+abiertos) se movió a `docs/use-cases/auth.md` → "Especificación FE-OTP-1".
 
 ---
 
-## AUTH-2 — Backend real de autenticación OTP (JWT end-to-end)
+## AUTH-2 — Backend real de autenticación OTP (JWT end-to-end) (LOW)
 
-**Estado:** 📌 sin arrancar (backlog — no iniciar hasta que FE-OTP-1 cierre) · **Complejidad:** 🔴 Alta
+**Estado:** 📌 sin arrancar (backlog — no iniciar hasta que FE-OTP-1 cierre) · **Prioridad:** LOW · **Complejidad:** 🔴 Alta
 
 ### Motivación
 
 El login hoy es (o será, tras FE-OTP-1) una simulación de OTP en frontend
 (`features/auth/infrastructure/auth.infra.ts`). Sin backend real no hay forma
 de emitir un código verdadero, protegerlo contra fuerza bruta, ni de que el
-guard de rol (`AppRouter.tsx`) refleje una sesión real en vez de un mock en
-Zustand.
+guard de rol (`router/guards/RoleRoute`) refleje una sesión real en vez de un
+mock en Zustand. Diseño vigente: el OTP se guarda hasheado en MongoDB con índice
+TTL (ADR-008) y el correo sale por `EmailSenderPort` + adapter SMTP (ADR-010); no
+hay Redis ni IBM Event Notifications en el MVP (ambos descartados).
 
 ### Alcance
 
@@ -514,7 +223,7 @@ Zustand.
   template de email dedicado en `packages/email-templates` (HTML plano, sin
   scripts, según regla del monorepo).
 - **Provisión de usuarios/roles**: mecanismo para pre-registrar correos con
-  rol asignado (`recruiter` | `technical` | `pm`) — sin esto, un login OTP
+  rol asignado (`recruiter` | `technical_ref` | `pm`) — sin esto, un login OTP
   exitoso no tiene de dónde sacar el rol para el JWT. Definir si es una
   colección Mongo administrada manualmente (MVP) o una pantalla de admin
   (fuera de alcance de este task si no está ya planificada).
@@ -551,16 +260,16 @@ problema en el diseño anterior.
 - [ ] Existe un mecanismo (aunque sea manual/admin de datos) para asignar rol
       a un correo antes de su primer login.
 - [ ] Un endpoint protegido con `@Roles('recruiter', 'pm')` rechaza a
-      `technical` con 403.
-- [ ] El guard de `AppRouter.tsx` sigue funcionando sin cambios de contrato
-      (mismo `UserRole`).
+      `technical_ref` con 403.
+- [ ] Las guardas de ruta del frontend (`router/guards/`) siguen funcionando
+      sin cambios de contrato (mismo `UserRole`).
 - [ ] El código OTP nunca aparece en logs ni responses en texto plano.
 
 ---
 
-## AUTH-3 — Sesión corta con refresh y expiración por inactividad en backend
+## AUTH-3 — Sesión corta con refresh y expiración por inactividad en backend (LOW)
 
-**Estado:** 📌 sin arrancar · **Prioridad:** Media · **Complejidad:** 🟡 Media · **Registrado:** 2026-10-27
+**Estado:** 📌 sin arrancar · **Prioridad:** LOW · **Complejidad:** 🟡 Media · **Registrado:** 2026-10-27
 
 ### Motivación
 
@@ -587,9 +296,9 @@ QW-2 (`auth_events`, idle timer) y AUTH-2 (cambia la emisión de tokens; hacerlo
 
 ---
 
-## AUTH-4 — Tokens de sesión en cookies httpOnly
+## AUTH-4 — Tokens de sesión en cookies httpOnly (LOW)
 
-**Estado:** 📌 sin arrancar · **Prioridad:** Media · **Complejidad:** 🟡 Media · **Registrado:** 2026-10-27
+**Estado:** 📌 sin arrancar · **Prioridad:** LOW · **Complejidad:** 🟡 Media · **Registrado:** 2026-10-27
 
 ### Motivación
 
@@ -615,205 +324,9 @@ AUTH-3.
 
 ---
 
-## PROC-2 — Backend de procesos + wizard
+## HARDEN-1 — Endurecimiento transversal final (LOW)
 
-**Estado:** 📌 sin arrancar · **Complejidad:** 🔴 Alta
-
-### Motivación
-
-El wizard de creación de proceso (Etapa 3 del plan FE) y el dashboard
-(Etapa 2) hoy corren sobre mocks. Este feature es el dominio central:
-crear proceso, asignar referente técnico, cargar candidato con validación
-de duplicado por email.
-
-### Alcance
-
-- Casos de uso detallados: [`docs/use-cases/processes.md`](./docs/use-cases/processes.md).
-- `capability/processes`: `POST /processes`, `PATCH /processes/:id`, `GET /processes`, `GET /processes/:id`.
-- `GET /users/referents?specialty=...` — listar referentes filtrables por especialidad (consumido por el paso 2 del wizard).
-- `POST /candidates` con validación de duplicado por email (índice único ya definido en `PROJECT_CONTEXT.md`).
-- Modelo de datos: ver ADR-013 en `docs/architecture/README.md` — `technicalRefs` embebido con rol (`principal`/`validador`, mínimo 1 de cada uno, validado en el DTO), sincronización `Candidate.processIds` ↔ `Process.candidateIds` por llamada en memoria entre servicios (nunca adapter cruzado ni transacción Mongo — Mongo corre standalone).
-- Frontend: `processes.infra.ts` y `wizard.store.ts` (Etapa 3) pasan de mock a `fetch` real.
-
-**Abierto (resolver al implementar, ver ADR-013):** taxonomía de `User.specialty` (texto libre vs. catálogo controlado); manejo explícito del fallo parcial al sincronizar `Candidate.processIds` (loguear + excepción tipada, nunca `catch {}` silencioso).
-
-### Dependencias
-
-AUTH-2 (endpoints protegidos por rol) · FE Etapas 2-3 (UI y `infrastructure/` mock-first ya existentes).
-
-### Criterios de éxito
-
-- [ ] Se puede crear un proceso completo end-to-end (los 4 pasos del wizard persisten en backend).
-- [ ] Cargar un candidato con email duplicado devuelve error claro, no crea registro.
-- [ ] Dashboard muestra datos reales de `GET /processes`, no `MOCK_PROCESSES`.
-
----
-
-## CAND-1 — Feature Candidatos
-
-**Estado:** 📌 sin arrancar · **Complejidad:** 🟡 Media
-
-### Motivación
-
-`features/candidates/` existe como scaffold vacío (`infrastructure/` ya
-renombrado en Etapa 0). Es el banco de perfiles que consumen reclutador y PM.
-
-### Alcance
-
-- Casos de uso detallados: [`docs/use-cases/candidates.md`](./docs/use-cases/candidates.md).
-- Frontend: estructura completa `components/{atoms,molecules,organisms,pages}`, banco de perfiles + detalle de candidato, filtros de UI (client-state en `store/` solo si aplica).
-- Backend: `GET /candidates` (paginado, nunca query sin límite — regla de `.clinerules`), `GET /candidates/:id`, `PATCH /candidates/:id`.
-
-### Dependencias
-
-PROC-2 (los candidatos nacen asociados a un proceso vía `POST /candidates` del wizard) — este feature completa el CRUD y la vista de banco de perfiles standalone.
-
-### Criterios de éxito
-
-- [ ] Banco de perfiles lista candidatos con paginación real.
-- [ ] Detalle de candidato muestra su historial de procesos.
-- [ ] Sigue el golden path de `good-practices/examples/frontend/` (mock-first → luego backend real, sin tocar componentes).
-
----
-
-## INT-1 — Feature Entrevistas (calendario + notificaciones)
-
-**Estado:** 📌 sin arrancar · **Complejidad:** 🔴 Alta
-
-### Motivación
-
-Agendamiento de entrevistas con disponibilidad del referente técnico,
-confirmación, reprogramación, export `.ics`, y notificación por email/Slack.
-Es el flujo más transversal (3 roles interactúan: reclutador agenda,
-referente confirma, PM observa).
-
-### Alcance
-
-- Casos de uso detallados: [`docs/use-cases/interviews.md`](./docs/use-cases/interviews.md).
-- Backend `capability/interviews`: `POST /availability`, `GET /availability/:referentId`, `POST /interviews`, `PATCH /interviews/:id/confirm`, `PATCH /interviews/:id/reschedule`, `GET /interviews/:id/ics`.
-- Backend `capability/notifications`: email al referente al agendar (`EmailSenderPort` + adapter SMTP), email de confirmación al reclutador, webhook Slack si el referente no tiene disponibilidad.
-- Sin cache de disponibilidad (sin Redis en el MVP — ADR-008); la disponibilidad se lee directo de MongoDB. Si el volumen lo justifica más adelante, se revisita con un store compartido, no antes.
-- `reschedule` apenda a `Interview.rescheduleHistory` (embebido) y repone `status` a `pending` (ver ADR-013 — limitación conocida: no distingue "nunca confirmada" de "reprogramada"). Índices a crear: `processId`, compuesto `{referentId, scheduledAt}`.
-- Frontend (Etapa 5 del plan FE): calendario reclutador, dashboard de disponibilidad del referente (vista matriz + lista), export `.ics` con `ical.js` (ya instalado).
-
-### Dependencias
-
-PROC-2 · CAND-1 (no se agenda una entrevista sin proceso ni candidato existentes) · AUTH-2 (email del referente sale del JWT/perfil).
-
-### Criterios de éxito
-
-- [ ] Reclutador agenda → referente recibe email → confirma o reprograma.
-- [ ] `.ics` descargado abre correctamente en un cliente de calendario real.
-- [ ] Sin disponibilidad cargada, el webhook de Slack se dispara (fallback documentado aquí).
-- [ ] Timezone del referente visible en todos los componentes de horario.
-
----
-
-## FEED-1 — Feature Feedback técnico
-
-**Estado:** 📌 sin arrancar · **Complejidad:** 🟡 Media
-
-### Motivación
-
-Formulario de feedback post-entrevista. **Quién escribe vs. quién lee** (aclarado
-2026-10-15, ver ADR-013 — antes había una contradicción real entre este documento,
-`docs/flows/README.md` y `navigation.ts` sobre esto):
-- **Escribe** el `technical_ref` que hizo la entrevista — es el único con acceso a
-  `/feedback` (el formulario), regla ya correcta en `navigation.ts`/`AppRouter.tsx`
-  desde Etapa 0. No se toca.
-- **Leen** `recruiter` y `pm` los resultados ya guardados, desde el detalle del
-  proceso (`/processes/:id`, tab "Feedback"), nunca desde `/feedback`.
-
-Template sugerido por IA según el perfil del rol, score por dimensión.
-
-### Alcance
-
-- Casos de uso detallados: [`docs/use-cases/feedback.md`](./docs/use-cases/feedback.md).
-- Backend `capability/feedback`: `POST /feedback` (solo el `referentId` autor de la entrevista puede crear/editar su propio feedback), `GET /feedback/:processId` (reclutador/PM del proceso, o el propio referente autor para su registro), `POST /feedback/:id/send-email`.
-- Modelo de datos: ver ADR-013 — `Feedback` sin campo `visibleTo` (la visibilidad se aplica en código, no se persiste); índice único en `interviewId` para forzar 1 feedback por entrevista a nivel de base.
-- Frontend (Etapa 6 del plan FE): formulario con dimensiones técnicas + soft skills, score 1-5, recomendación final (avanza / no avanza / hold). Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre los mockups).
-
-### Dependencias
-
-INT-1 (el feedback se dispara post-entrevista) · AUTH-2 (guard de rol real, hoy solo mockeado en Zustand).
-
-### Criterios de éxito
-
-- [ ] `/feedback` (el formulario) sigue siendo exclusivo de `technical_ref`, verificado con backend real — `recruiter`/`pm` no pueden escribir feedback.
-- [ ] `recruiter`/`pm` pueden leer el feedback guardado de un proceso desde su detalle, verificado con backend real.
-- [ ] Intentar crear un segundo feedback para la misma entrevista falla (índice único en `interviewId`), no solo por validación de aplicación.
-- [ ] Feedback enviado por email al candidato usa `packages/email-templates` (HTML plano, sin scripts).
-- [ ] Reclutador ve resultados agregados por proceso.
-
----
-
-## REP-1 — Feature Reportes
-
-**Estado:** 📌 sin arrancar · **Complejidad:** 🟡 Media
-
-### Motivación
-
-Historial de reportes por proceso/candidato y generación de PDF para
-enviar al cliente — el punto de salida del flujo completo.
-
-### Alcance
-
-- Casos de uso detallados: [`docs/use-cases/reports.md`](./docs/use-cases/reports.md).
-- Backend `capability/reports`: `GET /reports/:processId/candidate/:id` (genera PDF), `POST /reports/:id/send` (envía por correo al cliente).
-- Modelo de datos: entidad `Report` (ver ADR-013 en `docs/architecture/README.md`) con `sentHistory` embebido (append-only) como registro auditable de envíos. Índice `processId`.
-- IBM COS: bucket de reportes/CVs configurado.
-- Frontend (Etapa 7 del plan FE): botón "Generar PDF" + "Enviar al cliente", historial de reportes.
-
-### Dependencias
-
-FEED-1 (el reporte consolida feedback + entrevistas + datos del candidato).
-
-### Criterios de éxito
-
-- [ ] PDF generado contiene datos reales del proceso, no placeholder.
-- [ ] Envío al cliente deja registro (auditable) de cuándo y a quién se envió.
-
-**Abierto (resolver al implementar, ver ADR-013):** cardinalidad de `ReportSendEvent.sentTo` — ¿un evento por destinatario, o un array por evento si un envío tiene varios destinatarios a la vez?
-
----
-
-## CV-1 — Análisis de CV asistido (watsonx.ai + IBM COS)
-
-**Estado:** 📌 sin arrancar · **Complejidad:** 🔴 Alta
-
-### Motivación
-
-Idea capturada del plan original (semana 4): al cargar el CV de
-un candidato, pre-llenar el perfil automáticamente en vez de captura manual
-completa. No es bloqueante para el flujo — CAND-1 funciona con carga manual
-— pero mejora significativamente la experiencia del reclutador, y es el
-momento IA de la demo (ver ADR-009 en `docs/architecture/README.md`).
-
-### Alcance
-
-- Backend `capability/cv-analysis`: `POST /cv/upload` (PDF/WORD a IBM COS), `POST /cv/analyze` detrás de un `CvAnalysisPort` con adapter para watsonx.ai (prompt + `WATSONX_MODEL_ID` configurable) que extrae datos estructurados.
-- **Antes de implementar:** verificar si watsonx.ai está disponible en `br-sao` (ver "Abierto" en `docs/architecture/README.md`). Si no, el adapter envía el texto del CV de forma transitoria a la región más cercana disponible, **sin email ni teléfono** (enmascarados antes de enviar) y sin persistir nada fuera de `br-sao` — validar con sponsor/compliance antes de habilitarlo.
-- Frontend: en el wizard paso 3, un único elemento "Sugerir skills desde el CV" (ver `docs/design/UX-GUIDELINES.md` §4), spinner de análisis, pre-llenado del formulario con los datos extraídos (editable, nunca autocompletado silencioso).
-
-### Dependencias
-
-CAND-1 (se integra en el flujo de carga de candidato existente, no lo reemplaza).
-
-### Complejidad y tamaño
-
-**Alta** — integración con dos servicios de IBM Cloud (COS + watsonx.ai) más el manejo de archivos binarios, hoy sin ningún wiring existente en el proyecto, más la verificación de disponibilidad regional pendiente.
-
-### Criterios de éxito
-
-- [ ] Subir un CV real (PDF) pre-llena nombre/email/skills con precisión razonable (validar con muestra manual, no 100% automático).
-- [ ] El reclutador puede corregir cualquier campo pre-llenado antes de guardar.
-- [ ] Archivo original queda accesible en COS, no solo el texto extraído.
-
----
-
-## HARDEN-1 — Endurecimiento transversal final
-
-**Estado:** 📌 sin arrancar · **Complejidad:** 🟢 Baja (por ítem, varios ítems)
+**Estado:** 📌 sin arrancar · **Prioridad:** LOW · **Complejidad:** 🟢 Baja (por ítem, varios ítems)
 
 ### Motivación
 
@@ -842,9 +355,9 @@ Todas las features de UI deben existir para que la decisión de `@carbon/react` 
 
 ---
 
-## DEPLOY-1 — Deploy real en IBM Cloud
+## DEPLOY-1 — Deploy real en IBM Cloud (LOW)
 
-**Estado:** 📌 sin arrancar · **Complejidad:** 🔴 Alta
+**Estado:** 📌 sin arrancar · **Prioridad:** LOW · **Complejidad:** 🔴 Alta
 
 ### Motivación
 
@@ -872,7 +385,7 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 ### Criterios de éxito
 
 - [ ] La app es accesible por URL pública/interna IBM sin depender de `localhost`.
-- [ ] Los 3 flujos críticos (crear proceso, agendar entrevista, feedback) funcionan contra servicios reales de IBM Cloud, no mocks.
+- [ ] Los flujos de la POC Bench First (por definir en el replanning) funcionan contra servicios reales de IBM Cloud, no mocks.
 - [ ] Credenciales de servicios IBM Cloud nunca en logs, responses, ni el repo (secrets de Code Engine).
 - [ ] `tb-web` sirve la SPA y el proxy `/api` llega a `tb-api` sin CORS.
 - [ ] El pipeline de GitHub Actions despliega automáticamente en cada push a `main`.
@@ -883,30 +396,32 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 ## Cambios a este roadmap
 
 - Cualquier reordenamiento se discute y queda registrado aquí (fecha + razón).
-- Una idea nueva que surja sin plan de ejecución todavía se agrega como
-  feature nuevo con estado 📌, aunque falte completar todas sus secciones.
+- Una idea nueva sin plan de ejecución se agrega como feature con estado 📌, aunque falte completar secciones.
 
 ### Historial
 
-| Fecha      | Cambio                                                                                   | Razón                                                                                                                                                          |
-| ---------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-13 | Roadmap inicial. Migrado el contenido del plan de arquitectura original (archivado). | Se necesitaba un backlog vivo por feature (motivación/alcance/dependencias/estado) distinto del plan de ejecución etapa-por-etapa del refactor frontend actual. |
-| 2026-09-13 | Etapa 1 de FE marcada como cerrada (`LoginPage.tsx`/DT-001 resuelto, ver `DEBT_TECH.md`). | Cierre de etapa verificado (lint/typecheck/97 tests/`validate-quality.mjs`/verificación visual con Playwright) — próximo paso es Etapa 2 (`DashboardPage.tsx`/`SidebarNav.tsx`). |
-| 2026-09-13 | Agregado `FE-OTP-1` (login OTP por correo, frontend mock-first) con prioridad Alta, insertado antes de AUTH-2 y de Etapa 2 del plan FE; `AUTH-2` actualizado de "JWT sobre password" a "JWT sobre OTP" (complejidad Media → Alta por rate limiting/lockout/provisión de roles). | Decisión de producto: reemplazar password por OTP/magic code (`@ibm.com` como factor de autenticación) para reducir superficie de ataque en una plataforma interna sin login de candidatos; migración futura a IBM App ID/SSO w3id sin romper el contrato de JWT interno. Reabre parcialmente el organism `LoginForm` de Etapa 1 — documentado como ajuste de alcance, no como deuda técnica nueva. |
-| 2026-10-15 | Reordenado: `QW-1` (nuevo) + Etapas 2-3 + `AUTH-1` (nuevo) + `PROC-2` delante de `FE-OTP-1`; `CV-1` marcado como candidato a adelantarse. | Demo a un futuro sponsor IBM con un vertical real con backend (decisión del usuario): priorizar el flujo de negocio sobre el login. Validación del 2026-10-15 encontró CI frontend y backend en rojo y navegación de demo rota — se atacan primero como quick wins. |
-| 2026-10-15 | Arquitectura objetivo IBM Cloud definida (`docs/architecture/README.md`, ADR-006 a ADR-012): todo en Code Engine (`tb-web`/`tb-api`, se descarta Render), región única `br-sao`, sin Redis (OTP en MongoDB con TTL), watsonx.ai reemplaza Watson NLU (`CvAnalysisPort`), email detrás de `EmailSenderPort` + adapter SMTP (se descarta Event Notifications), secretos de Code Engine + CI/CD por GitHub Actions. `DEPLOY-1` recibe alcance concreto; `CV-1`, `AUTH-2` e `INT-1` actualizados; `FE-OTP-1` recorta `TestimonialCard`/`ProductPreviewMock` del panel de marca (`docs/design/UX-GUIDELINES.md` §3.1). | Decisiones del usuario (sesión 2026-10-15) sobre deploy target, región, y reemplazo de Watson NLU/Event Notifications/Redis, que nunca tuvieron un ADR propio y contradecían el código real (`PROJECT_CONTEXT.md` daba Code Engine por decidido, `ROADMAP.md` lo reabría; Redis planificado sin ningún uso en código). |
-| 2026-10-15 | Modelo de dominio y persistencia cerrado (ADR-013): `packages/shared-types` actualizado (`Process.technicalRefs` con rol principal/validador, `StageHistoryEntry.status`, `Interview.rescheduleHistory`, nueva entidad `Report`, `User.specialty`, `WatsonNLUResult`→`CvAnalysisResult`); se elimina `Feedback.visibleTo`. Resuelta la contradicción real sobre acceso a `/feedback` entre `navigation.ts`, esta documentación y `docs/flows/README.md` (ver FEED-1). Definida la regla de consistencia `Candidate`↔`Process` (llamada en memoria entre servicios, nunca adapter cruzado ni transacción Mongo — Mongo corre standalone). | El usuario pidió validar la separación de roles; al resolver la contradicción de Feedback surgió que el modelo de dominio nunca se completó (sin `Report`, sin rol de referente, sin campo de especialidad) — se modeló todo antes de que PROC-2/CAND-1/INT-1/FEED-1/REP-1 empiecen a construir sobre vacíos. |
-| 2026-10-18 | `docs/use-cases/` creado: catálogo de casos de uso por rol y feature (`auth`, `processes`, `candidates`, `interviews`, `feedback`, `reports`), enlazado desde la sección "Alcance" de cada feature en este roadmap. Discrepancia detectada (sin resolver): `AppRouter.tsx` da acceso a `pm` en `/processes/new`/`/processes/:id`, pero `PROJECT_CONTEXT.md` y `docs/flows/README.md` asumen que PM es solo lectura — señalada en `docs/use-cases/processes.md` para resolver al implementar PROC-2. | Especificación funcional "quién puede hacer qué" vivía repartida e incompleta entre 3 documentos sin cubrir casos negativos — mismo tipo de vacío que causó la contradicción real de Feedback. |
-| 2026-10-18 | `AUTH-1` backend cerrado: `capability/auth` completa + `shared/auth/` (`JwtAuthGuard`/`RolesGuard`/`@Roles`) + seed idempotente de usuarios demo. Verificado de forma independiente contra el backend corriendo (no solo tests): 3 logins con rol correcto, 401/403/404 en los casos de borde, seed estable tras 2 reinicios. Bug real encontrado y corregido en la verificación: `UserModel.role` (tipo unión) sin `@Prop({type: String})` explícito crasheaba el proceso en runtime aunque todos los tests (unit+e2e) pasaran en verde — ninguno levanta el proceso completo contra Mongoose sin mockear. Swap de `auth.infra.ts` (frontend) queda pendiente para un pase de `frontend-task` aparte. | Primer backend real del proyecto — desbloquea el swap de mock a `httpClient` en frontend y es el prerequisito de endpoints protegidos para PROC-2. El bug de Mongoose es la razón concreta de por qué la "Definición de done" del repo exige verificación independiente del reporte de un sub-agente, no solo confiar en que sus tests pasaron. |
-
-| 2026-10-24 | `AUTH-1` cerrado en código: swap de `auth.infra.ts` a `POST /auth/dev-login`, test de integración contra Mongo real (33 e2e / 16 unit backend, 146 frontend), y resueltos **DT-008** (`dev-login` y seed ahora fallan cerrado con `AUTH_DEV_LOGIN_ENABLED`, nuevo en `.env.example`/compose) y **DT-009** (`httpClient` limpia la sesión ante 401 con token activo). Corregido de paso `THROTTLE_TTL` (segundos en `.env.example`, `@nestjs/throttler` v5 espera ms: la ventana real era de 60 ms). Verificado además contra el proceso real (`node dist/main`): flag on → 201 y seed; flag ausente → 404 y sin seed; `production` + flag on → 404 y sin seed. Pendiente: recorrido en navegador (DT-010). | La revisión de AUTH-1 encontró que `dev-login` quedaba abierto si el despliegue omitía `NODE_ENV` y que un token vencido dejaba al usuario con sesión muerta; ambos se resolvieron antes de PROC-2/DEPLOY-1 como se recomendó. |
-| 2026-10-24 | Hardening de sesión del frontend (post-revisión de AUTH-1), 3 tramos secuenciales con `frontend-task`: **DT-017** carrera del 401 (token capturado al enviar), **DT-015** caché de React Query vaciada al terminar/cambiar la sesión (`QueryClient` único + `sessionCacheGuard`), **DT-016** sesión vencida tras F5 (`tokenExpiry` + `useSessionExpiry` + `ProtectedRoute`, falla cerrado). Frontend 146 → 178 tests. Cada arreglo verificado con sabotaje (se quita el arreglo y el test correspondiente falla). Restricción nueva para Etapa 2 / PROC-2: todo `useQuery` bajo el árbol de rutas protegido. Pendiente: recorrido en navegador (DT-010). | La revisión de AUTH-1 señaló tres casos latentes que se vuelven reales con los primeros `useQuery`; se cierran antes de que existan datos que filtrar. En el primer intento un subagente falló con `E003` porque heredó `claude-opus-5-5`, que el gateway no admite para agentes de código: se relanzó con `model: sonnet`. |
-| 2026-10-25 | Limpieza de documentación legacy (alcance A): `plan-arquitectonico.md` y 10 mockups Stitch movidos a `legacy_docs/` (fuera del contexto del agente: regla en `CLAUDE.md`/`.clinerules` + `deny` de lectura en `.claude/settings.json`); `docs/archive/c4-otro-producto/` eliminado (otro producto); `*.pptx` fuera de git (`.gitignore`); ADR-004/009/013 marcados PENDIENTE DE REEMPLAZO (encuadre Bench First); despliegue/IBM Cloud Logs/health check pasados a "objetivo, no implementado". | Aislar lo obsoleto antes de rediseñar el dominio (alcance B, pendiente: casos de uso, ROADMAP y `shared-types`). Turborepo descartado: la POC levanta sin él. |
-| 2026-10-27 | Registradas **QW-2** (prioridad alta: limpieza de env vars, idle timer 360 s + aviso 60 s parametrizable, logout con auditoría en `auth_events`, verificación de Mongo con login/logout), **AUTH-3** (sesión corta + refresh con TTL, cierra DT-018) y **AUTH-4** (tokens en cookies httpOnly, cierra DT-019). Alta deuda DT-018 y DT-019. | El "logout" solo borraba el estado del cliente y la sesión no caducaba por inactividad; el JWT de 1 h seguía válido tras salir. Se separan las mejoras fáciles (QW-2) de las que cambian el modelo de sesión (AUTH-3/4) para no mezclar riesgos. |
-| 2026-10-27 | **OBS-1 cerrado en código:** FlowLog (`shared/observability/`), apagado por defecto (`FLOW_LOG_ENABLED=false`), falla cerrado y nunca en producción; `@TraceFlow()` en `AuthService.devLogin` y `MongooseUserAdapter.findByEmail`. Backend 35 unit / 38 e2e, typecheck limpio. Deuda nueva DT-020 (warnings de lint). Pendiente OBS-2 (sección Mongo con flag propio). | Ver el flujo request → adapter → response en terminal sin tocar el código de cada capability, y sin riesgo de que llegue a producción. |
+| Fecha | Cambio | Razón |
+| --- | --- | --- |
+| 2026-09-13 | Roadmap inicial, migrado del plan de arquitectura original (archivado). | Hacía falta un backlog vivo por feature, distinto del plan etapa-por-etapa del refactor frontend. |
+| 2026-09-13 | Etapa 1 de FE cerrada (`LoginPage.tsx`, DT-001). | Cierre verificado con lint, typecheck, 97 tests, `validate-quality` y Playwright. |
+| 2026-09-13 | Agregado `FE-OTP-1` antes de AUTH-2 y de la Etapa 2; `AUTH-2` pasa de password a OTP (Media → Alta). | Decisión de producto: OTP por correo `@ibm.com` reduce superficie de ataque; reabre `LoginForm` como cambio de alcance. |
+| 2026-10-15 | Reordenado: `QW-1`, Etapas 2-3, `AUTH-1` y `PROC-2` delante de `FE-OTP-1`; `CV-1` candidato a adelantarse. | Demo al sponsor con un vertical real con backend; CI y navegación de la demo estaban rotos. |
+| 2026-10-15 | Arquitectura objetivo IBM Cloud (ADR-006 a ADR-012): Code Engine en `br-sao`, sin Redis, watsonx.ai por `CvAnalysisPort`, email por `EmailSenderPort`; `DEPLOY-1` con alcance concreto. | Decisiones sobre deploy, región y reemplazo de Watson NLU/Event Notifications/Redis que no tenían ADR y contradecían el código. |
+| 2026-10-15 | Modelo de dominio cerrado (ADR-013): `shared-types` actualizado, entidad `Report`, regla de consistencia `Candidate`↔`Process`; resuelta la contradicción de acceso a `/feedback`. | Al validar roles se vio que el modelo nunca se completó; se modeló antes de construir PROC-2, CAND-1, INT-1, FEED-1 y REP-1. |
+| 2026-10-18 | Creado `docs/use-cases/` (casos de uso por rol y feature); señalada sin resolver la discrepancia de acceso de PM en `/processes/new`. | La especificación de "quién puede hacer qué" estaba repartida entre 3 documentos sin casos negativos. |
+| 2026-10-18 | `AUTH-1` backend cerrado y verificado contra el proceso real; bug de `@Prop` sin `type: String` en uniones corregido. | Primer backend real; el bug pasó todos los tests y solo apareció al arrancar el proceso (verificación independiente). |
+| 2026-10-24 | `AUTH-1` cerrado en código: swap de `auth.infra.ts`, test de integración contra Mongo, DT-008 y DT-009 resueltos, `THROTTLE_TTL` corregido a ms. | La revisión halló `dev-login` abierto sin `NODE_ENV` y sesión muerta con token vencido; se resolvieron antes de PROC-2/DEPLOY-1. |
+| 2026-10-24 | Hardening de sesión del frontend: DT-017 (401 tardío), DT-015 (caché por sesión), DT-016 (JWT vencido tras F5); 146 → 178 tests. | La revisión de AUTH-1 señaló tres casos latentes que se vuelven reales con los primeros `useQuery`. |
+| 2026-10-25 | Limpieza de documentación legacy (alcance A): `legacy_docs/` fuera del contexto del agente, C4 de otro producto eliminado, ADR-004/009/013 pendientes de reemplazo. | Aislar lo obsoleto antes de rediseñar el dominio (alcance B, pendiente). |
+| 2026-10-27 | Registradas `QW-2`, `AUTH-3` y `AUTH-4`; altas DT-018 y DT-019. | El logout solo borraba estado del cliente y la sesión no caducaba por inactividad. |
+| 2026-10-27 | `OBS-1` cerrado en código: FlowLog apagado por defecto y nunca en producción; alta DT-020. | Ver el flujo request → adapter → response sin tocar cada capability ni arriesgar producción. |
+| 2026-10-27 | `QW-2` cerrado en código (`a1c5b96`, `1341f8a`, `666fcf0`, `71cb074`) y verificado con curl + Mongo; altas DT-022, DT-023, DT-024. | Falta el recorrido en navegador (DT-010); DT-018 y DT-019 siguen abiertas. |
+| 2026-10-28 | Etapa 2 de FE cerrada en código (`dd77ff8`, `2ef1a5b`, `0326925`), **pendiente de revisión en navegador (DT-010)**; 264 tests y 0 críticos en `validate-quality`. | Cierra el único crítico (DT-002) y alinea el shell y el Inicio con `UX-GUIDELINES.md`; DT-002/007/024 se resuelven tras revisar las pantallas. |
+| 2026-10-28 | `ROADMAP.md` adelgazado: encuadre anterior archivado en `legacy_docs/`, FE-OTP-1 movida a `docs/use-cases/auth.md`, tabla de equivalencias Bench First. | Preparar el replanning Bench First; el detalle sigue en git, `docs/use-cases/` y `legacy_docs/`. |
+| 2026-10-28 | Fuentes de verdad consolidadas: `.clinerules` pasa a puntero, el estado actual se mueve de `CLAUDE.md` a este archivo y `PROJECT_CONTEXT.md` se reparte entre sus dueños y queda como puntero (el dominio anterior se archiva). | Una única fuente de verdad por tema; tokens de diseño: manda el código de Tailwind (DT-026). |
 
 ---
 
-_Ver también: [`CLAUDE.md`](./CLAUDE.md) → "Estado actual / próximo paso" para el punto de retoma inmediato ·
-[`PROJECT_CONTEXT.md`](./PROJECT_CONTEXT.md) para el dominio completo ·
-[`good-practices/DEBT_TECH.md`](./good-practices/DEBT_TECH.md) para deuda técnica de línea/arquitectura (no features nuevos)._
+_Ver también: [`CLAUDE.md`](./CLAUDE.md) para las invariantes ·
+[`docs/architecture/README.md`](./docs/architecture/README.md) para las decisiones ·
+[`good-practices/DEBT_TECH.md`](./good-practices/DEBT_TECH.md) para la deuda técnica._

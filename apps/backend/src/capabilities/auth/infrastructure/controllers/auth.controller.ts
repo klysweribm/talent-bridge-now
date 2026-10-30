@@ -1,5 +1,6 @@
-import { Body, Controller, Get, NotFoundException, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Post, Req, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import type { Request } from 'express';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../../shared/auth/jwt-auth.guard';
 import { Roles } from '../../../../shared/auth/roles.decorator';
@@ -7,6 +8,7 @@ import { RolesGuard } from '../../../../shared/auth/roles.guard';
 import { AuthService } from '../../application/services/auth.service';
 import { isDevLoginEnabled } from '../config/dev-login.config';
 import { DevLoginDto } from '../../domain/dto/dev-login.dto';
+import { requestMeta } from './request-meta';
 import type { IAuthToken } from '../../domain/interfaces/auth-token.interface';
 
 @ApiTags('Auth')
@@ -26,12 +28,12 @@ export class AuthController {
     status: 404,
     description: 'Deshabilitado salvo AUTH_DEV_LOGIN_ENABLED=true (y nunca con NODE_ENV=production)',
   })
-  async devLogin(@Body() dto: DevLoginDto): Promise<IAuthToken> {
+  async devLogin(@Body() dto: DevLoginDto, @Req() req: Request): Promise<IAuthToken> {
     if (!isDevLoginEnabled(this.configService)) {
       throw new NotFoundException();
     }
 
-    return this.authService.devLogin(dto.email);
+    return this.authService.devLogin(dto.email, requestMeta(req));
   }
 
   @Get('whoami')

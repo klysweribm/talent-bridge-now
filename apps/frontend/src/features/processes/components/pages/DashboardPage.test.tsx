@@ -1,70 +1,43 @@
-import { render, screen, type RenderResult } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Route, Routes } from 'react-router-dom';
+import { renderWithProviders } from '../../test-utils';
 import { DashboardPage } from './DashboardPage';
-import { useAuthStore } from '@features/auth/store/auth.store';
 
-const MOCK_USER = { id: '1', name: 'Mariana López', email: 'mariana@ibm.com', role: 'recruiter' as const };
-
-function renderWithRouter(): RenderResult {
-  return render(
-    <MemoryRouter>
-      <DashboardPage />
-    </MemoryRouter>,
+function setup(): void {
+  renderWithProviders(
+    <Routes>
+      <Route path="/" element={<DashboardPage />} />
+      <Route path="/processes/new" element={<p>wizard</p>} />
+    </Routes>,
   );
 }
 
 describe('DashboardPage', () => {
-  beforeEach(() => {
-    useAuthStore.getState().setAuth(MOCK_USER, 'token');
+  it('should render the "Inicio" heading and a single primary action', () => {
+    setup();
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
   });
 
-  afterEach(() => {
-    useAuthStore.getState().clearAuth();
+  it('should navigate to the wizard from "Nuevo Proceso"', async () => {
+    setup();
+    await userEvent.click(screen.getByRole('button', { name: 'Nuevo Proceso' }));
+    expect(screen.getByText('wizard')).toBeInTheDocument();
   });
 
-  it('should render page heading', () => {
-    renderWithRouter();
-    expect(screen.getByRole('heading', { name: /dashboard de reclutamiento/i })).toBeInTheDocument();
+  it('should compose counters, attention, active processes and today interviews', async () => {
+    setup();
+    expect(await screen.findByRole('link', { name: /Feedback pendiente/ })).toBeInTheDocument();
+    expect(await screen.findByRole('region', { name: 'Requiere atención' })).toBeInTheDocument();
+    expect(await screen.findByRole('region', { name: 'Procesos activos' })).toBeInTheDocument();
+    expect(await screen.findByRole('region', { name: 'Entrevistas de hoy' })).toBeInTheDocument();
   });
 
-  it('should render welcome message with user name', () => {
-    renderWithRouter();
-    expect(screen.getByText('Mariana López')).toBeInTheDocument();
-  });
-
-  it('should render all 4 KPI cards', () => {
-    renderWithRouter();
-    expect(screen.getByLabelText('Procesos Activos: 12')).toBeInTheDocument();
-    expect(screen.getByLabelText('Candidatos en Proceso: 34')).toBeInTheDocument();
-    expect(screen.getByLabelText('Entrevistas Esta Semana: 8')).toBeInTheDocument();
-    expect(screen.getByLabelText('Contratados Este Mes: 5')).toBeInTheDocument();
-  });
-
-  it('should render process list section', () => {
-    renderWithRouter();
-    expect(screen.getByLabelText('Procesos Activos Recientes')).toBeInTheDocument();
-  });
-
-  it('should render interviews section', () => {
-    renderWithRouter();
-    expect(screen.getByLabelText('Entrevistas del Día')).toBeInTheDocument();
-  });
-
-  it('should render progress bar for hired goal', () => {
-    renderWithRouter();
-    const progressBar = screen.getByRole('progressbar');
-    expect(progressBar).toHaveAttribute('aria-valuenow', '63');
-  });
-
-  it('should render Nuevo Proceso button', () => {
-    renderWithRouter();
-    expect(screen.getByLabelText('Nuevo Proceso de Selección')).toBeInTheDocument();
-  });
-
-  it('should render all mock processes', () => {
-    renderWithRouter();
-    expect(screen.getByText('Desarrollador React & Node.js Senior')).toBeInTheDocument();
-    expect(screen.getByText('Arquitecto Cloud AWS / IBM Cloud')).toBeInTheDocument();
-    expect(screen.getByText('Data Engineer — Pipeline & MLOps')).toBeInTheDocument();
+  it('should not show removed UX §3.2 elements', () => {
+    setup();
+    expect(screen.queryByText(/filtro global/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+    expect(screen.queryByText(/meta/i)).not.toBeInTheDocument();
   });
 });

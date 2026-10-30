@@ -72,4 +72,4 @@ tabla de arriba.
 
 ---
 
-Ver [`PROJECT_CONTEXT.md`](../../PROJECT_CONTEXT.md) para contexto completo.
+Ver [`ROADMAP.md`](../../ROADMAP.md) para el estado y [`docs/architecture/README.md`](../../docs/architecture/README.md) para las decisiones.

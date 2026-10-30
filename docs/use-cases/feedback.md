@@ -1,7 +1,7 @@
 # Casos de uso — Feedback (FEED-1)
 
 > Este es el feature donde se encontró y resolvió una contradicción real
-> entre `navigation.ts`, `ROADMAP.md` y `docs/flows/README.md` (sesión
+> entre `navigation.ts`, el roadmap de entonces y `docs/flows/README.md` (sesión
 > 2026-10-15, ver ADR-013). Este documento es la versión definitiva de esa
 > resolución — si algo en otro doc contradice esto, **gana este archivo**.
 
@@ -35,7 +35,7 @@ forzada por índice único — ADR-013).
 - Segundo intento de `POST /feedback` para el mismo `interviewId` → falla
   por el índice único en `interviewId` **a nivel de base de datos**, no
   solo por una validación de aplicación (criterio de éxito explícito de
-  FEED-1 en `ROADMAP.md` — debe fallar incluso si la validación de
+  FEED-1, hoy fuera del roadmap hasta el replanning — debe fallar incluso si la validación de
   aplicación tuviera un bug).
 - Entrevista todavía `pending`/`cancelled` (nunca ocurrió) → 400, no se
   puede cargar feedback de una entrevista que no sucedió.
@@ -50,7 +50,7 @@ usuario autenticado.
 **Reglas de borde / negativas:**
 - Cualquier otro rol o cualquier otro referente → 403.
 - **No hay endpoint `PATCH /feedback/:id` listado todavía en el alcance
-  de `ROADMAP.md`** (solo `POST`, `GET`, `send-email`) — a definir en
+  de FEED-1** (solo `POST`, `GET`, `send-email`) — a definir en
   FEED-1 si la edición reutiliza `POST` de forma idempotente sobre el
   mismo `interviewId` o si se agrega un `PATCH` explícito.
 
@@ -84,9 +84,8 @@ guardados de ese proceso.
 `packages/email-templates` (HTML plano, sin scripts) → `EmailSenderPort`.
 **Reglas de borde / negativas:**
 - `technical_ref`/`pm` → 403 (el envío al candidato es acción exclusiva
-  del reclutador — es quien tiene la relación con el candidato, ver
-  `PROJECT_CONTEXT.md` → "El Candidato NO tiene acceso... el reclutador
-  envía feedback manual por correo").
+  del reclutador — es quien tiene la relación con el candidato; el candidato
+  no tiene acceso en el MVP y el reclutador envía el feedback manual por correo).
 - El candidato nunca tiene acceso directo a ningún endpoint de feedback
   (no tiene login en el MVP) — el envío es siempre push por email, nunca
   un link que el candidato consulte en la app.

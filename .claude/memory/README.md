@@ -5,7 +5,7 @@ Curated, git-committed, team-shared reference knowledge about **how to work** in
 - `context-engineering-guide.md` — when to continue / fork / summarize / start a new session, and the `/context-health` → `/generate-relevant-report` → `/import-relevant-report` handoff workflow.
 - `agentic-architecture.md` — the hub-and-spoke sub-agent model (`.claude/agents/*.md`), concurrency/per-task limits, and the per-agent `model:` convention.
 
-Domain and architecture knowledge does **not** live here: it lives in `PROJECT_CONTEXT.md` (domain, data models, design system), `good-practices/BEST-PRACTICES.md` (conventions, long form) and `.claude/rules/*.md` (conventions, condensed, path-scoped). Don't duplicate them here.
+Domain and architecture knowledge does **not** live here. Dominio vigente: pendiente (`docs/domain.md`); los tipos actuales de `packages/shared-types` pertenecen al encuadre anterior. Diseño: `docs/design/UX-GUIDELINES.md`. Convenciones: `.claude/rules/`. Estado: `ROADMAP.md`. Don't duplicate them here.
 
 ## What this is *not*
 

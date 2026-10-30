@@ -71,4 +71,18 @@ export const NAV_ICON_DEFS: Readonly<Record<string, ISvgIconDef>> = {
       { tag: 'path', attrs: { d: 'M17 14v7M7 14v7M17 3v3M7 3v3M10 14 2.3 21.7M14 14l7.7 7.7' } },
     ],
   },
+  logout: {
+    ...STROKE_DEFAULTS, viewBox: '0 0 24 24',
+    children: [
+      { tag: 'path', attrs: { d: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4' } },
+      { tag: 'path', attrs: { d: 'M16 17l5-5-5-5' } },
+      { tag: 'path', attrs: { d: 'M21 12H9' } },
+    ],
+  },
+  chevron_left: {
+    ...STROKE_DEFAULTS, viewBox: '0 0 24 24',
+    children: [
+      { tag: 'path', attrs: { d: 'M15 18l-6-6 6-6' } },
+    ],
+  },
 } as const;

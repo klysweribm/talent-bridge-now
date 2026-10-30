@@ -32,14 +32,18 @@ decidido, no resuelve lo que ADR-013 dejó abierto a propósito.
 
 ## Índice
 
-| Archivo | Feature(s) de `ROADMAP.md` | Roles involucrados |
+| Archivo | Feature(s) | Roles involucrados |
 | --- | --- | --- |
-| [`auth.md`](./auth.md) | AUTH-1, AUTH-2 | Los 3 roles (login) |
-| [`processes.md`](./processes.md) | PROC-2 | Reclutador, Referente Técnico, PM |
-| [`candidates.md`](./candidates.md) | CAND-1 | Reclutador, PM |
-| [`interviews.md`](./interviews.md) | INT-1 | Reclutador, Referente Técnico |
-| [`feedback.md`](./feedback.md) | FEED-1 | Referente Técnico (escribe), Reclutador/PM (leen) |
-| [`reports.md`](./reports.md) | REP-1 | PM, Reclutador |
+| [`auth.md`](./auth.md) | AUTH-1, AUTH-2, FE-OTP-1 (en `ROADMAP.md`) | Los 3 roles (login) |
+| [`processes.md`](./processes.md) | PROC-2 (encuadre anterior, ya no en `ROADMAP.md`) | Reclutador, Referente Técnico, PM |
+| [`candidates.md`](./candidates.md) | CAND-1 (encuadre anterior) | Reclutador, PM |
+| [`interviews.md`](./interviews.md) | INT-1 (encuadre anterior) | Reclutador, Referente Técnico |
+| [`feedback.md`](./feedback.md) | FEED-1 (encuadre anterior) | Referente Técnico (escribe), Reclutador/PM (leen) |
+| [`reports.md`](./reports.md) | REP-1 (encuadre anterior) | PM, Reclutador |
+
+> **Encuadre anterior:** desde el 2026-10-28, PROC-2, CAND-1, INT-1, FEED-1, REP-1 y CV-1 ya no son
+> secciones de `ROADMAP.md` (esperan el replanning Bench First; ver su tabla de equivalencias). Estos
+> casos de uso se revisan en ese replanning.
 
 `CV-1` no tiene archivo propio: es una acción dentro del wizard de
 `processes.md` (paso 3, "Sugerir skills desde el CV"), no un flujo de

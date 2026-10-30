@@ -2,6 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import type { User } from '@ibm-talent-bridge/shared-types';
+import { AUTH_EVENT_REPOSITORY_PORT } from '../ports/auth-event-repository.port';
 import { USER_REPOSITORY_PORT, type IUserRepositoryPort } from '../ports/user-repository.port';
 import { AuthService } from './auth.service';
 
@@ -28,6 +29,7 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         { provide: USER_REPOSITORY_PORT, useValue: fakeUserRepository },
+        { provide: AUTH_EVENT_REPOSITORY_PORT, useValue: { record: jest.fn() } },
         { provide: JwtService, useValue: { sign: signMock } },
       ],
     }).compile();
@@ -41,11 +43,7 @@ describe('AuthService', () => {
     const result = await service.devLogin(DEMO_USER.email);
 
     expect(result).toEqual({ accessToken: 'signed-jwt', user: DEMO_USER });
-    expect(signMock).toHaveBeenCalledWith({
-      sub: DEMO_USER.id,
-      email: DEMO_USER.email,
-      role: DEMO_USER.role,
-    });
+    expect(signMock).toHaveBeenCalledWith({ sub: 'u-1', email: 'ana@ibm.com', role: 'recruiter' });
   });
 
   it('should embed the correct role in the signed payload for each demo role', async () => {
@@ -60,9 +58,7 @@ describe('AuthService', () => {
   it('should throw UnauthorizedException when the email has no seeded user', async () => {
     (fakeUserRepository.findByEmail as jest.Mock).mockResolvedValue(null);
 
-    await expect(service.devLogin('desconocido@ibm.com')).rejects.toThrow(
-      UnauthorizedException,
-    );
+    await expect(service.devLogin('desconocido@ibm.com')).rejects.toThrow(UnauthorizedException);
     expect(signMock).not.toHaveBeenCalled();
   });
 });

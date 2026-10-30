@@ -19,4 +19,26 @@ describe('env', () => {
   it('should reject an empty VITE_API_URL', () => {
     expect(() => envSchema.parse({ VITE_API_URL: '' })).toThrow();
   });
+
+  it('should default the idle timer to 360 s timeout and 60 s warning', () => {
+    const result = envSchema.parse({});
+    expect(result.VITE_IDLE_TIMEOUT_SECONDS).toBe(360);
+    expect(result.VITE_IDLE_WARNING_SECONDS).toBe(60);
+  });
+
+  it('should coerce idle values given as strings', () => {
+    const result = envSchema.parse({ VITE_IDLE_TIMEOUT_SECONDS: '120', VITE_IDLE_WARNING_SECONDS: '30' });
+    expect(result.VITE_IDLE_TIMEOUT_SECONDS).toBe(120);
+    expect(result.VITE_IDLE_WARNING_SECONDS).toBe(30);
+  });
+
+  it('should reject a warning that is not shorter than the timeout', () => {
+    expect(() => envSchema.parse({ VITE_IDLE_TIMEOUT_SECONDS: '60', VITE_IDLE_WARNING_SECONDS: '60' })).toThrow();
+    expect(() => envSchema.parse({ VITE_IDLE_TIMEOUT_SECONDS: '30', VITE_IDLE_WARNING_SECONDS: '60' })).toThrow();
+  });
+
+  it('should reject non-positive or non-integer idle values', () => {
+    expect(() => envSchema.parse({ VITE_IDLE_TIMEOUT_SECONDS: '0' })).toThrow();
+    expect(() => envSchema.parse({ VITE_IDLE_WARNING_SECONDS: '1.5' })).toThrow();
+  });
 });

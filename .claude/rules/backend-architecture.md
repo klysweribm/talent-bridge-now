@@ -5,7 +5,7 @@ paths:
 
 # Backend architecture — Hexagonal + DDD, vertical slice per capability
 
-Detail and examples: `good-practices/BEST-PRACTICES.md` §3 (read only the section you need). Domain model (Candidate/Process/Interview/Feedback/Report fields, stages, roles): `PROJECT_CONTEXT.md`; embed-vs-reference decisions and cross-aggregate consistency: ADR-013 in `docs/architecture/README.md`.
+Detail and examples: `good-practices/BEST-PRACTICES.md` §3 (read only the section you need). Entity types and roles: `packages/shared-types` (domain doc pending, `docs/domain.md`); use cases: `docs/use-cases/`; embed-vs-reference decisions and cross-aggregate consistency: ADR-013 in `docs/architecture/README.md`.
 
 ## Layout
 
@@ -29,6 +29,7 @@ Plural resources (`/candidates`, `/processes`), standard verbs/status codes, fil
 ## MongoDB (Mongoose)
 
 - `timestamps: true` on every schema; Mongoose schemas live in `infrastructure/adapters/`, never in `domain/`.
+- Every `@Prop` on a field typed as a TS union (`UserRole`, a process stage, a feedback recommendation, `shared-types` unions) needs an explicit `@Prop({ type: String, ... })`: Mongoose cannot infer a union and the process crashes at startup with `CannotDetermineTypeError`. Unit and e2e tests with fakes do not catch it — only booting the real process does.
 - `candidate.email` unique index; index `processId` on interviews and feedback.
 - Always paginate (`skip`/`limit` with a capped default) — never an unbounded `find()`.
 - Adapters map Mongoose documents → domain interfaces before returning; a `Document` type never leaves the adapter.

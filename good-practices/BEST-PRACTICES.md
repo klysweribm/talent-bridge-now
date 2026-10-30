@@ -447,7 +447,7 @@ interface ICandidatePort {
   findByEmail(email: string): Promise<Candidate | null>;
 }
 
-type TUserRole = 'recruiter' | 'technical' | 'pm';
+type TUserRole = 'recruiter' | 'technical_ref' | 'pm';
 
 enum EInterviewOutcome {
   Advance = 'advance',
@@ -457,7 +457,7 @@ enum EInterviewOutcome {
 
 // ❌ — sin prefijo, ya no cumple la convención
 interface CandidatePort { ... }
-type UserRole = 'recruiter' | 'technical' | 'pm';
+type UserRole = 'recruiter' | 'technical_ref' | 'pm';
 enum InterviewOutcome { ... }
 ```
 
@@ -638,9 +638,9 @@ export class InterviewController {
 
 ## 4.bis Mockups de Stitch (`DESIGN/`) — guía visual, no código fuente
 
-`DESIGN/stitch_ibm_talent_bridge_portal/**/code.html` y sus `screen.png` son
-generados por una herramienta externa (Stitch) para comunicar layout e
-intención visual. **No son código a copiar ni a transcribir.** Un ejemplo real
+Los mockups locales de `DESIGN/` (HTML y capturas generados por una herramienta
+externa) comunican layout e intención visual; **no son fuente de diseño ni código
+a copiar o transcribir.** Un ejemplo real
 de por qué esto es una regla no negociable: la versión original de
 `LoginPage.tsx` (422 líneas) fue construida pegando casi literal el
 `code.html` de `iniciar_sesi_n_ibm_talent_bridge/` — de ahí decenas de
@@ -703,4 +703,4 @@ BACKEND
 
 ---
 
-_Ver también: [`PROJECT_CONTEXT.md`](../PROJECT_CONTEXT.md) · `.clinerules`_
+_Ver también: [`CLAUDE.md`](../CLAUDE.md) · `.claude/rules/`_

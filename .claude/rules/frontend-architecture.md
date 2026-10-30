@@ -39,7 +39,8 @@ No upward imports (an atom never imports a molecule/organism). Molecules and ato
 
 - Carbon Design System + Tailwind utilities mapped from tokens in `tailwind.config.ts` / `config/design-tokens.ts`. Never a raw hex/px value in a component when a token exists.
 - IBM Plex Sans; icons only through the shared `Icon` atom, never inline SVG in a component.
-- `DESIGN/` (Stitch mockups) is a **visual reference only** — never paste its HTML. Decompose into atoms/molecules/organisms + tokens first (`BEST-PRACTICES.md` §4.bis).
+- `DESIGN/` holds local mockups that are **not a design source** — never paste their HTML. Decompose into atoms/molecules/organisms + tokens first (`BEST-PRACTICES.md` §4.bis).
+- Table and list rows: 48px compact / 56px standard.
 - Forms: `react-hook-form` + `zod` (`zodResolver`), schema next to the form hook (see `features/auth/hooks/useLoginForm.ts`).
 
 ## Naming

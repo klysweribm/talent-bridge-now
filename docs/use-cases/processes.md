@@ -20,14 +20,14 @@
 > también a `pm` (`roles: ['recruiter', 'pm']`, ver `COMING_SOON_ROUTES`),
 > pero este documento y `docs/flows/README.md` asumen que crear/editar un
 > proceso es exclusivo de `recruiter` — PM es "vista ejecutiva de solo
-> lectura" según `PROJECT_CONTEXT.md` → "Roles del MVP". No se corrige el
+> lectura" según el contexto del encuadre anterior (roles del MVP). No se corrige el
 > código en este catálogo (solo se escribe en modo documentación); al
 > implementar PROC-2 hay que decidir cuál de los dos es correcto: ¿el
 > acceso de PM a esas rutas es solo para que `ComingSoon` no le dé 404
 > mientras no hay pantalla real (plausible, dado que `/processes/new` y
 > `/processes/:id` hoy renderizan `ComingSoon` para todos), o PM debería
 > tener de verdad acceso de lectura al detalle/wizard? Los casos de uso de
-> abajo asumen la segunda lectura de `PROJECT_CONTEXT.md` (PM = solo
+> abajo asumen la segunda lectura (PM = solo
 > lectura, nunca crea/edita) hasta que se resuelva explícitamente.
 
 ## UC-PROC-1: Crear proceso completo (wizard de 4 pasos)

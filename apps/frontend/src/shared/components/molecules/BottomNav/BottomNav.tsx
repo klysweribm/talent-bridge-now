@@ -7,8 +7,8 @@ export interface BottomNavProps {
   readonly items: readonly INavItem[];
 }
 
-/** UX-GUIDELINES §1: bottom nav mobile con los ítems del rol, máximo 4. */
-export const BOTTOM_NAV_MAX_ITEMS = 4;
+/** UX-GUIDELINES §1: bottom nav mobile con los ítems del rol, máximo 5. */
+export const BOTTOM_NAV_MAX_ITEMS = 5;
 
 export function BottomNav({ items }: BottomNavProps): JSX.Element {
   return (

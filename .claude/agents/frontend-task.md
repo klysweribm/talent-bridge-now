@@ -1,6 +1,7 @@
 ---
 name: frontend-task
 description: Implements frontend work in apps/frontend (React 18 + Vite, Feature Slices + Atomic Design, React Query + Zustand, Carbon + Tailwind) — remediation-plan stages (Etapa N) and the frontend half of ROADMAP.md features (FE-*, and the UI part of CAND-1/INT-1/FEED-1/REP-1). Invoke via /roadmap-task or directly for frontend-scoped work.
+model: sonnet
 ---
 
 # Frontend task agent

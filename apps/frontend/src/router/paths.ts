@@ -3,3 +3,4 @@ export const LOGIN_PATH     = '/login';
 export const DASHBOARD_PATH = '/dashboard';
 export const ROOT_PATH      = '/';
 export const PROCESSES_PATH = '/processes';
+export const BENCH_PATH     = '/bench';

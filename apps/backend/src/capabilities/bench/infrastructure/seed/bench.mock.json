@@ -1,0 +1,1338 @@
+[
+  {
+    "benchCode": "BN-0001",
+    "displayName": "Valeria Montoya",
+    "primaryRole": "Java Developer",
+    "practice": "Application Development",
+    "seniority": "jr",
+    "skills": [
+      {
+        "name": "Java",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "Spring Boot",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "SQL",
+        "level": 2,
+        "years": 1
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "intermediate"
+      }
+    ],
+    "location": {
+      "country": "Argentina",
+      "city": "Córdoba"
+    },
+    "benchSince": "2026-09-14",
+    "availableFrom": "2026-10-20",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0002",
+    "displayName": "Tomás Ferreyra",
+    "primaryRole": "Frontend Developer",
+    "practice": "Application Development",
+    "seniority": "jr",
+    "skills": [
+      {
+        "name": "React",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "TypeScript",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "JavaScript",
+        "level": 3,
+        "years": 2
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "intermediate"
+      }
+    ],
+    "location": {
+      "country": "Chile",
+      "city": "Santiago"
+    },
+    "benchSince": "2026-10-01",
+    "availableFrom": "2026-11-05",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0003",
+    "displayName": "Camila Restrepo",
+    "primaryRole": "QA Automation Engineer",
+    "practice": "Quality Engineering",
+    "seniority": "jr",
+    "skills": [
+      {
+        "name": "Selenium",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "Java",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "Jira",
+        "level": 3,
+        "years": 2
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "basic"
+      }
+    ],
+    "location": {
+      "country": "Colombia",
+      "city": "Medellín"
+    },
+    "benchSince": "2026-09-28",
+    "availableFrom": "2026-10-25",
+    "status": "soft_booked"
+  },
+  {
+    "benchCode": "BN-0004",
+    "displayName": "Joaquín Techera",
+    "primaryRole": "Python Developer",
+    "practice": "Data & AI",
+    "seniority": "jr",
+    "skills": [
+      {
+        "name": "Python",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "SQL",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "Pandas",
+        "level": 2,
+        "years": 1
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "intermediate"
+      }
+    ],
+    "location": {
+      "country": "Uruguay",
+      "city": "Montevideo"
+    },
+    "benchSince": "2026-10-10",
+    "availableFrom": "2026-11-12",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0005",
+    "displayName": "Luciana Barbosa",
+    "primaryRole": "Salesforce Developer",
+    "practice": "CRM",
+    "seniority": "jr",
+    "skills": [
+      {
+        "name": "Salesforce",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "Apex",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "JavaScript",
+        "level": 2,
+        "years": 1
+      }
+    ],
+    "languages": [
+      {
+        "code": "pt",
+        "level": "native"
+      },
+      {
+        "code": "es",
+        "level": "intermediate"
+      },
+      {
+        "code": "en",
+        "level": "basic"
+      }
+    ],
+    "location": {
+      "country": "Brasil",
+      "city": "São Paulo"
+    },
+    "benchSince": "2026-10-05",
+    "availableFrom": "2026-10-28",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0006",
+    "displayName": "Diego Quispe",
+    "primaryRole": "DevOps Engineer",
+    "practice": "Cloud & Infrastructure",
+    "seniority": "jr",
+    "skills": [
+      {
+        "name": "Docker",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "Linux",
+        "level": 3,
+        "years": 2
+      },
+      {
+        "name": "Git",
+        "level": 3,
+        "years": 2
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "basic"
+      }
+    ],
+    "location": {
+      "country": "Perú",
+      "city": "Lima"
+    },
+    "benchSince": "2026-10-12",
+    "availableFrom": "2026-12-01",
+    "status": "assigned"
+  },
+  {
+    "benchCode": "BN-0007",
+    "displayName": "Martina Giordano",
+    "primaryRole": "Node.js Developer",
+    "practice": "Application Development",
+    "seniority": "ssr",
+    "skills": [
+      {
+        "name": "Node.js",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "NestJS",
+        "level": 3,
+        "years": 2
+      },
+      {
+        "name": "TypeScript",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "MongoDB",
+        "level": 3,
+        "years": 2
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Argentina",
+      "city": "Buenos Aires"
+    },
+    "benchSince": "2026-09-01",
+    "availableFrom": "2026-10-18",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0008",
+    "displayName": "Andrés Valdivia",
+    "primaryRole": "Angular Developer",
+    "practice": "Application Development",
+    "seniority": "ssr",
+    "skills": [
+      {
+        "name": "Angular",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "TypeScript",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "RxJS",
+        "level": 3,
+        "years": 2
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "intermediate"
+      }
+    ],
+    "location": {
+      "country": "Chile",
+      "city": "Valparaíso"
+    },
+    "benchSince": "2026-09-15",
+    "availableFrom": "2026-11-02",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0009",
+    "displayName": "Paula Cardozo",
+    "primaryRole": "Java Developer",
+    "practice": "Application Development",
+    "seniority": "ssr",
+    "skills": [
+      {
+        "name": "Java",
+        "level": 3,
+        "years": 4
+      },
+      {
+        "name": "Spring Boot",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "Kafka",
+        "level": 2,
+        "years": 1
+      },
+      {
+        "name": "SQL",
+        "level": 3,
+        "years": 4
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Uruguay",
+      "city": "Montevideo"
+    },
+    "benchSince": "2026-09-20",
+    "availableFrom": "2026-11-09",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0010",
+    "displayName": "Rafael Moreira",
+    "primaryRole": ".NET Developer",
+    "practice": "Application Development",
+    "seniority": "ssr",
+    "skills": [
+      {
+        "name": ".NET",
+        "level": 3,
+        "years": 4
+      },
+      {
+        "name": "C#",
+        "level": 3,
+        "years": 4
+      },
+      {
+        "name": "SQL",
+        "level": 3,
+        "years": 4
+      }
+    ],
+    "languages": [
+      {
+        "code": "pt",
+        "level": "native"
+      },
+      {
+        "code": "es",
+        "level": "intermediate"
+      },
+      {
+        "code": "en",
+        "level": "intermediate"
+      }
+    ],
+    "location": {
+      "country": "Brasil",
+      "city": "Curitiba"
+    },
+    "benchSince": "2026-08-25",
+    "availableFrom": "2026-10-15",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0011",
+    "displayName": "Natalia Orozco",
+    "primaryRole": "Data Engineer",
+    "practice": "Data & AI",
+    "seniority": "ssr",
+    "skills": [
+      {
+        "name": "Python",
+        "level": 4,
+        "years": 4
+      },
+      {
+        "name": "Spark",
+        "level": 3,
+        "years": 2
+      },
+      {
+        "name": "SQL",
+        "level": 4,
+        "years": 4
+      },
+      {
+        "name": "Airflow",
+        "level": 3,
+        "years": 2
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Colombia",
+      "city": "Bogotá"
+    },
+    "benchSince": "2026-09-05",
+    "availableFrom": "2026-11-16",
+    "status": "soft_booked"
+  },
+  {
+    "benchCode": "BN-0012",
+    "displayName": "Sebastián Aguirre",
+    "primaryRole": "SAP Consultant",
+    "practice": "ERP",
+    "seniority": "ssr",
+    "skills": [
+      {
+        "name": "SAP",
+        "level": 3,
+        "years": 4
+      },
+      {
+        "name": "ABAP",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "SAP FI",
+        "level": 3,
+        "years": 3
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "intermediate"
+      }
+    ],
+    "location": {
+      "country": "México",
+      "city": "Ciudad de México"
+    },
+    "benchSince": "2026-09-10",
+    "availableFrom": "2026-12-14",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0013",
+    "displayName": "Florencia Paredes",
+    "primaryRole": "QA Automation Engineer",
+    "practice": "Quality Engineering",
+    "seniority": "ssr",
+    "skills": [
+      {
+        "name": "Selenium",
+        "level": 4,
+        "years": 4
+      },
+      {
+        "name": "Cypress",
+        "level": 3,
+        "years": 2
+      },
+      {
+        "name": "Java",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "Jira",
+        "level": 4,
+        "years": 4
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Argentina",
+      "city": "Rosario"
+    },
+    "benchSince": "2026-10-02",
+    "availableFrom": "2026-11-06",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0014",
+    "displayName": "Gonzalo Salinas",
+    "primaryRole": "React Developer",
+    "practice": "Application Development",
+    "seniority": "ssr",
+    "skills": [
+      {
+        "name": "React",
+        "level": 4,
+        "years": 3
+      },
+      {
+        "name": "TypeScript",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "Node.js",
+        "level": 3,
+        "years": 2
+      },
+      {
+        "name": "GraphQL",
+        "level": 2,
+        "years": 1
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "intermediate"
+      }
+    ],
+    "location": {
+      "country": "Perú",
+      "city": "Lima"
+    },
+    "benchSince": "2026-09-22",
+    "availableFrom": "2026-10-22",
+    "status": "soft_booked"
+  },
+  {
+    "benchCode": "BN-0015",
+    "displayName": "Daniela Ibarra",
+    "primaryRole": "Salesforce Developer",
+    "practice": "CRM",
+    "seniority": "ssr",
+    "skills": [
+      {
+        "name": "Salesforce",
+        "level": 4,
+        "years": 4
+      },
+      {
+        "name": "Apex",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "Lightning",
+        "level": 3,
+        "years": 3
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "México",
+      "city": "Guadalajara"
+    },
+    "benchSince": "2026-09-12",
+    "availableFrom": "2026-11-23",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0016",
+    "displayName": "Matías Echeverría",
+    "primaryRole": "DevOps Engineer",
+    "practice": "Cloud & Infrastructure",
+    "seniority": "ssr",
+    "skills": [
+      {
+        "name": "OpenShift",
+        "level": 3,
+        "years": 2
+      },
+      {
+        "name": "Docker",
+        "level": 4,
+        "years": 4
+      },
+      {
+        "name": "Kubernetes",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "Jenkins",
+        "level": 3,
+        "years": 3
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Chile",
+      "city": "Santiago"
+    },
+    "benchSince": "2026-08-30",
+    "availableFrom": "2026-10-19",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0017",
+    "displayName": "Ignacio Benítez",
+    "primaryRole": "Java Architect",
+    "practice": "Application Development",
+    "seniority": "sr",
+    "skills": [
+      {
+        "name": "Java",
+        "level": 5,
+        "years": 9
+      },
+      {
+        "name": "Spring Boot",
+        "level": 5,
+        "years": 7
+      },
+      {
+        "name": "Kafka",
+        "level": 4,
+        "years": 4
+      },
+      {
+        "name": "Kubernetes",
+        "level": 3,
+        "years": 3
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Argentina",
+      "city": "Buenos Aires"
+    },
+    "benchSince": "2026-08-18",
+    "availableFrom": "2026-10-21",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0018",
+    "displayName": "Carolina Ospina",
+    "primaryRole": "Java Developer",
+    "practice": "Application Development",
+    "seniority": "sr",
+    "skills": [
+      {
+        "name": "Java",
+        "level": 4,
+        "years": 7
+      },
+      {
+        "name": "Spring Boot",
+        "level": 4,
+        "years": 6
+      },
+      {
+        "name": "Microservices",
+        "level": 4,
+        "years": 5
+      },
+      {
+        "name": "SQL",
+        "level": 4,
+        "years": 7
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Colombia",
+      "city": "Bogotá"
+    },
+    "benchSince": "2026-09-03",
+    "availableFrom": "2026-11-04",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0019",
+    "displayName": "Hernán Lagos",
+    "primaryRole": "Java Developer",
+    "practice": "Application Development",
+    "seniority": "sr",
+    "skills": [
+      {
+        "name": "Java",
+        "level": 5,
+        "years": 8
+      },
+      {
+        "name": "Spring Boot",
+        "level": 4,
+        "years": 6
+      },
+      {
+        "name": "OpenShift",
+        "level": 3,
+        "years": 3
+      },
+      {
+        "name": "Docker",
+        "level": 4,
+        "years": 5
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Chile",
+      "city": "Santiago"
+    },
+    "benchSince": "2026-09-17",
+    "availableFrom": "2026-12-10",
+    "status": "soft_booked"
+  },
+  {
+    "benchCode": "BN-0020",
+    "displayName": "Renata Almeida",
+    "primaryRole": "Java Developer",
+    "practice": "Application Development",
+    "seniority": "sr",
+    "skills": [
+      {
+        "name": "Java",
+        "level": 4,
+        "years": 8
+      },
+      {
+        "name": "Spring Boot",
+        "level": 4,
+        "years": 5
+      },
+      {
+        "name": "Angular",
+        "level": 3,
+        "years": 3
+      }
+    ],
+    "languages": [
+      {
+        "code": "pt",
+        "level": "native"
+      },
+      {
+        "code": "es",
+        "level": "advanced"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Brasil",
+      "city": "Rio de Janeiro"
+    },
+    "benchSince": "2026-08-22",
+    "availableFrom": "2026-11-30",
+    "status": "assigned"
+  },
+  {
+    "benchCode": "BN-0021",
+    "displayName": "Emilio Cabrera",
+    "primaryRole": "Node.js Architect",
+    "practice": "Application Development",
+    "seniority": "sr",
+    "skills": [
+      {
+        "name": "Node.js",
+        "level": 5,
+        "years": 8
+      },
+      {
+        "name": "NestJS",
+        "level": 4,
+        "years": 4
+      },
+      {
+        "name": "TypeScript",
+        "level": 5,
+        "years": 7
+      },
+      {
+        "name": "Docker",
+        "level": 4,
+        "years": 5
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "México",
+      "city": "Monterrey"
+    },
+    "benchSince": "2026-09-08",
+    "availableFrom": "2026-10-27",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0022",
+    "displayName": "Silvana Rojas",
+    "primaryRole": "Mainframe Developer",
+    "practice": "Legacy Modernization",
+    "seniority": "sr",
+    "skills": [
+      {
+        "name": "COBOL",
+        "level": 5,
+        "years": 12
+      },
+      {
+        "name": "JCL",
+        "level": 4,
+        "years": 10
+      },
+      {
+        "name": "DB2",
+        "level": 4,
+        "years": 8
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "intermediate"
+      }
+    ],
+    "location": {
+      "country": "Argentina",
+      "city": "Buenos Aires"
+    },
+    "benchSince": "2026-09-25",
+    "availableFrom": "2026-11-11",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0023",
+    "displayName": "Federico Mansilla",
+    "primaryRole": "SAP Consultant",
+    "practice": "ERP",
+    "seniority": "sr",
+    "skills": [
+      {
+        "name": "SAP",
+        "level": 5,
+        "years": 9
+      },
+      {
+        "name": "ABAP",
+        "level": 4,
+        "years": 7
+      },
+      {
+        "name": "SAP FI",
+        "level": 4,
+        "years": 6
+      },
+      {
+        "name": "SAP S/4HANA",
+        "level": 4,
+        "years": 3
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "México",
+      "city": "Ciudad de México"
+    },
+    "benchSince": "2026-08-28",
+    "availableFrom": "2026-12-21",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0024",
+    "displayName": "Lorena Zárate",
+    "primaryRole": "Data Scientist",
+    "practice": "Data & AI",
+    "seniority": "sr",
+    "skills": [
+      {
+        "name": "Python",
+        "level": 5,
+        "years": 7
+      },
+      {
+        "name": "Machine Learning",
+        "level": 4,
+        "years": 5
+      },
+      {
+        "name": "SQL",
+        "level": 4,
+        "years": 6
+      },
+      {
+        "name": "Spark",
+        "level": 3,
+        "years": 3
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Chile",
+      "city": "Santiago"
+    },
+    "benchSince": "2026-10-06",
+    "availableFrom": "2026-11-19",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0025",
+    "displayName": "Bruno Teixeira",
+    "primaryRole": "DevOps Engineer",
+    "practice": "Cloud & Infrastructure",
+    "seniority": "sr",
+    "skills": [
+      {
+        "name": "OpenShift",
+        "level": 4,
+        "years": 4
+      },
+      {
+        "name": "Kubernetes",
+        "level": 5,
+        "years": 5
+      },
+      {
+        "name": "Docker",
+        "level": 5,
+        "years": 7
+      },
+      {
+        "name": "Terraform",
+        "level": 4,
+        "years": 4
+      }
+    ],
+    "languages": [
+      {
+        "code": "pt",
+        "level": "native"
+      },
+      {
+        "code": "es",
+        "level": "intermediate"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Brasil",
+      "city": "Porto Alegre"
+    },
+    "benchSince": "2026-09-09",
+    "availableFrom": "2026-10-24",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0026",
+    "displayName": "Isabel Cuadros",
+    "primaryRole": "QA Lead",
+    "practice": "Quality Engineering",
+    "seniority": "sr",
+    "skills": [
+      {
+        "name": "Selenium",
+        "level": 5,
+        "years": 8
+      },
+      {
+        "name": "Java",
+        "level": 4,
+        "years": 6
+      },
+      {
+        "name": "Cypress",
+        "level": 4,
+        "years": 3
+      },
+      {
+        "name": "Jira",
+        "level": 5,
+        "years": 8
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Perú",
+      "city": "Lima"
+    },
+    "benchSince": "2026-09-30",
+    "availableFrom": "2026-10-31",
+    "status": "soft_booked"
+  },
+  {
+    "benchCode": "BN-0027",
+    "displayName": "Alejandro Villanueva",
+    "primaryRole": "Technical Lead",
+    "practice": "Application Development",
+    "seniority": "lead",
+    "skills": [
+      {
+        "name": "Java",
+        "level": 5,
+        "years": 12
+      },
+      {
+        "name": "Spring Boot",
+        "level": 5,
+        "years": 9
+      },
+      {
+        "name": "Angular",
+        "level": 4,
+        "years": 5
+      },
+      {
+        "name": "Microservices",
+        "level": 5,
+        "years": 8
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Colombia",
+      "city": "Medellín"
+    },
+    "benchSince": "2026-08-12",
+    "availableFrom": "2026-11-13",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0028",
+    "displayName": "Mariana Pizarro",
+    "primaryRole": "Cloud Solution Lead",
+    "practice": "Cloud & Infrastructure",
+    "seniority": "lead",
+    "skills": [
+      {
+        "name": "OpenShift",
+        "level": 5,
+        "years": 6
+      },
+      {
+        "name": "Kubernetes",
+        "level": 5,
+        "years": 7
+      },
+      {
+        "name": "Terraform",
+        "level": 5,
+        "years": 6
+      },
+      {
+        "name": "Docker",
+        "level": 5,
+        "years": 9
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "native"
+      }
+    ],
+    "location": {
+      "country": "Chile",
+      "city": "Santiago"
+    },
+    "benchSince": "2026-08-20",
+    "availableFrom": "2026-12-05",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0029",
+    "displayName": "Eduardo Sandoval",
+    "primaryRole": "Delivery Lead",
+    "practice": "Application Development",
+    "seniority": "lead",
+    "skills": [
+      {
+        "name": "React",
+        "level": 4,
+        "years": 6
+      },
+      {
+        "name": "Node.js",
+        "level": 5,
+        "years": 9
+      },
+      {
+        "name": "NestJS",
+        "level": 4,
+        "years": 4
+      },
+      {
+        "name": "TypeScript",
+        "level": 5,
+        "years": 8
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "México",
+      "city": "Querétaro"
+    },
+    "benchSince": "2026-09-02",
+    "availableFrom": "2026-10-23",
+    "status": "available"
+  },
+  {
+    "benchCode": "BN-0030",
+    "displayName": "Gabriela Fontana",
+    "primaryRole": "Salesforce Architect",
+    "practice": "CRM",
+    "seniority": "lead",
+    "skills": [
+      {
+        "name": "Salesforce",
+        "level": 5,
+        "years": 10
+      },
+      {
+        "name": "Apex",
+        "level": 5,
+        "years": 8
+      },
+      {
+        "name": "Lightning",
+        "level": 5,
+        "years": 7
+      },
+      {
+        "name": "MuleSoft",
+        "level": 4,
+        "years": 4
+      }
+    ],
+    "languages": [
+      {
+        "code": "es",
+        "level": "native"
+      },
+      {
+        "code": "en",
+        "level": "advanced"
+      }
+    ],
+    "location": {
+      "country": "Uruguay",
+      "city": "Montevideo"
+    },
+    "benchSince": "2026-09-18",
+    "availableFrom": "2026-11-26",
+    "status": "assigned"
+  }
+]

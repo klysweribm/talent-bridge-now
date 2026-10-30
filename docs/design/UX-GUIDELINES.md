@@ -22,7 +22,7 @@ Basado en la variante `dashboard_reclutador_versi_n_simplificada_2`.
 | Contenido | Título de página (24px) + **una** acción primaria a la derecha | Eyebrows ("Visión Operativa • Q1"), saludos personalizados |
 
 - Una sola marca en toda la app: **IBM Talent Bridge**. Nunca "IBM Consulting Hub", "Consulting Ops", etc.
-- Mobile: bottom nav con los mismos ítems del rol (máx. 4) en lugar de sidebar.
+- Mobile: bottom nav con los mismos ítems del rol (máx. 5) en lugar de sidebar.
 
 ## 2. Navegación del MVP
 
@@ -31,6 +31,7 @@ Fuente de verdad en código: `apps/frontend/src/shared/config/navigation.ts`.
 | Ítem | Ruta | Roles |
 | --- | --- | --- |
 | Inicio | `/dashboard` | recruiter, technical_ref, pm |
+| Banca | `/bench` | recruiter, pm |
 | Procesos | `/processes` | recruiter, pm |
 | Entrevistas | `/interviews` | recruiter, technical_ref |
 | Feedback | `/feedback` | technical_ref |

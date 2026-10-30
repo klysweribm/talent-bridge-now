@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './capabilities/auth/auth.module';
+import { BenchModule } from './capabilities/bench/bench.module';
 import { HealthModule } from './monitoring/health.module';
 import { FlowLogModule } from './shared/observability/flow-log.module';
 import { SharedAuthModule } from './shared/auth/shared-auth.module';
@@ -46,6 +47,7 @@ const MS_PER_SECOND = 1000;
     SharedAuthModule,
     HealthModule,
     AuthModule,
+    BenchModule,
   ],
   providers: [
     {

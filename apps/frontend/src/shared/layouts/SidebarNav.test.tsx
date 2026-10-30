@@ -30,6 +30,16 @@ describe('SidebarNav', () => {
     expect(screen.getByRole('button', { name: 'Cerrar sesión' })).toBeInTheDocument();
   });
 
+  it('should list "Banca" for a recruiter', () => {
+    renderSidebar('recruiter');
+    expect(screen.getByRole('link', { name: 'Banca' })).toBeInTheDocument();
+  });
+
+  it('should not list "Banca" for a technical_ref', () => {
+    renderSidebar('technical_ref');
+    expect(screen.queryByRole('link', { name: 'Banca' })).not.toBeInTheDocument();
+  });
+
   it('should not render support card, theme toggle or profile card', () => {
     renderSidebar('recruiter');
 

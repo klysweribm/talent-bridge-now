@@ -5,7 +5,7 @@
 > anterior (procesos → candidatos → entrevistas → feedback → reportes) quedó archivado fuera
 > de este documento y espera el replanning Bench First.
 >
-> **Última actualización:** 2026-10-28 (adelgazamiento previo al replanning Bench First)
+> **Última actualización:** 2026-10-30 (BENCH-1 implementado en código, pendiente de verificación en vivo)
 
 ---
 
@@ -52,6 +52,7 @@ anterior, a revisar en el replanning).
 | OBS-1 | ✅ cerrado en código | LOW | — |
 | QW-2 | ✅ cerrado en código (falta DT-010) | HIGH | AUTH-1 |
 | FE | 🚧 Etapas 0-2 en código; Etapa 2 pendiente de revisión en navegador | MEDIUM | — |
+| BENCH-1 | 🚧 implementado en código, falta verificación en vivo | HIGH | AUTH-1, Etapa 2 |
 | FE-OTP-1 | 📌 sin arrancar | LOW | Etapa 1 (cerrada) |
 | AUTH-2 | 📌 sin arrancar | LOW | FE-OTP-1 |
 | AUTH-3 | 📌 sin arrancar | LOW | QW-2, AUTH-2 |
@@ -66,16 +67,21 @@ anterior, a revisar en el replanning).
 > Se actualiza al cerrar cada tarea (`/roadmap-task` o `/update-roadmap`). El detalle histórico vive en el
 > Historial de abajo y en `good-practices/DEBT_TECH.md` → Resueltos.
 
-- **Gates (2026-10-28):** backend 39 unit / 41 e2e, lint 0 errores / 14 warnings; frontend 264 tests, lint 0
-  errores (2 warnings preexistentes en `sessionCacheGuard.test.tsx`), `validate-quality --strict` 0 críticos.
+- **Gates (2026-10-30, tras BENCH-1):** backend 112 unit / 74 e2e (antes 39 / 41), lint 0 errores / 14 warnings;
+  frontend 375 tests (antes 264), lint 0 errores (2 warnings preexistentes en `sessionCacheGuard.test.tsx`),
+  build OK, `validate-quality --strict` 0 críticos sobre 107 archivos.
+- **BENCH-1 sin verificar en vivo:** falta recrear el stack con podman, `curl` por rol, el arranque de la imagen de
+  producción y el recorrido en navegador (ver su sección).
 - **Pendiente de verificación en navegador (DT-010):** QW-1, AUTH-1, QW-2 y la Etapa 2 (F5, los 3 roles, aviso de
   inactividad a los 360 s). Hasta registrarlo siguen abiertas DT-002, DT-007 y DT-024.
 - **Git:** `b9acfc4`, `95d4fcc`, `a4da541`, `55a87cf` y otros commits anteriores conservan `Co-Authored-By`;
   reescribirlos está pendiente (`git filter-branch` fue bloqueado por permisos). Sin remote: no se ha añadido
   `https://github.com/klysweribm/architecture-reviewer-app.git` ni se ha hecho push; nunca `--force`;
   `~/.gitconfig` tiene `http.sslverify=false`; auth por token o SSH sin decidir.
-- **Próximo paso:** decidir la reescritura de commits y el remote, y hacer el recorrido en navegador (DT-010).
-  Después, el replanning Bench First (ver "Backlog Bench First"). Opcionales: OBS-2 y DT-020.
+- **Próximo paso:** cerrar la verificación en vivo de BENCH-1 y registrar el recorrido en navegador junto con
+  DT-010; decidir la reescritura de commits y el remote. Después, **AI-1** (asistente sobre la banca vía
+  `AiProviderPort`, que enviará a ICA solo los campos sin datos personales de `IBenchResource`) y `MATCH-1`.
+  Opcionales: OBS-2 y DT-020.
 
 ---
 
@@ -154,6 +160,45 @@ el JWT aún es válido; sin `trust proxy`, `ip` es la del proxy (DT-023); durant
 - [ ] DT-022 (los e2e dejan filas `u-1` en `auth_events`, origen sin confirmar), DT-023 y DT-024 (esta última
       resuelta en código por la Etapa 2; se cierra tras revisar las pantallas).
 - DT-018 y DT-019 siguen abiertas: las cierran AUTH-3 y AUTH-4.
+
+---
+
+## BENCH-1 — Banca desde mock JSON (HIGH)
+
+**Estado:** 🚧 implementado en código, falta verificación en vivo · **Complejidad:** 🟡 Media · **Casos de uso:**
+[`docs/use-cases/bench.md`](./docs/use-cases/bench.md)
+
+Primer dato de negocio real: 30 recursos inventados y anonimizados (`bench.mock.json`) se siembran en la colección
+`bench_resources`; `GET /bench` (paginado y filtrable), `GET /bench/skills` y `GET /bench/:benchCode` los exponen a
+`recruiter` y `pm` (`TODO(RBAC-1)`), y `/bench` los muestra con filtros en la URL y un detalle lateral. Solo lectura.
+Es la base de `MATCH-1` y del dashboard ejecutivo. Commits: pendientes de autorizar.
+
+**Decisiones:** reutiliza `PaginatedResponse` (campo `data`, no `items`); los tipos nuevos de `shared-types` llevan
+prefijo I/T/E y son solo tipos (la imagen de producción no resuelve el alias en runtime, así que los arrays de enum
+viven en el backend); el catálogo de skills solo incluye skills de recursos visibles por defecto; `technical_ref`
+que entra por URL se redirige a `/dashboard`; `BOTTOM_NAV_MAX_ITEMS` sube de 4 a 5.
+
+**Criterios de éxito:**
+- [x] `shared-types` con los tipos de banca, sin email, teléfono ni salario.
+- [x] Seed idempotente por `benchCode` y fail-closed (`BENCH_SEED_ENABLED=true` exacto, nunca en producción), con el
+      mock validado ítem a ítem (e2e: dos arranques dan 30 documentos).
+- [x] `GET /bench`: filtros skills (AND, sin distinguir mayúsculas), seniority, `availableBy`, país y estado;
+      paginación acotada (`limit` ≤ 50), orden estable; 401 / 403 / 400 / 404 (e2e contra Mongo real).
+- [x] Índices del schema creados (único en `benchCode`; `seniority`, `status`, `availableFrom`, `skills.name`).
+- [x] Pantalla `/bench` con filtros en la URL, página reiniciada al cambiar un filtro, estados de carga, vacío y
+      error, y detalle de un recurso (tests de componente).
+- [x] Gates en verde: backend 112 unit / 74 e2e, frontend 375 tests, 0 críticos en `validate-quality`.
+- [x] Proceso real arrancado desde `dist/` con `bench seed: 30 upserted` y `/health` en 200 (lo ejecutó el
+      sub-agente de backend; **no repetido tras las últimas correcciones**).
+- [ ] Stack recreado con podman: `/health` con `database: up`, 30 documentos e índices vistos con `mongosh`, y 30 tras
+      reiniciar el backend.
+- [ ] `curl` con token de cada usuario demo (200 / 403 / 401 / 400 / 404) contra el stack real.
+- [ ] Imagen de producción (`apps/backend/Dockerfile`) construida y arrancada: resuelve `shared-types` y el JSON.
+- [ ] Recorrido en navegador con los tres roles (junto con DT-010).
+
+**Límites que deja:** el filtro de skills usa regex sin distinguir mayúsculas, que no aprovecha el índice; el seed
+restablece los datos del mock en cada arranque; las fechas del mock son absolutas; la lista de países vive en el
+frontend; el detalle lateral no atrapa el foco con Tab (ver DT-027 a DT-029).
 
 ---
 
@@ -418,6 +463,7 @@ HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerr
 | 2026-10-27 | `QW-2` cerrado en código (`a1c5b96`, `1341f8a`, `666fcf0`, `71cb074`) y verificado con curl + Mongo; altas DT-022, DT-023, DT-024. | Falta el recorrido en navegador (DT-010); DT-018 y DT-019 siguen abiertas. |
 | 2026-10-28 | Etapa 2 de FE cerrada en código (`dd77ff8`, `2ef1a5b`, `0326925`), **pendiente de revisión en navegador (DT-010)**; 264 tests y 0 críticos en `validate-quality`. | Cierra el único crítico (DT-002) y alinea el shell y el Inicio con `UX-GUIDELINES.md`; DT-002/007/024 se resuelven tras revisar las pantallas. |
 | 2026-10-28 | `ROADMAP.md` adelgazado: encuadre anterior archivado en `legacy_docs/`, FE-OTP-1 movida a `docs/use-cases/auth.md`, tabla de equivalencias Bench First. | Preparar el replanning Bench First; el detalle sigue en git, `docs/use-cases/` y `legacy_docs/`. |
+| 2026-10-30 | `BENCH-1` implementado en código (backend, frontend y casos de uso), **falta verificación en vivo**; altas DT-027 a DT-029; los tipos de `shared-types` llevan prefijo I/T/E. | Primer dato de negocio real de Bench First, base de `MATCH-1`. |
 | 2026-10-28 | Fuentes de verdad consolidadas: `.clinerules` pasa a puntero, el estado actual se mueve de `CLAUDE.md` a este archivo y `PROJECT_CONTEXT.md` se reparte entre sus dueños y queda como puntero (el dominio anterior se archiva). | Una única fuente de verdad por tema; tokens de diseño: manda el código de Tailwind (DT-026). |
 
 ---

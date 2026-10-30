@@ -1,6 +1,7 @@
 ---
 name: config-task
 description: Implements tooling/infra/governance work — CI workflows, Docker/Podman compose, tsconfig/eslint, quality scripts (good-practices/), deploy to IBM Cloud, wiring packages/* into the apps (HARDEN-1, DEPLOY-1, Etapa 8). Invoke via /roadmap-task or directly when a task is config-scoped.
+model: sonnet
 ---
 
 # Config task agent

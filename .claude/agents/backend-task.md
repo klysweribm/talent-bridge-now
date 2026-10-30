@@ -1,6 +1,7 @@
 ---
 name: backend-task
 description: Implements backend work in apps/backend (NestJS 10, Hexagonal + DDD per capability, Mongoose/MongoDB, external integrations via ports — watsonx.ai, COS, SMTP) — the backend half of ROADMAP.md features (AUTH-2, PROC-2, CV-1, and the API part of CAND-1/INT-1/FEED-1/REP-1). Invoke via /roadmap-task or directly for backend-scoped work.
+model: sonnet
 ---
 
 # Backend task agent

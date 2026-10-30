@@ -6,13 +6,13 @@ import { SidebarNavList } from './SidebarNavList';
 describe('SidebarNavList', () => {
   it('should render one link per item and mark the active one', () => {
     render(
-      <MemoryRouter initialEntries={['/processes']}>
+      <MemoryRouter initialEntries={['/bench']}>
         <SidebarNavList items={NAVIGATION_ITEMS.slice(0, 2)} collapsed={false} />
       </MemoryRouter>,
     );
 
     expect(screen.getAllByRole('link')).toHaveLength(2);
-    expect(screen.getByRole('link', { name: 'Procesos' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Banca' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Inicio' })).not.toHaveAttribute('aria-current');
   });
 

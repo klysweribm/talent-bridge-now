@@ -23,6 +23,7 @@ export interface INavItem {
 
 export const NAVIGATION_ITEMS: readonly INavItem[] = [
   { path: '/dashboard',  label: 'Inicio',      mobileLabel: 'Inicio',   icon: 'dashboard',  roles: ['recruiter', 'pm', 'technical_ref'] },
+  { path: '/bench',      label: 'Banca',       mobileLabel: 'Banca',    icon: 'bench',      roles: ['recruiter', 'pm'] },
   { path: '/processes',  label: 'Procesos',    mobileLabel: 'Procesos', icon: 'processes',  roles: ['recruiter', 'pm'] },
   { path: '/interviews', label: 'Entrevistas', mobileLabel: 'Agenda',   icon: 'interviews', roles: ['recruiter', 'technical_ref'] },
   { path: '/feedback',   label: 'Feedback',    mobileLabel: 'Feedback', icon: 'feedback',   roles: ['technical_ref'] },

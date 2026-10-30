@@ -2,8 +2,9 @@ import type { ReactElement } from 'react';
 import { ComingSoon } from '@shared/components/organisms/ComingSoon';
 import { NAVIGATION_ITEMS } from '@shared/config/navigation';
 import type { UserRole } from '@features/auth/store/auth.store';
+import { BenchPage } from '@features/bench/components/pages/BenchPage';
 import { DashboardPage } from '@features/processes/components/pages/DashboardPage';
-import { DASHBOARD_PATH, PROCESSES_PATH } from './paths';
+import { BENCH_PATH, DASHBOARD_PATH, PROCESSES_PATH } from './paths';
 
 export interface IRouteConfig {
   readonly path:    string;
@@ -26,9 +27,15 @@ const EXTRA_ROUTES: readonly Omit<IRouteConfig, 'element'>[] = [
   { path: `${PROCESSES_PATH}/:id`, label: 'Detalle del Proceso', roles: PROCESSES_ROLES },
 ];
 
+// Pantallas reales por ruta; todo lo demás cae en ComingSoon.
+const REAL_PAGES: Readonly<Record<string, ReactElement>> = {
+  [DASHBOARD_PATH]: <DashboardPage />,
+  [BENCH_PATH]:     <BenchPage />,
+};
+
 const toRoute = (route: Omit<IRouteConfig, 'element'>): IRouteConfig => ({
   ...route,
-  element: route.path === DASHBOARD_PATH ? <DashboardPage /> : <ComingSoon label={route.label} />,
+  element: REAL_PAGES[route.path] ?? <ComingSoon label={route.label} />,
 });
 
 export const PROTECTED_ROUTES: readonly IRouteConfig[] =

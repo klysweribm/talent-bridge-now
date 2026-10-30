@@ -9,6 +9,6 @@ describe('MobileNav', () => {
     render(<MemoryRouter><MobileNav /></MemoryRouter>);
 
     expect(screen.getAllByRole('link').map(l => l.getAttribute('aria-label')))
-      .toEqual(['Inicio', 'Procesos', 'Reportes']);
+      .toEqual(['Inicio', 'Banca', 'Procesos', 'Reportes']);
   });
 });

@@ -97,6 +97,18 @@ describe('AppRouter — navigation/route consistency', () => {
     expect(screen.queryByLabelText(/correo corporativo/i)).not.toBeInTheDocument();
   });
 
+  it('should send a technical_ref who opens /bench to /dashboard', () => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'technical_ref' }, validToken());
+    renderAt('/bench');
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
+  });
+
+  it.each(['recruiter', 'pm'] as const)('should render the real BenchPage for a %s on /bench', role => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role }, validToken());
+    renderAt('/bench');
+    expect(screen.getByRole('heading', { level: 1, name: 'Banca' })).toBeInTheDocument();
+  });
+
   it('should send a technical_ref who opens /processes to /dashboard', () => {
     useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'technical_ref' }, validToken());
     renderAt('/processes');

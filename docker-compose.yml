@@ -20,6 +20,17 @@ services:
       BENCH_SEED_ENABLED: ${BENCH_SEED_ENABLED:-true}
       AUTH_EVENT_RETENTION_DAYS: ${AUTH_EVENT_RETENTION_DAYS:-90}
       FLOW_LOG_ENABLED: ${FLOW_LOG_ENABLED:-false}
+      # IA (ICA): la clave solo por interpolación; vacía = IA deshabilitada
+      ICA_API_KEY: ${ICA_API_KEY:-}
+      ICA_API_URL: ${ICA_API_URL:-https://api.servicesessentials.ibm.com/v1}
+      ICA_MODEL_ID: ${ICA_MODEL_ID:-claude-haiku-5-5}
+      ICA_MAX_TOKENS: ${ICA_MAX_TOKENS:-8192}
+      ICA_TIMEOUT_MS: ${ICA_TIMEOUT_MS:-60000}
+      AI_PROVIDER: ${AI_PROVIDER:-ica}
+      AI_RETRY_MAX_ATTEMPTS: ${AI_RETRY_MAX_ATTEMPTS:-3}
+      AI_RETRY_BASE_MS: ${AI_RETRY_BASE_MS:-1000}
+      AI_RETRY_MAX_MS: ${AI_RETRY_MAX_MS:-10000}
+      AI_TOTAL_TIMEOUT_MS: ${AI_TOTAL_TIMEOUT_MS:-90000}
     volumes:
       - ./apps/backend/src:/app/apps/backend/src
       # Read-only: habilita el alias @ibm-talent-bridge/shared-types (tsconfig
@@ -82,8 +93,12 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: talent-bridge
+      # Usuario de solo lectura (docker/mongo-init); la contraseña solo por interpolación
+      MONGO_READONLY_USER: ${MONGO_READONLY_USER:-tb_reader}
+      MONGO_READONLY_PASSWORD: ${MONGO_READONLY_PASSWORD:-}
     volumes:
       - mongodb_data:/data/db
+      - ./docker/mongo-init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       # CMD-SHELL con comillas: la forma CMD con paréntesis rompe /bin/sh en podman-compose
       test: ['CMD-SHELL', 'mongosh --quiet --eval "db.adminCommand(''ping'').ok" || exit 1']

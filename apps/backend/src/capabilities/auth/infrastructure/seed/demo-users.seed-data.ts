@@ -1,4 +1,5 @@
 import type { UserRole } from '@ibm-talent-bridge/shared-types';
+import * as demoUsers from './demo-users.seed.json';
 
 export interface IDemoUserSeed {
   readonly email: string;
@@ -8,16 +9,8 @@ export interface IDemoUserSeed {
 }
 
 /**
- * Usuarios demo sembrados en Mongo para AUTH-1 (dev-login). El frontend ya no
- * guarda una copia: `auth.infra.ts` consume estos usuarios vía `POST /auth/dev-login`.
+ * Usuarios demo sembrados en Mongo para AUTH-1 (dev-login). Los datos viven en
+ * `demo-users.seed.json` (igual que la banca en `bench.mock.json`); el frontend
+ * los consume vía `POST /auth/dev-login`.
  */
-export const DEMO_USERS_SEED: readonly IDemoUserSeed[] = [
-  { email: 'ana@ibm.com', fullName: 'Ana García', role: 'recruiter', timezone: 'America/Bogota' },
-  {
-    email: 'carlos@ibm.com',
-    fullName: 'Carlos Londoño',
-    role: 'technical_ref',
-    timezone: 'America/Bogota',
-  },
-  { email: 'mariana@ibm.com', fullName: 'Mariana López', role: 'pm', timezone: 'America/Bogota' },
-] as const;
+export const DEMO_USERS_SEED: readonly IDemoUserSeed[] = demoUsers as unknown as readonly IDemoUserSeed[];

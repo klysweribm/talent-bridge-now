@@ -1,0 +1,5 @@
+[
+  { "email": "ana@ibm.com", "fullName": "Ana García", "role": "recruiter", "timezone": "America/Bogota" },
+  { "email": "carlos@ibm.com", "fullName": "Carlos Londoño", "role": "technical_ref", "timezone": "America/Bogota" },
+  { "email": "mariana@ibm.com", "fullName": "Mariana López", "role": "pm", "timezone": "America/Bogota" }
+]

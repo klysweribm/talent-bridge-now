@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { AiModule } from './capabilities/ai/ai.module';
 import { AuthModule } from './capabilities/auth/auth.module';
 import { BenchModule } from './capabilities/bench/bench.module';
 import { HealthModule } from './monitoring/health.module';
@@ -48,6 +49,7 @@ const MS_PER_SECOND = 1000;
     HealthModule,
     AuthModule,
     BenchModule,
+    AiModule,
   ],
   providers: [
     {

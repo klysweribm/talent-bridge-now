@@ -254,6 +254,24 @@ flowchart TB
   - Manejo explícito del fallo parcial en la sincronización `Candidate↔Process` más allá de "loguear y propagar" — PROC-2/CAND-1.
   - Política de cambios "breaking" en `shared-types` una vez que las capabilities tengan consumidores reales (hoy no hace falta tooling de migración porque no hay ninguno todavía).
 
+### ADR-014: IA detrás de `AiProviderPort` con adapter ICA (sustituye el proveedor de ADR-009)
+
+- **Estado:** Aceptada para la POC (2026-10-31). Sustituye **solo la parte de proveedor de IA** de ADR-009 (watsonx.ai); el resto de ADR-009 sigue pendiente de reemplazo.
+- **Contexto:** la POC necesita IA en varios flujos (CV a JSON, match con la banca, feedback). ICA (IBM Consulting Advantage) expone un gateway compatible con OpenAI (`/chat-models/chat/completions`) y la clave de desarrollador ya está disponible. Existe una implementación de referencia en `architecture-reviewer-app` (proveedor de una sola llamada con reintentos y una reparación de JSON; no hay loop agéntico que copiar).
+- **Decisión:** capability `ai`, de tipo service-domain, exportada por `AiModule` para que otras capabilities la importen. `AiProviderPort` recibe `messages` (`system`/`user`/`assistant`) y opciones (`maxTokens`, `jsonMode`, modelo) y devuelve `{ content, finishReason, usage }`; un campo `tools` se podrá añadir sin romper a los llamadores. Adapters: `ICA` (HTTP) y `fake` (solo por `AI_PROVIDER=fake`, nunca con `NODE_ENV=production`, sin respaldo automático cuando ICA falla). Los tópicos viven en un registro `AI_TOPICS` (prompt de sistema y esquema de salida opcional); se entrega `general`.
+- **Dos reglas distintas:** la **seguridad falla cerrado** (sin clave, configuración inválida o modo no permitido, la IA queda apagada) y la **disponibilidad falla suave** (si ICA cae o tarda, el resto de la POC sigue). El coordinator nunca lanza: devuelve `{ ok: true, ... }` o `{ ok: false, reason }`. Los fallos de ICA salen como **503**, nunca 401 (el `httpClient` del frontend cierra la sesión ante un 401).
+- **Configuración:** todo por `ConfigService` (`ICA_API_URL`, `ICA_API_KEY`, `ICA_MODEL_ID`, `ICA_MAX_TOKENS`, `ICA_TIMEOUT_MS`, `AI_PROVIDER`, `AI_RETRY_*`, `AI_TOTAL_TIMEOUT_MS`). Los secretos van por interpolación en compose, nunca literales. `ICA_SPACE_ID` se retira: no tiene consumidor ni aparece en la spec.
+- **Discrepancia sobre tool-calling:** el `ROADMAP.md` del otro proyecto (F28) afirmaba que el gateway no soporta tool-calling. Una prueba real (2026-10-31) mostró que `tools` funciona en `claude-haiku-5-5`, `claude-sonnet-5-5` y `claude-opus-5-5` (`finish_reason: "tool_calls"`, ronda completa y llamadas en paralelo). No se usa en AI-1; permite más adelante un coordinator con sub-agentes como herramientas. Sin probar: `tool_choice` y `tools` combinado con JSON mode.
+- **Hechos de ICA a respetar:** `temperature` solo acepta `1` (se omite); `claude-haiku-4-5` ya no existe (400 `Model not found`); una clave inválida da **400** `Invalid icaKey` (no 401), así que los 400 se distinguen por el cuerpo; sin `response_format` el modelo envuelve el JSON en vallas de código.
+- **Riesgos:**
+  - **PII (DT-030):** un CV contiene datos personales y saldría a ICA; con el CV a JSON es el caso principal. Decisión del equipo: se acepta para la POC local y se aborda después.
+  - La subida de CV (PDF a texto) y el parámetro `files` de ICA no entran en AI-1 y no están probados.
+  - `POST /ai/ask` es un proxy abierto para `recruiter` y `pm`; se acota con longitud máxima de `query`, throttle más estricto y lista cerrada de tópicos.
+  - Temperatura fija en 1: respuestas no deterministas.
+  - Disponibilidad: ICA es un endpoint interno de IBM (VPN) y tardó de 3,5 a 5,9 s en una respuesta mínima; no se sabe si es alcanzable desde Code Engine `br-sao` (riesgo de `DEPLOY-1`).
+  - Prompt injection: la salida se valida y el modelo nunca ejecuta acciones; solo propone un borrador que confirma una persona.
+- **Consecuencias:** cambiar de proveedor (p. ej. watsonx.ai) es cambiar el adapter. El frontend oculta el asistente o muestra "Asistente no disponible" según `GET /ai/status`.
+
 ---
 
 ## Abierto — validar con sponsor/compliance

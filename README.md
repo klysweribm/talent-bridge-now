@@ -60,6 +60,8 @@ ibm-talent-bridge/
 cp .env.example .env
 # Definir MONGO_INITDB_ROOT_PASSWORD y usar la misma contraseña en MONGODB_URI.
 # Para desarrollo local no se necesitan credenciales de IBM Cloud.
+# Opcional (asistente de IA): ICA_API_KEY (ICA → Settings → API Keys → ICA APIs). Sin ella la app
+# arranca igual y la IA queda deshabilitada (`GET /ai/status` → NOT_CONFIGURED).
 (cd apps/backend && npm install)
 (cd apps/frontend && npm install)
 ```
@@ -77,6 +79,13 @@ cd apps/frontend && npm run dev       # terminal 2 — hot reload
 ```bash
 podman-compose up -d                  # o: docker-compose up -d
 ```
+
+Primer arranque con un volumen de Mongo vacío: el backend siembra solo los usuarios demo y la banca
+(`AUTH_DEV_LOGIN_ENABLED` y `BENCH_SEED_ENABLED`, en `true` por defecto en el compose). No hace falta ningún
+paso previo: `podman-compose up -d` basta. Si cambias el `.env`, recrea el backend para que lea las variables:
+`podman-compose up -d --force-recreate backend` (nunca `down -v`, borra el volumen de Mongo).
+`podman-compose config` es opcional: solo imprime el compose con las variables ya resueltas, útil para
+depurar. Usuario de Mongo de solo lectura y detalle de los seeds: `docs/guides/mongo-readonly-user.md`.
 
 ### Servicios
 

@@ -52,6 +52,7 @@ Orden: primero lo que requiere acción, luego el backlog por prioridad, al final
 
 | ID | Estado | Prioridad | Depende de |
 | --- | --- | --- | --- |
+| AI-1 | ✅ cerrado en código y verificado en vivo: capability `ai` (ICA) con coordinator simple | HIGH | — |
 | BENCH-1 | 🚧 verificado en vivo (stack, `curl` por rol, imagen de producción); falta el recorrido con los 3 roles | HIGH | AUTH-1, Etapa 2 |
 | QW-1 | 🚧 implementado, falta el recorrido en navegador (DT-010) | HIGH | — |
 | FE | 🚧 Etapas 0-2 en código; Etapa 2 pendiente de revisión en navegador | MEDIUM | — |
@@ -73,6 +74,7 @@ Orden: primero lo que requiere acción, luego el backlog por prioridad, al final
 > Historial de abajo y en `good-practices/DEBT_TECH.md` → Resueltos.
 
 **Próximos pasos, en orden:**
+0. **AI-1 (cerrado en código, rama `feature/AI-1`):** capability `ai` vía ICA. Siguiente para la POC: tópico de CV a JSON (AI-2), proceso con match de banca y referentes.
 1. **Recorrido en navegador con los 3 roles** (ana@, carlos@, mariana@ibm.com): cierra BENCH-1 y de paso DT-010 (F5
    conserva la sesión, ningún link da 404, aviso de inactividad a los 360 s). Con eso se pueden cerrar QW-1, AUTH-1,
    QW-2 y la Etapa 2, y las deudas DT-002, DT-007 y DT-024. La primera prueba visual de `/bench` ya salió bien;
@@ -101,6 +103,38 @@ nunca `--force`.
 ## 🚧 En curso y por verificar
 
 > Lo que sigue abierto. Orden: lo más importante primero.
+
+## AI-1 — Capability `ai`: coordinador de IA vía ICA (HIGH)
+
+**Estado:** ✅ cerrado en código y verificado en vivo (2026-11-01), sin commitear · **Complejidad:** 🟡 Media · **Casos de uso:** [`docs/use-cases/ai.md`](./docs/use-cases/ai.md) · **Decisión:** ADR-014
+
+Servicio inyectable (`AiModule`) al que cualquier capability envía una consulta y recibe una respuesta, con **tópicos**
+por segmento (hoy solo `general`). Es el cimiento de la POC: el CV a JSON, el match con la banca y el feedback asistido
+lo consumen. Reutiliza el proveedor ICA de `architecture-reviewer-app` (mapper, reintento, reparación de JSON).
+
+**Decisiones:** ICA sustituye a watsonx.ai como proveedor (solo el adapter cambia si se revierte); el coordinator nunca
+lanza (`{ ok, ... }`) y los fallos de ICA salen como 503, nunca 401; seguridad falla cerrado, disponibilidad falla
+suave; proveedor `fake` solo por `AI_PROVIDER=fake`, sin respaldo automático; salida estructurada (`jsonMode` + esquema)
+desde el inicio; `ICA_SPACE_ID` se retira; modelo por defecto `claude-haiku-5-5`. PII a ICA: aceptada para la POC
+(DT-030).
+
+**Criterios de éxito:**
+- [x] Contrato en `shared-types` (`ai.ts`), ADR-014, casos de uso y DT-030.
+- [x] Variables en `.env.example` y compose por interpolación (`${ICA_API_KEY:-}`), sin clave en `docker-compose.test.yml` (solo `AI_PROVIDER: fake`).
+- [x] Puerto, adapter ICA, mapper, reintento con backoff y reparación de JSON, con TDD (unit en Jest con `fetch` simulado).
+- [x] Coordinator que nunca lanza, con tope de tiempo total (`AI_TOTAL_TIMEOUT_MS`) y tópico `general`.
+- [x] `GET /ai/status` valida clave y modelo (`MODEL_NOT_FOUND`) sin exponer la clave; `POST /ai/ask` acotado (10/min, `query` ≤ 4000, tópicos en lista cerrada).
+- [x] e2e: 401 / 403 / 400 / 200 / 503; con el proveedor fallando, `/bench` y `/auth` responden normal.
+- [x] Gates (2026-11-01): backend 242 unit / 89 e2e, lint 0 errores / 14 warnings (sin nuevos), build OK, `validate-quality --strict` 0 críticos sobre 114 archivos.
+- [x] Arranque real con y sin clave: con clave `/ai/status` da `available: true` (`claude-haiku-5-5`) y `/ai/ask` 200; sin clave arranca (WARN `AI disabled`), `/health` `database: up`, `/ai/status` `NOT_CONFIGURED`, `/ai/ask` 503 y `/bench` 200. Pendiente: el caso de modelo inexistente (`MODEL_NOT_FOUND`) solo está cubierto por tests.
+- [x] Llamadas reales a ICA: `/ai/ask` (3,3 s) y `response_format: json_object` con un esquema de CV, que validó. Con `max_tokens` bajo (200) el JSON salió truncado (`finish_reason: length`); el tope por defecto de la app pasó a 8192 (el modelo admite 128000 y genera ~150 tokens/s), con timeouts de 60 s por llamada y 90 s en total. Sin verificar en vivo: el backend en ejecución aún no recargó esos valores. El tópico con esquema pasando por el servicio queda para AI-2.
+- [x] La clave no aparece en ningún archivo versionado ni sin ignorar (0 coincidencias) ni en los logs del contenedor (0).
+
+**Límites que deja:** sub-agentes y tool-calling (`TODO(AI-2)`), tópicos de oportunidad / CV / feedback, subida de CV y
+`files`, `stream`, almacén de credencial en memoria, persistencia de conversaciones. Alcance de ICA desde Code Engine
+`br-sao` sin verificar (riesgo de DEPLOY-1).
+
+---
 
 ## BENCH-1 — Banca desde mock JSON (HIGH)
 
@@ -496,6 +530,7 @@ DT-020 (warnings de lint del FlowLog) y DT-021 (el `Dockerfile` fija `NODE_ENV=p
 | 2026-10-30 | `BENCH-1` implementado en código (backend, frontend y casos de uso), **falta verificación en vivo**; altas DT-027 a DT-029; los tipos de `shared-types` llevan prefijo I/T/E. | Primer dato de negocio real de Bench First, base de `MATCH-1`. |
 | 2026-10-28 | Fuentes de verdad consolidadas: `.clinerules` pasa a puntero, el estado actual se mueve de `CLAUDE.md` a este archivo y `PROJECT_CONTEXT.md` se reparte entre sus dueños y queda como puntero (el dominio anterior se archiva). | Una única fuente de verdad por tema; tokens de diseño: manda el código de Tailwind (DT-026). |
 | 2026-10-30 | `BENCH-1` verificado en vivo (stack con podman, `curl` por rol, imagen de producción); `ROADMAP.md` reordenado con lo pendiente arriba y lo cerrado al final. | Que el documento muestre primero qué toca hacer; solo queda el recorrido en navegador con los 3 roles. |
+| 2026-10-31 | `AI-1` iniciada: capability `ai` con proveedor ICA (ADR-014), contrato en `shared-types`, casos de uso y alta de DT-030 (PII hacia ICA). | La POC del fin de semana necesita IA en CV, match y feedback; ICA sustituye a watsonx.ai como proveedor. |
 
 ---
 

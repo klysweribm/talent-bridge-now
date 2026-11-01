@@ -20,6 +20,8 @@ services:
       JWT_EXPIRATION: 1h
       AUTH_DEV_LOGIN_ENABLED: 'true'
       BENCH_SEED_ENABLED: 'true'
+      # Los tests nunca llaman a ICA: proveedor falso con respuestas fijas
+      AI_PROVIDER: fake
     depends_on:
       mongodb-test:
         condition: service_healthy

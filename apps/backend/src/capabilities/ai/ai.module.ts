@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { AI_PROVIDER_PORT } from './application/ports/ai-provider.port';
 import { AiCompletionService } from './application/services/ai-completion.service';
 import { AiCoordinatorService } from './application/services/ai-coordinator.service';
+import { AiFileAskService } from './application/services/ai-file-ask.service';
 import { AiStatusService } from './application/services/ai-status.service';
 import { AI_TOPICS } from './domain/ai-topics';
 import { AI_CONFIG, AI_TOPICS_REGISTRY } from './domain/constants/ai.constants';
@@ -18,6 +19,7 @@ import { AiController } from './infrastructure/controllers/ai.controller';
   providers: [
     AiCompletionService,
     AiCoordinatorService,
+    AiFileAskService,
     AiStatusService,
     IcaProvider,
     FakeProvider,

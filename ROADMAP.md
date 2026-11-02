@@ -52,6 +52,7 @@ Orden: primero lo que requiere acción, luego el backlog por prioridad, al final
 
 | ID | Estado | Prioridad | Depende de |
 | --- | --- | --- | --- |
+| CAND-2 | 🚧 en curso: contrato en `shared-types`, ADR-015 y casos de uso; spike de ICA `files` pendiente | HIGH | AI-1 |
 | AI-1 | ✅ cerrado en código y verificado en vivo: capability `ai` (ICA) con coordinator simple | HIGH | — |
 | BENCH-1 | 🚧 verificado en vivo (stack, `curl` por rol, imagen de producción); falta el recorrido con los 3 roles | HIGH | AUTH-1, Etapa 2 |
 | QW-1 | 🚧 implementado, falta el recorrido en navegador (DT-010) | HIGH | — |
@@ -103,6 +104,52 @@ nunca `--force`.
 ## 🚧 En curso y por verificar
 
 > Lo que sigue abierto. Orden: lo más importante primero.
+
+## CAND-2 — Candidato externo desde CV (ICA `files` o extracción clásica) (HIGH)
+
+**Estado:** 🚧 en curso (2026-11-01), rama `feature/CAND-2` · **Complejidad:** 🔴 Alta · **Casos de uso:** UC-CAND-5 en [`docs/use-cases/candidates.md`](./docs/use-cases/candidates.md) · **Decisión:** ADR-015
+
+Cargar un CV (PDF o DOCX), extraer un `ICandidateProfileDraft` y mostrarlo en un formulario editable; solo al confirmar
+se crea el `Candidate` tentativo. Dos extractores seleccionables con el mismo esquema: ICA (principal, `files`) y
+clásico local (respaldo). `/processes/new` pasa a ser una cuadrícula de cajas; solo la Caja 1 es funcional.
+
+**Decisiones:** `pdf-parse` + `mammoth` para el modo clásico; reintento en Clásica con botón explícito, sin cambio
+silencioso; la extracción no persiste; PII a ICA aceptada para la POC (DT-030) con mitigaciones baratas
+(`.claude/rules/cv-pii-handling.md`); `Candidate` con `cvUrl` opcional y `status`.
+
+**Criterios de éxito:**
+- [x] Contrato en `shared-types` (`candidates.ts`) con typecheck verde en backend y frontend.
+- [x] ADR-015 y UC-CAND-5.
+- [x] Spike de ICA `files` con un PDF y un DOCX sintéticos (2026-11-01): sube, se extrae y responde en el chat; `response_format` no es fiable con `files` (ver ADR-015). Sin probar: tamaño máximo, `.doc`, PDF escaneado.
+- [ ] Variable de tamaño máximo del archivo en `.env.example` y compose.
+- [ ] Extensión aditiva de `ai` (subir, esperar, borrar) con el coordinator sin lanzar.
+- [ ] `POST /candidates/cv-extraction` con ambos extractores, roles y 503 sin 401.
+- [ ] `POST /candidates` con email único y `status: 'tentative'`.
+- [ ] Pantalla `/candidates/new` y cuadrícula en `/processes/new` (Caja 1 funcional).
+- [ ] Prueba en vivo con CV sintéticos, 3 roles y 0 fugas de la clave.
+
+**Mejoras pedidas (2026-11-01), pendientes:**
+- [x] **Tamaño del archivo en la pantalla de carga:** mostrar el peso del archivo elegido y el límite que debe respetar (hoy 5 MiB, `VITE_CV_MAX_FILE_BYTES`, mismo valor que `CV_MAX_FILE_BYTES` del backend). Avisar antes de enviar si lo excede.
+- [x] **Datos adicionales del candidato (pendiente verificar en Mongo y en el navegador):** mostrar, debajo del formulario y con buen formato, lo que el CV aporta y el formulario no edita: `summary` (resumen), `experience` (experiencia) y `education` (educación), además de `languages`. Es solo lectura, como información para el PM o el reclutador; no se agrega al formulario de creación.
+  - La persistencia ya existe: `POST /candidates` guarda `summary`, `experience`, `education` y `languages` en Mongo asociados al candidato (y el frontend los reenvía desde el borrador). Falta verificar en la base que quedan guardados tras crear un candidato real.
+  - Son opcionales, pero enriquecen el perfil y se podrán usar en otras etapas (listado y detalle de candidatos, match).
+  - Depende de que el extractor devuelva esos campos: ICA ya los llena; el modo clásico no (queda para su mejora).
+- [x] **Extracción de ICA incompleta:** diagnosticado (ADR-015). `files` no entrega el documento completo al modelo; el texto en línea sí. Implementados `ica-text` (texto en línea, sin subir el archivo) y el clásico completado con ICA, con backend 366 unit / 127 e2e y frontend 443 tests. Falta la prueba en vivo con el backend real y comparar tiempos de los tres modos.
+
+**CAND-2b — Actualizar un perfil desde un CV más nuevo (en curso):**
+- [ ] `PUT /candidates/:id` con reemplazo total; conserva correo, estado, creador y fecha de creación.
+- [ ] Auditoría: `createdBy`, `updatedBy` (id, correo y rol del JWT), `updateCount`.
+- [ ] Aviso suave antes de editar si el correo ya existe (`matches.exact`) y aviso no bloqueante de perfiles parecidos (`matches.similar`: mismo nombre normalizado o mismo teléfono).
+- [ ] Revisión profunda de deuda técnica de todo CAND-2 (solo hallazgos; nada se corrige sin OK).
+- Límites: la escritura manual no muestra el aviso de parecidos; los candidatos anteriores no tienen claves de búsqueda; el RUT queda como campo opcional futuro (decisión con compliance).
+
+**Fuera de alcance (siguiente):** asociar el candidato a un proceso; listado y detalle de candidatos; Cajas 2 y 3;
+persistencia del archivo (COS); pool externo; deduplicación avanzada; reintentos automáticos entre extractores; OCR;
+`stream`. **Caja 3 (especificación pendiente):** unidad de negocio (consulting, tech, infra), cliente, descripción,
+rol, expertise, contacto en el cliente (opcional), código de proyecto (opcional), PM del proyecto (opcional) y plazos
+de contratación.
+
+---
 
 ## AI-1 — Capability `ai`: coordinador de IA vía ICA (HIGH)
 
@@ -531,6 +578,7 @@ DT-020 (warnings de lint del FlowLog) y DT-021 (el `Dockerfile` fija `NODE_ENV=p
 | 2026-10-28 | Fuentes de verdad consolidadas: `.clinerules` pasa a puntero, el estado actual se mueve de `CLAUDE.md` a este archivo y `PROJECT_CONTEXT.md` se reparte entre sus dueños y queda como puntero (el dominio anterior se archiva). | Una única fuente de verdad por tema; tokens de diseño: manda el código de Tailwind (DT-026). |
 | 2026-10-30 | `BENCH-1` verificado en vivo (stack con podman, `curl` por rol, imagen de producción); `ROADMAP.md` reordenado con lo pendiente arriba y lo cerrado al final. | Que el documento muestre primero qué toca hacer; solo queda el recorrido en navegador con los 3 roles. |
 | 2026-10-31 | `AI-1` iniciada: capability `ai` con proveedor ICA (ADR-014), contrato en `shared-types`, casos de uso y alta de DT-030 (PII hacia ICA). | La POC del fin de semana necesita IA en CV, match y feedback; ICA sustituye a watsonx.ai como proveedor. |
+| 2026-11-01 | `CAND-2` iniciada: contrato `candidates.ts` en `shared-types`, ADR-015, UC-CAND-5 y regla `cv-pii-handling`. Spike de ICA `files` pendiente (bloqueado por permisos de `curl`). | La POC necesita crear candidatos externos desde un CV, con extracción por ICA o clásica y revisión humana antes de crear. |
 
 ---
 

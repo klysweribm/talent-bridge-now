@@ -66,3 +66,15 @@ describe('mapIcaModelsResponse', () => {
     expect(thrownKind(() => mapIcaModelsResponse(json))).toBe('INVALID_OUTPUT');
   });
 });
+
+describe('buildIcaChatRequest files', () => {
+  it('should add the files field only when file ids are given', () => {
+    const messages = [{ role: 'user', content: 'U' }] as const;
+
+    expect(buildIcaChatRequest({ messages, fileIds: ['a', 'b'] }, 'm', 9, false)).toMatchObject({
+      files: [{ type: 'file', id: 'a' }, { type: 'file', id: 'b' }],
+    });
+    expect(buildIcaChatRequest({ messages }, 'm', 9, false)).not.toHaveProperty('files');
+    expect(buildIcaChatRequest({ messages, fileIds: [] }, 'm', 9, false)).not.toHaveProperty('files');
+  });
+});

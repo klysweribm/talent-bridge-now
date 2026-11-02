@@ -71,6 +71,14 @@ describe('httpClient', () => {
     expect(init.body).toBe(JSON.stringify({ title: 'New process' }));
   });
 
+  it('should send a PUT with the JSON-stringified body', async () => {
+    mockFetchOnce(200, { id: '2' });
+    await httpClient.put('/candidates/2', { fullName: 'X' });
+    const [, init] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [string, RequestInit];
+    expect(init.method).toBe('PUT');
+    expect(init.body).toBe(JSON.stringify({ fullName: 'X' }));
+  });
+
   it('should reject with a typed HttpError carrying the server message on a 4xx/5xx response', async () => {
     mockFetchOnce(404, { message: 'Process not found' });
     await expect(httpClient.get('/processes/missing')).rejects.toMatchObject({

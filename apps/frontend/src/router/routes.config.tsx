@@ -3,8 +3,10 @@ import { ComingSoon } from '@shared/components/organisms/ComingSoon';
 import { NAVIGATION_ITEMS } from '@shared/config/navigation';
 import type { UserRole } from '@features/auth/store/auth.store';
 import { BenchPage } from '@features/bench/components/pages/BenchPage';
+import { NewCandidatePage } from '@features/candidates/components/pages/NewCandidatePage';
 import { DashboardPage } from '@features/processes/components/pages/DashboardPage';
-import { BENCH_PATH, DASHBOARD_PATH, PROCESSES_PATH } from './paths';
+import { NewProcessPage } from '@features/processes/components/pages/NewProcessPage';
+import { BENCH_PATH, CANDIDATES_NEW_PATH, DASHBOARD_PATH, NEW_PROCESS_PATH, PROCESSES_PATH } from './paths';
 
 export interface IRouteConfig {
   readonly path:    string;
@@ -23,14 +25,18 @@ const PROCESSES_ROLES: readonly UserRole[] =
 
 // Rutas protegidas sin item de sidebar: mismos roles que /processes, sin pantalla real aún.
 const EXTRA_ROUTES: readonly Omit<IRouteConfig, 'element'>[] = [
-  { path: `${PROCESSES_PATH}/new`, label: 'Nuevo Proceso',       roles: PROCESSES_ROLES },
+  { path: NEW_PROCESS_PATH,       label: 'Nuevo Proceso',       roles: PROCESSES_ROLES },
   { path: `${PROCESSES_PATH}/:id`, label: 'Detalle del Proceso', roles: PROCESSES_ROLES },
+  // CAND-2: alta de candidato; sin item de sidebar (el bottom-nav del reclutador ya tiene 5).
+  { path: CANDIDATES_NEW_PATH,    label: 'Agregar candidato',   roles: PROCESSES_ROLES },
 ];
 
 // Pantallas reales por ruta; todo lo demás cae en ComingSoon.
 const REAL_PAGES: Readonly<Record<string, ReactElement>> = {
   [DASHBOARD_PATH]: <DashboardPage />,
   [BENCH_PATH]:     <BenchPage />,
+  [NEW_PROCESS_PATH]:     <NewProcessPage />,
+  [CANDIDATES_NEW_PATH]:  <NewCandidatePage />,
 };
 
 const toRoute = (route: Omit<IRouteConfig, 'element'>): IRouteConfig => ({

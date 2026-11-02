@@ -64,7 +64,8 @@ export interface Candidate {
   fullName: string;
   phone?: string;
   linkedIn?: string;
-  cvUrl: string;           // URL en IBM COS
+  cvUrl?: string;          // URL en IBM COS; opcional hasta que exista COS (CAND-2 no guarda el archivo)
+  status?: TCandidateStatus; // 'tentative' al crearse desde CV (CAND-2)
   cvAnalysis?: CvAnalysisResult;
   processIds: string[];    // Puede estar en N procesos simultáneos — mantenido en sync con Process.candidateIds (ver ADR-013)
   createdAt: string;
@@ -227,5 +228,8 @@ export interface ApiError {
   statusCode: number;
   timestamp: string;
 }
+import type { TCandidateStatus } from './candidates';
+
 export * from './bench';
 export * from './ai';
+export * from './candidates';

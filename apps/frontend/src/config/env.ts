@@ -9,6 +9,10 @@ export const envSchema = z.object({
   VITE_API_URL: z.string().min(1).default('/api/v1'),
   VITE_IDLE_TIMEOUT_SECONDS: z.coerce.number().int().positive().default(360),
   VITE_IDLE_WARNING_SECONDS: z.coerce.number().int().positive().default(60),
+  // Tope de tamaño del CV validado en el cliente; el backend lo aplica con CV_MAX_FILE_BYTES.
+  VITE_CV_MAX_FILE_BYTES: z.coerce.number().int().positive().default(5_242_880),
+  // CAND-2 mock-first: 'true' usa datos simulados hasta que el backend de candidates exista.
+  VITE_CANDIDATES_USE_MOCK: z.enum(['true', 'false']).default('true').transform(value => value === 'true'),
 }).refine(env => env.VITE_IDLE_WARNING_SECONDS < env.VITE_IDLE_TIMEOUT_SECONDS, {
   message: 'VITE_IDLE_WARNING_SECONDS debe ser menor que VITE_IDLE_TIMEOUT_SECONDS',
   path: ['VITE_IDLE_WARNING_SECONDS'],

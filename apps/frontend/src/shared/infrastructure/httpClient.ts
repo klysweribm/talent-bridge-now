@@ -9,7 +9,7 @@ import { HttpError } from './httpError';
  * (nunca un `catch {}` silencioso). Un 401 con sesión activa significa token
  * vencido o inválido: se limpia la sesión y `ProtectedRoute` redirige a /login.
  */
-export type THttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+export type THttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export interface IHttpRequestOptions {
   readonly method?:  THttpMethod;
@@ -23,9 +23,10 @@ function isErrorPayload(data: unknown): data is { message: string } {
   return typeof data === 'object' && data !== null && typeof (data as { message?: unknown }).message === 'string';
 }
 
-function buildHeaders(token: string | null, custom?: Readonly<Record<string, string>>): HeadersInit {
+// Con FormData el navegador fija el `Content-Type` multipart con su boundary: no se pisa.
+function buildHeaders(token: string | null, body: unknown, custom?: Readonly<Record<string, string>>): HeadersInit {
   return {
-    'Content-Type': 'application/json',
+    ...(body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...custom,
   };
@@ -42,12 +43,17 @@ async function parseJsonBody(response: Response): Promise<unknown> {
   }
 }
 
+function serializeBody(body: unknown): BodyInit | undefined {
+  if (body === undefined) return undefined;
+  return body instanceof FormData ? body : JSON.stringify(body);
+}
+
 async function fetchResponse(url: string, method: THttpMethod, body: unknown, headers: HeadersInit): Promise<Response> {
   try {
     return await fetch(url, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: serializeBody(body),
     });
   } catch (error) {
     throw new HttpError(0, error instanceof Error ? error.message : 'Error de red desconocido.');
@@ -66,13 +72,13 @@ function endSessionIfExpired(status: number, sentToken: string | null): void {
 export async function httpRequest<T>(path: string, options: IHttpRequestOptions = {}): Promise<T> {
   const { method = 'GET', body, headers } = options;
   const sentToken = useAuthStore.getState().token;
-  const response = await fetchResponse(`${ENV.VITE_API_URL}${path}`, method, body, buildHeaders(sentToken, headers));
+  const response = await fetchResponse(`${ENV.VITE_API_URL}${path}`, method, body, buildHeaders(sentToken, body, headers));
   const data = await parseJsonBody(response);
 
   if (!response.ok) {
     endSessionIfExpired(response.status, sentToken);
     const message = isErrorPayload(data) ? data.message : `Error HTTP ${response.status}`;
-    throw new HttpError(response.status, message);
+    throw new HttpError(response.status, message, data);
   }
 
   return data as T;
@@ -83,6 +89,8 @@ export const httpClient = {
     httpRequest<T>(path, { method: 'GET', headers }),
   post:   <T>(path: string, body?: unknown, headers?: Readonly<Record<string, string>>): Promise<T> =>
     httpRequest<T>(path, { method: 'POST', body, headers }),
+  put:    <T>(path: string, body?: unknown, headers?: Readonly<Record<string, string>>): Promise<T> =>
+    httpRequest<T>(path, { method: 'PUT', body, headers }),
   patch:  <T>(path: string, body?: unknown, headers?: Readonly<Record<string, string>>): Promise<T> =>
     httpRequest<T>(path, { method: 'PATCH', body, headers }),
   delete: <T>(path: string, headers?: Readonly<Record<string, string>>): Promise<T> =>

@@ -9,10 +9,10 @@ interface IIcaChatResponse {
 
 /**
  * Cuerpo OpenAI-compatible. Los modelos de ICA solo aceptan temperature=1, así que
- * se OMITE (con 0 o 0.3 el gateway responde 400 UnsupportedParamsError). Sin stream ni files.
+ * se OMITE (con 0 o 0.3 el gateway responde 400 UnsupportedParamsError). Sin stream. `files` solo si hay archivos subidos.
  */
 export function buildIcaChatRequest(
-  request: Pick<IAiCompletionRequest, 'messages'>,
+  request: Pick<IAiCompletionRequest, 'messages' | 'fileIds'>,
   model: string,
   maxTokens: number,
   jsonMode: boolean,
@@ -21,6 +21,7 @@ export function buildIcaChatRequest(
     model,
     messages: request.messages,
     max_tokens: maxTokens,
+    ...(request.fileIds?.length ? { files: request.fileIds.map((id) => ({ type: 'file', id })) } : {}),
     ...(jsonMode ? { response_format: { type: 'json_object' } } : {}),
   };
 }

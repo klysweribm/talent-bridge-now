@@ -5,6 +5,7 @@ import { CANDIDATE_DIRECTORY_PORT, PROCESS_ERROR_CODES, PROCESS_REPOSITORY_PORT 
 import type { IProcessChanges, TProcessRecord } from '../../domain/interfaces/process-record.interface';
 import type { ICandidateDirectoryPort } from '../ports/candidate-directory.port';
 import type { IProcessRepositoryPort } from '../ports/process-repository.port';
+import { terminalStateError } from './candidate-association.helpers';
 import { isOwnerPm, loadManageableProcess } from './process-access.helpers';
 import { ProcessDetailService } from './process-detail.service';
 
@@ -27,9 +28,16 @@ export class ProcessUpdateService {
     if (cancelling) await this.releaseAll(record);
     const changes: IProcessChanges = { ...request, ...(cancelling ? { candidateIds: [] } : {}) };
     const updated = await this.repository.update(id, changes);
-    if (!updated) throw new NotFoundException(`Process ${id} not found`);
+    if (!updated) throw await this.updateMissError(id);
     this.logger.log(`Process updated: id=${id} fields=${Object.keys(request).join(',')}`);
     return this.details.build(updated);
+  }
+
+  /** El update condicional no coincidió: otro request lo borró (404) o lo dejó terminal mientras tanto (400). */
+  private async updateMissError(id: string): Promise<Error> {
+    const current = await this.repository.findById(id);
+    if (!current) return new NotFoundException(`Process ${id} not found`);
+    return terminalStateError(current.status);
   }
 
   private async assertCanSetRecruiter(record: TProcessRecord, recruiterId: string, actor: ICandidateActor): Promise<void> {

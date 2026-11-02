@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, type Model } from 'mongoose';
 import type { IProcessRepositoryPort } from '../../application/ports/process-repository.port';
-import { DEFAULT_PROCESS_STATUS } from '../../domain/constants/process.constants';
+import { DEFAULT_PROCESS_STATUS, TERMINAL_PROCESS_STATUSES } from '../../domain/constants/process.constants';
 import type { INewProcess, IProcessChanges, TProcessRecord } from '../../domain/interfaces/process-record.interface';
 import { ProcessModel, type ProcessDocument } from './process.schema';
 
@@ -47,7 +47,9 @@ export class MongooseProcessAdapter implements IProcessRepositoryPort {
   async update(id: string, changes: IProcessChanges): Promise<TProcessRecord | null> {
     if (!isValidObjectId(id)) return null;
     const set = { ...changes, ...(changes.candidateIds ? { candidateIds: [...changes.candidateIds] } : {}) };
-    const document = await this.model.findByIdAndUpdate(id, { $set: set }, { new: true }).exec();
+    // Condicional: un cierre/cancelación concurrente no se pisa. `$nin` incluye documentos sin `status` (legacy = abierto).
+    const filter = { _id: id, status: { $nin: TERMINAL_PROCESS_STATUSES } };
+    const document = await this.model.findOneAndUpdate(filter, { $set: set }, { new: true }).exec();
     return document ? this.toDomain(document) : null;
   }
 

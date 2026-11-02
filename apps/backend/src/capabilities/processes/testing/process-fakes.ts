@@ -1,5 +1,6 @@
 import type { IProcessRepositoryPort } from '../application/ports/process-repository.port';
 import type { ICandidateDirectoryPort } from '../application/ports/candidate-directory.port';
+import { TERMINAL_PROCESS_STATUSES } from '../domain/constants/process.constants';
 import type { ICandidateDirectoryEntry, TCandidateAssignOutcome } from '../domain/interfaces/candidate-directory.interface';
 import type { INewProcess, IProcessChanges, TProcessRecord } from '../domain/interfaces/process-record.interface';
 
@@ -74,7 +75,7 @@ function buildRepository(processes: TProcessMap, spies: IProcessFakes['spies']):
     }),
     update: jest.fn((id: string, changes: IProcessChanges) => {
       const current = processes.get(id);
-      if (!current) return Promise.resolve(null);
+      if (!current || TERMINAL_PROCESS_STATUSES.includes(current.status)) return Promise.resolve(null);
       const next: TProcessRecord = { ...current, ...changes, candidateIds: [...(changes.candidateIds ?? current.candidateIds)] };
       processes.set(id, next);
       return Promise.resolve(next);

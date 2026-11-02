@@ -6,7 +6,7 @@ import {
   CandidateAlreadyAssignedError, CandidateLimitExceededError, ProcessServiceUnavailableError,
 } from '../../../infrastructure/processCreate.errors';
 import { useWizardStore } from '../../../store/wizard.store';
-import { makeCandidate, makePage, renderAt } from '../../../test-utils';
+import { OPPORTUNITY_FIXTURE, makeCandidate, makePage, renderAt } from '../../../test-utils';
 import { ProcessConfirmStep } from './ProcessConfirmStep';
 
 vi.mock('../../../infrastructure/processCreate.infra');
@@ -16,7 +16,7 @@ const CREATED = { id: 'p9' } as Awaited<ReturnType<typeof infra.createProcess>>;
 function seed(candidates = [makeCandidate(1)]): void {
   useWizardStore.setState({
     step: 'confirm',
-    data: { title: 'Dev Java', clientName: 'Banco', ownerPmId: 'u2' },
+    data: { title: 'Dev Java', clientName: 'Banco', ownerPmId: 'u2', ...OPPORTUNITY_FIXTURE, skills: [...OPPORTUNITY_FIXTURE.skills] },
     candidates,
   });
 }
@@ -40,6 +40,9 @@ describe('ProcessConfirmStep', () => {
     expect(screen.getByText('Banco')).toBeInTheDocument();
     expect(await screen.findByText('Luis PM')).toBeInTheDocument();
     expect(screen.getByText('Candidato 1 · Rol 1')).toBeInTheDocument();
+    expect(screen.getByText('Java, Spring')).toBeInTheDocument();
+    expect(screen.getByText('Band 8')).toBeInTheDocument();
+    expect(screen.getByText('Evaluar diseño de APIs.')).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /crear proceso/i })).toHaveLength(1);
   });
 
@@ -74,7 +77,7 @@ describe('ProcessConfirmStep', () => {
     show();
     await userEvent.click(screen.getByRole('button', { name: 'Crear proceso' }));
     expect(await screen.findByText('detalle')).toBeInTheDocument();
-    expect(infra.createProcess).toHaveBeenCalledWith({ title: 'Dev Java', clientName: 'Banco', ownerPmId: 'u2', candidateIds: ['c1'] });
+    expect(infra.createProcess).toHaveBeenCalledWith({ title: 'Dev Java', clientName: 'Banco', ...OPPORTUNITY_FIXTURE, skills: ['Java', 'Spring'], ownerPmId: 'u2', candidateIds: ['c1'] });
     expect(useWizardStore.getState().data.title).toBe('');
   });
 

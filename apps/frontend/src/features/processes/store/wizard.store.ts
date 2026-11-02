@@ -20,7 +20,7 @@ interface IWizardActions {
 
 const INITIAL_STATE: IWizardState = {
   step:       'data',
-  data:       { title: '', clientName: '' },
+  data:       { title: '', clientName: '', opportunityRole: '', skills: [], roleDescription: '' },
   candidates: [],
 };
 

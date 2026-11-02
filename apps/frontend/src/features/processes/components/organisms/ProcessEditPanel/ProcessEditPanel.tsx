@@ -4,6 +4,7 @@ import { Button } from '@shared/components/atoms/Button';
 import { PROCESS_ACTIONS_COPY } from '../../../config/processActions.copy';
 import { useProcessEditForm } from '../../../hooks/useProcessEditForm';
 import { useUpdateProcess } from '../../../hooks/useUpdateProcess';
+import { buildUpdateProcessRequest } from '../../../utils/buildUpdateProcessRequest';
 import { ActionFeedback } from '../../molecules/ActionFeedback/ActionFeedback';
 import { ProcessEditFields } from '../../molecules/ProcessEditFields/ProcessEditFields';
 
@@ -16,8 +17,14 @@ const COPY = PROCESS_ACTIONS_COPY.edit;
 export function ProcessEditPanel({ process }: ProcessEditPanelProps): JSX.Element {
   const [editing, setEditing] = useState(false);
   const update = useUpdateProcess(process.id);
-  const form = useProcessEditForm({ title: process.title, clientName: process.clientName }, values => {
-    update.mutate(values, { onSuccess: () => setEditing(false) });
+  const initial = {
+    title: process.title, clientName: process.clientName, opportunityRole: process.opportunityRole,
+    skills: process.skills, roleDescription: process.roleDescription, band: process.band ?? undefined,
+  };
+  const form = useProcessEditForm(initial, values => {
+    const request = buildUpdateProcessRequest(initial, values);
+    if (Object.keys(request).length === 0) { setEditing(false); return; }
+    update.mutate(request, { onSuccess: () => setEditing(false) });
   });
   const close = (): void => { update.reset(); setEditing(false); };
 

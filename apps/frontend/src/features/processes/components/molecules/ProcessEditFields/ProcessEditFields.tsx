@@ -4,6 +4,7 @@ import { InputField } from '@shared/components/atoms/InputField';
 import { PROCESS_ACTIONS_COPY } from '../../../config/processActions.copy';
 import { PROCESS_FIELD_IDS } from '../../../constants/processFieldIds';
 import type { IUseProcessEditForm } from '../../../hooks/useProcessEditForm';
+import { OpportunityFields } from '../OpportunityFields/OpportunityFields';
 
 export interface ProcessEditFieldsProps {
   readonly form:     IUseProcessEditForm;
@@ -22,6 +23,7 @@ export function ProcessEditFields({ form, busy, onSubmit, onCancel }: ProcessEdi
         onChange={onTextChange('title')} onBlur={() => touchField('title')} />
       <InputField id={PROCESS_FIELD_IDS.clientName} label={COPY.clientLabel} value={values.clientName} error={errors.clientName?.message}
         onChange={onTextChange('clientName')} onBlur={() => touchField('clientName')} />
+      <OpportunityFields bindings={form.opportunity} />
       <div className="flex flex-wrap gap-sm">
         <Button type="submit" className="min-h-11" disabled={busy}>{busy ? COPY.saving : COPY.save}</Button>
         <Button type="button" variant="secondary" className="min-h-11" disabled={busy} onClick={onCancel}>{COPY.cancel}</Button>

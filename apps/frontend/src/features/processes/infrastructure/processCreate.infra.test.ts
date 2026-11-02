@@ -9,7 +9,7 @@ vi.mock('@shared/infrastructure/httpClient', () => ({ httpClient: { get: vi.fn()
 
 const get = vi.mocked(httpClient.get);
 const post = vi.mocked(httpClient.post);
-const REQUEST = { title: 'T', clientName: 'C' };
+const REQUEST = { title: 'T', clientName: 'C', opportunityRole: 'R', skills: ['Java'], roleDescription: 'D', band: 7 };
 
 describe('processCreate.infra', () => {
   beforeEach(() => { get.mockReset(); post.mockReset(); get.mockResolvedValue({}); post.mockResolvedValue({}); });

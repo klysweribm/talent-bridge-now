@@ -84,7 +84,7 @@ describe('process create hooks', () => {
   });
 
   describe('useCreateProcess', () => {
-    const REQUEST = { title: 'T', clientName: 'C' };
+    const REQUEST = { title: 'T', clientName: 'C', opportunityRole: 'R', skills: ['Java'], roleDescription: 'D', band: 7 };
 
     it('should return the created process and invalidate list and available candidates', async () => {
       const created = { id: 'p1' } as never;

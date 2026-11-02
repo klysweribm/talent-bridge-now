@@ -4,7 +4,7 @@ import { ListErrorState } from '@shared/components/molecules/ListErrorState';
 import { HttpError } from '@shared/infrastructure/httpError';
 import { NOT_FOUND_STATUS, PROCESS_LIST_COPY } from '../../../config/processList.constants';
 import { useProcessDetail } from '../../../hooks/useProcessDetail';
-import { ProcessDetailHeader } from '../../molecules/ProcessDetailHeader/ProcessDetailHeader';
+import { ProcessDetailCard } from '../../molecules/ProcessDetailCard/ProcessDetailCard';
 import { ProcessActions } from '../ProcessActions/ProcessActions';
 
 export interface ProcessDetailViewProps {
@@ -35,7 +35,7 @@ export function ProcessDetailView({ id }: ProcessDetailViewProps): JSX.Element {
   return (
     <div className="flex flex-col gap-lg">
       {back}
-      <ProcessDetailHeader process={data} />
+      <ProcessDetailCard process={data} />
       <ProcessActions process={data} />
     </div>
   );

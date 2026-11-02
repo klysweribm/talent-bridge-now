@@ -5,18 +5,21 @@ import { PROCESS_FIELD_IDS } from '../constants/processFieldIds';
 import { buildProcessDataSchema, type TProcessDataValues } from '../schemas/processData.schema';
 import { useWizardStore } from '../store/wizard.store';
 import type { TProcessCreatorRole } from '../types/processCreate.types';
+import { OPPORTUNITY_FIELD_ORDER, buildOpportunityBindings, type IOpportunityBindings, type TOpportunityField } from './opportunityBindings';
 
-export type TProcessFieldName = keyof TProcessDataValues;
+export type TProcessTextField = 'title' | 'clientName' | 'ownerPmId' | 'recruiterId';
+type TProcessFieldName = TProcessTextField | TOpportunityField;
 
-const FIELD_ORDER: readonly TProcessFieldName[] = ['title', 'clientName', 'ownerPmId', 'recruiterId'];
+const FIELD_ORDER: readonly TProcessFieldName[] = ['title', 'clientName', 'ownerPmId', 'recruiterId', ...OPPORTUNITY_FIELD_ORDER];
 
 export interface IUseProcessDataForm {
-  readonly values:       Readonly<Record<TProcessFieldName, string>>;
+  readonly values:       Readonly<Record<TProcessTextField, string>>;
   readonly errors:       FieldErrors<TProcessDataValues>;
+  readonly opportunity:  IOpportunityBindings;
   /** Cantidad de errores a anunciar; 0 hasta el primer intento de envío. */
   readonly bannerCount:  number;
-  readonly setField:     (name: TProcessFieldName, value: string) => void;
-  readonly onTextChange: (name: TProcessFieldName) => (event: ChangeEvent<HTMLInputElement>) => void;
+  readonly setField:     (name: TProcessTextField, value: string) => void;
+  readonly onTextChange: (name: TProcessTextField) => (event: ChangeEvent<HTMLInputElement>) => void;
   readonly touchField:   (name: TProcessFieldName) => void;
   readonly onSubmit:     (event?: BaseSyntheticEvent) => void;
 }
@@ -25,31 +28,31 @@ export function useProcessDataForm(role: TProcessCreatorRole): IUseProcessDataFo
   const data = useWizardStore(state => state.data);
   const saveData = useWizardStore(state => state.saveData);
   const setStep = useWizardStore(state => state.setStep);
-  const defaults: Record<TProcessFieldName, string> = {
-    title: data.title, clientName: data.clientName, ownerPmId: data.ownerPmId ?? '', recruiterId: data.recruiterId ?? '',
-  };
+  const defaults = { ...data, skills: [...data.skills], ownerPmId: data.ownerPmId ?? '', recruiterId: data.recruiterId ?? '' };
   const { control, setValue, trigger, handleSubmit, formState: { errors, submitCount } } = useForm<TProcessDataValues>({
     resolver: zodResolver(buildProcessDataSchema(role)),
     mode: 'onBlur',
     defaultValues: defaults,
   });
-  const watched = useWatch({ control, defaultValue: defaults });
-  const values: Record<TProcessFieldName, string> = { ...defaults, ...watched };
+  const values = { ...defaults, ...useWatch<TProcessDataValues>({ control, defaultValue: defaults }) };
 
   const focusFirstInvalid = (invalid: FieldErrors<TProcessDataValues>): void => {
     const first = FIELD_ORDER.find(name => invalid[name]);
     if (first) document.getElementById(PROCESS_FIELD_IDS[first])?.focus();
   };
-  const submit = handleSubmit(parsed => { saveData(parsed); setStep('candidates'); }, focusFirstInvalid);
-  const setField = (name: TProcessFieldName, value: string): void =>
-    setValue(name, value, { shouldValidate: Boolean(errors[name]) });
+  const submit = handleSubmit(parsed => { saveData({ ...parsed }); setStep('candidates'); }, focusFirstInvalid);
+  const setField = (name: TProcessTextField, value: string): void => setValue(name, value, { shouldValidate: Boolean(errors[name]) });
+  const opportunity = buildOpportunityBindings(
+    values, errors,
+    (name, value, validate) => setValue(name, value as never, { shouldValidate: validate }),
+    name => { void trigger(name); },
+  );
 
   return {
-    values, errors,
+    values, errors, opportunity, setField,
     bannerCount: submitCount > 0 ? Object.keys(errors).length : 0,
-    setField,
-    onTextChange: name => event => setField(name, event.target.value),
     touchField: name => { void trigger(name); },
+    onTextChange: name => event => setField(name, event.target.value),
     onSubmit: event => { void submit(event); },
   };
 }

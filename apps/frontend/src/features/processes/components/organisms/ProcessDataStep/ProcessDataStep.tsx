@@ -5,6 +5,7 @@ import { useProcessDataForm } from '../../../hooks/useProcessDataForm';
 import { useUserOptions } from '../../../hooks/useUserOptions';
 import { DataFields } from '../../molecules/DataFields';
 import { ErrorBanner } from '../../molecules/ErrorBanner';
+import { OpportunityFields } from '../../molecules/OpportunityFields/OpportunityFields';
 import { StepHeading } from '../../molecules/StepHeading';
 
 export function ProcessDataStep(): JSX.Element {
@@ -29,6 +30,7 @@ export function ProcessDataStep(): JSX.Element {
         userValue={form.values[userField]} userError={form.errors[userField]?.message}
         onUser={value => form.setField(userField, value)} onBlurUser={() => form.touchField(userField)}
       />
+      <OpportunityFields bindings={form.opportunity} />
       <div className="flex justify-end">
         <Button type="submit" className="min-h-11">{WIZARD_TEXT.next}</Button>
       </div>

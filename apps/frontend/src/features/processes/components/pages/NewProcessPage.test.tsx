@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useAuthStore } from '@features/auth/store/auth.store';
 import * as infra from '../../infrastructure/processCreate.infra';
 import { useWizardStore } from '../../store/wizard.store';
-import { makeCandidate, makePage, renderAt } from '../../test-utils';
+import { OPPORTUNITY_FIXTURE, fillOpportunity, makeCandidate, makePage, renderAt } from '../../test-utils';
 import { NewProcessPage } from './NewProcessPage';
 
 vi.mock('../../infrastructure/processCreate.infra');
@@ -37,6 +37,7 @@ describe('NewProcessPage', () => {
     show();
     await userEvent.type(screen.getByLabelText('Título *'), 'Dev');
     await userEvent.type(screen.getByLabelText('Cliente *'), 'Banco');
+    await fillOpportunity(userEvent.setup());
     await userEvent.selectOptions(await screen.findByLabelText('Project Manager *'), 'u2');
     await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
     const checkbox = await screen.findByRole('checkbox', { name: 'Candidato 1 · Rol 1' });
@@ -46,7 +47,7 @@ describe('NewProcessPage', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Confirmar y crear' })).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Crear proceso' }));
     expect(await screen.findByText('detalle')).toBeInTheDocument();
-    expect(infra.createProcess).toHaveBeenCalledWith({ title: 'Dev', clientName: 'Banco', ownerPmId: 'u2', candidateIds: ['c1'] });
+    expect(infra.createProcess).toHaveBeenCalledWith({ title: 'Dev', clientName: 'Banco', ...OPPORTUNITY_FIXTURE, skills: ['Java', 'Spring'], ownerPmId: 'u2', candidateIds: ['c1'] });
   });
 
   it('should complete the flow as a PM with no recruiter and no candidates', async () => {
@@ -55,11 +56,12 @@ describe('NewProcessPage', () => {
     show();
     await userEvent.type(screen.getByLabelText('Título *'), 'Dev');
     await userEvent.type(screen.getByLabelText('Cliente *'), 'Banco');
+    await fillOpportunity(userEvent.setup());
     await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
     await userEvent.click(await screen.findByRole('button', { name: 'Siguiente' }));
     expect(screen.getByText('Aún sin candidatos')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Crear proceso' }));
     expect(await screen.findByText('detalle')).toBeInTheDocument();
-    expect(infra.createProcess).toHaveBeenCalledWith({ title: 'Dev', clientName: 'Banco' });
+    expect(infra.createProcess).toHaveBeenCalledWith({ title: 'Dev', clientName: 'Banco', ...OPPORTUNITY_FIXTURE, skills: ['Java', 'Spring'] });
   });
 });

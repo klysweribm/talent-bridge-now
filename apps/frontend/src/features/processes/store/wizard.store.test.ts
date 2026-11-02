@@ -1,6 +1,7 @@
 import { useWizardStore } from './wizard.store';
 
 const ANA = { id: 'c1', fullName: 'Ana', primaryRole: 'Dev' };
+const DRAFT = { title: 'T', clientName: 'C', opportunityRole: 'R', skills: ['Java'], roleDescription: 'D', band: 7 };
 const LUIS = { id: 'c2', fullName: 'Luis' };
 
 describe('useWizardStore', () => {
@@ -9,7 +10,7 @@ describe('useWizardStore', () => {
   it('should start at the data step with empty data and no candidates', () => {
     const state = useWizardStore.getState();
     expect(state.step).toBe('data');
-    expect(state.data).toEqual({ title: '', clientName: '' });
+    expect(state.data).toEqual({ title: '', clientName: '', opportunityRole: '', skills: [], roleDescription: '' });
     expect(state.candidates).toEqual([]);
   });
 
@@ -19,8 +20,8 @@ describe('useWizardStore', () => {
   });
 
   it('should save the step 1 data', () => {
-    useWizardStore.getState().saveData({ title: 'T', clientName: 'C', ownerPmId: 'pm1' });
-    expect(useWizardStore.getState().data).toEqual({ title: 'T', clientName: 'C', ownerPmId: 'pm1' });
+    useWizardStore.getState().saveData({ ...DRAFT, ownerPmId: 'pm1' });
+    expect(useWizardStore.getState().data).toEqual({ ...DRAFT, ownerPmId: 'pm1' });
   });
 
   it('should add a candidate keeping the full object', () => {
@@ -55,15 +56,15 @@ describe('useWizardStore', () => {
 
   it('should reset everything', () => {
     useWizardStore.getState().setStep('confirm');
-    useWizardStore.getState().saveData({ title: 'T', clientName: 'C' });
+    useWizardStore.getState().saveData(DRAFT);
     useWizardStore.getState().toggleCandidate(ANA, 3);
     useWizardStore.getState().reset();
     const state = useWizardStore.getState();
-    expect([state.step, state.data, state.candidates]).toEqual(['data', { title: '', clientName: '' }, []]);
+    expect([state.step, state.data, state.candidates]).toEqual(['data', { title: '', clientName: '', opportunityRole: '', skills: [], roleDescription: '' }, []]);
   });
 
   it('should not persist to web storage', () => {
-    useWizardStore.getState().saveData({ title: 'T', clientName: 'C' });
+    useWizardStore.getState().saveData(DRAFT);
     expect(sessionStorage.length + localStorage.length).toBe(0);
   });
 });

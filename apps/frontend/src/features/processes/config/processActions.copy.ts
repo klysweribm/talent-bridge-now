@@ -3,7 +3,7 @@ import type { TProcessStatus } from '@ibm-talent-bridge/shared-types';
 export const PROCESS_ACTIONS_COPY = {
   readOnlyTerminal: 'Este proceso está cerrado o cancelado: solo lectura.',
   edit: {
-    open: 'Editar título y cliente', save: 'Guardar cambios', saving: 'Guardando…', cancel: 'Cancelar',
+    open: 'Editar datos del proceso', save: 'Guardar cambios', saving: 'Guardando…', cancel: 'Cancelar',
     titleLabel: 'Título', clientLabel: 'Cliente', saved: 'Cambios guardados.',
   },
   status: { label: 'Estado', saved: 'Estado actualizado.', remove: 'Eliminar proceso', keep: 'Volver', working: 'Guardando…' },

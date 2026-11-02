@@ -18,8 +18,7 @@ export function ProcessConfirmStep(): JSX.Element {
         <ErrorBanner message={confirm.errorMessage || CONFIRM_STEP_TEXT.genericError} actionLabel={confirm.canRetry ? WIZARD_TEXT.retry : undefined} onAction={confirm.submit} />
       )}
       <ConfirmSummary
-        title={data.title}
-        clientName={data.clientName}
+        {...data}
         userLabel={confirm.isRecruiter ? CONFIRM_STEP_TEXT.pmLabel : CONFIRM_STEP_TEXT.recruiterLabel}
         userName={confirm.userName}
         candidates={candidates}

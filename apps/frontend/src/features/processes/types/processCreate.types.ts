@@ -12,4 +12,9 @@ export interface IProcessDataDraft {
   readonly clientName:  string;
   readonly ownerPmId?:  string;
   readonly recruiterId?: string;
+  /** Campos de la oportunidad (PROC-1c); `band` queda sin definir hasta que el usuario la elige. */
+  readonly opportunityRole: string;
+  readonly skills:          readonly string[];
+  readonly roleDescription: string;
+  readonly band?:           number;
 }

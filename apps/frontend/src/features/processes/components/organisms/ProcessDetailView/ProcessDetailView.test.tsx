@@ -22,6 +22,7 @@ const available = vi.mocked(createInfra.fetchAvailableCandidates);
 
 const DETAIL: IProcessDetail = {
   id: 'p1', title: 'Backend Java', clientName: 'Banco', ownerPmId: 'pm1', recruiterId: 'rec1', status: 'open',
+  opportunityRole: 'Backend Java Sr', skills: ['Java', 'Spring'], roleDescription: 'Evaluar APIs.', band: 8, technicalRefIds: [], technicalRefs: [],
   maxCandidates: 2, createdBy: 'pm1', createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
   candidateIds: ['c1'], candidates: [{ id: 'c1', fullName: 'Lucía Fernández' }],
 };
@@ -49,7 +50,7 @@ describe('ProcessDetailView actions', () => {
   describe('permissions', () => {
     it('should show every action to the owner PM', async () => {
       await mount();
-      expect(screen.getByRole('button', { name: 'Editar título y cliente' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Editar datos del proceso' })).toBeInTheDocument();
       expect(screen.getByLabelText('Estado')).toBeInTheDocument();
       expect(await screen.findByLabelText('Reclutador')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Agregar candidato' })).toBeInTheDocument();
@@ -83,17 +84,56 @@ describe('ProcessDetailView actions', () => {
   describe('edit title and client', () => {
     it('should PATCH the trimmed values and show success', async () => {
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar título y cliente' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
       await user.clear(screen.getByLabelText('Título'));
       await user.type(screen.getByLabelText('Título'), '  Nuevo título ');
       await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
-      await waitFor(() => expect(update).toHaveBeenCalledWith('p1', { title: 'Nuevo título', clientName: 'Banco' }));
+      await waitFor(() => expect(update).toHaveBeenCalledWith('p1', { title: 'Nuevo título' }));
       expect(await screen.findByRole('status')).toHaveTextContent('Cambios guardados.');
+    });
+
+    it('should edit the opportunity fields and PATCH only the ones that changed', async () => {
+      const user = await mount();
+      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('radio', { name: 'Banda 9' }));
+      await user.click(screen.getByRole('button', { name: 'Quitar Spring' }));
+      await user.type(screen.getByLabelText('Stack tecnológico *'), 'Kafka{Enter}');
+      await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+      await waitFor(() => expect(update).toHaveBeenCalledWith('p1', { skills: ['Java', 'Kafka'], band: 9 }));
+    });
+
+    it('should not call the API when nothing changed and close the form', async () => {
+      const user = await mount();
+      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+      expect(update).not.toHaveBeenCalled();
+      expect(screen.queryByRole('button', { name: 'Guardar cambios' })).not.toBeInTheDocument();
+    });
+
+    it('should block an empty skills list and a blank description with no request', async () => {
+      const user = await mount();
+      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Quitar Java' }));
+      await user.click(screen.getByRole('button', { name: 'Quitar Spring' }));
+      await user.clear(screen.getByLabelText('Expectativas de evaluación técnica *'));
+      await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+      expect(await screen.findAllByText('Agrega al menos 1 tecnología.')).not.toHaveLength(0);
+      expect(screen.getByText('La descripción del rol es obligatoria.')).toBeInTheDocument();
+      expect(update).not.toHaveBeenCalled();
+    });
+
+    it('should require a band when editing a legacy process', async () => {
+      fetchDetail.mockResolvedValue({ ...DETAIL, band: null });
+      const user = await mount();
+      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+      expect(await screen.findByText('Elige la banda profesional.')).toBeInTheDocument();
+      expect(update).not.toHaveBeenCalled();
     });
 
     it('should block an empty title with a field error and no request', async () => {
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar título y cliente' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
       await user.clear(screen.getByLabelText('Título'));
       await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
       expect(await screen.findByText('El título es obligatorio.')).toBeInTheDocument();
@@ -103,7 +143,8 @@ describe('ProcessDetailView actions', () => {
     it.each([[403, undefined, /no tienes permiso/i], [400, 'PROCESS_TERMINAL_STATE', /cerrado o cancelado/i]])('should show the translated %i error', async (status, code, copy) => {
       update.mockRejectedValue(apiError(status, code));
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar título y cliente' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.type(screen.getByLabelText('Título'), ' 2');
       await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
       expect(await screen.findByRole('alert')).toHaveTextContent(copy);
     });
@@ -111,7 +152,8 @@ describe('ProcessDetailView actions', () => {
     it('should disable the buttons while saving', async () => {
       update.mockReturnValue(new Promise(() => undefined));
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar título y cliente' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.type(screen.getByLabelText('Título'), ' 2');
       await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
       expect(await screen.findByRole('button', { name: 'Guardando…' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Cancelar' })).toBeDisabled();
@@ -231,5 +273,26 @@ describe('ProcessDetailView actions', () => {
       await mount();
       expect(available).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('ProcessDetailView card', () => {
+  beforeEach(() => {
+    vi.resetAllMocks();
+    login('pm2', 'pm');
+    vi.mocked(createInfra.fetchUserOptions).mockResolvedValue(makePage([]) as never);
+  });
+  afterEach(() => useAuthStore.getState().clearAuth());
+
+  it('should render the detail card with the opportunity data, status chip and counter', async () => {
+    fetchDetail.mockResolvedValue(DETAIL);
+    await mount();
+    expect(screen.getByText('IBM CONSULTING LATAM')).toBeInTheDocument();
+    expect(screen.getByText('Band 8')).toBeInTheDocument();
+    expect(screen.getByText('Stack tecnológico requerido')).toBeInTheDocument();
+    expect(screen.getByText('Spring')).toBeInTheDocument();
+    expect(screen.getByText('Evaluar APIs.')).toBeInTheDocument();
+    expect(screen.getByText('Abierto')).toBeInTheDocument();
+    expect(screen.getByText('1 de 2 candidatos')).toBeInTheDocument();
   });
 });

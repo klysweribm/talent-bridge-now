@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useAuthStore } from '@features/auth/store/auth.store';
 import * as infra from '../../../infrastructure/processCreate.infra';
 import { useWizardStore } from '../../../store/wizard.store';
-import { makePage, renderWithProviders } from '../../../test-utils';
+import { OPPORTUNITY_FIXTURE, fillOpportunity, makePage, renderWithProviders } from '../../../test-utils';
 import { ProcessDataStep } from './ProcessDataStep';
 
 vi.mock('../../../infrastructure/processCreate.infra');
@@ -54,7 +54,9 @@ describe('ProcessDataStep', () => {
     expect(await screen.findByText('El título es obligatorio.')).toBeInTheDocument();
     expect(screen.getByText('El cliente es obligatorio.')).toBeInTheDocument();
     expect(screen.getByText('Elige el PM responsable del proceso.')).toBeInTheDocument();
-    expect(screen.getByText('Hay 3 errores en el formulario.')).toBeInTheDocument();
+    expect(screen.getByText('Hay 7 errores en el formulario.')).toBeInTheDocument();
+    ['El rol de la oportunidad es obligatorio.', 'Agrega al menos 1 tecnología.', 'Elige la banda profesional.', 'La descripción del rol es obligatoria.']
+      .forEach(message => expect(screen.getByText(message)).toBeInTheDocument());
     await waitFor(() => expect(screen.getByLabelText('Título *')).toHaveFocus());
     expect(screen.getByLabelText('Título *')).toHaveAttribute('aria-invalid', 'true');
     expect(useWizardStore.getState().step).toBe('data');
@@ -73,10 +75,11 @@ describe('ProcessDataStep', () => {
     renderWithProviders(<ProcessDataStep />);
     await userEvent.type(screen.getByLabelText('Título *'), 'Dev Java');
     await userEvent.type(screen.getByLabelText('Cliente *'), 'Banco');
+    await fillOpportunity(userEvent.setup());
     await userEvent.selectOptions(await screen.findByLabelText('Project Manager *'), 'u2');
     await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
     await waitFor(() => expect(useWizardStore.getState().step).toBe('candidates'));
-    expect(useWizardStore.getState().data).toMatchObject({ title: 'Dev Java', clientName: 'Banco', ownerPmId: 'u2' });
+    expect(useWizardStore.getState().data).toMatchObject({ title: 'Dev Java', clientName: 'Banco', ownerPmId: 'u2', ...OPPORTUNITY_FIXTURE, skills: ['Java', 'Spring'] });
   });
 
   it('should show an error with retry when users fail to load, keeping the form usable', async () => {
@@ -87,5 +90,22 @@ describe('ProcessDataStep', () => {
     expect(screen.getByLabelText('Título *')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
     expect(await screen.findByLabelText('Project Manager *')).toBeInTheDocument();
+  });
+
+  it('should require every opportunity field and not advance when they are missing', async () => {
+    loginAs('pm');
+    renderWithProviders(<ProcessDataStep />);
+    await userEvent.type(screen.getByLabelText('Título *'), 'Dev');
+    await userEvent.type(screen.getByLabelText('Cliente *'), 'Banco');
+    await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
+    expect(await screen.findByText('Elige la banda profesional.')).toBeInTheDocument();
+    expect(useWizardStore.getState().step).toBe('data');
+  });
+
+  it('should show the description character counter', async () => {
+    loginAs('pm');
+    renderWithProviders(<ProcessDataStep />);
+    await userEvent.type(screen.getByLabelText('Expectativas de evaluación técnica *'), 'abcd');
+    expect(screen.getByText(/4\/2000/)).toBeInTheDocument();
   });
 });

@@ -4,7 +4,7 @@ import type { IProcessListItem } from '@ibm-talent-bridge/shared-types';
 import { ProcessItem } from './ProcessItem';
 
 const BASE: IProcessListItem = {
-  id: 'p9', title: 'QA Lead', clientName: 'ACME', ownerPmId: 'pm1', recruiterId: null, status: 'interviewing',
+  id: 'p9', title: 'QA Lead', clientName: 'ACME', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [], status: 'interviewing',
   maxCandidates: 5, candidateCount: 3, createdBy: 'u1',
   createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
 };

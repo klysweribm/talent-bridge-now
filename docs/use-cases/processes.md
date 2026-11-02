@@ -1,105 +1,148 @@
-# Casos de uso — Procesos (PROC-2)
+# Casos de uso — Procesos (PROC-1)
 
-> Modelo de dominio: `Process`, `ProcessTechnicalRef`, `StageHistoryEntry`
-> en `packages/shared-types` (ver ADR-013 en `docs/architecture/README.md`).
-> Flujo narrativo base: `docs/flows/README.md` → Flujo 1 y Flujo 4.
+> Contrato: `packages/shared-types/src/processes.ts` (`IProcess`, `ICreateProcessRequest`, `IProcessListItem`, `IProcessDetail`, `IUserOption`) y `ICandidate.processId`.
+> Consistencia con candidatos: ADR-013 (llamada en memoria entre servicios, sin transacciones).
+> Alcance del MVP: crear, listar y asociar o quitar candidatos. Sin etapas, estados, historial de dueño, transferencia ni entrevistas.
+
+## Reglas de negocio
+
+- **R5:** la asignación de candidatos ocurre solo en el formulario del proceso (crear o editar). La lista de candidatos es de solo lectura.
+- **R6:** asignan y quitan candidatos **únicamente** el PM dueño (`ownerPmId`) y el reclutador del proceso (`recruiterId`, uno solo). Quién cargó al candidato (`ICandidate.createdBy`) es auditoría y no da permisos. Cualquier otro usuario → 403.
+- **R7:** el límite `MAX_CANDIDATES_PER_PROCESS` (defecto 5) vive solo en el backend. Superarlo → 400 con mensaje claro. El frontend lo lee de `maxCandidates` en la respuesta, nunca de una variable `VITE_`.
+- **R8:** toda regla se aplica en el backend. Ocultar un botón no cuenta como control.
+- **R9:** los listados (`/processes`, `/users`) son siempre paginados.
+- **R1–R3 (fase siguiente, no se implementan):** visibilidad `public/protected` de candidatos y filtrado por dueño en la query. Mientras tanto `GET /processes` lista todos y los candidatos sin `createdBy` son públicos.
+- **P1:** un candidato no puede estar en más de un proceso. «Disponible» = sin `processId`.
+- Un solo PM y un solo reclutador por proceso; nunca dos reclutadores.
 
 ## Resumen de permisos
 
-| Acción | Reclutador | Referente Técnico | PM |
+| Acción | Reclutador | Referente técnico | PM |
 | --- | --- | --- | --- |
-| Crear proceso (`POST /processes`) | ✅ | ❌ | ❌ |
-| Editar proceso (`PATCH /processes/:id`) | ✅ (si es su proceso) | ❌ | ❌ |
-| Ver listado de procesos (`GET /processes`) | ✅ | ❌ (ve solo sus asignados, vía `/interviews`) | ✅ (solo lectura) |
-| Ver detalle de un proceso (`GET /processes/:id`) | ✅ (sus procesos) | ✅ (solo si es `technicalRefs` del proceso) | ✅ (todos, lectura) |
-| Buscar referentes por especialidad (`GET /users/referents`) | ✅ | ❌ | ❌ |
-| Cargar candidato con duplicado de email (`POST /candidates`) | ✅ (bloqueado por validación) | — | — |
+| Crear proceso (`POST /processes`) | ✅ (debe elegir PM) | ❌ 403 | ✅ (queda como dueño) |
+| Listar (`GET /processes`) y detalle (`GET /processes/:id`) | ✅ | ❌ 403 | ✅ |
+| Asociar o quitar candidatos | ✅ solo si es el `recruiterId` | ❌ 403 | ✅ solo si es el `ownerPmId` |
+| Listar usuarios para selectores (`GET /users?role=pm\|recruiter`) | ✅ | ❌ 403 | ✅ |
 
-> ⚠️ **Discrepancia detectada (sin resolver, señalada para PROC-2):**
-> `AppRouter.tsx` da acceso a las rutas `/processes/new` y `/processes/:id`
-> también a `pm` (`roles: ['recruiter', 'pm']`, ver `COMING_SOON_ROUTES`),
-> pero este documento y `docs/flows/README.md` asumen que crear/editar un
-> proceso es exclusivo de `recruiter` — PM es "vista ejecutiva de solo
-> lectura" según el contexto del encuadre anterior (roles del MVP). No se corrige el
-> código en este catálogo (solo se escribe en modo documentación); al
-> implementar PROC-2 hay que decidir cuál de los dos es correcto: ¿el
-> acceso de PM a esas rutas es solo para que `ComingSoon` no le dé 404
-> mientras no hay pantalla real (plausible, dado que `/processes/new` y
-> `/processes/:id` hoy renderizan `ComingSoon` para todos), o PM debería
-> tener de verdad acceso de lectura al detalle/wizard? Los casos de uso de
-> abajo asumen la segunda lectura (PM = solo
-> lectura, nunca crea/edita) hasta que se resuelva explícitamente.
+Sin token → 401 en todos los endpoints.
 
-## UC-PROC-1: Crear proceso completo (wizard de 4 pasos)
+## UC-PROC-1: Crear un proceso
 
-**Rol:** Reclutador.
-**Precondición:** sesión válida con rol `recruiter`.
-**Flujo principal:** paso 1 (info del rol) → paso 2 (asignar referentes) →
-paso 3 (cargar candidatos) → paso 4 (confirmar y publicar) → `POST
-/processes` persiste el proceso completo.
+**Rol:** reclutador o PM.
+**Flujo principal:** `POST /processes` con `title`, `clientName` y, opcionalmente, `candidateIds`.
+- **Crea un PM:** `ownerPmId` se toma del JWT (el del cuerpo se ignora). `recruiterId` es el que elija de `GET /users?role=recruiter`, o `null` si no elige a nadie.
+- **Crea un reclutador:** `ownerPmId` es obligatorio (se elige de `GET /users?role=pm`) y `recruiterId` es el suyo (el del cuerpo se ignora).
 **Reglas de borde / negativas:**
-- Paso 2 exige **mínimo 1 `principal` + 1 `validador`** en
-  `technicalRefs` — validado por `class-validator` en el DTO (ADR-013), no
-  solo en la UI. Intentar publicar con 0 referentes de alguno de los dos
-  roles → 400.
-- `technical_ref` o `pm` intentando `POST /processes` → 403.
-- Paso 3: cargar un candidato con email ya existente → 400 con mensaje
-  claro (modal de alerta con el proceso existente, no crea un registro
-  nuevo) — ver `UC-CAND-*` en `candidates.md` para el detalle de esa regla,
-  que vive en la capability de candidatos, no en processes.
+- Reclutador sin `ownerPmId` → 400.
+- `ownerPmId` que no es un usuario `pm`, o `recruiterId` que no es un usuario `recruiter`, o cualquiera inexistente → 400.
+- Con `recruiterId: null`, solo el PM dueño asocia y quita candidatos.
+- `candidateIds` por encima del límite → 400; alguno ya asignado a otro proceso → 400/409; alguno inexistente → 404.
+- El autor (`createdBy`) sale siempre del JWT, nunca del cuerpo.
+- Cambiar el reclutador después (que el PM quite al actual y asigne a otro) queda **fuera del MVP**.
 
-## UC-PROC-2: Editar un proceso existente
+## UC-PROC-2: Listar procesos y ver el detalle
 
-**Rol:** Reclutador.
-**Precondición:** el proceso existe y `recruiterId` coincide con el
-usuario autenticado (un reclutador no edita el proceso de otro
-reclutador en el MVP — no hay noción de "equipo" todavía).
-**Flujo principal:** `PATCH /processes/:id`.
+**Rol:** reclutador o PM.
+**Flujo principal:** `GET /processes?page&limit` devuelve título, cliente, `candidateCount`, `maxCandidates` y fecha. `GET /processes/:id` devuelve además los candidatos resumidos (`id`, `fullName`, `primaryRole`).
 **Reglas de borde / negativas:**
-- Reclutador distinto al `recruiterId` del proceso → 403.
-- `technical_ref`/`pm` → 403 (son siempre lectura sobre `Process`).
-- Proceso con `status: 'closed'` → rechazar la edición de campos que
-  afectan el flujo activo (ej. `technicalRefs`, `currentStage`); permitir
-  solo lo que no afecta el histórico ya cerrado — **a definir en PROC-2**
-  qué campos son editables post-cierre (no hay precedente en flows/README.md).
+- Lista vacía → la UI muestra «Sin procesos abiertos» y el botón «+ Nuevo proceso».
+- `:id` inexistente → 404.
+- `page` y `limit` fuera de rango → 400 (mismo patrón que bench: `DEFAULT_LIMIT 20`, `MAX_LIMIT 50`).
 
-## UC-PROC-3: Ver listado/detalle de procesos (lectura por rol)
+## UC-PROC-3: Asociar y quitar candidatos
 
-**Rol:** Reclutador, Referente Técnico, PM.
-**Precondición:** sesión válida.
-**Flujo principal:**
-- Reclutador: `GET /processes` lista los suyos (dashboard, Flujo 1).
-- PM: `GET /processes` lista todos, vista ejecutiva de solo lectura
-  (Flujo 3) — PM nunca ve un botón de editar/crear en esta vista.
-- Referente Técnico: no tiene una vista de "todos los procesos" en
-  `navigation.ts` (no está en `roles` de `/processes`) — accede al detalle
-  de un proceso específico solo indirectamente, a través de sus
-  entrevistas asignadas (`/interviews` → detalle de entrevista → datos del
-  proceso asociados a esa entrevista).
+**Rol:** PM dueño o reclutador del proceso.
+**Flujo principal:** `POST /processes/:id/candidates` con `{ candidateId }` y `DELETE /processes/:id/candidates/:candidateId`. El proceso y el candidato se actualizan por llamada en memoria entre servicios (ADR-013).
 **Reglas de borde / negativas:**
-- `GET /processes/:id` para un proceso donde el referente **no** está en
-  `technicalRefs` → 403 (un referente no puede ver procesos ajenos aunque
-  conozca el ID).
-- Reclutador consultando `GET /processes/:id` de un proceso de otro
-  reclutador → **a definir**: ¿puede leerlo (visibilidad de equipo) aunque
-  no pueda editarlo? `docs/flows/README.md` no lo cubre. Hasta que se
-  decida, tratar como 403 (más restrictivo, se puede relajar después sin
-  romper contrato).
+- Candidato disponible → queda con `processId`. Quitarlo lo libera.
+- Candidato ya en otro proceso → 400/409.
+- Superar el límite → 400 con mensaje claro.
+- Candidato o proceso inexistente → 404.
+- Un reclutador que no es el del proceso → 403, aunque él haya cargado al candidato.
+- Si la segunda escritura falla, se registra en el log (solo ids) y se propaga una excepción tipada; nunca se traga el error.
 
-## UC-PROC-4: Buscar y asignar referentes técnicos (paso 2 del wizard)
+## UC-PROC-4: Selectores de usuarios
 
-**Rol:** Reclutador.
-**Precondición:** está en el paso 2 del wizard (proceso en borrador, no
-publicado todavía).
-**Flujo principal:** `GET /users/referents?specialty=...` filtra por
-stack/especialidad → reclutador asigna `principal` + `validador`.
+**Rol:** reclutador o PM.
+**Flujo principal:** `GET /users?role=pm|recruiter&page&limit` devuelve solo `{ id, fullName }`.
 **Reglas de borde / negativas:**
-- `specialty` es texto libre hoy (taxonomía controlada es decisión
-  **pendiente**, ver ADR-013 "Abierto") — el filtro puede no encontrar
-  coincidencias si el dato no está normalizado (`"React"` vs `"ReactJS"`).
-  No es un bug a corregir en PROC-2; es la limitación conocida que ADR-013
-  deferió.
-- Asignar al mismo `userId` como `principal` y `validador` del mismo
-  proceso → 400 (un referente no puede validar su propio trabajo).
-- `technical_ref`/`pm` llamando `GET /users/referents` → 403 (es un
-  endpoint de soporte al wizard, exclusivo de `recruiter`).
+- `role` solo admite `pm` y `recruiter`. Cualquier otro valor, incluido `technical_ref`, o su ausencia → 400.
+- `technical_ref` → 403.
+
+## Escenarios Gherkin
+
+```gherkin
+Feature: Procesos con varios candidatos
+
+  Scenario: un PM crea un proceso
+    Given un PM autenticado
+    When envía POST /processes con título y cliente
+    Then recibe 201 y ownerPmId es su id
+
+  Scenario: un reclutador crea un proceso sin elegir PM
+    Given un reclutador autenticado
+    When envía POST /processes sin ownerPmId
+    Then recibe 400
+
+  Scenario: un reclutador crea un proceso eligiendo PM
+    Given un reclutador autenticado y un usuario con rol pm
+    When envía POST /processes con ese ownerPmId
+    Then recibe 201 y recruiterId es el id del reclutador
+
+  Scenario: un PM elige un reclutador de la lista
+    Given un PM autenticado y un usuario con rol recruiter
+    When envía POST /processes con ese recruiterId
+    Then recibe 201 y ese reclutador puede asociar y quitar candidatos
+
+  Scenario: un PM no elige reclutador
+    Given un PM autenticado
+    When envía POST /processes sin recruiterId
+    Then recruiterId es null y solo el PM dueño puede asociar o quitar candidatos
+
+  Scenario: ownerPmId o recruiterId con otro rol o inexistente
+    When se envía un ownerPmId que no es pm, o un recruiterId que no es recruiter, o un id inexistente
+    Then recibe 400
+
+  Scenario: asociar un candidato disponible
+    Given un candidato sin processId
+    When el PM dueño lo asocia al proceso
+    Then el candidato queda con processId
+
+  Scenario: asociar un candidato ya asignado
+    Given un candidato con processId de otro proceso
+    When se intenta asociar
+    Then recibe 400 o 409
+
+  Scenario: superar el límite
+    Given un proceso con MAX_CANDIDATES_PER_PROCESS candidatos
+    When se asocia uno más
+    Then recibe 400 con un mensaje que indica el límite
+
+  Scenario: un reclutador ajeno asocia o quita
+    Given un reclutador que no es el recruiterId del proceso, aunque haya cargado al candidato
+    When asocia o quita un candidato
+    Then recibe 403
+
+  Scenario: GET /users con un rol no permitido
+    When se pide GET /users?role=technical_ref
+    Then recibe 400
+
+  Scenario: technical_ref o sin token
+    When un technical_ref llama a /processes, /candidates o /users
+    Then recibe 403
+    And sin token recibe 401
+
+  Scenario: lista vacía en la UI
+    Given que no hay procesos
+    When se abre /processes
+    Then se ve «Sin procesos abiertos» y el botón «+ Nuevo proceso»
+
+  Scenario: sin candidatos disponibles en el formulario
+    Given que no hay candidatos sin processId
+    When se abre «Nuevo proceso»
+    Then la caja Candidatos se ve deshabilitada y solo queda «Agregar candidato»
+```
+
+## Diferido (no es PROC-1)
+
+Los casos del wizard anterior (referentes técnicos `principal` y `validador`, etapas, edición con `PATCH`, cierre de procesos, búsqueda `GET /users/referents`) quedan para las features de referentes (4 y 5) y de etapas. Dependen de los tipos legados `Process`, `ProcessTechnicalRef` y `StageHistoryEntry` (DT-029/DT-037), que no se tocan en PROC-1.

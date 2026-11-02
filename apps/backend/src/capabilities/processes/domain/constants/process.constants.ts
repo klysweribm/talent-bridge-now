@@ -14,6 +14,8 @@ export const PROCESS_SKILL_MAX = 60;
 /** Banda de la oportunidad: entero entre ambos valores (inclusive). */
 export const PROCESS_BAND_MIN = 6;
 export const PROCESS_BAND_MAX = 10;
+/** Máximo de referentes técnicos asignados a un proceso. */
+export const PROCESS_TECHNICAL_REFS_MAX = 2;
 /** Tope de ids aceptados en `candidateIds` . */
 export const PROCESS_CANDIDATE_IDS_MAX = 50;
 
@@ -33,4 +35,5 @@ export const PROCESS_ERROR_CODES = {
   candidateLimit: 'PROCESS_CANDIDATE_LIMIT',
   candidateAlreadyAssigned: 'CANDIDATE_ALREADY_ASSIGNED',
   releaseFailed: 'PROCESS_RELEASE_FAILED',
+  invalidTechnicalRef: 'PROCESS_INVALID_TECHNICAL_REF',
 } as const;

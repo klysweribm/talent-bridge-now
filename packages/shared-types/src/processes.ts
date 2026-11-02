@@ -2,6 +2,7 @@
 // El límite de candidatos vive en el backend (`MAX_CANDIDATES_PER_PROCESS`) y viaja en cada respuesta.
 
 import type { ICandidateActor } from './candidates';
+import type { IUserProfile } from './users';
 
 /** Límites de procesos que el formulario necesita antes de que exista un proceso. */
 export interface IProcessLimits {
@@ -29,6 +30,8 @@ export interface IProcess {
   /** Banda de la oportunidad (entera); `null` solo en procesos legacy sin banda. Al escribir es siempre un entero. */
   readonly band: number | null;
   readonly candidateIds: readonly string[];
+  /** Referentes técnicos asignados (máx. 2); los procesos anteriores no lo tienen: se leen como []. */
+  readonly technicalRefIds: readonly string[];
   readonly maxCandidates: number;
   readonly createdBy: ICandidateActor;
   readonly createdAt: string;
@@ -61,6 +64,8 @@ export interface IUpdateProcessRequest {
   readonly band?: number;
   readonly recruiterId?: string;
   readonly status?: TProcessStatus;
+  /** Reemplaza el conjunto de referentes técnicos (máx. 2, activos); `[]` los quita todos. */
+  readonly technicalRefIds?: readonly string[];
 }
 
 /** Fila de `GET /processes`. */
@@ -75,9 +80,14 @@ export interface IProcessCandidateSummary {
   readonly primaryRole?: string;
 }
 
+/** Ficha completa de un referente técnico asignado a un proceso. */
+export interface IProcessTechnicalRef extends IUserProfile {}
+
 /** `GET /processes/:id`. */
 export interface IProcessDetail extends IProcess {
   readonly candidates: readonly IProcessCandidateSummary[];
+  /** En el orden de `technicalRefIds`; un referente que ya no existe se omite. */
+  readonly technicalRefs: readonly IProcessTechnicalRef[];
 }
 
 /** `POST /processes/:id/candidates`. */
@@ -85,8 +95,10 @@ export interface IAddProcessCandidateRequest {
   readonly candidateId: string;
 }
 
-/** Opción de selector de `GET /users?role=pm|recruiter`: solo id y nombre. */
+/** Opción de selector de `GET /users?role=pm|recruiter|technical_ref`: solo id y nombre. */
 export interface IUserOption {
   readonly id: string;
   readonly fullName: string;
+  /** Solo en `role=technical_ref`, y solo si el usuario tiene banda. */
+  readonly band?: number;
 }

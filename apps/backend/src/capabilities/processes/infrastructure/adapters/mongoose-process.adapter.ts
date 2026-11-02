@@ -46,7 +46,11 @@ export class MongooseProcessAdapter implements IProcessRepositoryPort {
 
   async update(id: string, changes: IProcessChanges): Promise<TProcessRecord | null> {
     if (!isValidObjectId(id)) return null;
-    const set = { ...changes, ...(changes.candidateIds ? { candidateIds: [...changes.candidateIds] } : {}) };
+    const set = {
+      ...changes,
+      ...(changes.candidateIds ? { candidateIds: [...changes.candidateIds] } : {}),
+      ...(changes.technicalRefIds ? { technicalRefIds: [...changes.technicalRefIds] } : {}),
+    };
     // Condicional: un cierre/cancelación concurrente no se pisa. `$nin` incluye documentos sin `status` (legacy = abierto).
     const filter = { _id: id, status: { $nin: TERMINAL_PROCESS_STATUSES } };
     const document = await this.model.findOneAndUpdate(filter, { $set: set }, { new: true }).exec();
@@ -70,6 +74,7 @@ export class MongooseProcessAdapter implements IProcessRepositoryPort {
       recruiterId: document.recruiterId ?? null,
       status: document.status ?? DEFAULT_PROCESS_STATUS,
       candidateIds: [...document.candidateIds],
+      technicalRefIds: [...(document.technicalRefIds ?? [])],
       createdBy: { id: document.createdBy.id, email: document.createdBy.email, role: document.createdBy.role },
       createdAt: document.createdAt.toISOString(),
       updatedAt: document.updatedAt.toISOString(),

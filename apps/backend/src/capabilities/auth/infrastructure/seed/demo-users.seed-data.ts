@@ -1,4 +1,4 @@
-import type { UserRole } from '@ibm-talent-bridge/shared-types';
+import type { TUserStatus, UserRole } from '@ibm-talent-bridge/shared-types';
 import * as demoUsers from './demo-users.seed.json';
 
 export interface IDemoUserSeed {
@@ -6,7 +6,13 @@ export interface IDemoUserSeed {
   readonly fullName: string;
   readonly role: UserRole;
   readonly timezone: string;
+  readonly band?: number;
+  readonly description?: string;
+  readonly status?: TUserStatus;
 }
+
+/** Campos del perfil que el seeder rellena en usuarios ya existentes que no los tienen (nunca pisa los ya presentes). */
+export const BACKFILL_FIELDS = ['band', 'description', 'status'] as const;
 
 /**
  * Usuarios demo sembrados en Mongo para AUTH-1 (dev-login). Los datos viven en

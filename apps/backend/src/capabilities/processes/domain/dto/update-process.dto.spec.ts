@@ -45,3 +45,21 @@ describe('UpdateProcessDto', () => {
     expect(await errorsFor({ hack: 1 })).toEqual(['hack']);
   });
 });
+
+describe('UpdateProcessDto technicalRefIds', () => {
+  const ids = ['a', 'b'];
+  it.each([[[]], [['a']], [ids]])('should accept %p', async (technicalRefIds) => {
+    expect(await errorsFor({ technicalRefIds })).toEqual([]);
+  });
+
+  it.each([
+    ['more than two', ['a', 'b', 'c']],
+    ['duplicates', ['a', 'a']],
+    ['null', null],
+    ['a string', 'a'],
+    ['empty ids', ['a', '']],
+    ['non string ids', [1, 2]],
+  ])('should reject %s', async (_label, technicalRefIds) => {
+    expect(await errorsFor({ technicalRefIds })).toEqual(['technicalRefIds']);
+  });
+});

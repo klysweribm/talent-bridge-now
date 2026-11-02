@@ -1,10 +1,10 @@
 import { Transform } from 'class-transformer';
 import {
-  ArrayMaxSize, ArrayMinSize, IsArray, IsInt, IsNotEmpty, IsString, Max, MaxLength, Min, ValidateIf,
+  ArrayMaxSize, ArrayMinSize, ArrayUnique, IsArray, IsInt, IsNotEmpty, IsString, Max, MaxLength, Min, ValidateIf,
 } from 'class-validator';
 import {
   PROCESS_BAND_MAX, PROCESS_BAND_MIN, PROCESS_OPPORTUNITY_ROLE_MAX, PROCESS_ROLE_DESCRIPTION_MAX, PROCESS_SKILLS_MAX, PROCESS_SKILLS_MIN,
-  PROCESS_SKILL_MAX,
+  PROCESS_SKILL_MAX, PROCESS_TECHNICAL_REFS_MAX,
 } from '../constants/process.constants';
 
 /** Decoradores compartidos por `CreateProcessDto` y `UpdateProcessDto`: una sola regla por campo. */
@@ -43,3 +43,7 @@ export const SkillsField = (isOptional = false): PropertyDecorator =>
 
 export const BandField = (isOptional = false): PropertyDecorator =>
   compose(...optional(isOptional), IsInt(), Min(PROCESS_BAND_MIN), Max(PROCESS_BAND_MAX));
+
+/** Ids de referentes técnicos: lista (vacía válida) de a lo sumo `PROCESS_TECHNICAL_REFS_MAX` ids no vacíos y sin repetir. */
+export const TechnicalRefIdsField = (isOptional = false): PropertyDecorator =>
+  compose(...optional(isOptional), IsArray(), ArrayMaxSize(PROCESS_TECHNICAL_REFS_MAX), ArrayUnique(), IsString({ each: true }), IsNotEmpty({ each: true }));

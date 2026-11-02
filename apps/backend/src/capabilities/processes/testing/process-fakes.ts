@@ -36,7 +36,7 @@ const ACTOR = { id: PM_ID, email: 'pm@example.test', role: 'pm' } as const;
 
 function buildSpies(processes: TProcessMap, candidates: TCandidateMap): IProcessFakes['spies'] {
   const create = jest.fn((p: INewProcess) => {
-    const record: TProcessRecord = { ...p, status: 'open', id: `p-${processes.size + 1}`, candidateIds: [...(p.candidateIds ?? [])], ...STAMP };
+    const record: TProcessRecord = { ...p, status: 'open', id: `p-${processes.size + 1}`, candidateIds: [...(p.candidateIds ?? [])], technicalRefIds: [], ...STAMP };
     processes.set(record.id, record);
     return Promise.resolve(record);
   });
@@ -79,7 +79,7 @@ function buildRepository(processes: TProcessMap, spies: IProcessFakes['spies']):
     update: jest.fn((id: string, changes: IProcessChanges) => {
       const current = processes.get(id);
       if (!current || TERMINAL_PROCESS_STATUSES.includes(current.status)) return Promise.resolve(null);
-      const next: TProcessRecord = { ...current, ...changes, candidateIds: [...(changes.candidateIds ?? current.candidateIds)] };
+      const next: TProcessRecord = { ...current, ...changes, candidateIds: [...(changes.candidateIds ?? current.candidateIds)], technicalRefIds: [...(changes.technicalRefIds ?? current.technicalRefIds)] };
       processes.set(id, next);
       return Promise.resolve(next);
     }),
@@ -107,7 +107,7 @@ export function buildProcessFakes(): IProcessFakes {
     directory: buildDirectory(candidates, spies),
     addProcess: (overrides = {}) => {
       const record: TProcessRecord = {
-        id: 'p-0', title: 'T', clientName: 'C', ...OPPORTUNITY, skills: [...OPPORTUNITY.skills], ownerPmId: PM_ID, recruiterId: REC_ID, status: 'open', candidateIds: [], createdBy: ACTOR, ...STAMP, ...overrides,
+        id: 'p-0', title: 'T', clientName: 'C', ...OPPORTUNITY, skills: [...OPPORTUNITY.skills], ownerPmId: PM_ID, recruiterId: REC_ID, status: 'open', candidateIds: [], technicalRefIds: [], createdBy: ACTOR, ...STAMP, ...overrides,
       };
       processes.set(record.id, record);
       return record;

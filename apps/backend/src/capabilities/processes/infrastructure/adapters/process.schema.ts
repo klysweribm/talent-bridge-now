@@ -27,6 +27,7 @@ export class ProcessModel {
   @Prop({ type: String, default: null, index: true }) recruiterId!: string | null;
   @Prop({ type: String, enum: PROCESS_STATUSES, default: DEFAULT_PROCESS_STATUS }) status!: TProcessStatus;
   @Prop({ type: [String], default: [] }) candidateIds!: string[];
+  @Prop({ type: [String], default: [] }) technicalRefIds!: string[];
   @Prop({ type: SchemaFactory.createForClass(ProcessActorModel), required: true }) createdBy!: ProcessActorModel;
 
   createdAt!: Date;

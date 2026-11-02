@@ -8,7 +8,7 @@ function buildWith(maxCandidatesPerProcess: number): ProcessService {
   const fakes = buildProcessFakes();
   const config = { maxCandidatesPerProcess };
   const claims = new ProcessCandidateClaimService(fakes.repository, fakes.directory, config);
-  return new ProcessService(fakes.repository, {} as UserDirectoryService, config, claims, new ProcessDetailService(fakes.directory, config));
+  return new ProcessService(fakes.repository, {} as UserDirectoryService, config, claims, new ProcessDetailService(fakes.directory, {} as UserDirectoryService, config));
 }
 
 describe('ProcessService.getLimits', () => {

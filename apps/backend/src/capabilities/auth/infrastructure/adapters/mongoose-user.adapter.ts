@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import type { Model } from 'mongoose';
 import type { User } from '@ibm-talent-bridge/shared-types';
 import type { IUserRepositoryPort } from '../../application/ports/user-repository.port';
+import { DEFAULT_USER_STATUS } from '../../domain/constants/user-directory.constants';
 import { TraceFlow } from '../../../../shared/observability/trace-flow.decorator';
 import { UserModel, type UserDocument } from './user.schema';
 
@@ -25,6 +26,9 @@ export class MongooseUserAdapter implements IUserRepositoryPort {
       timezone: document.timezone,
       avatarUrl: document.avatarUrl,
       specialty: document.specialty,
+      band: document.band ?? null,
+      description: document.description ?? '',
+      status: document.status ?? DEFAULT_USER_STATUS,
       createdAt: document.createdAt?.toISOString() ?? new Date().toISOString(),
       updatedAt: document.updatedAt?.toISOString() ?? new Date().toISOString(),
     };

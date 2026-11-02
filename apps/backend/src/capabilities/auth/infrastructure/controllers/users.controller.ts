@@ -17,9 +17,9 @@ export class UsersController {
   constructor(private readonly directory: UserDirectoryService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Lista paginada de usuarios (id y nombre) por rol: pm o recruiter' })
+  @ApiOperation({ summary: 'Lista paginada de usuarios (id y nombre) por rol: pm, recruiter o technical_ref (este solo activos)' })
   @ApiResponse({ status: 200, description: 'Página de opciones { id, fullName }' })
-  @ApiResponse({ status: 400, description: 'role ausente o distinto de pm | recruiter' })
+  @ApiResponse({ status: 400, description: 'role ausente o fuera de pm | recruiter | technical_ref' })
   @ApiResponse({ status: 401, description: 'Sin token' })
   @ApiResponse({ status: 403, description: 'Rol sin acceso' })
   list(@Query() query: UsersQueryDto): Promise<PaginatedResponse<IUserOption>> {

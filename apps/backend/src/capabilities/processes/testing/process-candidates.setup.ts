@@ -2,6 +2,7 @@ import type { ICandidateActor } from '@ibm-talent-bridge/shared-types';
 import { ProcessCandidatesService } from '../application/services/process-candidates.service';
 import { ProcessDetailService } from '../application/services/process-detail.service';
 import { buildProcessFakes, REC_ID, PM_ID, type IProcessFakes } from './process-fakes';
+import { buildUsersFake } from './process-users.fake';
 
 export const MAX = 3;
 const CONFIG = { maxCandidatesPerProcess: MAX };
@@ -13,7 +14,7 @@ export function setup(): { fakes: IProcessFakes; service: ProcessCandidatesServi
   const fakes = buildProcessFakes();
   fakes.addProcess();
   fakes.addCandidate('c-1');
-  return { fakes, service: new ProcessCandidatesService(fakes.repository, fakes.directory, CONFIG, new ProcessDetailService(fakes.directory, CONFIG)) };
+  return { fakes, service: new ProcessCandidatesService(fakes.repository, fakes.directory, CONFIG, new ProcessDetailService(fakes.directory, buildUsersFake().service, CONFIG)) };
 }
 
 export const loggedText = (spy: jest.SpyInstance): string => JSON.stringify(spy.mock.calls);

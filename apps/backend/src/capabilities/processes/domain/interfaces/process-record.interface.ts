@@ -14,6 +14,8 @@ export interface IProcessChanges {
   readonly recruiterId?: string;
   readonly status?: TProcessStatus;
   readonly candidateIds?: readonly string[];
+  /** Reemplaza el conjunto completo (ids ya validados). */
+  readonly technicalRefIds?: readonly string[];
 }
 
 /** Datos para crear un proceso; el repositorio asigna id y fechas. */

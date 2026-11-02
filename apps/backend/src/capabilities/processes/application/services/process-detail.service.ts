@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { IProcessDetail } from '@ibm-talent-bridge/shared-types';
+import { UserDirectoryService } from '../../../auth/application/services/user-directory.service';
 import { CANDIDATE_DIRECTORY_PORT, PROCESSES_CONFIG } from '../../domain/constants/process.constants';
 import type { IProcessesConfig } from '../../domain/interfaces/process-config.interface';
 import type { TProcessRecord } from '../../domain/interfaces/process-record.interface';
@@ -11,6 +12,7 @@ export class ProcessDetailService {
 
   constructor(
     @Inject(CANDIDATE_DIRECTORY_PORT) private readonly directory: ICandidateDirectoryPort,
+    private readonly users: UserDirectoryService,
     @Inject(PROCESSES_CONFIG) private readonly config: IProcessesConfig,
   ) {}
 
@@ -21,6 +23,16 @@ export class ProcessDetailService {
     const orphans = record.candidateIds.filter((id) => !known.has(id));
     if (orphans.length > 0) this.logger.warn(`Process ${record.id} references missing candidates: ids=${orphans.join(',')}`);
     const candidates = found.map(({ id, fullName, primaryRole }) => ({ id, fullName, ...(primaryRole ? { primaryRole } : {}) }));
-    return { ...record, maxCandidates: this.config.maxCandidatesPerProcess, candidates };
+    const technicalRefs = await this.resolveTechnicalRefs(record);
+    return { ...record, maxCandidates: this.config.maxCandidatesPerProcess, candidates, technicalRefs };
+  }
+
+  /** Una sola consulta por ids; conserva el orden de `technicalRefIds` y omite (con warning, solo ids) a los que ya no existen. */
+  private async resolveTechnicalRefs(record: TProcessRecord): Promise<IProcessDetail['technicalRefs']> {
+    if (record.technicalRefIds.length === 0) return [];
+    const byId = new Map((await this.users.findProfiles(record.technicalRefIds)).map((profile) => [profile.id, profile]));
+    const missing = record.technicalRefIds.filter((id) => !byId.has(id));
+    if (missing.length > 0) this.logger.warn(`Process ${record.id} references missing technical referents: ids=${missing.join(',')}`);
+    return record.technicalRefIds.flatMap((id) => byId.get(id) ?? []);
   }
 }

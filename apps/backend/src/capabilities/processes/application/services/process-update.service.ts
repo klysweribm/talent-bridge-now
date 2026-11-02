@@ -8,6 +8,7 @@ import type { IProcessRepositoryPort } from '../ports/process-repository.port';
 import { terminalStateError } from './candidate-association.helpers';
 import { isOwnerPm, loadManageableProcess } from './process-access.helpers';
 import { ProcessDetailService } from './process-detail.service';
+import { assertValidTechnicalRefs } from './technical-ref.helpers';
 
 /** `PATCH /processes/:id`: edición, cambio de reclutador y de estado. Todas las reglas viven aquí. */
 @Injectable()
@@ -24,6 +25,7 @@ export class ProcessUpdateService {
   async update(id: string, request: IUpdateProcessRequest, actor: ICandidateActor): Promise<IProcessDetail> {
     const record = await loadManageableProcess(this.repository, this.logger, id, actor);
     if (request.recruiterId !== undefined) await this.assertCanSetRecruiter(record, request.recruiterId, actor);
+    if (request.technicalRefIds !== undefined) await assertValidTechnicalRefs(this.users, request.technicalRefIds);
     const cancelling = request.status === 'cancelled';
     if (cancelling) await this.releaseAll(record);
     const changes: IProcessChanges = { ...request, ...(cancelling ? { candidateIds: [] } : {}) };

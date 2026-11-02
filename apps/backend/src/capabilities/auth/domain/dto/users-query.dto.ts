@@ -4,7 +4,7 @@ import { DEFAULT_LIMIT, DEFAULT_PAGE, MAX_LIMIT } from '../../../../shared/pagin
 import { DIRECTORY_ROLES } from '../constants/user-directory.constants';
 import type { UserRole } from '@ibm-talent-bridge/shared-types';
 
-/** Query de `GET /users`: `role` es obligatorio y solo admite `pm` | `recruiter`. */
+/** Query de `GET /users`: `role` es obligatorio y admite los roles de `DIRECTORY_ROLES`. */
 export class UsersQueryDto {
   @IsIn(DIRECTORY_ROLES)
   role!: UserRole;

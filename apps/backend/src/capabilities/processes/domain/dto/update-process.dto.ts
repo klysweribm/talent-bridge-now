@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsIn, IsNotEmpty, IsString, MaxLength, ValidateIf } from 'class-validator';
 import { PROCESS_CLIENT_NAME_MAX, PROCESS_STATUSES, PROCESS_TITLE_MAX } from '../constants/process.constants';
-import { BandField, OpportunityRoleField, present, RoleDescriptionField, SkillsField, trim } from './process-field.decorators';
+import { BandField, OpportunityRoleField, present, RoleDescriptionField, SkillsField, TechnicalRefIdsField, trim } from './process-field.decorators';
 import type { TProcessStatus } from '@ibm-talent-bridge/shared-types';
 
 
@@ -30,4 +30,7 @@ export class UpdateProcessDto {
 
   @ValidateIf(present) @IsIn(PROCESS_STATUSES)
   status?: TProcessStatus;
+
+  @TechnicalRefIdsField(true)
+  technicalRefIds?: string[];
 }

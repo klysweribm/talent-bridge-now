@@ -24,3 +24,5 @@ apps/frontend/*.tsbuildinfo
 
 # Decks de presentación del proyecto (no se versionan por ahora)
 *.pptx
+
+cand2-spike-diag.sh

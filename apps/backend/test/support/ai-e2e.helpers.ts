@@ -11,6 +11,7 @@ import { AiModule } from '../../src/capabilities/ai/ai.module';
 import { AI_PROVIDER_PORT, type IAiProviderPort } from '../../src/capabilities/ai/application/ports/ai-provider.port';
 import { AuthModule } from '../../src/capabilities/auth/auth.module';
 import { BenchModule } from '../../src/capabilities/bench/bench.module';
+import { CandidatesModule } from '../../src/capabilities/candidates/candidates.module';
 import { SharedAuthModule } from '../../src/shared/auth/shared-auth.module';
 
 export const FAKE_KEY = 'test-key-not-real';
@@ -33,6 +34,7 @@ const BASE_ENV: Record<string, string> = {
   AI_RETRY_BASE_MS: '1',
   AI_RETRY_MAX_MS: '1',
   AI_TOTAL_TIMEOUT_MS: '2000',
+  CV_MAX_FILE_BYTES: '4096',
 };
 
 export interface IAiTestContext {
@@ -55,6 +57,7 @@ function testImports(label: string): unknown[] {
     AuthModule,
     BenchModule,
     AiModule,
+    CandidatesModule,
   ];
 }
 

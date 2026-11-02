@@ -17,5 +17,7 @@ import { BenchSeeder } from './infrastructure/seed/bench.seeder';
     BenchSeeder,
     { provide: BENCH_REPOSITORY_PORT, useClass: MongooseBenchAdapter },
   ],
+  // Otras capabilities leen el catálogo de skills por llamada en memoria (ADR-013).
+  exports: [BenchService],
 })
 export class BenchModule {}

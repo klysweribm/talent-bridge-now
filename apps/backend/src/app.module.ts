@@ -6,6 +6,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AiModule } from './capabilities/ai/ai.module';
 import { AuthModule } from './capabilities/auth/auth.module';
 import { BenchModule } from './capabilities/bench/bench.module';
+import { CandidatesModule } from './capabilities/candidates/candidates.module';
 import { HealthModule } from './monitoring/health.module';
 import { FlowLogModule } from './shared/observability/flow-log.module';
 import { SharedAuthModule } from './shared/auth/shared-auth.module';
@@ -50,6 +51,7 @@ const MS_PER_SECOND = 1000;
     AuthModule,
     BenchModule,
     AiModule,
+    CandidatesModule,
   ],
   providers: [
     {

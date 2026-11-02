@@ -67,7 +67,7 @@ export async function closeProcessesApp(ctx: IProcessesContext): Promise<void> {
 }
 
 /** Petición firmada con el id REAL del usuario demo (el servicio toma el autor del JWT). */
-export function as(ctx: IProcessesContext, user: IDemoUser | undefined, method: 'get' | 'post' | 'put' | 'delete', path: string): request.Test {
+export function as(ctx: IProcessesContext, user: IDemoUser | undefined, method: 'get' | 'post' | 'put' | 'patch' | 'delete', path: string): request.Test {
   const call = request(ctx.app.getHttpServer())[method](`${API}${path}`);
   if (!user) return call;
   return call.set('Authorization', `Bearer ${ctx.jwt.sign({ sub: user.id, email: user.email, role: user.role })}`);

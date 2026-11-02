@@ -1,7 +1,7 @@
 import type { IProcessRepositoryPort } from '../application/ports/process-repository.port';
 import type { ICandidateDirectoryPort } from '../application/ports/candidate-directory.port';
 import type { ICandidateDirectoryEntry, TCandidateAssignOutcome } from '../domain/interfaces/candidate-directory.interface';
-import type { INewProcess, TProcessRecord } from '../domain/interfaces/process-record.interface';
+import type { INewProcess, IProcessChanges, TProcessRecord } from '../domain/interfaces/process-record.interface';
 
 export const PM_ID = 'pm-1';
 export const OTHER_PM = 'pm-2';
@@ -32,7 +32,7 @@ const ACTOR = { id: PM_ID, email: 'pm@example.test', role: 'pm' } as const;
 
 function buildSpies(processes: TProcessMap, candidates: TCandidateMap): IProcessFakes['spies'] {
   const create = jest.fn((p: INewProcess) => {
-    const record: TProcessRecord = { ...p, id: `p-${processes.size + 1}`, candidateIds: [...(p.candidateIds ?? [])], ...STAMP };
+    const record: TProcessRecord = { ...p, status: 'open', id: `p-${processes.size + 1}`, candidateIds: [...(p.candidateIds ?? [])], ...STAMP };
     processes.set(record.id, record);
     return Promise.resolve(record);
   });
@@ -72,6 +72,13 @@ function buildRepository(processes: TProcessMap, spies: IProcessFakes['spies']):
       processes.set(id, { ...current, candidateIds: current.candidateIds.filter((c) => c !== candidateId) });
       return Promise.resolve(true);
     }),
+    update: jest.fn((id: string, changes: IProcessChanges) => {
+      const current = processes.get(id);
+      if (!current) return Promise.resolve(null);
+      const next: TProcessRecord = { ...current, ...changes, candidateIds: [...(changes.candidateIds ?? current.candidateIds)] };
+      processes.set(id, next);
+      return Promise.resolve(next);
+    }),
     delete: jest.fn((id: string) => { processes.delete(id); return Promise.resolve(); }),
   };
 }
@@ -96,7 +103,7 @@ export function buildProcessFakes(): IProcessFakes {
     directory: buildDirectory(candidates, spies),
     addProcess: (overrides = {}) => {
       const record: TProcessRecord = {
-        id: 'p-0', title: 'T', clientName: 'C', ownerPmId: PM_ID, recruiterId: REC_ID, candidateIds: [], createdBy: ACTOR, ...STAMP, ...overrides,
+        id: 'p-0', title: 'T', clientName: 'C', ownerPmId: PM_ID, recruiterId: REC_ID, status: 'open', candidateIds: [], createdBy: ACTOR, ...STAMP, ...overrides,
       };
       processes.set(record.id, record);
       return record;

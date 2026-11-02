@@ -1,5 +1,5 @@
 import {
-  ConflictException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, ServiceUnavailableException,
+  Inject, Injectable, Logger, NotFoundException, ServiceUnavailableException,
 } from '@nestjs/common';
 import type { ICandidateActor, IProcessDetail } from '@ibm-talent-bridge/shared-types';
 import { CANDIDATE_DIRECTORY_PORT, PROCESSES_CONFIG, PROCESS_REPOSITORY_PORT } from '../../domain/constants/process.constants';
@@ -7,7 +7,8 @@ import type { IProcessesConfig } from '../../domain/interfaces/process-config.in
 import type { TProcessRecord } from '../../domain/interfaces/process-record.interface';
 import type { ICandidateDirectoryPort } from '../ports/candidate-directory.port';
 import type { IProcessRepositoryPort } from '../ports/process-repository.port';
-import { assertWithinLimit, releaseQuietly, unavailableCandidate } from './candidate-association.helpers';
+import { alreadyAssignedError, assertWithinLimit, releaseQuietly, unavailableCandidate } from './candidate-association.helpers';
+import { loadManageableProcess } from './process-access.helpers';
 import { ProcessDetailService } from './process-detail.service';
 
 /** Asociación proceso <-> candidato con consistencia por llamada en memoria, sin transacciones (ADR-013). */
@@ -23,11 +24,11 @@ export class ProcessCandidatesService {
   ) {}
 
   async associate(processId: string, candidateId: string, actor: ICandidateActor): Promise<IProcessDetail> {
-    const record = await this.authorizedProcess(processId, actor);
+    const record = await loadManageableProcess(this.repository, this.logger, processId, actor);
     const [entry] = await this.directory.findByIds([candidateId]);
     if (!entry) throw new NotFoundException('Candidate not found');
     if (record.candidateIds.length >= this.config.maxCandidatesPerProcess) assertWithinLimit(record.candidateIds.length + 1, this.config.maxCandidatesPerProcess);
-    if (entry.processId !== undefined) throw new ConflictException('The candidate already belongs to a process');
+    if (entry.processId !== undefined) throw alreadyAssignedError();
     const outcome = await this.directory.assign(candidateId, processId);
     if (outcome !== 'assigned') throw unavailableCandidate(outcome);
     let added: boolean;
@@ -47,7 +48,7 @@ export class ProcessCandidatesService {
   }
 
   async dissociate(processId: string, candidateId: string, actor: ICandidateActor): Promise<IProcessDetail> {
-    const record = await this.authorizedProcess(processId, actor);
+    const record = await loadManageableProcess(this.repository, this.logger, processId, actor);
     if (!record.candidateIds.includes(candidateId)) throw new NotFoundException('The candidate is not in this process');
     if (!(await this.repository.removeCandidate(processId, candidateId))) throw new NotFoundException('The candidate is not in this process');
     try {
@@ -60,17 +61,5 @@ export class ProcessCandidatesService {
     }
     this.logger.log(`Candidate removed: process=${processId} candidate=${candidateId}`);
     return this.details.build((await this.repository.findById(processId)) as TProcessRecord);
-  }
-
-  /** R6: solo el PM dueño o el reclutador asignado; `createdBy` del candidato no cuenta. */
-  private async authorizedProcess(processId: string, actor: ICandidateActor): Promise<TProcessRecord> {
-    const record = await this.repository.findById(processId);
-    if (!record) throw new NotFoundException(`Process ${processId} not found`);
-    const allowed = actor.id === record.ownerPmId || (record.recruiterId !== null && actor.id === record.recruiterId);
-    if (!allowed) {
-      this.logger.warn(`Candidate management forbidden: process=${processId} user=${actor.id}`);
-      throw new ForbiddenException('Only the owner PM or the assigned recruiter can manage the candidates of this process');
-    }
-    return record;
   }
 }

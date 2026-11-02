@@ -8,6 +8,12 @@ export interface IProcessLimits {
   readonly maxCandidates: number;
 }
 
+/**
+ * Estado del proceso (PROC-1b). `closed` y `cancelled` son terminales. Distinto del legado `ProcessStatus`
+ * ('active'|'paused'|'closed') de `index.ts`, que sigue ligado al tipo `Process` antiguo.
+ */
+export type TProcessStatus = 'open' | 'in_progress' | 'interviewing' | 'closed' | 'cancelled';
+
 /** Proceso persistido. `recruiterId` es null cuando el PM no eligió reclutador: solo el PM dueño gestiona candidatos. */
 export interface IProcess {
   readonly id: string;
@@ -15,6 +21,7 @@ export interface IProcess {
   readonly clientName: string;
   readonly ownerPmId: string;
   readonly recruiterId: string | null;
+  readonly status: TProcessStatus;
   readonly candidateIds: readonly string[];
   readonly maxCandidates: number;
   readonly createdBy: ICandidateActor;
@@ -32,6 +39,14 @@ export interface ICreateProcessRequest {
   readonly ownerPmId?: string;
   readonly recruiterId?: string;
   readonly candidateIds?: readonly string[];
+}
+
+/** `PATCH /processes/:id`: todos los campos son opcionales. Solo el PM dueño puede cambiar `recruiterId`. */
+export interface IUpdateProcessRequest {
+  readonly title?: string;
+  readonly clientName?: string;
+  readonly recruiterId?: string;
+  readonly status?: TProcessStatus;
 }
 
 /** Fila de `GET /processes`. */

@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, type Model } from 'mongoose';
 import type { IProcessRepositoryPort } from '../../application/ports/process-repository.port';
-import type { INewProcess, TProcessRecord } from '../../domain/interfaces/process-record.interface';
+import { DEFAULT_PROCESS_STATUS } from '../../domain/constants/process.constants';
+import type { INewProcess, IProcessChanges, TProcessRecord } from '../../domain/interfaces/process-record.interface';
 import { ProcessModel, type ProcessDocument } from './process.schema';
 
 @Injectable()
@@ -43,6 +44,13 @@ export class MongooseProcessAdapter implements IProcessRepositoryPort {
     return updated !== null;
   }
 
+  async update(id: string, changes: IProcessChanges): Promise<TProcessRecord | null> {
+    if (!isValidObjectId(id)) return null;
+    const set = { ...changes, ...(changes.candidateIds ? { candidateIds: [...changes.candidateIds] } : {}) };
+    const document = await this.model.findByIdAndUpdate(id, { $set: set }, { new: true }).exec();
+    return document ? this.toDomain(document) : null;
+  }
+
   async delete(id: string): Promise<void> {
     if (isValidObjectId(id)) await this.model.deleteOne({ _id: id }).exec();
   }
@@ -54,6 +62,7 @@ export class MongooseProcessAdapter implements IProcessRepositoryPort {
       clientName: document.clientName,
       ownerPmId: document.ownerPmId,
       recruiterId: document.recruiterId ?? null,
+      status: document.status ?? DEFAULT_PROCESS_STATUS,
       candidateIds: [...document.candidateIds],
       createdBy: { id: document.createdBy.id, email: document.createdBy.email, role: document.createdBy.role },
       createdAt: document.createdAt.toISOString(),

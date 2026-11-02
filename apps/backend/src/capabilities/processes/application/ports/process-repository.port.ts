@@ -1,4 +1,4 @@
-import type { INewProcess, TProcessRecord } from '../../domain/interfaces/process-record.interface';
+import type { INewProcess, IProcessChanges, TProcessRecord } from '../../domain/interfaces/process-record.interface';
 
 export interface IProcessRepositoryPort {
   create(process: INewProcess): Promise<TProcessRecord>;
@@ -10,6 +10,8 @@ export interface IProcessRepositoryPort {
   addCandidate(id: string, candidateId: string, max: number): Promise<boolean>;
   /** Quita el id del proceso. `false` si no estaba. */
   removeCandidate(id: string, candidateId: string): Promise<boolean>;
+  /** Aplica los cambios y devuelve el proceso actualizado; `null` si no existe. */
+  update(id: string, changes: IProcessChanges): Promise<TProcessRecord | null>;
   /** Borra el proceso (solo para revertir una creación fallida). */
   delete(id: string): Promise<void>;
 }

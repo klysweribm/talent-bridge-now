@@ -7,19 +7,22 @@ import { CANDIDATE_DIRECTORY_PORT, PROCESSES_CONFIG, PROCESS_REPOSITORY_PORT } f
 import { ProcessCandidateClaimService } from './application/services/process-candidate-claim.service';
 import { ProcessDetailService } from './application/services/process-detail.service';
 import { ProcessCandidatesService } from './application/services/process-candidates.service';
+import { ProcessUpdateService } from './application/services/process-update.service';
 import { ProcessService } from './application/services/process.service';
 import { CandidateDirectoryAdapter } from './infrastructure/adapters/candidate-directory.adapter';
 import { MongooseProcessAdapter } from './infrastructure/adapters/mongoose-process.adapter';
 import { ProcessModel, ProcessSchema } from './infrastructure/adapters/process.schema';
 import { buildProcessesConfig } from './infrastructure/config/processes.config';
 import { ProcessCandidatesController } from './infrastructure/controllers/process-candidates.controller';
+import { ProcessUpdateController } from './infrastructure/controllers/process-update.controller';
 import { ProcessesController } from './infrastructure/controllers/processes.controller';
 
 @Module({
   imports: [AuthModule, CandidatesModule, MongooseModule.forFeature([{ name: ProcessModel.name, schema: ProcessSchema }])],
-  controllers: [ProcessesController, ProcessCandidatesController],
+  controllers: [ProcessesController, ProcessUpdateController, ProcessCandidatesController],
   providers: [
     ProcessService,
+    ProcessUpdateService,
     ProcessCandidatesService,
     ProcessCandidateClaimService,
     ProcessDetailService,

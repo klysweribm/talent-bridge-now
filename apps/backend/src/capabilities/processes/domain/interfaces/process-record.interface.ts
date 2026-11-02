@@ -1,7 +1,16 @@
-import type { ICandidateActor, IProcess } from '@ibm-talent-bridge/shared-types';
+import type { ICandidateActor, IProcess, TProcessStatus } from '@ibm-talent-bridge/shared-types';
 
 /** Proceso tal como lo persiste el repositorio: sin `maxCandidates`, que es configuración y no dato. */
 export type TProcessRecord = Omit<IProcess, 'maxCandidates'>;
+
+/** Cambios parciales de un proceso; `candidateIds` solo se reemplaza al cancelar (vaciar). */
+export interface IProcessChanges {
+  readonly title?: string;
+  readonly clientName?: string;
+  readonly recruiterId?: string;
+  readonly status?: TProcessStatus;
+  readonly candidateIds?: readonly string[];
+}
 
 /** Datos para crear un proceso; el repositorio asigna id y fechas. */
 export interface INewProcess {

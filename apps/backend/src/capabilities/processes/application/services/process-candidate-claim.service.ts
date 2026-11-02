@@ -3,7 +3,7 @@ import { CANDIDATE_DIRECTORY_PORT, PROCESSES_CONFIG, PROCESS_REPOSITORY_PORT } f
 import type { IProcessesConfig } from '../../domain/interfaces/process-config.interface';
 import type { ICandidateDirectoryPort } from '../ports/candidate-directory.port';
 import type { IProcessRepositoryPort } from '../ports/process-repository.port';
-import { assertWithinLimit, releaseQuietly, unavailableCandidate } from './candidate-association.helpers';
+import { alreadyAssignedError, assertWithinLimit, releaseQuietly, unavailableCandidate } from './candidate-association.helpers';
 
 /** Candidatos que nacen con el proceso (`POST /processes`): validar antes de crear, marcar después, revertir si falla. */
 @Injectable()
@@ -23,7 +23,7 @@ export class ProcessCandidateClaimService {
     assertWithinLimit(ids.length, this.config.maxCandidatesPerProcess);
     const found = await this.directory.findByIds(ids);
     if (found.length !== ids.length) throw new NotFoundException('One or more candidates were not found');
-    if (found.some((entry) => entry.processId !== undefined)) throw new ConflictException('One or more candidates already belong to a process');
+    if (found.some((entry) => entry.processId !== undefined)) throw alreadyAssignedError('One or more candidates already belong to a process');
   }
 
   /** Marca los candidatos del proceso recién creado; si falla algo revierte lo marcado y borra el proceso. */

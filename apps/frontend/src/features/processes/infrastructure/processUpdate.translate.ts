@@ -15,6 +15,7 @@ const COPY_BY_CODE: Readonly<Record<string, string>> = {
   [PROCESS_ERROR_CODES.candidateLimit]:           PROCESS_ACTION_ERRORS.candidateLimit,
   [PROCESS_ERROR_CODES.candidateAlreadyAssigned]: PROCESS_ACTION_ERRORS.candidateAlreadyAssigned,
   [PROCESS_ERROR_CODES.releaseFailed]:            PROCESS_ACTION_ERRORS.releaseFailed,
+  [PROCESS_ERROR_CODES.invalidTechnicalRef]:      PROCESS_ACTION_ERRORS.invalidTechnicalRef,
 };
 
 export function errorCode(error: HttpError): string | undefined {

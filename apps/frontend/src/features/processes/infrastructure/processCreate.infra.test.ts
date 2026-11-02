@@ -39,6 +39,11 @@ describe('processCreate.infra', () => {
     expect(get).toHaveBeenCalledWith('/users?role=recruiter');
   });
 
+  it('should GET /users with role technical_ref', async () => {
+    await fetchUserOptions('technical_ref', { limit: 50 });
+    expect(get).toHaveBeenCalledWith('/users?role=technical_ref&limit=50');
+  });
+
   it('should GET /processes/limits', async () => {
     await fetchProcessLimits();
     expect(get).toHaveBeenCalledWith('/processes/limits');

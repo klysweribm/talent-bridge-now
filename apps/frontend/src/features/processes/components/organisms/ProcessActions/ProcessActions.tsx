@@ -6,6 +6,7 @@ import { ProcessCandidatesPanel } from '../ProcessCandidatesPanel/ProcessCandida
 import { ProcessEditPanel } from '../ProcessEditPanel/ProcessEditPanel';
 import { ProcessRecruiterPanel } from '../ProcessRecruiterPanel/ProcessRecruiterPanel';
 import { ProcessStatusPanel } from '../ProcessStatusPanel/ProcessStatusPanel';
+import { ProcessTechnicalTeamPanel } from '../ProcessTechnicalTeamPanel/ProcessTechnicalTeamPanel';
 
 export interface ProcessActionsProps {
   readonly process: IProcessDetail;
@@ -20,6 +21,7 @@ export function ProcessActions({ process }: ProcessActionsProps): JSX.Element {
       {permissions.canChangeStatus && <ProcessStatusPanel process={process} />}
       {permissions.canChangeRecruiter && <ProcessRecruiterPanel process={process} />}
       {TERMINAL_PROCESS_STATUSES.includes(process.status) && <p className="text-body-md text-text-secondary">{PROCESS_ACTIONS_COPY.readOnlyTerminal}</p>}
+      <ProcessTechnicalTeamPanel process={process} canEdit={permissions.canEdit} />
       <ProcessCandidatesPanel process={process} canManage={permissions.canManageCandidates} />
     </>
   );

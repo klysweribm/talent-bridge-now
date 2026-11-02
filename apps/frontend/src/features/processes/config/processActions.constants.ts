@@ -4,6 +4,7 @@ export const PROCESS_ERROR_CODES = {
   candidateLimit:           'PROCESS_CANDIDATE_LIMIT',
   candidateAlreadyAssigned: 'CANDIDATE_ALREADY_ASSIGNED',
   releaseFailed:            'PROCESS_RELEASE_FAILED',
+  invalidTechnicalRef:      'PROCESS_INVALID_TECHNICAL_REF',
 } as const;
 
 export const PROCESS_ACTION_ERRORS = {
@@ -11,6 +12,7 @@ export const PROCESS_ACTION_ERRORS = {
   candidateLimit:           'Superaste el máximo de candidatos permitido para un proceso.',
   candidateAlreadyAssigned: 'Uno o más candidatos ya pertenecen a otro proceso.',
   releaseFailed:            'No se pudieron liberar los candidatos; el proceso no se canceló. Intenta de nuevo.',
+  invalidTechnicalRef:      'Alguno de los referentes técnicos ya no está disponible. Actualiza la lista y elige de nuevo.',
   serviceUnavailable:       'No se pudo guardar el cambio en este momento. No se modificó nada; intenta de nuevo.',
   forbidden:                'No tienes permiso para realizar esta acción en este proceso.',
   notFound:                 'El proceso o el candidato ya no existe.',

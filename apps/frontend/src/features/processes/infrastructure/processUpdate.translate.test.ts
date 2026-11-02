@@ -10,6 +10,7 @@ describe('translateProcessActionError', () => {
     [coded(400, PROCESS_ERROR_CODES.candidateLimit), PROCESS_ACTION_ERRORS.candidateLimit],
     [coded(409, PROCESS_ERROR_CODES.candidateAlreadyAssigned), PROCESS_ACTION_ERRORS.candidateAlreadyAssigned],
     [coded(503, PROCESS_ERROR_CODES.releaseFailed), PROCESS_ACTION_ERRORS.releaseFailed],
+    [coded(400, PROCESS_ERROR_CODES.invalidTechnicalRef), PROCESS_ACTION_ERRORS.invalidTechnicalRef],
   ])('should map the stable code of %o to its user copy', (error, copy) => {
     const result = translateProcessActionError(error);
     expect(result).toBeInstanceOf(ProcessActionError);

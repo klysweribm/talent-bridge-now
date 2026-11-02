@@ -295,4 +295,33 @@ describe('ProcessDetailView card', () => {
     expect(screen.getByText('Abierto')).toBeInTheDocument();
     expect(screen.getByText('1 de 2 candidatos')).toBeInTheDocument();
   });
+
+  describe('technical team', () => {
+    const REF = { id: 'tr9', fullName: 'Tomás Ref', email: 't@ibm.com', role: 'technical_ref', band: 8, description: 'Java', status: 'active' } as const;
+
+    it('should render the assigned team with the manage button for the owner PM', async () => {
+      login('pm1', 'pm');
+      fetchDetail.mockResolvedValue({ ...DETAIL, technicalRefIds: ['tr9'], technicalRefs: [REF] });
+      await mount();
+      expect(screen.getByRole('heading', { name: 'Equipo técnico asignado' })).toBeInTheDocument();
+      expect(screen.getByText('Tomás Ref')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Gestionar equipo técnico' })).toBeInTheDocument();
+    });
+
+    it('should be read-only for a technical_ref', async () => {
+      login('tr1', 'technical_ref');
+      fetchDetail.mockResolvedValue({ ...DETAIL, technicalRefIds: ['tr9'], technicalRefs: [REF] });
+      await mount();
+      expect(screen.getByText('Tomás Ref')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Gestionar equipo técnico' })).not.toBeInTheDocument();
+    });
+
+    it('should be read-only on a terminal process', async () => {
+      login('pm1', 'pm');
+      fetchDetail.mockResolvedValue({ ...DETAIL, status: 'closed' });
+      await mount();
+      expect(screen.getByText('Sin asignar')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Gestionar equipo técnico' })).not.toBeInTheDocument();
+    });
+  });
 });

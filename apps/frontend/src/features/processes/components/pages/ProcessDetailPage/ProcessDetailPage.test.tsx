@@ -9,7 +9,7 @@ vi.mock('../../../infrastructure/processList.infra');
 
 const fetchDetail = vi.mocked(infra.fetchProcessDetail);
 const detail: IProcessDetail = {
-  id: 'p1', title: 'Backend Java Sr', clientName: 'Banco Andino', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [], status: 'in_progress',
+  id: 'p1', title: 'Backend Java Sr', clientName: 'Banco Andino', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [], technicalRefs: [], status: 'in_progress',
   maxCandidates: 5, createdBy: 'u1', createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
   candidateIds: ['c1', 'c2'],
   candidates: [{ id: 'c1', fullName: 'Lucía Fernández', primaryRole: 'Backend Developer' }, { id: 'c2', fullName: 'Juan Pérez' }],

@@ -1,0 +1,28 @@
+export const TECHNICAL_TEAM_COPY = {
+  title:      'Equipo técnico asignado',
+  subtitle:   'Referentes que evalúan técnicamente a los candidatos',
+  complete:   'Par completo',
+  none:       'Sin asignar',
+  partial:    (count: number, max: number): string => `${count} de ${max} asignados`,
+  empty:      'Aún no hay referentes técnicos asignados a este proceso.',
+  band:       (band: number): string => `Band ${band}`,
+  inactive:   'Inactivo',
+  manage:     'Gestionar equipo técnico',
+  closeManage: 'Cerrar',
+  picker: {
+    heading:   'Referentes técnicos disponibles',
+    counter:   (count: number, max: number): string => `${count} de ${max} seleccionados`,
+    limit:     (max: number): string => `Alcanzaste el máximo de ${max} referentes: desmarca uno para elegir otro.`,
+    loading:   'Cargando referentes técnicos',
+    loadError: 'No se pudieron cargar los referentes técnicos.',
+    retry:     'Reintentar',
+    empty:     'No hay referentes técnicos disponibles.',
+    save:      'Guardar equipo',
+    saving:    'Guardando…',
+    cancel:    'Cancelar',
+    saved:     'Equipo técnico actualizado.',
+    inactiveSuffix: '(inactivo)',
+    option:    (name: string, band: number | null | undefined, inactive: boolean): string =>
+      [name, band != null ? `Band ${band}` : '', inactive ? '(inactivo)' : ''].filter(Boolean).join(' · '),
+  },
+} as const;

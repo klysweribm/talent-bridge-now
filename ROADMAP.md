@@ -134,7 +134,7 @@ silencioso; la extracción no persiste; PII a ICA aceptada para la POC (DT-030) 
   - La persistencia ya existe: `POST /candidates` guarda `summary`, `experience`, `education` y `languages` en Mongo asociados al candidato (y el frontend los reenvía desde el borrador). Falta verificar en la base que quedan guardados tras crear un candidato real.
   - Son opcionales, pero enriquecen el perfil y se podrán usar en otras etapas (listado y detalle de candidatos, match).
   - Depende de que el extractor devuelva esos campos: ICA ya los llena; el modo clásico no (queda para su mejora).
-- [x] **Extracción de ICA incompleta:** diagnosticado (ADR-015). `files` no entrega el documento completo al modelo; el texto en línea sí. Implementados `ica-text` (texto en línea, sin subir el archivo) y el clásico completado con ICA, con backend 366 unit / 127 e2e y frontend 443 tests. Falta la prueba en vivo con el backend real y comparar tiempos de los tres modos.
+- [ ] **Extracción de ICA incompleta:** diagnosticado (ADR-015): `files` no entrega el documento completo al modelo; el texto en línea sí. Implementados `ica-text` y el clásico completado con ICA. Pendiente: prueba en vivo del backend real con los tres modos, tiempos y la actualización de perfiles.
 
 **CAND-2b — Actualizar un perfil desde un CV más nuevo (en curso):**
 - [ ] `PUT /candidates/:id` con reemplazo total; conserva correo, estado, creador y fecha de creación.

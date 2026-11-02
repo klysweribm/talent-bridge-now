@@ -15,6 +15,8 @@ CLAUDE.md
 # Claude Code — personal/ephemeral
 .claude/settings.local.json
 .claude/scratchpads/*
+# Scripts de diagnóstico locales (suben CV reales a ICA y llevan rutas de tu máquina): nunca al repo.
+.claude/tmp/
 !.claude/scratchpads/README.md
 
 # Frontend: byproducts of `tsc -b` (tsconfig.node.json is composite)
@@ -26,3 +28,6 @@ apps/frontend/*.tsbuildinfo
 *.pptx
 
 cand2-spike-diag.sh
+
+# Salida de cobertura de Jest (npm run test:cov)
+coverage/

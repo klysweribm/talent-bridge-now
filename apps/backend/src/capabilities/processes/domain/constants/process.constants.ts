@@ -5,6 +5,15 @@ export const PROCESSES_CONFIG = Symbol('PROCESSES_CONFIG');
 
 export const PROCESS_TITLE_MAX = 200;
 export const PROCESS_CLIENT_NAME_MAX = 200;
+export const PROCESS_OPPORTUNITY_ROLE_MAX = 200;
+export const PROCESS_ROLE_DESCRIPTION_MAX = 2000;
+/** Tecnologías requeridas: entre 1 y `PROCESS_SKILLS_MAX`, cada una de hasta `PROCESS_SKILL_MAX` caracteres. */
+export const PROCESS_SKILLS_MIN = 1;
+export const PROCESS_SKILLS_MAX = 15;
+export const PROCESS_SKILL_MAX = 60;
+/** Banda de la oportunidad: entero entre ambos valores (inclusive). */
+export const PROCESS_BAND_MIN = 6;
+export const PROCESS_BAND_MAX = 10;
 /** Tope de ids aceptados en `candidateIds` . */
 export const PROCESS_CANDIDATE_IDS_MAX = 50;
 

@@ -1,5 +1,5 @@
 import type { IProcessDetail, IProcessListItem, PaginatedResponse } from '@ibm-talent-bridge/shared-types';
-import { as, createCandidate } from './support/processes-e2e.helpers';
+import { as, createCandidate, OPPORTUNITY } from './support/processes-e2e.helpers';
 import { useProcessCandidatesApp } from './support/process-candidates-e2e.helpers';
 
 jest.setTimeout(30_000);
@@ -62,7 +62,7 @@ describe('Process candidates creation', () => {
     expect((await stored(y))?.processId).toBe(created.id);
     const free = await createCandidate(ctx(), ana(), 'Alta Libre');
     const before = (await as(ctx(), mariana(), 'get', '/processes?limit=50').expect(200)).body as PaginatedResponse<IProcessListItem>;
-    const post = (ids: string[]): ReturnType<typeof as> => as(ctx(), mariana(), 'post', '/processes').send({ title: 'T', clientName: 'C', candidateIds: ids });
+    const post = (ids: string[]): ReturnType<typeof as> => as(ctx(), mariana(), 'post', '/processes').send({ title: 'T', clientName: 'C', ...OPPORTUNITY, candidateIds: ids });
     await post([free, x]).expect(409);
     await post([free, '507f1f77bcf86cd799439011']).expect(404);
     await post([free, free]).expect(400);

@@ -10,6 +10,9 @@ export const REC_ID = 'rec-1';
 export const OTHER_REC = 'rec-2';
 export const FULL_NAME = 'Nombre Secretisimo';
 
+/** Campos de la oportunidad válidos para crear y para sembrar procesos en los tests. */
+export const OPPORTUNITY = { opportunityRole: 'Dev Senior React', skills: ['React', 'AWS'], roleDescription: 'Perfil senior', band: 8 } as const;
+
 export interface IProcessFakes {
   readonly processes: Map<string, TProcessRecord>;
   readonly candidates: Map<string, ICandidateDirectoryEntry>;
@@ -104,7 +107,7 @@ export function buildProcessFakes(): IProcessFakes {
     directory: buildDirectory(candidates, spies),
     addProcess: (overrides = {}) => {
       const record: TProcessRecord = {
-        id: 'p-0', title: 'T', clientName: 'C', ownerPmId: PM_ID, recruiterId: REC_ID, status: 'open', candidateIds: [], createdBy: ACTOR, ...STAMP, ...overrides,
+        id: 'p-0', title: 'T', clientName: 'C', ...OPPORTUNITY, skills: [...OPPORTUNITY.skills], ownerPmId: PM_ID, recruiterId: REC_ID, status: 'open', candidateIds: [], createdBy: ACTOR, ...STAMP, ...overrides,
       };
       processes.set(record.id, record);
       return record;

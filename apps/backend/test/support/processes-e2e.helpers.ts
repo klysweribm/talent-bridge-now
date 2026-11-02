@@ -15,6 +15,8 @@ import { SharedAuthModule } from '../../src/shared/auth/shared-auth.module';
 const TEST_JWT_SECRET = 'integration_secret_key_for_ci_only_32chars';
 const RUN_ID = `${process.pid}-${Date.now()}`;
 export const API = '/api/v1';
+/** Campos de la oportunidad obligatorios al crear un proceso. */
+export const OPPORTUNITY = { opportunityRole: 'Dev Senior React & Cloud', skills: ['React', 'AWS'], roleDescription: 'Perfil senior con experiencia en cloud', band: 8 };
 
 export interface IDemoUser { readonly id: string; readonly email: string; readonly role: UserRole; readonly fullName: string }
 export interface IProcessesContext {

@@ -1,9 +1,9 @@
 import type { IProcess, IProcessLimits, IProcessDetail, IProcessListItem, PaginatedResponse } from '@ibm-talent-bridge/shared-types';
-import { as, buildProcessesApp, closeProcessesApp, type IProcessesContext } from './support/processes-e2e.helpers';
+import { as, buildProcessesApp, OPPORTUNITY, closeProcessesApp, type IProcessesContext } from './support/processes-e2e.helpers';
 
 jest.setTimeout(30_000);
 
-const BODY = { title: 'Proceso Inventado', clientName: 'Cliente Inventado' };
+const BODY = { title: 'Proceso Inventado', clientName: 'Cliente Inventado', ...OPPORTUNITY };
 
 describe('Processes', () => {
   let ctx: IProcessesContext;
@@ -79,7 +79,7 @@ describe('Processes reads', () => {
   it('should return the detail, 404 for unknown ids and 400 for malformed ids', async () => {
     const created = (await post(ctx.users.mariana, BODY).expect(201)).body as IProcess;
     const detail = (await as(ctx, ctx.users.ana, 'get', `/processes/${created.id}`).expect(200)).body as IProcessDetail;
-    expect(detail).toMatchObject({ id: created.id, candidates: [], candidateIds: [], maxCandidates: 7 });
+    expect(detail).toMatchObject({ id: created.id, candidates: [], candidateIds: [], maxCandidates: 7, ...OPPORTUNITY });
     await as(ctx, ctx.users.ana, 'get', '/processes/507f1f77bcf86cd799439011').expect(404);
     await as(ctx, ctx.users.ana, 'get', '/processes/not-an-id').expect(400);
   });

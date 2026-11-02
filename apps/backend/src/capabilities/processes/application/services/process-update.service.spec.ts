@@ -1,5 +1,5 @@
 import { BadRequestException, ForbiddenException, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
-import { OTHER_PM, OTHER_REC } from '../../testing/process-fakes';
+import { OPPORTUNITY, OTHER_PM, OTHER_REC } from '../../testing/process-fakes';
 import { actorOf, assignedRec, ownerPm, setupUpdate } from '../../testing/process-update.setup';
 
 const bodyOf = (error: unknown): unknown => (error as BadRequestException).getResponse();
@@ -91,5 +91,35 @@ describe('ProcessUpdateService.update status', () => {
     expect(fakes.processes.get('p-0')).toMatchObject({ status: 'open', candidateIds: ['c-1'] });
     expect(error).toHaveBeenCalled();
     jest.restoreAllMocks();
+  });
+});
+
+describe('ProcessUpdateService.update opportunity fields', () => {
+  const patch = { opportunityRole: 'Tech Lead', skills: ['Java'], roleDescription: 'Lidera', band: 9 };
+
+  it('should apply a partial change and keep the other opportunity fields', async () => {
+    const { fakes, service } = setupUpdate();
+    expect(await service.update('p-0', { band: 9 }, ownerPm)).toMatchObject({ ...OPPORTUNITY, band: 9 });
+    expect(fakes.processes.get('p-0')).toMatchObject({ ...OPPORTUNITY, band: 9 });
+  });
+
+  it('should let the owner pm and the assigned recruiter change every opportunity field', async () => {
+    const { service } = setupUpdate();
+    expect(await service.update('p-0', patch, ownerPm)).toMatchObject(patch);
+    expect(await service.update('p-0', { skills: ['Go'] }, assignedRec)).toMatchObject({ ...patch, skills: ['Go'] });
+  });
+
+  it('should throw 403 for another pm and leave the fields untouched', async () => {
+    const { fakes, service } = setupUpdate();
+    await expect(service.update('p-0', patch, actorOf(OTHER_PM, 'pm'))).rejects.toBeInstanceOf(ForbiddenException);
+    expect(fakes.processes.get('p-0')).toMatchObject(OPPORTUNITY);
+  });
+
+  it('should throw 400 PROCESS_TERMINAL_STATE when the process is closed', async () => {
+    const { fakes, service } = setupUpdate();
+    fakes.addProcess({ id: 'p-9', status: 'closed' });
+    const error = await service.update('p-9', patch, ownerPm).catch((e: unknown) => e);
+    expect(error).toBeInstanceOf(BadRequestException);
+    expect(bodyOf(error)).toMatchObject({ code: 'PROCESS_TERMINAL_STATE' });
   });
 });

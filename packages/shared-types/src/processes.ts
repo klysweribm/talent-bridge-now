@@ -22,6 +22,12 @@ export interface IProcess {
   readonly ownerPmId: string;
   readonly recruiterId: string | null;
   readonly status: TProcessStatus;
+  /** Campos de la oportunidad (PROC-1c). Los procesos anteriores a PROC-1c no los tienen: se leen como '' / [] / null. */
+  readonly opportunityRole: string;
+  readonly skills: readonly string[];
+  readonly roleDescription: string;
+  /** Banda de la oportunidad (entera); `null` solo en procesos legacy sin banda. Al escribir es siempre un entero. */
+  readonly band: number | null;
   readonly candidateIds: readonly string[];
   readonly maxCandidates: number;
   readonly createdBy: ICandidateActor;
@@ -36,6 +42,10 @@ export interface IProcess {
 export interface ICreateProcessRequest {
   readonly title: string;
   readonly clientName: string;
+  readonly opportunityRole: string;
+  readonly skills: readonly string[];
+  readonly roleDescription: string;
+  readonly band: number;
   readonly ownerPmId?: string;
   readonly recruiterId?: string;
   readonly candidateIds?: readonly string[];
@@ -45,6 +55,10 @@ export interface ICreateProcessRequest {
 export interface IUpdateProcessRequest {
   readonly title?: string;
   readonly clientName?: string;
+  readonly opportunityRole?: string;
+  readonly skills?: readonly string[];
+  readonly roleDescription?: string;
+  readonly band?: number;
   readonly recruiterId?: string;
   readonly status?: TProcessStatus;
 }

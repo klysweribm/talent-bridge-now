@@ -7,6 +7,10 @@ export type TProcessRecord = Omit<IProcess, 'maxCandidates'>;
 export interface IProcessChanges {
   readonly title?: string;
   readonly clientName?: string;
+  readonly opportunityRole?: string;
+  readonly skills?: readonly string[];
+  readonly roleDescription?: string;
+  readonly band?: number;
   readonly recruiterId?: string;
   readonly status?: TProcessStatus;
   readonly candidateIds?: readonly string[];
@@ -16,6 +20,10 @@ export interface IProcessChanges {
 export interface INewProcess {
   readonly title: string;
   readonly clientName: string;
+  readonly opportunityRole: string;
+  readonly skills: readonly string[];
+  readonly roleDescription: string;
+  readonly band: number;
   readonly ownerPmId: string;
   readonly recruiterId: string | null;
   readonly createdBy: ICandidateActor;

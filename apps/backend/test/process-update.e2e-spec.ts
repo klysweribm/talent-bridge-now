@@ -2,7 +2,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import type { Model } from 'mongoose';
 import type { IProcess, IProcessDetail } from '@ibm-talent-bridge/shared-types';
 import { ProcessModel, type ProcessDocument } from '../src/capabilities/processes/infrastructure/adapters/process.schema';
-import { as, createCandidate } from './support/processes-e2e.helpers';
+import { as, createCandidate, OPPORTUNITY } from './support/processes-e2e.helpers';
 import { useProcessCandidatesApp } from './support/process-candidates-e2e.helpers';
 
 jest.setTimeout(30_000);
@@ -22,7 +22,7 @@ describe('PATCH /processes/:id', () => {
     await patch(ctx().users.carlos, p.id, { title: 'X' }).expect(403);
     const foreign = await newProcess(mariana());
     await patch(ana(), foreign.id, { title: 'X' }).expect(403);
-    const otherOwner = (await as(ctx(), ana(), 'post', '/processes').send({ title: 'T', clientName: 'C', ownerPmId: mariana().id }).expect(201)).body as IProcess;
+    const otherOwner = (await as(ctx(), ana(), 'post', '/processes').send({ title: 'T', clientName: 'C', ...OPPORTUNITY, ownerPmId: mariana().id }).expect(201)).body as IProcess;
     await patch(ana(), otherOwner.id, { title: 'Del recruiter' }).expect(200);
     expect(((await patch(mariana(), p.id, { title: 'Nuevo', clientName: 'Otro' }).expect(200)).body as IProcessDetail)).toMatchObject({ title: 'Nuevo', clientName: 'Otro' });
     expect(((await patch(ana(), p.id, { title: 'Por reclutador' }).expect(200)).body as IProcessDetail).title).toBe('Por reclutador');

@@ -31,6 +31,7 @@ services:
       AI_RETRY_BASE_MS: ${AI_RETRY_BASE_MS:-1000}
       AI_RETRY_MAX_MS: ${AI_RETRY_MAX_MS:-10000}
       AI_TOTAL_TIMEOUT_MS: ${AI_TOTAL_TIMEOUT_MS:-90000}
+      CV_MAX_FILE_BYTES: ${CV_MAX_FILE_BYTES:-5242880}
     volumes:
       - ./apps/backend/src:/app/apps/backend/src
       # Read-only: habilita el alias @ibm-talent-bridge/shared-types (tsconfig
@@ -71,6 +72,8 @@ services:
       VITE_APP_ENV: development
       VITE_IDLE_TIMEOUT_SECONDS: ${VITE_IDLE_TIMEOUT_SECONDS:-360}
       VITE_IDLE_WARNING_SECONDS: ${VITE_IDLE_WARNING_SECONDS:-60}
+      VITE_CV_MAX_FILE_BYTES: ${VITE_CV_MAX_FILE_BYTES:-5242880}
+      VITE_CANDIDATES_USE_MOCK: ${VITE_CANDIDATES_USE_MOCK:-true}
     volumes:
       - ./apps/frontend/src:/app/apps/frontend/src
       # Read-only: habilita el alias @ibm-talent-bridge/shared-types (tsconfig

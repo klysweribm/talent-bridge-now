@@ -46,3 +46,7 @@ No upward imports (an atom never imports a molecule/organism). Molecules and ato
 ## Naming
 
 `PascalCase.tsx` components (one folder per component when it has a test), `useCamelCase.ts` hooks, `camelCase.infra.ts`, `camelCase.store.ts`.
+
+## No barrels
+
+Barrels per component or folder inside `apps/` are forbidden (e.g. `index.ts` with `export { ErrorBanner } from './ErrorBanner'`). Import straight from the file: `./ErrorBanner/ErrorBanner`. Exception: a package entry point (`packages/*/src/index.ts`) is its public API. Existing barrels are logged as DT-043 and are removed in a dedicated task, not opportunistically; new code never adds one.

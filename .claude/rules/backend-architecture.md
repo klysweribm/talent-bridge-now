@@ -9,7 +9,7 @@ Detail and examples: `good-practices/BEST-PRACTICES.md` §3 (read only the secti
 
 ## Layout
 
-`src/capabilities/<capability>/{application/{ports,services}, domain/{dto,interfaces}, infrastructure/{adapters,controllers}}`, plus `<capability>.module.ts`. Capabilities: `auth`, `candidates`, `processes`, `interviews`, `feedback`, `reports`, `notifications`, `cv-analysis`. Cross-cutting guards/interceptors/filters/pipes go in `src/shared/`. Aliases: `@capabilities/*`, `@shared/*`.
+`src/capabilities/<capability>/{application/{ports,services}, domain/{dto,interfaces}, infrastructure/{adapters,controllers}}`, plus `<capability>.module.ts`. Capabilities: `auth`, `candidates`, `processes`, `interviews`, `feedback`, `reports`, `notifications`, `cv-analysis`. Cross-cutting guards/interceptors/filters/pipes go in `src/shared/`. Aliases: `@capabilities/*`, `@shared/*`. No barrels (`index.ts` re-exports) inside `apps/`; import from the file (see `frontend-architecture.md` § No barrels).
 
 State today: only `main.ts`, `app.module.ts` and `monitoring/health.*` exist — every capability directory is an empty skeleton. The first capability implemented becomes the golden path for the rest; build it carefully and point to it from here once it exists.
 

@@ -46,6 +46,38 @@ Los IDs PROC-2, CAND-1, INT-1, FEED-1, REP-1 y CV-1 ya no existen como secciones
 actualizarse tras el replanning. Los casos de uso por rol y feature siguen en `docs/use-cases/` (encuadre
 anterior, a revisar en el replanning).
 
+### Funcionalidades de la POC (la ruta que se aisló para esta etapa)
+
+Esto no es todo el roadmap: son las piezas que se eligieron para tener un recorrido completo en la POC (reclutador crea el
+proceso, asigna referente, agenda, el referente evalúa con ayuda de IA). Estado a 2026-11-02, tras el commit `d9f2e1c`.
+«Verificado» dice cómo se comprobó; lo que dice «solo tests» o «no verificado» no se ha visto funcionando en vivo.
+
+| # | Funcionalidad | Estado | Verificado |
+| --- | --- | --- | --- |
+| 1 | ICA como apoyo de IA (capability `ai`) | ✅ Hecha (AI-1) | En vivo por el usuario |
+| 3 | Cargar CV (PDF/Word), extracción a JSON, formulario editable, candidato tentativo, actualización por correo | ✅ Hecha (CAND-2); falta solo la imagen de producción (DT-034) | En vivo por el usuario |
+| 2 | Crear proceso, asociar de 1 a N candidatos, listar procesos | ✅ Hecha en código y commiteada (PROC-1) | Solo tests y e2e; falta tu recorrido en navegador y los `curl` de escritura |
+| 2d | Lista de candidatos en el menú y alta de candidato sin iniciar un proceso | ✅ Hecha en código y commiteada (PROC-1) | Solo tests; `GET /candidates` en vivo exige recrear el backend |
+| 2e | Detalle del proceso con acciones: editar título y cliente, agregar y quitar candidatos, cambiar reclutador, estado y cancelar | 🚧 En curso por otro agente en esta rama | No verificado por el líder |
+| 2f | Regla de no más barrels y deuda de los existentes | 🚧 Pedida, junto con 2e | No verificado por el líder |
+| 2c | Inicio por rol con procesos reales | 🟡 Parcial: el contador y la lista de procesos del Inicio ya son reales; faltan los dashboards propios por rol y el resto de bloques sigue con datos de prueba | Solo tests |
+| 2b | Visibilidad `public/protected` de candidatos y filtrado por dueño | ⏳ Pendiente (R1-R3, fase siguiente) | — |
+| 4 | Asignar referente técnico a un proceso | ⏳ Pendiente (siguiente recomendada) | — |
+| 5 | Lista de referentes con disponibilidad y perfil expandible | ⏳ Pendiente (va con la 4) | — |
+| 6a | Booking, vista PM o reclutador | ⏳ Pendiente | — |
+| 6b | Booking, vista referente | ⏳ Pendiente | — |
+| 8 | Feedback asistido por IA | ⏳ Pendiente | — |
+| 7 | Estrellas y rating de referentes | ⏳ Pendiente, bajo esfuerzo | — |
+| 9 | Pool externo de casi-contratados | ⏳ Pendiente, bajo esfuerzo | — |
+
+Resumen: de 12 filas de la ruta, 4 están hechas en código (1, 3, 2, 2d), 1 es parcial (2c), 2 están en curso (2e, 2f) y 7 están
+pendientes. Solo la 1 y la 3 se han visto funcionando en vivo.
+
+**Orden sugerido para completar la POC:** 2e y 2f (en curso) → 4 y 5 juntas (referentes: no se puede asignar a quien no se
+puede listar, y exigen sembrar referentes de demostración con especialidad y disponibilidad) → 6a y 6b mínimas → 8 (el
+referente evalúa con ayuda de ICA, lo que más luce en la demo) → 2c (dashboards por rol, que es en su mayoría composición de
+lo anterior) → 7 y 9 si sobra tiempo. La 2b queda al final salvo que la demo exija privacidad entre reclutadores.
+
 ### Features vigentes
 
 Orden: primero lo que requiere acción, luego el backlog por prioridad, al final lo cerrado.

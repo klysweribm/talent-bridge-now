@@ -41,4 +41,15 @@ describe('env', () => {
     expect(() => envSchema.parse({ VITE_IDLE_TIMEOUT_SECONDS: '0' })).toThrow();
     expect(() => envSchema.parse({ VITE_IDLE_WARNING_SECONDS: '1.5' })).toThrow();
   });
+
+  it('should default the CV size cap to 5 MiB and the candidates mock switch to on', () => {
+    const result = envSchema.parse({});
+    expect(result.VITE_CV_MAX_FILE_BYTES).toBe(5_242_880);
+    expect(result.VITE_CANDIDATES_USE_MOCK).toBe(true);
+  });
+
+  it('should read the candidates mock switch from a string and reject other values', () => {
+    expect(envSchema.parse({ VITE_CANDIDATES_USE_MOCK: 'false' }).VITE_CANDIDATES_USE_MOCK).toBe(false);
+    expect(() => envSchema.parse({ VITE_CANDIDATES_USE_MOCK: 'maybe' })).toThrow();
+  });
 });

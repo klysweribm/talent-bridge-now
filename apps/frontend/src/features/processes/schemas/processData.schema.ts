@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { PROCESS_DATA_ERRORS, PROCESS_TEXT_MAX_LENGTH } from '../config/processCreate.constants';
 import type { TProcessCreatorRole } from '../types/processCreate.types';
 
-const text = (required: string, tooLong: string): z.ZodString =>
+export const text = (required: string, tooLong: string): z.ZodString =>
   z.string({ required_error: required }).trim().min(1, required).max(PROCESS_TEXT_MAX_LENGTH, tooLong);
 
 const TEXT_FIELD = text('', '');

@@ -57,6 +57,9 @@ export const colors = {
     'danger-bg':  '#ffebeb',
     'info-bg':    '#edf5ff',
     'info-text':  '#0043ce',
+    'success-text': '#0e6027',
+    'purple-bg':  '#f6f2ff',
+    'purple-text': '#6929c4',
   },
   error: {
     DEFAULT:   '#ba1a1a',

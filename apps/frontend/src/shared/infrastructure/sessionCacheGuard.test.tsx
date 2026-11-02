@@ -20,13 +20,13 @@ function seedCache(client: QueryClient): void {
   client.setQueryData(QUERY_KEY, 'cached');
 }
 
-function ProbeOrganism({ queryFn }: { readonly queryFn: () => Promise<string> }) {
+function ProbeOrganism({ queryFn }: { readonly queryFn: () => Promise<string> }): JSX.Element {
   const { data } = useQuery({ queryKey: QUERY_KEY, queryFn });
   return <p data-testid="probe">{data ?? 'loading'}</p>;
 }
 
 // Como la app real: el árbol protegido se desmonta sin sesión y se monta al loguear.
-function ProtectedProbe({ queryFn }: { readonly queryFn: () => Promise<string> }) {
+function ProtectedProbe({ queryFn }: { readonly queryFn: () => Promise<string> }): JSX.Element | null {
   const token = useAuthStore((state) => state.token);
   return token ? <ProbeOrganism queryFn={queryFn} /> : null;
 }

@@ -13,7 +13,7 @@ const search = (): string => screen.getByTestId('search').textContent ?? '';
 const item = (over: Partial<IProcessListItem> = {}): IProcessListItem => ({
   id: 'p1', title: 'Backend Java Sr', clientName: 'Banco Andino', ownerPmId: 'pm1', recruiterId: null,
   maxCandidates: 5, createdBy: 'u1', createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
-  candidateCount: 2, ...over,
+  candidateCount: 2, status: 'open', ...over,
 });
 const page = (data: IProcessListItem[], extra: Partial<PaginatedResponse<IProcessListItem>> = {}): PaginatedResponse<IProcessListItem> =>
   ({ data, total: data.length, page: 1, limit: 20, totalPages: 1, ...extra });

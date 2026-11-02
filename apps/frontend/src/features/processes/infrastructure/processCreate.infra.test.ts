@@ -45,17 +45,27 @@ describe('processCreate.infra', () => {
   });
 
   it.each([
-    [409, 'The candidate already belongs to a process', CandidateAlreadyAssignedError],
-    [400, 'A process can have at most 5 candidates', CandidateLimitExceededError],
-    [404, 'Candidate not found', CandidateNotFoundForProcessError],
-    [503, 'Could not associate', ProcessServiceUnavailableError],
-  ])('should translate a %i into its typed error', async (status, message, errorClass) => {
-    post.mockRejectedValue(new HttpError(status, message));
+    [409, 'The candidate already belongs to a process', 'CANDIDATE_ALREADY_ASSIGNED', CandidateAlreadyAssignedError],
+    [400, 'A process can have at most 5 candidates', 'PROCESS_CANDIDATE_LIMIT', CandidateLimitExceededError],
+    [404, 'Candidate not found', undefined, CandidateNotFoundForProcessError],
+    [503, 'Could not associate', undefined, ProcessServiceUnavailableError],
+  ])('should translate a %i into its typed error', async (status, message, code, errorClass) => {
+    post.mockRejectedValue(new HttpError(status, message, code ? { code } : null));
     await expect(createProcess(REQUEST)).rejects.toBeInstanceOf(errorClass);
   });
 
-  it('should keep the server message in the limit error', async () => {
+  it('should translate by code even if the server text changes language', async () => {
+    post.mockRejectedValue(new HttpError(400, 'Un proceso admite como máximo 5 candidatos', { code: 'PROCESS_CANDIDATE_LIMIT' }));
+    await expect(createProcess(REQUEST)).rejects.toBeInstanceOf(CandidateLimitExceededError);
+  });
+
+  it('should not treat an uncoded 400 whose text mentions the limit as the limit error', async () => {
     post.mockRejectedValue(new HttpError(400, 'A process can have at most 5 candidates'));
+    await expect(createProcess(REQUEST)).rejects.not.toBeInstanceOf(CandidateLimitExceededError);
+  });
+
+  it('should keep the server message in the limit error', async () => {
+    post.mockRejectedValue(new HttpError(400, 'A process can have at most 5 candidates', { code: 'PROCESS_CANDIDATE_LIMIT' }));
     await expect(createProcess(REQUEST)).rejects.toMatchObject({ serverMessage: 'A process can have at most 5 candidates' });
   });
 

@@ -9,12 +9,10 @@ export const USER_OPTIONS_QUERY_KEY = 'user-options';
 export const PROCESS_LIMITS_QUERY_KEY = 'process-limits';
 
 export const HTTP_BAD_REQUEST = 400;
+export const HTTP_FORBIDDEN = 403;
 export const HTTP_NOT_FOUND = 404;
 export const HTTP_CONFLICT = 409;
 export const HTTP_UNAVAILABLE = 503;
-
-/** Fragmento del 400 del servidor cuando se supera el máximo de candidatos ("at most N candidates"). */
-export const CANDIDATE_LIMIT_SERVER_PATTERN = /at most \d+ candidates/i;
 
 export const PROCESS_CREATE_ERRORS = {
   candidateAlreadyAssigned: 'Uno o más candidatos ya pertenecen a otro proceso.',

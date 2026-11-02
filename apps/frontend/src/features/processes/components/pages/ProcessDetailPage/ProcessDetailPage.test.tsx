@@ -9,7 +9,7 @@ vi.mock('../../../infrastructure/processList.infra');
 
 const fetchDetail = vi.mocked(infra.fetchProcessDetail);
 const detail: IProcessDetail = {
-  id: 'p1', title: 'Backend Java Sr', clientName: 'Banco Andino', ownerPmId: 'pm1', recruiterId: null,
+  id: 'p1', title: 'Backend Java Sr', clientName: 'Banco Andino', ownerPmId: 'pm1', recruiterId: null, status: 'in_progress',
   maxCandidates: 5, createdBy: 'u1', createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
   candidateIds: ['c1', 'c2'],
   candidates: [{ id: 'c1', fullName: 'Lucía Fernández', primaryRole: 'Backend Developer' }, { id: 'c2', fullName: 'Juan Pérez' }],
@@ -29,6 +29,11 @@ describe('ProcessDetailPage', () => {
     expect(screen.getByText('Backend Developer')).toBeInTheDocument();
     expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
     expect(fetchDetail).toHaveBeenCalledWith('p1');
+  });
+
+  it('should show the status chip with visible text', async () => {
+    mount();
+    expect(await screen.findByText('Avanzando')).toBeInTheDocument();
   });
 
   it('should offer a "Volver a procesos" link', async () => {

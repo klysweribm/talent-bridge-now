@@ -5,7 +5,7 @@ import { HttpError } from '@shared/infrastructure/httpError';
 import { NOT_FOUND_STATUS, PROCESS_LIST_COPY } from '../../../config/processList.constants';
 import { useProcessDetail } from '../../../hooks/useProcessDetail';
 import { ProcessDetailHeader } from '../../molecules/ProcessDetailHeader/ProcessDetailHeader';
-import { ProcessCandidateList } from '../../molecules/ProcessCandidateList/ProcessCandidateList';
+import { ProcessActions } from '../ProcessActions/ProcessActions';
 
 export interface ProcessDetailViewProps {
   readonly id: string;
@@ -36,7 +36,7 @@ export function ProcessDetailView({ id }: ProcessDetailViewProps): JSX.Element {
     <div className="flex flex-col gap-lg">
       {back}
       <ProcessDetailHeader process={data} />
-      <ProcessCandidateList candidates={data.candidates} />
+      <ProcessActions process={data} />
     </div>
   );
 }

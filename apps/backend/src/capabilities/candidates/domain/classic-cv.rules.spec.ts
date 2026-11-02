@@ -55,3 +55,44 @@ describe('extractClassicDraft', () => {
     expect(draft.email).toBeUndefined();
   });
 });
+
+describe('extractClassicDraft resource bounds', () => {
+  it('should finish in well under a second on a huge text made of one long token', () => {
+    const hostile = 'a'.repeat(900_000);
+
+    const started = Date.now();
+    const { draft } = extractClassicDraft(hostile, CATALOG);
+
+    expect(Date.now() - started).toBeLessThan(1000);
+    expect(draft.email).toBeUndefined();
+  });
+
+  it('should still find the contact data in the first part of a text longer than the cap', () => {
+    const text = `${TEXT}\n${'relleno '.repeat(100_000)}`;
+
+    const { draft } = extractClassicDraft(text, CATALOG);
+
+    expect(draft.email).toBe('lucia.fernandez.demo@example.com');
+  });
+
+  it('should not match an email whose token is longer than a sane address length', () => {
+    const { draft } = extractClassicDraft(`${'x'.repeat(5000)}@example.com`, CATALOG);
+
+    expect(draft.email).toBeUndefined();
+  });
+});
+
+describe('extractClassicDraft LinkedIn scanning', () => {
+  it('should find a LinkedIn url without scheme and normalize it to https', () => {
+    const { draft } = extractClassicDraft('Contacto: linkedin.com/in/lucia-fernandez-demo | Chile y más texto de relleno', CATALOG);
+
+    expect(draft.linkedIn).toBe('https://linkedin.com/in/lucia-fernandez-demo');
+  });
+
+  it('should not stall on a huge token that merely contains the word linkedin', () => {
+    const started = Date.now();
+    extractClassicDraft(`linkedin${'a'.repeat(900_000)}`, CATALOG);
+
+    expect(Date.now() - started).toBeLessThan(1000);
+  });
+});

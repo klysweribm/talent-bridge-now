@@ -52,8 +52,10 @@ Orden: primero lo que requiere acción, luego el backlog por prioridad, al final
 
 | ID | Estado | Prioridad | Depende de |
 | --- | --- | --- | --- |
-| CAND-2 | 🚧 en curso: contrato en `shared-types`, ADR-015 y casos de uso; spike de ICA `files` pendiente | HIGH | AI-1 |
-| AI-1 | ✅ cerrado en código y verificado en vivo: capability `ai` (ICA) con coordinator simple | HIGH | — |
+| CAND-2 | 🚧 implementado y con tests (extracción de CV con 3 modos, alta y actualización por correo con auditoría); falta la prueba en vivo con ICA real, Mongo y navegador | HIGH | AI-1 |
+| AI-1 | ✅ cerrado en código y verificado en vivo: capability `ai` (ICA) con coordinator simple; ahora también archivos y consulta con definición propia (CAND-2) | HIGH | — |
+| CAND-3 | 📌 sin arrancar: asociar varios candidatos a un proceso y mejorar cómo se agregan (Caja 1 de `/processes/new`) | HIGH | CAND-2 |
+| CAND-4 | 📌 sin arrancar: retirar el modo `ica` con archivo y mejorar el modo clásico (país, rol, experiencia) | MEDIUM | CAND-2 |
 | BENCH-1 | 🚧 verificado en vivo (stack, `curl` por rol, imagen de producción); falta el recorrido con los 3 roles | HIGH | AUTH-1, Etapa 2 |
 | QW-1 | 🚧 implementado, falta el recorrido en navegador (DT-010) | HIGH | — |
 | FE | 🚧 Etapas 0-2 en código; Etapa 2 pendiente de revisión en navegador | MEDIUM | — |
@@ -75,29 +77,34 @@ Orden: primero lo que requiere acción, luego el backlog por prioridad, al final
 > Historial de abajo y en `good-practices/DEBT_TECH.md` → Resueltos.
 
 **Próximos pasos, en orden:**
-0. **AI-1 (cerrado en código, rama `feature/AI-1`):** capability `ai` vía ICA. Siguiente para la POC: tópico de CV a JSON (AI-2), proceso con match de banca y referentes.
-1. **Recorrido en navegador con los 3 roles** (ana@, carlos@, mariana@ibm.com): cierra BENCH-1 y de paso DT-010 (F5
+0. **CAND-2 (en código, rama `feature/CAND-2`, 14 commits locales sin push):** prueba en vivo pendiente. Recrear el backend y el
+   frontend, cargar un CV real en los tres modos (`ica-text`, `classic`, `ica`), crear el perfil, volver a cargarlo y ver
+   el aviso de actualización, y comprobar en Mongo que quedan `summary`, `experience`, `education`, `languages` y el autor.
+   Probar también el modo clásico con ICA caído y un CV en Word.
+1. **CAND-3 (siguiente feature pedida):** varios candidatos por proceso y un mejor flujo para agregarlos. Entrar en plan
+   mode: parte de la Caja 1 de `/processes/new` y de ADR-013 (`Candidate.processIds` <-> `Process.candidateIds`).
+2. **Decidir el modo `ica` (archivo):** recomendado retirarlo tras la demo (DT-033); es el único con el defecto de contacto
+   vacío y deja CV huérfanos en ICA si la subida expira.
+3. **Imagen de producción (DT-034):** `docker build` real del `Dockerfile` del backend con un PDF, porque `pdf-parse` arrastra
+   `@napi-rs/canvas` y sobre Alpine no está probado.
+4. **Recorrido en navegador con los 3 roles** (ana@, carlos@, mariana@ibm.com): cierra BENCH-1 y de paso DT-010 (F5
    conserva la sesión, ningún link da 404, aviso de inactividad a los 360 s). Con eso se pueden cerrar QW-1, AUTH-1,
-   QW-2 y la Etapa 2, y las deudas DT-002, DT-007 y DT-024. La primera prueba visual de `/bench` ya salió bien;
-   falta el barrido por rol y los demás puntos.
-2. **Seguridad del repositorio:** la URL de `origin` lleva un token de GitHub en texto plano dentro de
-   `.git/config`. Revocarlo, pasar a un credential helper o SSH y reescribir la URL sin credenciales. Además
-   `~/.gitconfig` tiene `http.sslverify=false`.
-3. **Decidir qué hacer con los 21 commits con `Co-Authored-By`:** ya están en `origin` (`feature/improvements` y
-   `main`), así que quitarlos exige `--force`, descartado hasta nueva orden. No hay commits locales sin subir
-   con esa línea; los nuevos de BENCH-1 no la llevan.
-4. **Replanning Bench First** (ADR, `docs/domain.md`, casos de uso, `shared-types`) y, después, **AI-1**
-   (asistente sobre la banca vía `AiProviderPort`, que enviará a ICA solo los campos sin datos personales de
-   `IBenchResource`) y `MATCH-1`. Al replanificar hay que actualizar `/roadmap-task` (DT-025).
-5. Opcionales: OBS-2 y DT-020; deudas nuevas de BENCH-1 (DT-027 a DT-029).
+   QW-2 y la Etapa 2, y las deudas DT-002, DT-007 y DT-024.
+5. **Seguridad del repositorio:** la URL de `origin` lleva un token de GitHub en texto plano dentro de `.git/config`.
+   Revocarlo, pasar a un credential helper o SSH y reescribir la URL sin credenciales. Además `~/.gitconfig` tiene
+   `http.sslverify=false`.
+6. **Decidir qué hacer con los 21 commits con `Co-Authored-By`:** ya están en `origin`, así que quitarlos exige `--force`,
+   descartado hasta nueva orden. Los commits de CAND-2 no llevan esa línea.
+7. **Replanning Bench First** (ADR, `docs/domain.md`, casos de uso, `shared-types`) y `MATCH-1`. Al replanificar hay que
+   actualizar `/roadmap-task` (DT-025). Opcionales: OBS-2, DT-020 y las deudas DT-027 a DT-038.
 
-**Gates (2026-10-30, tras BENCH-1):** backend 112 unit / 74 e2e (antes 39 / 41), lint 0 errores / 14 warnings;
-frontend 375 tests (antes 264), lint 0 errores (2 warnings preexistentes en `sessionCacheGuard.test.tsx`; el
-script `npm run lint` usa `--max-warnings 0` y por eso sale en rojo), build OK, `validate-quality --strict`
-0 críticos sobre 107 archivos.
+**Gates (2026-11-02, tras CAND-2):** backend 394 unit / 139 e2e (antes 112 / 74), lint 0 errores / 14 warnings, build OK;
+frontend 489 tests (antes 375), lint 0 errores (2 warnings preexistentes en `sessionCacheGuard.test.tsx`; el script
+`npm run lint` usa `--max-warnings 0` y por eso sale en rojo), build OK; `validate-quality --strict` 0 críticos sobre 177
+archivos. Todo contra fakes y CV sintéticos: falta ICA real, Mongo inspeccionado y navegador.
 
-**Git:** rama `feature/BENCH`, commits locales sin push. `origin` apunta a `klysweribm/talent-bridge-now`;
-nunca `--force`.
+**Git:** rama `feature/CAND-2` (sale de `main` tras el merge de AI-1), commits locales sin push. `origin` apunta a
+`klysweribm/talent-bridge-now`; nunca `--force`.
 
 ---
 
@@ -105,13 +112,15 @@ nunca `--force`.
 
 > Lo que sigue abierto. Orden: lo más importante primero.
 
-## CAND-2 — Candidato externo desde CV (ICA `files` o extracción clásica) (HIGH)
+## CAND-2 — Candidato externo desde CV (3 extractores, alta y actualización) (HIGH)
 
-**Estado:** 🚧 en curso (2026-11-01), rama `feature/CAND-2` · **Complejidad:** 🔴 Alta · **Casos de uso:** UC-CAND-5 en [`docs/use-cases/candidates.md`](./docs/use-cases/candidates.md) · **Decisión:** ADR-015
+**Estado:** 🚧 implementado y con tests (2026-11-02), falta la prueba en vivo · rama `feature/CAND-2` · **Complejidad:** 🔴 Alta · **Casos de uso:** UC-CAND-5 y UC-CAND-6 en [`docs/use-cases/candidates.md`](./docs/use-cases/candidates.md) · **Decisión:** ADR-015
 
 Cargar un CV (PDF o DOCX), extraer un `ICandidateProfileDraft` y mostrarlo en un formulario editable; solo al confirmar
-se crea el `Candidate` tentativo. Dos extractores seleccionables con el mismo esquema: ICA (principal, `files`) y
-clásico local (respaldo). `/processes/new` pasa a ser una cuadrícula de cajas; solo la Caja 1 es funcional.
+se crea el `Candidate` tentativo. Tres extractores seleccionables con el mismo esquema: `ica-text` (principal, el backend
+extrae el texto y lo manda a ICA en línea), `classic` (reglas locales completadas con ICA, y que sigue funcionando si ICA
+cae) e `ica` (archivo vía `files`, solo para comparar). `/processes/new` es una cuadrícula de cajas; solo la Caja 1 es
+funcional.
 
 **Decisiones:** `pdf-parse` + `mammoth` para el modo clásico; reintento en Clásica con botón explícito, sin cambio
 silencioso; la extracción no persiste; PII a ICA aceptada para la POC (DT-030) con mitigaciones baratas
@@ -119,31 +128,36 @@ silencioso; la extracción no persiste; PII a ICA aceptada para la POC (DT-030) 
 
 **Criterios de éxito:**
 - [x] Contrato en `shared-types` (`candidates.ts`) con typecheck verde en backend y frontend.
-- [x] ADR-015 y UC-CAND-5.
-- [x] Spike de ICA `files` con un PDF y un DOCX sintéticos (2026-11-01): sube, se extrae y responde en el chat; `response_format` no es fiable con `files` (ver ADR-015). Sin probar: tamaño máximo, `.doc`, PDF escaneado.
-- [ ] Variable de tamaño máximo del archivo en `.env.example` y compose.
-- [ ] Extensión aditiva de `ai` (subir, esperar, borrar) con el coordinator sin lanzar.
-- [ ] `POST /candidates/cv-extraction` con ambos extractores, roles y 503 sin 401.
-- [ ] `POST /candidates` con email único y `status: 'tentative'`.
-- [ ] Pantalla `/candidates/new` y cuadrícula en `/processes/new` (Caja 1 funcional).
-- [ ] Prueba en vivo con CV sintéticos, 3 roles y 0 fugas de la clave.
+- [x] ADR-015 y UC-CAND-5 / UC-CAND-6.
+- [x] Spike de ICA `files` y diagnóstico en vivo (2026-11-01): `files` no entrega el documento completo al modelo; el texto en línea sí (ver ADR-015).
+- [x] Variable `CV_MAX_FILE_BYTES` en `.env.example` y compose; `.env.example` ordenado por proyecto.
+- [x] Extensión aditiva de `ai` (subir, esperar, borrar, consulta con definición propia) con el coordinator sin lanzar.
+- [x] `POST /candidates/cv-extraction` con los tres modos, roles y 503 sin 401; el modo clásico nunca devuelve 503.
+- [x] `POST /candidates` con email único y `status: 'tentative'`, y `PUT /candidates/:id` con reemplazo total.
+- [x] Pantalla `/candidates/new` y cuadrícula en `/processes/new` (Caja 1 funcional).
+- [x] Defectos de la revisión corregidos: regex cuadráticas, límites del parser, `@TraceFlow()` en `complete`, skills con comas, mock apagado por defecto, correo fijo al actualizar, scripts de Jest para la CI.
+- [ ] Prueba en vivo: backend y frontend recreados, CV real en los tres modos, tiempos, Word, clásico con ICA caído, y 0 fugas de la clave.
+- [ ] Verificar en Mongo que quedan `summary`, `experience`, `education`, `languages` y el autor tras crear y actualizar.
+- [ ] Construir la imagen de producción y probar un PDF (DT-034).
 
-**Mejoras pedidas (2026-11-01), pendientes:**
+**Mejoras pedidas (2026-11-01):**
 - [x] **Tamaño del archivo en la pantalla de carga:** mostrar el peso del archivo elegido y el límite que debe respetar (hoy 5 MiB, `VITE_CV_MAX_FILE_BYTES`, mismo valor que `CV_MAX_FILE_BYTES` del backend). Avisar antes de enviar si lo excede.
 - [x] **Datos adicionales del candidato (pendiente verificar en Mongo y en el navegador):** mostrar, debajo del formulario y con buen formato, lo que el CV aporta y el formulario no edita: `summary` (resumen), `experience` (experiencia) y `education` (educación), además de `languages`. Es solo lectura, como información para el PM o el reclutador; no se agrega al formulario de creación.
   - La persistencia ya existe: `POST /candidates` guarda `summary`, `experience`, `education` y `languages` en Mongo asociados al candidato (y el frontend los reenvía desde el borrador). Falta verificar en la base que quedan guardados tras crear un candidato real.
   - Son opcionales, pero enriquecen el perfil y se podrán usar en otras etapas (listado y detalle de candidatos, match).
   - Depende de que el extractor devuelva esos campos: ICA ya los llena; el modo clásico no (queda para su mejora).
-- [x] **Extracción de ICA incompleta:** diagnosticado (ADR-015). `files` no entrega el documento completo al modelo; el texto en línea sí. Implementados `ica-text` (texto en línea, sin subir el archivo) y el clásico completado con ICA, con backend 366 unit / 127 e2e y frontend 443 tests. Falta la prueba en vivo con el backend real y comparar tiempos de los tres modos.
+- [x] **Extracción de ICA incompleta (resuelta en código; falta la prueba en vivo):** diagnosticado (ADR-015): `files` no entrega el documento completo al modelo; el texto en línea sí. Implementados `ica-text` y el clásico completado con ICA. Pendiente: prueba en vivo del backend real con los tres modos, tiempos y la actualización de perfiles.
 
-**CAND-2b — Actualizar un perfil desde un CV más nuevo (en curso):**
-- [ ] `PUT /candidates/:id` con reemplazo total; conserva correo, estado, creador y fecha de creación.
-- [ ] Auditoría: `createdBy`, `updatedBy` (id, correo y rol del JWT), `updateCount`.
-- [ ] Aviso suave antes de editar si el correo ya existe (`matches.exact`) y aviso no bloqueante de perfiles parecidos (`matches.similar`: mismo nombre normalizado o mismo teléfono).
-- [ ] Revisión profunda de deuda técnica de todo CAND-2 (solo hallazgos; nada se corrige sin OK).
-- Límites: la escritura manual no muestra el aviso de parecidos; los candidatos anteriores no tienen claves de búsqueda; el RUT queda como campo opcional futuro (decisión con compliance).
+**CAND-2b — Actualizar un perfil desde un CV más nuevo (implementado):**
+- [x] `PUT /candidates/:id` con reemplazo total; conserva correo, estado, creador y fecha de creación.
+- [x] Auditoría: `createdBy`, `updatedBy` (id, correo y rol del JWT, nunca del cuerpo), `updateCount`.
+- [x] Aviso suave antes de editar si el correo ya existe (`matches.exact`) y aviso no bloqueante de perfiles parecidos (`matches.similar`: mismo nombre normalizado o mismos últimos 8 dígitos del teléfono).
+- [x] Revisión profunda de deuda técnica: hallazgos verificados, defectos corregidos y el resto registrado como DT-031 a DT-038.
+- [ ] Probar en vivo: crear el perfil, volver a cargar el CV y ver el aviso y la actualización.
+- Límites: la escritura manual no muestra el aviso de parecidos; los candidatos anteriores no tienen claves de búsqueda (DT-032); el RUT queda como campo opcional futuro (decisión con compliance).
+- Pendiente de decidir: mostrar «PM» en vez de «Project Manager» en el aviso de quién actualizó.
 
-**Fuera de alcance (siguiente):** asociar el candidato a un proceso; listado y detalle de candidatos; Cajas 2 y 3;
+**Fuera de alcance (siguiente):** asociar varios candidatos a un proceso (CAND-3); listado y detalle de candidatos; Cajas 2 y 3;
 persistencia del archivo (COS); pool externo; deduplicación avanzada; reintentos automáticos entre extractores; OCR;
 `stream`. **Caja 3 (especificación pendiente):** unidad de negocio (consulting, tech, infra), cliente, descripción,
 rol, expertise, contacto en el cliente (opcional), código de proyecto (opcional), PM del proyecto (opcional) y plazos
@@ -579,6 +593,8 @@ DT-020 (warnings de lint del FlowLog) y DT-021 (el `Dockerfile` fija `NODE_ENV=p
 | 2026-10-30 | `BENCH-1` verificado en vivo (stack con podman, `curl` por rol, imagen de producción); `ROADMAP.md` reordenado con lo pendiente arriba y lo cerrado al final. | Que el documento muestre primero qué toca hacer; solo queda el recorrido en navegador con los 3 roles. |
 | 2026-10-31 | `AI-1` iniciada: capability `ai` con proveedor ICA (ADR-014), contrato en `shared-types`, casos de uso y alta de DT-030 (PII hacia ICA). | La POC del fin de semana necesita IA en CV, match y feedback; ICA sustituye a watsonx.ai como proveedor. |
 | 2026-11-01 | `CAND-2` iniciada: contrato `candidates.ts` en `shared-types`, ADR-015, UC-CAND-5 y regla `cv-pii-handling`. Spike de ICA `files` pendiente (bloqueado por permisos de `curl`). | La POC necesita crear candidatos externos desde un CV, con extracción por ICA o clásica y revisión humana antes de crear. |
+| 2026-11-02 | `CAND-2` implementada: tres extractores (`ica-text`, `classic` completado con ICA, `ica`), alta y actualización por correo con auditoría y avisos de coincidencia, datos adicionales y tamaño del archivo en la pantalla de carga. Revisión de deuda técnica: corregidos regex cuadráticas, límites del parser, `@TraceFlow()` de `complete`, skills con comas, mock por defecto, correo fijo al actualizar y scripts de Jest para la CI; registradas DT-031 a DT-038. | Se pidió cargar un CV, revisarlo y crear o actualizar el candidato; el diagnóstico en vivo mostró que `files` perdía los datos de contacto y la revisión encontró defectos reales antes de commitear. |
+| 2026-11-02 | `CAND-3` y `CAND-4` registradas sin arrancar: varios candidatos por proceso, y retirar el modo `ica` y mejorar el clásico. | Siguiente feature pedida por el usuario y decisión pendiente sobre el modo `ica` (DT-033). |
 
 ---
 

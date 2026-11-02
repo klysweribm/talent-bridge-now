@@ -26,8 +26,7 @@ export class IcaProvider implements IAiProviderPort {
 
   constructor(@Inject(AI_CONFIG) private readonly config: TAiConfig) {}
 
-  // Los argumentos (mensajes) pueden llevar datos personales y la clave no es argumento: FlowLog solo ve la petición.
-  @TraceFlow()
+  // Sin @TraceFlow(): los mensajes pueden llevar el texto de un CV (datos personales) y FlowLog imprime los argumentos.
   async complete(request: IAiCompletionRequest): Promise<IAiCompletion> {
     const target = this.target();
     const model = request.model ?? target.model;

@@ -1,6 +1,7 @@
 import type { FieldErrors, UseFormRegister } from 'react-hook-form';
-import { FIELD_LABELS } from '../../../config/candidates.constants';
+import { EMAIL_LOCKED_HINT, FIELD_LABELS, SKILLS_HINT } from '../../../config/candidates.constants';
 import type { ICandidateFormValues } from '../../../utils/draftMapping';
+import { CandidateTextAreaField } from '../CandidateTextAreaField';
 import { CandidateTextField } from '../CandidateTextField';
 import { SeniorityField } from '../SeniorityField';
 
@@ -8,32 +9,51 @@ export interface CandidateFormFieldsProps {
   readonly register: UseFormRegister<ICandidateFormValues>;
   readonly errors: FieldErrors<ICandidateFormValues>;
   readonly missing: ReadonlySet<string>;
+  /** Modo actualización: el correo identifica al perfil y el backend rechaza cambiarlo, así que no se edita. */
+  readonly emailLocked?: boolean;
 }
 
-export function CandidateFormFields({ register, errors, missing }: CandidateFormFieldsProps): JSX.Element {
-  const field = (name: keyof typeof FIELD_LABELS, extra: { required?: boolean; label?: string } = {}): JSX.Element => (
+interface IFieldExtra {
+  readonly required?: boolean;
+  readonly label?: string;
+  readonly readOnly?: boolean;
+  readonly hint?: string;
+}
+
+type TFieldName = keyof typeof FIELD_LABELS;
+
+/** Un campo de texto del formulario, cableado a react-hook-form, a sus errores y al aviso de "no detectado". */
+function TextFieldFor({ name, form, extra = {} }: { readonly name: TFieldName; readonly form: CandidateFormFieldsProps; readonly extra?: IFieldExtra }): JSX.Element {
+  return (
     <CandidateTextField
       label={extra.label ?? FIELD_LABELS[name]}
       aria-required={extra.required}
-      error={errors[name]?.message}
-      missing={missing.has(name)}
-      {...register(name)}
+      readOnly={extra.readOnly}
+      hint={extra.hint}
+      error={form.errors[name]?.message}
+      missing={form.missing.has(name)}
+      {...form.register(name)}
     />
   );
+}
+
+export function CandidateFormFields(form: CandidateFormFieldsProps): JSX.Element {
+  const { register, errors, missing, emailLocked = false } = form;
+  const email: IFieldExtra = { required: true, label: `${FIELD_LABELS.email} *`, readOnly: emailLocked, hint: emailLocked ? EMAIL_LOCKED_HINT : undefined };
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-base">
-      {field('fullName', { required: true, label: `${FIELD_LABELS.fullName} *` })}
-      {field('email', { required: true, label: `${FIELD_LABELS.email} *` })}
-      {field('phone')}
-      {field('linkedIn')}
-      {field('country')}
-      {field('city')}
-      {field('primaryRole')}
+      <TextFieldFor name="fullName" form={form} extra={{ required: true, label: `${FIELD_LABELS.fullName} *` }} />
+      <TextFieldFor name="email" form={form} extra={email} />
+      <TextFieldFor name="phone" form={form} />
+      <TextFieldFor name="linkedIn" form={form} />
+      <TextFieldFor name="country" form={form} />
+      <TextFieldFor name="city" form={form} />
+      <TextFieldFor name="primaryRole" form={form} />
       <SeniorityField missing={missing.has('seniority')} {...register('seniority')} />
-      {field('yearsExperience')}
-      {field('skills', { label: `${FIELD_LABELS.skills} (separadas por coma)` })}
-      {field('summary')}
+      <TextFieldFor name="yearsExperience" form={form} />
+      <CandidateTextAreaField label={FIELD_LABELS.skills} hint={SKILLS_HINT} error={errors.skills?.message} missing={missing.has('skills')} {...register('skills')} />
+      <TextFieldFor name="summary" form={form} />
     </div>
   );
 }

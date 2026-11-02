@@ -19,10 +19,14 @@ export const candidateSchema = z.object({
   summary: z.string(),
 }) satisfies z.ZodType<ICandidateFormValues>;
 
-/** El borrador solo siembra los valores iniciales; después manda el estado del formulario. */
-export function useCandidateForm(draft?: ICandidateProfileDraft): UseFormReturn<ICandidateFormValues> {
+/**
+ * El borrador solo siembra los valores iniciales; después manda el estado del formulario. Si el perfil ya existe
+ * (`lockedEmail`), el correo sembrado es el guardado, no el que trajo el CV: es el que identifica al perfil.
+ */
+export function useCandidateForm(draft?: ICandidateProfileDraft, lockedEmail?: string): UseFormReturn<ICandidateFormValues> {
+  const seeded = draft ? draftToFormValues(draft) : EMPTY_FORM_VALUES;
   return useForm<ICandidateFormValues>({
     resolver: zodResolver(candidateSchema),
-    defaultValues: draft ? draftToFormValues(draft) : EMPTY_FORM_VALUES,
+    defaultValues: lockedEmail === undefined ? seeded : { ...seeded, email: lockedEmail },
   });
 }

@@ -1,4 +1,4 @@
-import type { ICandidate, ICandidateActor, ICreateCandidateRequest, TCandidateStatus } from '@ibm-talent-bridge/shared-types';
+import type { ICandidate, ICandidateActor, TCandidateAssignment, ICreateCandidateRequest, TCandidateStatus } from '@ibm-talent-bridge/shared-types';
 
 export interface ICandidateSimilarQuery {
   readonly nameKey?: string;
@@ -21,4 +21,12 @@ export interface ICandidateRepositoryPort {
    * fija `updatedBy`, recalcula las claves e incrementa `updateCount`. `null` si el id no existe o es inválido.
    */
   replace(id: string, request: ICreateCandidateRequest, actor: ICandidateActor): Promise<ICandidate | null>;
+  /** Solo los ids que existen (ids mal formados se ignoran). */
+  findByIds(ids: readonly string[]): Promise<readonly ICandidate[]>;
+  /** Fija `processId` solo si el candidato no tiene ninguno (update condicional, atómico). `false` si no cambió nada. */
+  claimProcess(id: string, processId: string): Promise<boolean>;
+  /** Quita `processId` solo si coincide con `processId`. `false` si no cambió nada. */
+  releaseProcess(id: string, processId: string): Promise<boolean>;
+  /** Candidatos paginados (más recientes primero). `assignment` ausente = todos; `available` = sin `processId`; `assigned` = con él. */
+  findPage(page: number, limit: number, assignment?: TCandidateAssignment): Promise<{ readonly items: readonly ICandidate[]; readonly total: number }>;
 }

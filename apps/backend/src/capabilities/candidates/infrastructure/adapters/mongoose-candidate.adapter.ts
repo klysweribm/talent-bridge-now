@@ -1,28 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, type Model } from 'mongoose';
-import type { ICandidate, ICandidateActor, ICreateCandidateRequest, TCandidateStatus } from '@ibm-talent-bridge/shared-types';
+import type { ICandidate, ICandidateActor, ICreateCandidateRequest, TCandidateAssignment, TCandidateStatus } from '@ibm-talent-bridge/shared-types';
 import type { ICandidateRepositoryPort, ICandidateSimilarQuery } from '../../application/ports/candidate-repository.port';
-import { normalizeName, phoneKey } from '../../domain/candidate-similarity';
 import { CANDIDATE_SIMILAR_LIMIT } from '../../domain/constants/candidate.constants';
 import { DuplicateCandidateEmailError } from '../../domain/errors/duplicate-candidate-email.error';
+import { isDuplicateKey, PROFILE_FIELDS, searchKeys } from './candidate-adapter.helpers';
 import { CandidateModel, type CandidateDocument } from './candidate.schema';
-
-const MONGO_DUPLICATE_KEY = 11000;
-
-const isDuplicateKey = (error: unknown): boolean =>
-  typeof error === 'object' && error !== null && (error as { code?: unknown }).code === MONGO_DUPLICATE_KEY;
-
-/** Campos de perfil que un reemplazo sustituye por completo (los ausentes se eliminan). Email y status no están. */
-const PROFILE_FIELDS = [
-  'fullName', 'phone', 'linkedIn', 'location', 'primaryRole', 'seniority', 'yearsExperience',
-  'skills', 'languages', 'education', 'experience', 'summary',
-] as const;
-
-const searchKeys = (request: ICreateCandidateRequest): { nameKey?: string; phoneKey?: string } => ({
-  nameKey: normalizeName(request.fullName) || undefined,
-  phoneKey: phoneKey(request.phone),
-});
 
 /** Sin `@TraceFlow()`: los argumentos y resultados son datos personales del candidato. */
 @Injectable()
@@ -52,6 +36,35 @@ export class MongooseCandidateAdapter implements ICandidateRepositoryPort {
       .limit(CANDIDATE_SIMILAR_LIMIT)
       .exec();
     return documents.map((document) => this.toDomain(document));
+  }
+
+  async findByIds(ids: readonly string[]): Promise<readonly ICandidate[]> {
+    const valid = ids.filter((id) => isValidObjectId(id));
+    if (valid.length === 0) return [];
+    const documents = await this.model.find({ _id: { $in: valid } }).exec();
+    const byId = new Map(documents.map((document) => [String(document._id), document]));
+    return valid.flatMap((id) => (byId.has(id) ? [this.toDomain(byId.get(id) as CandidateDocument)] : []));
+  }
+
+  async claimProcess(id: string, processId: string): Promise<boolean> {
+    if (!isValidObjectId(id)) return false;
+    const result = await this.model.updateOne({ _id: id, processId: { $exists: false } }, { $set: { processId } }).exec();
+    return result.modifiedCount === 1;
+  }
+
+  async releaseProcess(id: string, processId: string): Promise<boolean> {
+    if (!isValidObjectId(id)) return false;
+    const result = await this.model.updateOne({ _id: id, processId }, { $unset: { processId: 1 } }).exec();
+    return result.modifiedCount === 1;
+  }
+
+  async findPage(page: number, limit: number, assignment?: TCandidateAssignment): Promise<{ readonly items: readonly ICandidate[]; readonly total: number }> {
+    const filter = assignment ? { processId: { $exists: assignment === 'assigned' } } : {};
+    const [documents, total] = await Promise.all([
+      this.model.find(filter).sort({ createdAt: -1, _id: -1 }).skip((page - 1) * limit).limit(limit).exec(),
+      this.model.countDocuments(filter).exec(),
+    ]);
+    return { items: documents.map((document) => this.toDomain(document)), total };
   }
 
   async replace(id: string, request: ICreateCandidateRequest, actor: ICandidateActor): Promise<ICandidate | null> {

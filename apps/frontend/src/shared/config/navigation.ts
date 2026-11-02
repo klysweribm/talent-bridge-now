@@ -33,7 +33,6 @@ export const NAVIGATION_ITEMS: readonly INavItem[] = [
 /** Rutas protegidas que aún no tienen pantalla real — renderizan `ComingSoon`. */
 export const COMING_SOON_PATHS: readonly string[] = [
   '/processes',
-  '/processes/new',
   '/processes/:id',
   '/interviews',
   '/feedback',

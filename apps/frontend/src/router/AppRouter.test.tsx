@@ -127,6 +127,33 @@ describe('AppRouter — navigation/route consistency', () => {
     expect(screen.getByText('Esta sección está en construcción. El equipo de IBM Talent Bridge está trabajando en ella — vuelve pronto.')).toBeInTheDocument();
   });
 
+  it('should render ComingSoon for a protected detail route without a real screen yet', () => {
+    useAuthStore.getState().setAuth(DEMO_USER, validToken());
+    renderAt('/processes/42');
+    expect(screen.getByRole('heading', { level: 1, name: 'Detalle del Proceso' })).toBeInTheDocument();
+    expect(screen.getByText(/Esta sección está en construcción/)).toBeInTheDocument();
+  });
+
+  it.each(['recruiter', 'pm'] as const)('should render the requirement boxes on /processes/new for a %s', role => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role }, validToken());
+    renderAt('/processes/new');
+    expect(screen.getByRole('heading', { level: 1, name: 'Nuevo proceso' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /agregar candidato/i })).toHaveAttribute('href', '/candidates/new');
+  });
+
+  it.each(['recruiter', 'pm'] as const)('should render the real NewCandidatePage on /candidates/new for a %s', role => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role }, validToken());
+    renderAt('/candidates/new');
+    expect(screen.getByRole('heading', { level: 1, name: 'Agregar candidato' })).toBeInTheDocument();
+  });
+
+  it('should send a technical_ref who opens /candidates/new to /dashboard', () => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'technical_ref' }, validToken());
+    renderAt('/candidates/new');
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Agregar candidato' })).not.toBeInTheDocument();
+  });
+
   it('should render the 404 view inside the layout (sidebar visible) for an unknown authenticated route', () => {
     useAuthStore.getState().setAuth(DEMO_USER, validToken());
     renderAt('/this-route-does-not-exist');

@@ -33,7 +33,7 @@ const NO_DRAFT = { draft: {}, missingFields: [], warnings: [] } as const;
 
 export function CandidateReviewForm({ result, onRestart }: CandidateReviewFormProps): JSX.Element {
   const { draft, missingFields, warnings } = result ?? NO_DRAFT;
-  const { register, handleSubmit, setValue, formState: { errors } } = useCandidateForm(draft);
+  const { register, handleSubmit, setValue, formState: { errors } } = useCandidateForm(draft, result?.matches?.exact?.email);
   const submission = useCandidateSubmission(result?.matches?.exact?.id);
   const { duplicate } = submission;
   const missing = resolveMissing(missingFields);
@@ -49,7 +49,7 @@ export function CandidateReviewForm({ result, onRestart }: CandidateReviewFormPr
       <ReviewHeading result={result} />
       {result?.matches && <CandidateMatchNotice matches={result.matches} />}
       <ExtractionNotices missingLabels={missing.labels} warnings={warnings} />
-      <CandidateFormFields register={register} errors={errors} missing={missing.formFields} />
+      <CandidateFormFields register={register} errors={errors} missing={missing.formFields} emailLocked={isUpdate} />
       <AdditionalCandidateData draft={draft} />
       {duplicate && (
         // El backend rechaza un PUT con otro correo: se fija el del perfil existente.

@@ -36,9 +36,22 @@ describe('NewCandidatePage', () => {
     await upload(user);
     expect(await screen.findByLabelText(/nombre completo/i)).toHaveValue('Persona Inventada');
     expect(screen.getByLabelText(/correo/i)).toHaveValue('persona@example.com');
-    expect(screen.getByLabelText(/skills/i)).toHaveValue('Java, Kafka');
+    expect(screen.getByLabelText(/skills/i)).toHaveValue('Java\nKafka');
     expect(screen.getByText(`Extraído con ${EXTRACTOR_LABELS[extractor]}`)).toBeInTheDocument();
     expect(extract).toHaveBeenCalledWith(expect.objectContaining({ mode: extractor }));
+  });
+
+  it('should keep a skill whose name contains commas as one skill when confirming', async () => {
+    const COMMA_SKILL = 'AWS (EKS, Lambda, Bedrock, SQS, SNS)';
+    extract.mockResolvedValue(makeResult('ica-text', { draft: { ...makeResult('ica-text').draft, skills: [{ name: COMMA_SKILL, level: 4, years: 6 }, { name: 'Kafka' }] } }));
+    create.mockResolvedValue(makeCandidate());
+    const user = userEvent.setup();
+    renderPage(<NewCandidatePage />);
+    await upload(user);
+    expect(await screen.findByLabelText(/skills/i)).toHaveValue(`${COMMA_SKILL}\nKafka`);
+    await user.click(screen.getByRole('button', { name: /confirmar y crear candidato/i }));
+    await waitFor(() => expect(create).toHaveBeenCalledTimes(1));
+    expect(create.mock.calls[0][0].skills).toEqual([{ name: COMMA_SKILL, level: 4, years: 6 }, { name: 'Kafka' }]);
   });
 
   it('should highlight missing fields with accessible text, not only color', async () => {
@@ -226,6 +239,34 @@ describe('NewCandidatePage', () => {
       expect(screen.getByText('Actualizado por ana@ibm.com (Reclutador)')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Cargar otro candidato' })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'Volver al nuevo proceso' })).toBeInTheDocument();
+    });
+
+    it('should lock the email to the stored one when updating, since the backend rejects a different email', async () => {
+      extract.mockResolvedValue(makeResult('ica-text', {
+        draft: { ...makeResult('ica-text').draft, email: 'otro-correo-del-cv@example.com' },
+        matches: { exact: exactMatch, similar: [] },
+      }));
+      update.mockResolvedValue(makeCandidate({ id: 'ex1', updatedBy: actor, updateCount: 3 }));
+      const user = userEvent.setup();
+      renderPage(<NewCandidatePage />);
+      await upload(user);
+
+      const email = await screen.findByLabelText(/correo/i);
+      expect(email).toHaveValue('persona@example.com');
+      expect(email).toHaveAttribute('readonly');
+      expect(email).toHaveAccessibleDescription(/no se puede cambiar/i);
+      await user.click(screen.getByRole('button', { name: 'Actualizar candidato' }));
+      await waitFor(() => expect(update).toHaveBeenCalledTimes(1));
+      expect(update.mock.calls[0][1]).toMatchObject({ email: 'persona@example.com' });
+    });
+
+    it('should keep the email editable when creating a new candidate', async () => {
+      extract.mockResolvedValue(makeResult('ica-text'));
+      const user = userEvent.setup();
+      renderPage(<NewCandidatePage />);
+      await upload(user);
+
+      expect(await screen.findByLabelText(/correo/i)).not.toHaveAttribute('readonly');
     });
 
     it('should show an error message when the update gets a 404', async () => {

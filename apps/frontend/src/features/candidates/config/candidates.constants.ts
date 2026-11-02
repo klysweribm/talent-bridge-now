@@ -114,3 +114,9 @@ export const DUPLICATE_COPY = {
   emailNote: 'Se usará el correo del perfil existente',
   updatingExisting: 'Se actualizará el perfil existente con los valores del formulario. Se usará el correo del perfil existente.',
 } as const;
+
+/** Las skills se editan una por línea porque un nombre puede llevar comas (p. ej. `AWS (EKS, Lambda)`). */
+export const SKILLS_HINT = 'Una skill por línea.';
+
+/** En modo actualización el correo identifica al perfil y no se puede cambiar (UC-CAND-4 cubre el cambio de correo). */
+export const EMAIL_LOCKED_HINT = 'El correo identifica al perfil y no se puede cambiar al actualizar.';

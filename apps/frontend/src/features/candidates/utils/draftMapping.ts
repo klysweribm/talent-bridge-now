@@ -22,6 +22,9 @@ export const EMPTY_FORM_VALUES: ICandidateFormValues = {
 
 const text = (value: string | undefined): string => value ?? '';
 
+/** Una skill por línea: el nombre de una skill puede llevar comas (p. ej. `AWS (EKS, Lambda)`), por eso no se separa por coma. */
+const SKILLS_SEPARATOR = '\n';
+
 export function draftToFormValues(draft: ICandidateProfileDraft): ICandidateFormValues {
   return {
     fullName: text(draft.fullName), email: text(draft.email), phone: text(draft.phone),
@@ -29,14 +32,14 @@ export function draftToFormValues(draft: ICandidateProfileDraft): ICandidateForm
     primaryRole: text(draft.primaryRole),
     seniority: SENIORITY_VALUES.find(value => value === draft.seniority) ?? '',
     yearsExperience: text(draft.yearsExperience?.toString()),
-    skills: (draft.skills ?? []).map(skill => skill.name).join(', '),
+    skills: (draft.skills ?? []).map(skill => skill.name).join(SKILLS_SEPARATOR),
     summary: text(draft.summary),
   };
 }
 
 // Conserva nivel y años de las skills del borrador cuando el nombre sigue igual.
 function parseSkills(text: string, original: readonly IDraftSkill[]): readonly IDraftSkill[] {
-  return text.split(',').map(name => name.trim()).filter(Boolean).map(name =>
+  return text.split(/\r?\n/).map(name => name.trim()).filter(Boolean).map(name =>
     original.find(skill => skill.name.toLowerCase() === name.toLowerCase()) ?? { name });
 }
 

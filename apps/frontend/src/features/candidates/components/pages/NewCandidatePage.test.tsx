@@ -238,7 +238,7 @@ describe('NewCandidatePage', () => {
       expect(await screen.findByText(/candidato actualizado/i)).toBeInTheDocument();
       expect(screen.getByText('Actualizado por ana@ibm.com (Reclutador)')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Cargar otro candidato' })).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'Volver al nuevo proceso' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Ver candidatos' })).toHaveAttribute('href', '/candidates');
     });
 
     it('should lock the email to the stored one when updating, since the backend rejects a different email', async () => {

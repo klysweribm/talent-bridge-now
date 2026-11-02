@@ -7,7 +7,7 @@ describe('useVisibleNavItems', () => {
     useAuthStore.getState().setAuth({ id: 'r', name: 'Rita', email: 'rita@ibm.com', role: 'recruiter' }, 'fake-session-value');
     const { result } = renderHook(() => useVisibleNavItems());
 
-    expect(result.current.map(i => i.path)).toEqual(['/dashboard', '/bench', '/processes', '/interviews', '/reports']);
+    expect(result.current.map(i => i.path)).toEqual(['/dashboard', '/bench', '/processes', '/candidates', '/interviews', '/reports']);
   });
 
   it.each([['pm', true], ['recruiter', true], ['technical_ref', false]] as const)(

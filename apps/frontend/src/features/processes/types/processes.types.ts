@@ -1,27 +1,9 @@
-import type { ProcessStage } from '@/config/design-tokens';
-
-export type TProcessHealth = 'on_track' | 'at_risk';
 export type TInterviewStatus = 'confirmed' | 'pending_confirmation';
 export type TAttentionKind = 'no_referent' | 'overdue_feedback';
 
 export interface IDashboardSummary {
-  readonly activeProcesses: number;
   readonly interviewsToday: number;
   readonly pendingFeedback: number;
-}
-
-export interface IProcessSummary {
-  readonly id: string;
-  readonly title: string;
-  readonly client: string;
-  readonly stage: ProcessStage;
-  readonly candidatesCount: number;
-  readonly health: TProcessHealth;
-}
-
-export interface IActiveProcessesPage {
-  readonly items: readonly IProcessSummary[];
-  readonly total: number;
 }
 
 export interface ITodayInterview {

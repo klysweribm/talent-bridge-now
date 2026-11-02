@@ -1,6 +1,7 @@
 import { Button } from '@shared/components/atoms/Button';
 import type { ICvExtractionResult } from '@ibm-talent-bridge/shared-types';
 import { SUBMIT_LABELS } from '../../../config/candidates.constants';
+import { useCandidateExitLink } from '../../../hooks/useCandidateExitLink';
 import { useCandidateForm } from '../../../hooks/useCandidateForm';
 import { useCandidateSubmission } from '../../../hooks/useCandidateSubmission';
 import { formValuesToRequest } from '../../../utils/draftMapping';
@@ -33,6 +34,7 @@ const NO_DRAFT = { draft: {}, missingFields: [], warnings: [] } as const;
 
 export function CandidateReviewForm({ result, onRestart }: CandidateReviewFormProps): JSX.Element {
   const { draft, missingFields, warnings } = result ?? NO_DRAFT;
+  const exit = useCandidateExitLink();
   const { register, handleSubmit, setValue, formState: { errors } } = useCandidateForm(draft, result?.matches?.exact?.email);
   const submission = useCandidateSubmission(result?.matches?.exact?.id);
   const { duplicate } = submission;
@@ -41,7 +43,7 @@ export function CandidateReviewForm({ result, onRestart }: CandidateReviewFormPr
   const onSubmit = handleSubmit(values => submission.submit(formValuesToRequest(values, draft)));
 
   if (submission.isSuccess && submission.saved) {
-    return <CandidateCreated candidate={submission.saved} mode={isUpdate ? 'updated' : 'created'} onRestart={onRestart} />;
+    return <CandidateCreated candidate={submission.saved} mode={isUpdate ? 'updated' : 'created'} onRestart={onRestart} exitTo={exit.to} exitLabel={exit.label} />;
   }
 
   return (

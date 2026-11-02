@@ -1,23 +1,21 @@
-import { RequirementBox } from '../molecules/RequirementBox';
-
-const CANDIDATES_NEW_PATH = '/candidates/new';
+import { useWizardStore } from '../../store/wizard.store';
+import { WIZARD_TEXT } from '../../config/processWizard.constants';
+import { ProcessStepper } from '../molecules/ProcessStepper';
+import { ProcessCandidatesStep } from '../organisms/ProcessCandidatesStep';
+import { ProcessConfirmStep } from '../organisms/ProcessConfirmStep';
+import { ProcessDataStep } from '../organisms/ProcessDataStep';
 
 export function NewProcessPage(): JSX.Element {
+  const step = useWizardStore(state => state.step);
+  const setStep = useWizardStore(state => state.setStep);
+
   return (
-    <div className="px-xl py-lg flex flex-col gap-lg w-full max-w-7xl mx-auto">
-      <header className="flex flex-col gap-xs">
-        <h1 className="text-headline-md text-text-primary">Nuevo proceso</h1>
-        <p className="text-body-md text-text-secondary">Completa los requisitos del proceso.</p>
-      </header>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
-        <RequirementBox
-          title="Agregar candidato"
-          description="Sube un CV, revisa el perfil extraído y crea el candidato."
-          to={CANDIDATES_NEW_PATH}
-        />
-        <RequirementBox title="Seleccionar referente técnico" description="Elige quién evaluará a los candidatos." />
-        <RequirementBox title="Requisitos de la posición" description="Define el rol, el seniority y las skills." />
-      </div>
+    <div className="px-base md:px-xl py-lg flex flex-col gap-lg w-full max-w-3xl mx-auto">
+      <h1 className="text-headline-md text-text-primary">{WIZARD_TEXT.pageTitle}</h1>
+      <ProcessStepper current={step} onNavigate={setStep} disabled={false} />
+      {step === 'data' && <ProcessDataStep />}
+      {step === 'candidates' && <ProcessCandidatesStep />}
+      {step === 'confirm' && <ProcessConfirmStep />}
     </div>
   );
 }

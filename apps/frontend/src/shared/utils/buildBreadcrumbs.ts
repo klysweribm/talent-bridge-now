@@ -7,6 +7,8 @@ export interface IBreadcrumb {
 
 const HOME_PATH = '/dashboard';
 const NEW_SEGMENT_LABEL = 'Nuevo proceso';
+const NEW_CANDIDATE_SEGMENT_LABEL = 'Agregar candidato';
+const CANDIDATES_SECTION_PATH = '/candidates';
 const DETAIL_SEGMENT_LABEL = 'Detalle del proceso';
 
 /**
@@ -24,6 +26,7 @@ export function buildBreadcrumbs(pathname: string): readonly IBreadcrumb[] {
   const trail: IBreadcrumb[] = home ? [{ label: home.label, to: home.path }] : [];
   if (!child) return [...trail, { label: item.label }];
 
-  const childLabel = child === 'new' ? NEW_SEGMENT_LABEL : DETAIL_SEGMENT_LABEL;
+  const newLabel = item.path === CANDIDATES_SECTION_PATH ? NEW_CANDIDATE_SEGMENT_LABEL : NEW_SEGMENT_LABEL;
+  const childLabel = child === 'new' ? newLabel : DETAIL_SEGMENT_LABEL;
   return [...trail, { label: item.label, to: item.path }, { label: childLabel }];
 }

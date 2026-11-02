@@ -3,7 +3,7 @@ import { Icon } from '@shared/components/atoms/Icon';
 
 export interface CounterCardProps {
   readonly label: string;
-  readonly value: number;
+  readonly value: number | string;
   readonly to: string;
   readonly icon: string;
 }

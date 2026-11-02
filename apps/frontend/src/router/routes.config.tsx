@@ -3,10 +3,13 @@ import { ComingSoon } from '@shared/components/organisms/ComingSoon';
 import { NAVIGATION_ITEMS } from '@shared/config/navigation';
 import type { UserRole } from '@features/auth/store/auth.store';
 import { BenchPage } from '@features/bench/components/pages/BenchPage';
+import { CandidatesPage } from '@features/candidates/components/pages/CandidatesPage/CandidatesPage';
 import { NewCandidatePage } from '@features/candidates/components/pages/NewCandidatePage';
 import { DashboardPage } from '@features/processes/components/pages/DashboardPage';
+import { ProcessDetailPage } from '@features/processes/components/pages/ProcessDetailPage/ProcessDetailPage';
+import { ProcessesPage } from '@features/processes/components/pages/ProcessesPage/ProcessesPage';
 import { NewProcessPage } from '@features/processes/components/pages/NewProcessPage';
-import { BENCH_PATH, CANDIDATES_NEW_PATH, DASHBOARD_PATH, NEW_PROCESS_PATH, PROCESSES_PATH } from './paths';
+import { BENCH_PATH, CANDIDATES_NEW_PATH, CANDIDATES_PATH, DASHBOARD_PATH, NEW_PROCESS_PATH, PROCESSES_PATH } from './paths';
 
 export interface IRouteConfig {
   readonly path:    string;
@@ -35,7 +38,10 @@ const EXTRA_ROUTES: readonly Omit<IRouteConfig, 'element'>[] = [
 const REAL_PAGES: Readonly<Record<string, ReactElement>> = {
   [DASHBOARD_PATH]: <DashboardPage />,
   [BENCH_PATH]:     <BenchPage />,
+  [PROCESSES_PATH]:       <ProcessesPage />,
+  [`${PROCESSES_PATH}/:id`]: <ProcessDetailPage />,
   [NEW_PROCESS_PATH]:     <NewProcessPage />,
+  [CANDIDATES_PATH]:      <CandidatesPage />,
   [CANDIDATES_NEW_PATH]:  <NewCandidatePage />,
 };
 

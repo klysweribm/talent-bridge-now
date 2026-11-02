@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import type { TAiConfig } from '../../domain/interfaces/ai-config.interface';
 import type { IAiFileUpload } from '../../domain/interfaces/ai-completion.interface';
+import { flowStorage, type IFlowContext } from '../../../../shared/observability/flow-context';
 import { IcaProvider } from './ica.provider';
 
 const KEY = 'test-key-not-real';
@@ -146,5 +147,21 @@ describe('IcaProvider.complete with files', () => {
 
     const body = JSON.parse(fetchSpy.mock.calls[0][1]?.body as string) as Record<string, unknown>;
     expect(body.files).toEqual([{ type: 'file', id: 'f-1' }]);
+  });
+});
+
+describe('IcaProvider.complete under an active FlowLog trace', () => {
+  it('should not put the CV text sent in the messages into the flow log', async () => {
+    const SECRET_CV_TEXT = 'Texto privado del CV de Persona Inventada, correo persona.inventada@example.test';
+    fetchSpy.mockResolvedValue(json({
+      choices: [{ message: { content: '{}' }, finish_reason: 'stop' }], model: 'm', usage: { prompt_tokens: 1, completion_tokens: 1 },
+    }));
+    const context: IFlowContext = { id: 'trace-1', startedAt: Date.now(), reachedHandler: true, depth: 0 };
+
+    await flowStorage.run(context, () =>
+      new IcaProvider(CONFIG).complete({ messages: [{ role: 'user', content: SECRET_CV_TEXT }], maxTokens: 16 }));
+
+    expect(JSON.stringify(logged)).not.toContain('Texto privado');
+    expect(JSON.stringify(logged)).not.toContain('persona.inventada@example.test');
   });
 });

@@ -1,4 +1,4 @@
-import { BRAND } from '@features/auth/config/brand';
+import { BRAND } from '@/config/brand';
 import { AUTH_COPY } from '@features/auth/config/auth.copy';
 
 export function AuthFooter(): JSX.Element {

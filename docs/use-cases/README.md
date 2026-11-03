@@ -42,6 +42,7 @@ decidido, no resuelve lo que ADR-013 dejó abierto a propósito.
 | [`interviews.md`](./interviews.md) | INT-1 (encuadre anterior) | Reclutador, Referente Técnico |
 | [`feedback.md`](./feedback.md) | FEED-1 (encuadre anterior) | Referente Técnico (escribe), Reclutador/PM (leen) |
 | [`reports.md`](./reports.md) | REP-1 (encuadre anterior) | PM, Reclutador |
+| [`drafts.md`](./drafts.md) | DRAFT-1 (en `ROADMAP.md`, sin arrancar); recuperar formularios no enviados | Reclutador, PM, Referente Técnico (solo sus propios borradores) |
 
 > **Encuadre anterior:** desde el 2026-10-28, PROC-2, CAND-1, INT-1, FEED-1, REP-1 y CV-1 ya no son
 > secciones de `ROADMAP.md` (esperan el replanning Bench First; ver su tabla de equivalencias). Estos

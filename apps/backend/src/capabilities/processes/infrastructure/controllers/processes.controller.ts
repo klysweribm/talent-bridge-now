@@ -8,6 +8,7 @@ import { JwtAuthGuard } from '../../../../shared/auth/jwt-auth.guard';
 import type { IJwtPayload } from '../../../../shared/auth/jwt-payload.interface';
 import { Roles } from '../../../../shared/auth/roles.decorator';
 import { RolesGuard } from '../../../../shared/auth/roles.guard';
+import { ProcessLimitsService } from '../../application/services/process-limits.service';
 import { ProcessService } from '../../application/services/process.service';
 import { PROCESS_SEARCH_MAX } from '../../domain/constants/process.constants';
 import { CreateProcessDto } from '../../domain/dto/create-process.dto';
@@ -26,7 +27,7 @@ const toActor = (req: AuthedRequest): ICandidateActor => ({ id: req.user.sub, em
 // TODO(RBAC-1): reemplazar por permisos
 @Roles('recruiter', 'pm')
 export class ProcessesController {
-  constructor(private readonly processes: ProcessService) {}
+  constructor(private readonly processes: ProcessService, private readonly limitsService: ProcessLimitsService) {}
 
   @Post()
   @ApiOperation({ summary: 'Crea un proceso; el dueño PM y el reclutador dependen de quién lo crea' })
@@ -46,10 +47,10 @@ export class ProcessesController {
 
   // Debe ir antes de `:id`, o esa ruta la captura.
   @Get('limits')
-  @ApiOperation({ summary: 'Límites de procesos (tope de candidatos) para el formulario de creación' })
-  @ApiResponse({ status: 200, description: 'Límites configurados en el backend' })
+  @ApiOperation({ summary: 'Límites de procesos: tope de candidatos, oportunidad, referentes técnicos y estados terminales' })
+  @ApiResponse({ status: 200, description: '{ maxCandidates, opportunity: { roleMax, descriptionMax, skillsMin, skillsMax, skillMax, bandMin, bandMax }, technicalRefsMax, terminalStatuses }' })
   limits(): IProcessLimits {
-    return this.processes.getLimits();
+    return this.limitsService.getLimits();
   }
 
   @Get(':id')

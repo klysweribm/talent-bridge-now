@@ -1,11 +1,12 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { IProcessDetail, IProcessTechnicalRef } from '@ibm-talent-bridge/shared-types';
+import { useAuthStore } from '@features/auth/store/auth.store';
 import { HttpError } from '@shared/infrastructure/httpError';
 import * as createInfra from '../../../infrastructure/processCreate.infra';
 import * as updateInfra from '../../../infrastructure/processUpdate.infra';
 import { translateProcessActionError } from '../../../infrastructure/processUpdate.translate';
-import { makePage, renderWithProviders } from '../../../test-utils';
+import { makePage, mockProcessLimits, renderWithProviders } from '../../../test-utils';
 import { ProcessTechnicalTeamPanel } from './ProcessTechnicalTeamPanel';
 
 vi.mock('../../../infrastructure/processCreate.infra');
@@ -33,6 +34,8 @@ const open = async (user: ReturnType<typeof userEvent.setup>): Promise<void> => 
 describe('ProcessTechnicalTeamPanel', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    mockProcessLimits();
+    useAuthStore.setState({ user: { id: 'pm1', role: 'pm', email: 'pm1@ibm.com', name: 'pm1' }, token: 't' });
     options.mockResolvedValue(makePage(AVAILABLE) as never);
     update.mockResolvedValue(PROCESS());
   });
@@ -151,5 +154,22 @@ describe('ProcessTechnicalTeamPanel', () => {
     expect(await screen.findByText('No se pudieron cargar los referentes técnicos.')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Reintentar' }));
     expect(await screen.findByRole('checkbox', { name: 'Beto Ref' })).toBeInTheDocument();
+  });
+
+  it('should follow the server cap for referents (technicalRefsMax 1)', async () => {
+    mockProcessLimits({ technicalRefsMax: 1 });
+    const user = mount(PROCESS());
+    await open(user);
+    await user.click(await screen.findByRole('checkbox', { name: 'Ana Ref · Band 8' }));
+    expect(screen.getByText('1 de 1 seleccionados')).toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: 'Beto Ref' })).toBeDisabled();
+  });
+
+  it('should not open the picker nor assume a cap while the limits are unknown', async () => {
+    vi.mocked(createInfra.fetchProcessLimits).mockReturnValue(new Promise(() => undefined));
+    const user = mount(PROCESS());
+    await open(user);
+    expect(screen.queryByText(/seleccionados/)).not.toBeInTheDocument();
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 });

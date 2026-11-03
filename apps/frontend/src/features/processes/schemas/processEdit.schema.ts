@@ -1,13 +1,18 @@
 import { z } from 'zod';
 import { PROCESS_DATA_ERRORS } from '../config/processCreate.constants';
-import { opportunityShape } from './opportunity.schema';
+import type { IOpportunityLimits } from '@ibm-talent-bridge/shared-types';
+import { buildOpportunityShape, type TOpportunityShape } from './opportunity.schema';
 import { text } from './textField.schema';
 
-/** Edición del detalle: título, cliente y campos de la oportunidad; mismos límites y mensajes que la creación. */
-export const processEditSchema = z.object({
-  title:      text(PROCESS_DATA_ERRORS.titleRequired, PROCESS_DATA_ERRORS.titleTooLong),
-  clientName: text(PROCESS_DATA_ERRORS.clientRequired, PROCESS_DATA_ERRORS.clientTooLong),
-  ...opportunityShape,
-});
+type TProcessEditSchema = z.ZodObject<{ title: z.ZodString; clientName: z.ZodString } & TOpportunityShape>;
 
-export type TProcessEditValues = z.infer<typeof processEditSchema>;
+/** Edición del detalle: título, cliente y campos de la oportunidad; mismos límites y mensajes que la creación. */
+export function buildProcessEditSchema(limits: IOpportunityLimits): TProcessEditSchema {
+  return z.object({
+    title:      text(PROCESS_DATA_ERRORS.titleRequired, PROCESS_DATA_ERRORS.titleTooLong),
+    clientName: text(PROCESS_DATA_ERRORS.clientRequired, PROCESS_DATA_ERRORS.clientTooLong),
+    ...buildOpportunityShape(limits),
+  });
+}
+
+export type TProcessEditValues = z.infer<ReturnType<typeof buildProcessEditSchema>>;

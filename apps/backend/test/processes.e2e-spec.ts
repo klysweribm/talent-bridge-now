@@ -90,10 +90,15 @@ describe('Processes limits', () => {
   beforeAll(async () => { ctx = await buildProcessesApp('proclim'); });
   afterAll(() => closeProcessesApp(ctx));
 
-  it.each(['ana', 'mariana'] as const)('should return 200 with the configured maxCandidates for %s, not captured by :id', async (who) => {
+  it.each(['ana', 'mariana'] as const)('should return 200 with the full limits for %s, not captured by :id', async (who) => {
     const limits = (await as(ctx, ctx.users[who], 'get', '/processes/limits').expect(200)).body as IProcessLimits;
     const created = (await as(ctx, ctx.users.mariana, 'post', '/processes').send(BODY).expect(201)).body as IProcess;
-    expect(limits).toEqual({ maxCandidates: created.maxCandidates });
+    expect(limits).toEqual({
+      maxCandidates: created.maxCandidates,
+      opportunity: { roleMax: 200, descriptionMax: 2000, skillsMin: 1, skillsMax: 15, skillMax: 60, bandMin: 6, bandMax: 10 },
+      technicalRefsMax: 2,
+      terminalStatuses: ['closed', 'cancelled'],
+    });
   });
 
   it('should return 401 without a token and 403 for technical_ref', async () => {

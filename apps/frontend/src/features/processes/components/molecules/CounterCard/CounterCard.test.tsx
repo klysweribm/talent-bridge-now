@@ -8,4 +8,10 @@ describe('CounterCard', () => {
     const link = screen.getByRole('link', { name: 'Entrevistas hoy: 3' });
     expect(link).toHaveAttribute('href', '/interviews?date=today');
   });
+
+  it('should render an optional hint line under the value', () => {
+    render(<MemoryRouter><CounterCard label="Feedback pendiente" value="—" hint="Próximamente" to="/feedback" icon="feedback" /></MemoryRouter>);
+    expect(screen.getByText('Próximamente')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Feedback pendiente: —' })).toBeInTheDocument();
+  });
 });

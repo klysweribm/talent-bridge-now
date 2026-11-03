@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react';
+import type { IOpportunityLimits } from '@ibm-talent-bridge/shared-types';
 
 export type TOpportunityField = 'opportunityRole' | 'skills' | 'band' | 'roleDescription';
 
@@ -7,6 +8,13 @@ export interface IOpportunityValues {
   readonly skills:          readonly string[];
   readonly roleDescription: string;
   readonly band?:           number | undefined;
+}
+
+/** Estado de los límites del servidor (server state) que necesitan los campos: sin `data` no hay nada que validar ni mostrar. */
+export interface IOpportunityLimitsView {
+  readonly data?:  IOpportunityLimits | undefined;
+  readonly failed: boolean;
+  readonly retry:  () => void;
 }
 
 /** Contrato que reciben `OpportunityFields` y los dos formularios que lo usan (creación y edición). */
@@ -18,6 +26,7 @@ export interface IOpportunityBindings {
   readonly onSkills:      (skills: readonly string[]) => void;
   readonly onBand:        (band: number) => void;
   readonly touch:         (name: TOpportunityField) => void;
+  readonly limits:        IOpportunityLimitsView;
 }
 
 /** Forma mínima de los errores de react-hook-form que necesita este módulo (sirve para ambos formularios). */
@@ -28,6 +37,7 @@ export type TSetOpportunity = (name: TOpportunityField, value: string | number |
 
 export function buildOpportunityBindings(
   values: IOpportunityValues, issues: TOpportunityIssues, set: TSetOpportunity, touch: (name: TOpportunityField) => void,
+  limits: IOpportunityLimitsView,
 ): IOpportunityBindings {
   const errors = {
     opportunityRole: issues.opportunityRole?.message,
@@ -36,7 +46,7 @@ export function buildOpportunityBindings(
     band:            issues.band?.message,
   };
   return {
-    values, errors, touch,
+    values, errors, touch, limits,
     onRole:        event => set('opportunityRole', event.target.value, Boolean(errors.opportunityRole)),
     onDescription: event => set('roleDescription', event.target.value, Boolean(errors.roleDescription)),
     // Agregar/quitar una tecnología o elegir una banda es una decisión explícita: se valida al instante.

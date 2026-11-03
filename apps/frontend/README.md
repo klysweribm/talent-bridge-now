@@ -1,4 +1,4 @@
-# Frontend — IBM Talent Bridge
+# Frontend — IBM Future Now Portal
 
 > React + Vite + TypeScript  
 > Deploy: IBM Code Engine (`apps/frontend/Dockerfile`, nginx; ver ADR-006)

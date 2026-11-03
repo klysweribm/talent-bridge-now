@@ -3,6 +3,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch, type FieldErrors } from 'react-hook-form';
 import { PROCESS_FIELD_IDS } from '../constants/processFieldIds';
 import { buildProcessDataSchema, type TProcessDataValues } from '../schemas/processData.schema';
+import { noValidation } from './noValidationResolver';
+import { useOpportunityLimits } from './useOpportunityLimits';
 import { useWizardStore } from '../store/wizard.store';
 import type { TProcessCreatorRole } from '../types/processCreate.types';
 import { OPPORTUNITY_FIELD_ORDER, buildOpportunityBindings, type IOpportunityBindings, type TOpportunityField } from './opportunityBindings';
@@ -22,30 +24,35 @@ export interface IUseProcessDataForm {
   readonly onTextChange: (name: TProcessTextField) => (event: ChangeEvent<HTMLInputElement>) => void;
   readonly touchField:   (name: TProcessFieldName) => void;
   readonly onSubmit:     (event?: BaseSyntheticEvent) => void;
+  /** Sin los límites del servidor no se valida ni se envía. */
+  readonly canSubmit:    boolean;
+}
+
+function focusFirstInvalid(invalid: FieldErrors<TProcessDataValues>): void {
+  const first = FIELD_ORDER.find(name => invalid[name]);
+  if (first) document.getElementById(PROCESS_FIELD_IDS[first])?.focus();
 }
 
 export function useProcessDataForm(role: TProcessCreatorRole): IUseProcessDataForm {
+  const { limits, limitsView } = useOpportunityLimits();
   const data = useWizardStore(state => state.data);
   const saveData = useWizardStore(state => state.saveData);
   const setStep = useWizardStore(state => state.setStep);
   const defaults = { ...data, skills: [...data.skills], ownerPmId: data.ownerPmId ?? '', recruiterId: data.recruiterId ?? '' };
   const { control, setValue, trigger, handleSubmit, formState: { errors, submitCount } } = useForm<TProcessDataValues>({
-    resolver: zodResolver(buildProcessDataSchema(role)),
+    resolver: limits ? zodResolver(buildProcessDataSchema(role, limits)) : noValidation<TProcessDataValues>(),
     mode: 'onBlur',
     defaultValues: defaults,
   });
   const values = { ...defaults, ...useWatch<TProcessDataValues>({ control, defaultValue: defaults }) };
 
-  const focusFirstInvalid = (invalid: FieldErrors<TProcessDataValues>): void => {
-    const first = FIELD_ORDER.find(name => invalid[name]);
-    if (first) document.getElementById(PROCESS_FIELD_IDS[first])?.focus();
-  };
   const submit = handleSubmit(parsed => { saveData({ ...parsed }); setStep('candidates'); }, focusFirstInvalid);
   const setField = (name: TProcessTextField, value: string): void => setValue(name, value, { shouldValidate: Boolean(errors[name]) });
   const opportunity = buildOpportunityBindings(
     values, errors,
     (name, value, validate) => setValue(name, value as never, { shouldValidate: validate }),
     name => { void trigger(name); },
+    limitsView,
   );
 
   return {
@@ -53,6 +60,7 @@ export function useProcessDataForm(role: TProcessCreatorRole): IUseProcessDataFo
     bannerCount: submitCount > 0 ? Object.keys(errors).length : 0,
     touchField: name => { void trigger(name); },
     onTextChange: name => event => setField(name, event.target.value),
-    onSubmit: event => { void submit(event); },
+    canSubmit: limits !== undefined,
+    onSubmit: event => { if (limits) void submit(event); else event?.preventDefault(); },
   };
 }

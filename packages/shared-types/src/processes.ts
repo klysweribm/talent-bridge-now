@@ -4,9 +4,23 @@
 import type { ICandidateActor } from './candidates';
 import type { IUserProfile } from './users';
 
+/** Límites de la oportunidad (`GET /processes/limits`): origen único de los valores que valida el backend. */
+export interface IOpportunityLimits {
+  readonly roleMax: number;
+  readonly descriptionMax: number;
+  readonly skillsMin: number;
+  readonly skillsMax: number;
+  readonly skillMax: number;
+  readonly bandMin: number;
+  readonly bandMax: number;
+}
+
 /** Límites de procesos que el formulario necesita antes de que exista un proceso. */
 export interface IProcessLimits {
   readonly maxCandidates: number;
+  readonly opportunity: IOpportunityLimits;
+  readonly technicalRefsMax: number;
+  readonly terminalStatuses: readonly TProcessStatus[];
 }
 
 /**

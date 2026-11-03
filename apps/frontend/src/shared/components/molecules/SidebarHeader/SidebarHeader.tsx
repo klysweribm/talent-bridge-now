@@ -1,6 +1,7 @@
 import type { JSX } from 'react';
 import { Button } from '@shared/components/atoms/Button';
 import { Icon } from '@shared/components/atoms/Icon';
+import { BRAND } from '@/config/brand';
 
 export interface SidebarHeaderProps {
   readonly collapsed: boolean;
@@ -19,7 +20,7 @@ export function SidebarHeader({ collapsed, onToggle }: SidebarHeaderProps): JSX.
         IBM
       </span>
       <span className={collapsed ? 'hidden' : 'flex-1 truncate text-title-md text-text-primary'}>
-        IBM Talent Bridge
+        {BRAND.productFullName}
       </span>
       <Button
         variant="ghost"

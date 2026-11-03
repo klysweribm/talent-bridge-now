@@ -17,6 +17,3 @@ export const PROCESS_STATUS_CHIP: Readonly<Record<TProcessStatus, IProcessStatus
 
 /** Orden en que se ofrecen los estados en el selector. */
 export const PROCESS_STATUS_ORDER: readonly TProcessStatus[] = ['open', 'in_progress', 'interviewing', 'closed', 'cancelled'];
-
-/** Estados de los que no se sale (el backend los hace inmutables). */
-export const TERMINAL_PROCESS_STATUSES: readonly TProcessStatus[] = ['closed', 'cancelled'];

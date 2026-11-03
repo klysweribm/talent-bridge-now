@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { AuthFooter } from './AuthFooter';
-import { BRAND } from '@features/auth/config/brand';
+import { BRAND } from '@/config/brand';
 
 describe('AuthFooter', () => {
   it('should render the brand name, version and footer entries', () => {

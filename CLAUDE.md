@@ -97,6 +97,7 @@ Start a task with `/roadmap-task <ID | "Etapa N" | next>`: it delegates to the m
 - New code has tests (every new component tier, every new service via fake ports); new backend input has a DTO.
 - No layer-skipping, no state mixing, no silent `catch {}`, no hardcoded config.
 - `ROADMAP.md` / `DEBT_TECH.md` updated if the task moved a criterion or created/resolved debt.
+- Al cerrar cada unidad, el orquestador invoca a doc-keeper antes de proponer commits.
 
 ## Context & session workflow
 
@@ -108,5 +109,5 @@ See `.claude/memory/agentic-architecture.md` for the hub-and-spoke model (main s
 
 <!-- BEGIN TEMPORARY_SESSION_MEMORY -->
 Status: imported
-ImportedAt: 2026-11-02T00:38:21Z
+ImportedAt: 2026-11-03T20:34:35Z
 <!-- END TEMPORARY_SESSION_MEMORY -->

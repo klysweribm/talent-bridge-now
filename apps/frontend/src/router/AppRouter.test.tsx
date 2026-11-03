@@ -1,3 +1,4 @@
+import { BRAND } from '@/config/brand';
 import { act, render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AppRouter } from './AppRouter';
@@ -124,7 +125,7 @@ describe('AppRouter — navigation/route consistency', () => {
   it('should render ComingSoon for a protected section without a real screen yet', () => {
     useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'pm' }, validToken());
     renderAt('/reports');
-    expect(screen.getByText('Esta sección está en construcción. El equipo de IBM Talent Bridge está trabajando en ella — vuelve pronto.')).toBeInTheDocument();
+    expect(screen.getByText('Esta sección está en construcción. El equipo de ' + BRAND.productFullName + ' está trabajando en ella — vuelve pronto.')).toBeInTheDocument();
   });
 
   // /processes y /processes/:id ya tienen pantalla real (PROC-1): antes asertaban ComingSoon.

@@ -1,6 +1,8 @@
 import type { TProcessStatus } from '@ibm-talent-bridge/shared-types';
 
 export const PROCESS_ACTIONS_COPY = {
+  limitsError: 'No se pudieron cargar los límites del proceso: las acciones están deshabilitadas hasta tenerlos.',
+  limitsRetry: 'Reintentar',
   readOnlyTerminal: 'Este proceso está cerrado o cancelado: solo lectura.',
   edit: {
     open: 'Editar datos del proceso', save: 'Guardar cambios', saving: 'Guardando…', cancel: 'Cancelar',

@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { OPPORTUNITY_LIMITS } from '../../../config/processOpportunity.constants';
+import { LIMITS_FIXTURE, makeLimits } from '../../../test-utils';
 import { SkillChipsInput } from './SkillChipsInput';
 
-function Harness({ initial = [], error }: { readonly initial?: readonly string[]; readonly error?: string }): JSX.Element {
+const LIMITS = LIMITS_FIXTURE.opportunity;
+
+function Harness({ initial = [], error, limits = LIMITS }: { readonly initial?: readonly string[]; readonly error?: string; readonly limits?: typeof LIMITS }): JSX.Element {
   const [skills, setSkills] = useState<readonly string[]>(initial);
-  return <SkillChipsInput id="skills" label="Stack" skills={skills} error={error} hint="ayuda" onChange={setSkills} />;
+  return <SkillChipsInput id="skills" label="Stack" skills={skills} error={error} hint="ayuda" maxSkills={limits.skillsMax} maxSkillLength={limits.skillMax} onChange={setSkills} />;
 }
 const chips = (): string[] => screen.queryAllByRole('listitem').map(item => item.textContent ?? '');
 
@@ -45,15 +47,21 @@ describe('SkillChipsInput', () => {
   });
 
   it('should disable the input and announce the limit when the cap is reached', () => {
-    const full = Array.from({ length: OPPORTUNITY_LIMITS.skillsMax }, (_, index) => `S${index}`);
+    const full = Array.from({ length: LIMITS.skillsMax }, (_, index) => `S${index}`);
     render(<Harness initial={full} />);
     expect(screen.getByLabelText('Stack')).toBeDisabled();
-    expect(screen.getByRole('status')).toHaveTextContent(`${OPPORTUNITY_LIMITS.skillsMax} tecnologías`);
+    expect(screen.getByRole('status')).toHaveTextContent(`${LIMITS.skillsMax} tecnologías`);
+  });
+
+  it('should lock at the server cap, not at a local number (skillsMax 3)', () => {
+    render(<Harness initial={['A', 'B', 'C']} limits={makeLimits({ opportunity: { skillsMax: 3 } }).opportunity} />);
+    expect(screen.getByLabelText('Stack')).toBeDisabled();
+    expect(screen.getByRole('status')).toHaveTextContent('3 tecnologías');
   });
 
   it('should cap the text length of one skill', () => {
     render(<Harness />);
-    expect(screen.getByLabelText('Stack')).toHaveAttribute('maxlength', String(OPPORTUNITY_LIMITS.skillMax));
+    expect(screen.getByLabelText('Stack')).toHaveAttribute('maxlength', String(LIMITS.skillMax));
   });
 
   it('should expose label, list, hint and error accessibly', () => {

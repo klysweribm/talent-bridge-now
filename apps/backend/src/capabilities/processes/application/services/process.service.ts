@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import type {
-  ICandidateActor, ICreateProcessRequest, IProcess, IProcessDetail, IProcessLimits, IProcessListItem, PaginatedResponse, UserRole,
+  ICandidateActor, ICreateProcessRequest, IProcess, IProcessDetail, IProcessListItem, PaginatedResponse, UserRole,
 } from '@ibm-talent-bridge/shared-types';
 import { UserDirectoryService } from '../../../auth/application/services/user-directory.service';
 import { PROCESSES_CONFIG, PROCESS_REPOSITORY_PORT } from '../../domain/constants/process.constants';
@@ -67,11 +67,6 @@ export class ProcessService {
     if (id === null) return;
     const role = await this.users.findRole(id);
     if (role !== expected) throw new BadRequestException(`${field} must be an existing user with role ${expected}`);
-  }
-
-  /** Tope de candidatos por proceso, disponible antes de crear uno. */
-  getLimits(): IProcessLimits {
-    return { maxCandidates: this.config.maxCandidatesPerProcess };
   }
 
   private withMax(record: TProcessRecord): IProcess {

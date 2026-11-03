@@ -91,6 +91,7 @@ Orden: primero lo que requiere acción, luego el backlog por prioridad, al final
 | BENCH-1 | 🚧 verificado en vivo (stack, `curl` por rol, imagen de producción); falta el recorrido con los 3 roles | HIGH | AUTH-1, Etapa 2 |
 | QW-1 | 🚧 implementado, falta el recorrido en navegador (DT-010) | HIGH | — |
 | FE | 🚧 Etapas 0-2 en código; Etapa 2 pendiente de revisión en navegador | MEDIUM | — |
+| DRAFT-1 | 📌 sin arrancar (registrada; recuperar formularios no enviados tras el cierre de sesión) | MEDIUM | QW-2, PROC-1, CAND-2 |
 | FE-OTP-1 | 📌 sin arrancar | LOW | Etapa 1 (cerrada) |
 | AUTH-2 | 📌 sin arrancar | LOW | FE-OTP-1 |
 | AUTH-3 | 📌 sin arrancar | LOW | QW-2, AUTH-2 |
@@ -319,6 +320,62 @@ Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre cualquier moc
 ## 📌 Backlog (por prioridad)
 
 > Sin arrancar. Ordenado por dependencias: cada feature espera a la anterior.
+
+## DRAFT-1 — Recuperar trabajo no enviado tras el cierre de sesión (MEDIUM)
+
+**Estado:** 📌 sin arrancar (solo registrada; no implementar sin plan aprobado) · **Prioridad:** MEDIUM · **Complejidad:** 🟡 Media · **Casos de uso:** [`docs/use-cases/drafts.md`](./docs/use-cases/drafts.md)
+
+### Motivación
+
+La sesión se cierra por inactividad (aviso a los 360 s) o por expiración del JWT, y la caché de React Query se vacía al
+terminar la sesión (DT-015). Un formulario largo (nuevo proceso, agregar candidato, feedback) se pierde completo.
+
+### Alcance
+
+- **Backend:** capability `drafts`. Colección `drafts { userId, formKey, entityId?, payload, schemaVersion, updatedAt }`,
+  índice único `{ userId, formKey, entityId }` e índice TTL por `DRAFT_RETENTION_DAYS` (defecto 7, `ConfigService`).
+  Endpoints: `PUT /drafts/:formKey` (upsert), `GET /drafts/:formKey`, `DELETE /drafts/:formKey` y `GET /drafts` (lista del
+  usuario). Siempre filtrado por el `userId` del JWT; nunca se accede al borrador de otro.
+- **Frontend:** hook reutilizable `useFormDraft(formKey)`. Autoguardado con debounce (`DRAFT_AUTOSAVE_MS`, defecto 3000) y
+  guardado forzado antes del cierre por inactividad o expiración. Al volver, banner «Tienes un borrador del <fecha>:
+  Recuperar / Descartar».
+- **Formularios iniciales:** nuevo proceso, editar proceso y agregar candidato. Feedback se suma cuando exista.
+
+### Decisiones
+
+- El borrador **no crea ni modifica entidades**: solo al confirmar se guarda el proceso o el candidato, y entonces el
+  borrador se elimina.
+- Nunca se guarda el archivo del CV: solo los campos extraídos o escritos.
+- El `payload` se valida contra `schemaVersion`; si el formulario cambió de versión, el borrador se descarta con aviso,
+  nunca se carga a medias.
+- Logout manual: pregunta «¿Conservar borrador?». Inactividad o expiración: se conserva siempre.
+- Sin PII en logs: solo `userId`, `formKey` y tamaño.
+
+### Dependencias
+
+QW-2 (idle timer y logout), PROC-1 (formularios de proceso) y CAND-2 (formulario de candidato).
+
+### Preguntas abiertas
+
+1. ¿Un borrador por formulario o varios (por ejemplo, dos procesos a medio crear)? Defecto: uno por formulario nuevo y uno
+   por entidad en edición.
+2. ¿Qué pasa si, al recuperar la edición, la entidad cambió en el servidor? Defecto: avisar «el proceso cambió desde tu
+   borrador» y dejar elegir.
+3. ¿Se muestra un widget «Borradores pendientes» en el Inicio? Defecto: sí, prioridad LOW.
+
+### Criterios de éxito
+
+- [ ] Tras un cierre por inactividad o expiración, al volver a «Nuevo proceso» se ofrece recuperar el borrador con su fecha.
+- [ ] «Descartar» vacía el formulario y elimina el borrador; confirmar el proceso o el candidato también lo elimina.
+- [ ] El borrador no crea entidades (un borrador de «Agregar candidato» no aparece en Candidatos).
+- [ ] Aislamiento: el borrador de un usuario es inaccesible para otro (e2e con dos usuarios; 401 sin token).
+- [ ] Un borrador con `schemaVersion` anterior se descarta con aviso y no carga datos a medias.
+- [ ] Vence a los `DRAFT_RETENTION_DAYS` días (índice TTL) y no se ofrece al volver.
+- [ ] El archivo del CV nunca viaja al borrador; al recuperar hay que volver a adjuntarlo para reanalizarlo.
+- [ ] Logout manual con cambios sin enviar pregunta «¿Conservar borrador?»; la inactividad y la expiración conservan siempre.
+- [ ] Los logs no contienen datos del formulario (solo `userId`, `formKey` y tamaño).
+
+---
 
 ## FE-OTP-1 — Login OTP por correo corporativo + panel de marca (LOW)
 
@@ -636,6 +693,7 @@ DT-020 (warnings de lint del FlowLog) y DT-021 (el `Dockerfile` fija `NODE_ENV=p
 | 2026-11-02 | `PROC-1` arrancada en `feature/PROC-1`: línea base de gates re-ejecutada, contrato `processes.ts` en `shared-types` (más `ICandidate.processId`), `docs/use-cases/processes.md` reescrito con R5-R9 y Gherkin, nota P1 en ADR-013. | Plan aprobado por el usuario; el backend y el frontend siguen, un subagente a la vez. |
 | 2026-11-02 | `PROC-1`: backend de usuarios, procesos y asociación de candidatos (457 unit / 171 e2e), refactor de `Pagination` y estados de lista a `shared/`, lista y detalle de procesos (525 tests); un solo botón «+ Nuevo proceso». Diseño del formulario adoptado desde 4 mockups: 3 pasos sobre un solo formulario, 0 candidatos permitido, tope vía `GET /processes/limits`; mockups y §3.4 de UX-GUIDELINES guardados en `docs/design/`. | El usuario aportó los mockups del wizard y pidió un MVP que use solo lo que ya se puede construir. |
 | 2026-11-02 | `PROC-1` cerrada en código: formulario «Nuevo proceso» de 3 pasos, `GET /processes/limits`, `GET /candidates` (nombre, rol, correo, estado, fecha; sin teléfono), «Candidatos» en el menú de reclutador y PM (en móvil «Reportes» sale de la barra), Inicio con el total y la lista reales de procesos (una sola fila `ProcessItem` compartida con `/processes`) y sin etapa ni semáforo, que el proceso real no tiene. Deuda registrada: DT-039 a DT-042. | Peticiones del usuario tras revisar la UI: ver candidatos sin iniciar un proceso y datos reales en el Inicio; el dashboard por rol queda como tarea siguiente. |
+| 2026-11-03 | Registrada `DRAFT-1` (recuperar trabajo no enviado tras el cierre de sesión) y creado `docs/use-cases/drafts.md`; solo documentación, sin código. | La sesión caduca por inactividad o JWT y la caché se vacía (DT-015): un formulario largo se pierde completo. |
 
 ---
 

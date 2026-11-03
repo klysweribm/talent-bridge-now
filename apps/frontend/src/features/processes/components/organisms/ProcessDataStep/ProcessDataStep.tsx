@@ -32,7 +32,7 @@ export function ProcessDataStep(): JSX.Element {
       />
       <OpportunityFields bindings={form.opportunity} />
       <div className="flex justify-end">
-        <Button type="submit" className="min-h-11">{WIZARD_TEXT.next}</Button>
+        <Button type="submit" className="min-h-11" disabled={!form.canSubmit}>{WIZARD_TEXT.next}</Button>
       </div>
     </form>
   );

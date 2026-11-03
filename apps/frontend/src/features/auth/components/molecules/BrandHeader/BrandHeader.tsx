@@ -1,5 +1,5 @@
 import { Icon } from '@shared/components/atoms/Icon';
-import { BRAND } from '@features/auth/config/brand';
+import { BRAND } from '@/config/brand';
 import { AUTH_COPY } from '@features/auth/config/auth.copy';
 
 export function BrandHeader(): JSX.Element {

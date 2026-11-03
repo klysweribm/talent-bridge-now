@@ -7,6 +7,7 @@ import { CANDIDATE_DIRECTORY_PORT, PROCESSES_CONFIG, PROCESS_REPOSITORY_PORT } f
 import { ProcessCandidateClaimService } from './application/services/process-candidate-claim.service';
 import { ProcessDetailService } from './application/services/process-detail.service';
 import { ProcessCandidatesService } from './application/services/process-candidates.service';
+import { ProcessLimitsService } from './application/services/process-limits.service';
 import { ProcessUpdateService } from './application/services/process-update.service';
 import { ProcessService } from './application/services/process.service';
 import { CandidateDirectoryAdapter } from './infrastructure/adapters/candidate-directory.adapter';
@@ -26,6 +27,7 @@ import { ProcessesController } from './infrastructure/controllers/processes.cont
     ProcessCandidatesService,
     ProcessCandidateClaimService,
     ProcessDetailService,
+    ProcessLimitsService,
     { provide: PROCESSES_CONFIG, inject: [ConfigService], useFactory: buildProcessesConfig },
     { provide: PROCESS_REPOSITORY_PORT, useClass: MongooseProcessAdapter },
     { provide: CANDIDATE_DIRECTORY_PORT, useClass: CandidateDirectoryAdapter },

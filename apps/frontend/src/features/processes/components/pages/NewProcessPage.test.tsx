@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useAuthStore } from '@features/auth/store/auth.store';
 import * as infra from '../../infrastructure/processCreate.infra';
 import { useWizardStore } from '../../store/wizard.store';
-import { OPPORTUNITY_FIXTURE, fillOpportunity, makeCandidate, makePage, renderAt } from '../../test-utils';
+import { OPPORTUNITY_FIXTURE, fillOpportunity, makeCandidate, makePage, mockProcessLimits, renderAt } from '../../test-utils';
 import { NewProcessPage } from './NewProcessPage';
 
 vi.mock('../../infrastructure/processCreate.infra');
@@ -16,7 +16,7 @@ describe('NewProcessPage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     useWizardStore.getState().reset();
-    vi.mocked(infra.fetchProcessLimits).mockResolvedValue({ maxCandidates: 3 });
+    mockProcessLimits({ maxCandidates: 3 });
     vi.mocked(infra.fetchAvailableCandidates).mockResolvedValue(makePage([makeCandidate(1)]));
     vi.mocked(infra.createProcess).mockResolvedValue({ id: 'p1' } as Awaited<ReturnType<typeof infra.createProcess>>);
   });

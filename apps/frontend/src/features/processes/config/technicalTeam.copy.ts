@@ -3,6 +3,7 @@ export const TECHNICAL_TEAM_COPY = {
   subtitle:   'Referentes que evalúan técnicamente a los candidatos',
   complete:   'Par completo',
   none:       'Sin asignar',
+  assigned:   (count: number): string => `${count} asignados`,
   partial:    (count: number, max: number): string => `${count} de ${max} asignados`,
   empty:      'Aún no hay referentes técnicos asignados a este proceso.',
   band:       (band: number): string => `Band ${band}`,

@@ -1,7 +1,6 @@
 import type { IProcessDetail } from '@ibm-talent-bridge/shared-types';
 import { Button } from '@shared/components/atoms/Button';
 import { TECHNICAL_TEAM_COPY as COPY } from '../../../config/technicalTeam.copy';
-import { TECHNICAL_REFS_MAX } from '../../../config/technicalTeam.constants';
 import { useTechnicalTeamEditor } from '../../../hooks/useTechnicalTeamEditor';
 import { ActionFeedback } from '../../molecules/ActionFeedback/ActionFeedback';
 import { TechnicalRefPicker } from '../../molecules/TechnicalRefPicker/TechnicalRefPicker';
@@ -23,9 +22,9 @@ export function ProcessTechnicalTeamPanel({ process, canEdit }: ProcessTechnical
   );
   return (
     <div className="flex flex-col gap-md">
-      <TechnicalTeamCard refs={process.technicalRefs} maxRefs={TECHNICAL_REFS_MAX} actions={manage || undefined} />
-      {canEdit && editor.open && (
-        <TechnicalRefPicker status={editor.status} options={editor.options} selected={editor.selected} max={TECHNICAL_REFS_MAX}
+      <TechnicalTeamCard refs={process.technicalRefs} maxRefs={editor.max} actions={manage || undefined} />
+      {canEdit && editor.open && editor.max !== undefined && (
+        <TechnicalRefPicker status={editor.status} options={editor.options} selected={editor.selected} max={editor.max}
           saving={editor.saving} onToggle={editor.onToggle} onRetry={editor.onRetry} onSave={editor.onSave} onCancel={editor.onCancel} />
       )}
       {canEdit && <ActionFeedback error={editor.error} success={editor.saved ? COPY.picker.saved : undefined} />}

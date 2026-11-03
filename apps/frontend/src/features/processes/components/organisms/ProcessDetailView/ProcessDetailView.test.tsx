@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { IProcessDetail } from '@ibm-talent-bridge/shared-types';
 import { useAuthStore, type AuthUser } from '@features/auth/store/auth.store';
@@ -7,7 +7,7 @@ import * as createInfra from '../../../infrastructure/processCreate.infra';
 import * as listInfra from '../../../infrastructure/processList.infra';
 import * as updateInfra from '../../../infrastructure/processUpdate.infra';
 import { translateProcessActionError } from '../../../infrastructure/processUpdate.translate';
-import { makeCandidate, makePage, renderWithProviders } from '../../../test-utils';
+import { makeCandidate, makePage, mockProcessLimits, renderWithProviders } from '../../../test-utils';
 import { ProcessDetailView } from './ProcessDetailView';
 
 vi.mock('../../../infrastructure/processList.infra');
@@ -31,6 +31,9 @@ const apiError = (status: number, code?: string): Error => translateProcessActio
 const mount = async (): Promise<ReturnType<typeof userEvent.setup>> => {
   renderWithProviders(<ProcessDetailView id="p1" />);
   await screen.findByRole('heading', { level: 1, name: 'Backend Java' });
+  // Los permisos dependen de los límites del servidor: se espera a que lleguen (technical_ref nunca los pide).
+  if (useAuthStore.getState().user?.role !== 'technical_ref') await waitFor(() => expect(createInfra.fetchProcessLimits).toHaveBeenCalled());
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 0)); });
   return userEvent.setup();
 };
 
@@ -38,6 +41,7 @@ describe('ProcessDetailView actions', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     login('pm1', 'pm');
+    mockProcessLimits();
     fetchDetail.mockResolvedValue(DETAIL);
     update.mockResolvedValue(DETAIL);
     add.mockResolvedValue(DETAIL);
@@ -70,6 +74,24 @@ describe('ProcessDetailView actions', () => {
       expect(screen.queryByRole('button', { name: /editar|agregar|quitar|eliminar/i })).not.toBeInTheDocument();
       expect(screen.queryByLabelText('Estado')).not.toBeInTheDocument();
       expect(screen.getByText('Lucía Fernández')).toBeInTheDocument();
+    });
+
+    it('should offer no actions and let the user retry when the limits fail to load', async () => {
+      vi.mocked(createInfra.fetchProcessLimits).mockRejectedValue(new Error('down'));
+      await mount();
+      expect(await screen.findByText(/No se pudieron cargar los límites del proceso/)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Editar datos del proceso' })).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Estado')).not.toBeInTheDocument();
+      mockProcessLimits();
+      await (await Promise.resolve(userEvent.setup())).click(screen.getByRole('button', { name: 'Reintentar' }));
+      expect(await screen.findByRole('button', { name: 'Editar datos del proceso' })).toBeInTheDocument();
+    });
+
+    it('should treat as terminal what the server says (terminalStatuses [open] hides the actions)', async () => {
+      mockProcessLimits({ terminalStatuses: ['open'] });
+      await mount();
+      expect(screen.queryByLabelText('Estado')).not.toBeInTheDocument();
+      expect(await screen.findByText(/solo lectura/i)).toBeInTheDocument();
     });
 
     it.each(['closed', 'cancelled'] as const)('should offer no actions on a %s process', async status => {
@@ -280,6 +302,7 @@ describe('ProcessDetailView card', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     login('pm2', 'pm');
+    mockProcessLimits();
     vi.mocked(createInfra.fetchUserOptions).mockResolvedValue(makePage([]) as never);
   });
   afterEach(() => useAuthStore.getState().clearAuth());
@@ -305,7 +328,7 @@ describe('ProcessDetailView card', () => {
       await mount();
       expect(screen.getByRole('heading', { name: 'Equipo técnico asignado' })).toBeInTheDocument();
       expect(screen.getByText('Tomás Ref')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Gestionar equipo técnico' })).toBeInTheDocument();
+      expect(await screen.findByRole('button', { name: 'Gestionar equipo técnico' })).toBeInTheDocument();
     });
 
     it('should be read-only for a technical_ref', async () => {

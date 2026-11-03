@@ -1,3 +1,4 @@
+import { BRAND } from '@/config/brand';
 import { render, screen, waitFor, type RenderResult } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
@@ -74,9 +75,9 @@ describe('LoginPage', () => {
     }, { timeout: 2000 });
   });
 
-  it('should render IBM Talent Bridge heading', () => {
+  it('should render the product name heading', () => {
     renderWithRouter();
-    expect(screen.getByText('Talent Bridge')).toBeInTheDocument();
+    expect(screen.getByText(BRAND.productName)).toBeInTheDocument();
   });
 
   it('should render SSO button', () => {
@@ -91,8 +92,8 @@ describe('LoginPage', () => {
       expect(panel).not.toBeNull();
       expect(panel).toHaveAttribute('aria-hidden', 'true');
       expect(panel.querySelectorAll('h1,h2,h3,h4,h5,h6,[role="heading"],[role="alert"]')).toHaveLength(0);
-      expect(panel.textContent).not.toContain('Talent Bridge');
-      expect(screen.getAllByText('Talent Bridge')).toHaveLength(1);
+      expect(panel.textContent).not.toContain(BRAND.productName);
+      expect(screen.getAllByText(BRAND.productName)).toHaveLength(1);
     });
 
     it('should render the @ibm.com suffix as a chip inside the email field', () => {

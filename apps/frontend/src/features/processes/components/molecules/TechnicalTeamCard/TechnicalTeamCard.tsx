@@ -6,19 +6,21 @@ import { TechnicalRefCard } from '../TechnicalRefCard/TechnicalRefCard';
 
 export interface TechnicalTeamCardProps {
   readonly refs:     readonly IProcessTechnicalRef[];
-  readonly maxRefs:  number;
+  /** Sin tope conocido (p. ej. technical_ref no ve los límites) solo se muestra la cantidad asignada. */
+  readonly maxRefs?: number | undefined;
   /** Slot opcional (p. ej. el botón «Gestionar»); el componente no sabe de permisos ni de datos remotos. */
   readonly actions?: ReactNode;
 }
 
-function statusLabel(count: number, max: number): string {
+function statusLabel(count: number, max: number | undefined): string {
   if (count === 0) return COPY.none;
+  if (max === undefined) return COPY.assigned(count);
   return count >= max ? COPY.complete : COPY.partial(count, max);
 }
 
 /** Tarjeta presentacional «Equipo técnico asignado»: solo props, reutilizable en otras vistas. */
 export function TechnicalTeamCard({ refs, maxRefs, actions }: TechnicalTeamCardProps): JSX.Element {
-  const complete = refs.length >= maxRefs;
+  const complete = maxRefs !== undefined && refs.length >= maxRefs;
   return (
     <section aria-labelledby="technical-team-heading" className="flex flex-col gap-base p-lg rounded-lg border border-surface-high bg-surface-card">
       <header className="flex items-start justify-between gap-md">

@@ -10,8 +10,8 @@ export interface SearchBarProps extends InputHTMLAttributes<HTMLInputElement> {
 function buildInputClassName(canClear: boolean): string {
   return [
     'w-full h-10 pl-8 pr-sm rounded text-body-md',
-    'bg-surface-card border border-[#8d8d8d] text-text-primary',
-    'placeholder:text-[#a8a8a8]',
+    'bg-surface-card border border-outline-field text-text-primary',
+    'placeholder:text-text-placeholder',
     'focus:outline-2 focus:outline-primary-interactive focus:border-transparent',
     canClear ? 'pr-8' : '',
   ].join(' ');

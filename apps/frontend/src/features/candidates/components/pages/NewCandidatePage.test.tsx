@@ -125,6 +125,45 @@ describe('NewCandidatePage', () => {
     expect(extract).not.toHaveBeenCalled();
   });
 
+  it('should show the analysis card with an indeterminate bar only while extracting', async () => {
+    extract.mockReturnValue(new Promise(() => undefined));
+    const user = userEvent.setup();
+    renderPage(<NewCandidatePage />);
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    await upload(user);
+    expect(await screen.findByRole('progressbar')).not.toHaveAttribute('aria-valuenow');
+    expect(screen.getByText(/analizando cv/i)).toBeInTheDocument();
+  });
+
+  it('should let the user remove the chosen CV and go back to the dropzone', async () => {
+    const user = userEvent.setup();
+    renderPage(<NewCandidatePage />);
+    await user.upload(screen.getByLabelText(/archivo del cv/i), makeFile());
+    expect(screen.getByText('cv.pdf')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Quitar CV' }));
+    expect(screen.queryByText('cv.pdf')).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/archivo del cv/i)).toBeInTheDocument();
+  });
+
+  it('should keep the analyzed CV card with its keyword chips in the review', async () => {
+    extract.mockResolvedValue(makeResult('ica-text'));
+    const user = userEvent.setup();
+    renderPage(<NewCandidatePage />);
+    await upload(user);
+    expect(await screen.findByText('Palabras clave identificadas por ICA:')).toBeInTheDocument();
+    expect(screen.getByText('cv.pdf')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Crear ficha de nuevo candidato' })).toBeInTheDocument();
+  });
+
+  it('should show "Formato válido" only when the email has a valid format', async () => {
+    const user = userEvent.setup();
+    renderPage(<NewCandidatePage />);
+    await user.click(screen.getByRole('button', { name: /escritura manual/i }));
+    expect(screen.queryByText('Formato válido')).not.toBeInTheDocument();
+    await user.type(screen.getByLabelText(/correo/i), 'persona@example.com');
+    expect(screen.getByText('Formato válido')).toBeInTheDocument();
+  });
+
   it('should show the backend message when the server rejects the file (400)', async () => {
     extract.mockRejectedValue(new CvInvalidFileError('El archivo está corrupto.'));
     const user = userEvent.setup();

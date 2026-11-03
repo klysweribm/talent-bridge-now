@@ -3,6 +3,8 @@ import type { TProcessStatus } from '@ibm-talent-bridge/shared-types';
 export const PROCESS_REPOSITORY_PORT = Symbol('PROCESS_REPOSITORY_PORT');
 export const PROCESSES_CONFIG = Symbol('PROCESSES_CONFIG');
 
+/** Largo máximo del término de búsqueda `q` de `GET /processes`. */
+export const PROCESS_SEARCH_MAX = 100;
 export const PROCESS_TITLE_MAX = 200;
 export const PROCESS_CLIENT_NAME_MAX = 200;
 export const PROCESS_OPPORTUNITY_ROLE_MAX = 200;

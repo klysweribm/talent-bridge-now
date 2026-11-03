@@ -24,6 +24,8 @@ export interface IProcessFakes {
     readonly addCandidate: jest.Mock;
     readonly assign: jest.Mock;
     readonly release: jest.Mock;
+    readonly findPaginated: jest.Mock;
+    readonly count: jest.Mock;
   };
   addProcess(overrides?: Partial<TProcessRecord>): TProcessRecord;
   addCandidate(id: string, processId?: string): void;
@@ -60,7 +62,15 @@ function buildSpies(processes: TProcessMap, candidates: TCandidateMap): IProcess
     candidates.set(id, { id: found.id, fullName: found.fullName });
     return Promise.resolve(true);
   });
-  return { create, addCandidate, assign, release };
+  const findPaginated = jest.fn((_page: number, _limit: number, q?: string) => Promise.resolve(matching(processes, q)));
+  const count = jest.fn((q?: string) => Promise.resolve(matching(processes, q).length));
+  return { create, addCandidate, assign, release, findPaginated, count };
+}
+
+/** Búsqueda del fake: mismo criterio que el adapter (título, cliente o rol, sin distinguir mayúsculas). */
+function matching(processes: TProcessMap, q?: string): TProcessRecord[] {
+  const term = q?.toLowerCase();
+  return [...processes.values()].filter((p) => term === undefined || [p.title, p.clientName, p.opportunityRole].some((v) => v.toLowerCase().includes(term)));
 }
 
 function buildRepository(processes: TProcessMap, spies: IProcessFakes['spies']): IProcessRepositoryPort {
@@ -68,8 +78,8 @@ function buildRepository(processes: TProcessMap, spies: IProcessFakes['spies']):
     create: spies.create,
     addCandidate: spies.addCandidate,
     findById: jest.fn((id: string) => Promise.resolve(processes.get(id) ?? null)),
-    findPaginated: jest.fn<Promise<readonly TProcessRecord[]>, [number, number]>(() => Promise.resolve([...processes.values()])),
-    count: jest.fn(() => Promise.resolve(processes.size)),
+    findPaginated: spies.findPaginated,
+    count: spies.count,
     removeCandidate: jest.fn((id: string, candidateId: string) => {
       const current = processes.get(id);
       if (!current?.candidateIds.includes(candidateId)) return Promise.resolve(false);

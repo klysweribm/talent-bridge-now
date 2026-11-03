@@ -9,6 +9,7 @@ import type { TProcessRecord } from '../../domain/interfaces/process-record.inte
 import type { IProcessRepositoryPort } from '../ports/process-repository.port';
 import { ProcessCandidateClaimService } from './process-candidate-claim.service';
 import { ProcessDetailService } from './process-detail.service';
+import { resolveTechnicalRefs } from './technical-ref.resolver';
 
 @Injectable()
 export class ProcessService {
@@ -40,10 +41,13 @@ export class ProcessService {
     return this.withMax(created);
   }
 
-  async list(page: number, limit: number): Promise<PaginatedResponse<IProcessListItem>> {
-    const [records, total] = await Promise.all([this.repository.findPaginated(page, limit), this.repository.count()]);
+  /** `q` solo reduce el conjunto (título, cliente o rol); el total y las páginas reflejan el filtro. */
+  async list(page: number, limit: number, q?: string): Promise<PaginatedResponse<IProcessListItem>> {
+    const [records, total] = await Promise.all([this.repository.findPaginated(page, limit, q), this.repository.count(q)]);
+    const refs = await resolveTechnicalRefs(this.users, records, this.logger);
     const data = records.map(({ candidateIds, ...rest }) => ({
       ...rest, maxCandidates: this.config.maxCandidatesPerProcess, candidateCount: candidateIds.length,
+      technicalRefs: (refs.get(rest.id) ?? []).map(({ id, fullName, avatarUrl }) => ({ id, fullName, ...(avatarUrl ? { avatarUrl } : {}) })),
     }));
     return { data, total, page, limit, totalPages: Math.ceil(total / limit) };
   }

@@ -4,6 +4,7 @@ import { isValidObjectId, type Model } from 'mongoose';
 import type { IProcessRepositoryPort } from '../../application/ports/process-repository.port';
 import { DEFAULT_PROCESS_STATUS, TERMINAL_PROCESS_STATUSES } from '../../domain/constants/process.constants';
 import type { INewProcess, IProcessChanges, TProcessRecord } from '../../domain/interfaces/process-record.interface';
+import { buildProcessSearchFilter } from './process-search.filter';
 import { ProcessModel, type ProcessDocument } from './process.schema';
 
 @Injectable()
@@ -21,13 +22,13 @@ export class MongooseProcessAdapter implements IProcessRepositoryPort {
     return document ? this.toDomain(document) : null;
   }
 
-  async findPaginated(page: number, limit: number): Promise<readonly TProcessRecord[]> {
-    const documents = await this.model.find().sort({ createdAt: -1, _id: -1 }).skip((page - 1) * limit).limit(limit).exec();
+  async findPaginated(page: number, limit: number, q?: string): Promise<readonly TProcessRecord[]> {
+    const documents = await this.model.find(buildProcessSearchFilter(q)).sort({ createdAt: -1, _id: -1 }).skip((page - 1) * limit).limit(limit).exec();
     return documents.map((document) => this.toDomain(document));
   }
 
-  count(): Promise<number> {
-    return this.model.countDocuments().exec();
+  count(q?: string): Promise<number> {
+    return this.model.countDocuments(buildProcessSearchFilter(q)).exec();
   }
 
   async addCandidate(id: string, candidateId: string, max: number): Promise<boolean> {

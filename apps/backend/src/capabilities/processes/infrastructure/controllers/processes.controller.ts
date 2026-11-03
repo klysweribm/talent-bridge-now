@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type {
   ICandidateActor, IProcess, IProcessDetail, IProcessLimits, IProcessListItem, PaginatedResponse,
 } from '@ibm-talent-bridge/shared-types';
@@ -9,6 +9,7 @@ import type { IJwtPayload } from '../../../../shared/auth/jwt-payload.interface'
 import { Roles } from '../../../../shared/auth/roles.decorator';
 import { RolesGuard } from '../../../../shared/auth/roles.guard';
 import { ProcessService } from '../../application/services/process.service';
+import { PROCESS_SEARCH_MAX } from '../../domain/constants/process.constants';
 import { CreateProcessDto } from '../../domain/dto/create-process.dto';
 import { ProcessIdParamDto } from '../../domain/dto/process-id-param.dto';
 import { ProcessListQueryDto } from '../../domain/dto/process-list-query.dto';
@@ -36,9 +37,11 @@ export class ProcessesController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Lista paginada de procesos' })
+  @ApiOperation({ summary: 'Lista paginada de procesos, con los referentes asignados y búsqueda opcional' })
+  @ApiQuery({ name: 'q', required: false, description: `Busca (parcial, sin distinguir mayúsculas) en título, cliente y rol de la oportunidad; máx. ${PROCESS_SEARCH_MAX} caracteres. Vacío = sin filtro` })
+  @ApiResponse({ status: 400, description: 'page/limit/q inválidos (q repetido o de más de 100 caracteres)' })
   list(@Query() query: ProcessListQueryDto): Promise<PaginatedResponse<IProcessListItem>> {
-    return this.processes.list(query.page, query.limit);
+    return this.processes.list(query.page, query.limit, query.q);
   }
 
   // Debe ir antes de `:id`, o esa ruta la captura.

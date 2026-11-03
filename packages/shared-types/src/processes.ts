@@ -68,9 +68,18 @@ export interface IUpdateProcessRequest {
   readonly technicalRefIds?: readonly string[];
 }
 
+/** Referente técnico resumido en la lista de procesos: solo lo necesario para mostrarlo (sin email, banda ni descripción). */
+export interface IProcessListTechnicalRef {
+  readonly id: string;
+  readonly fullName: string;
+  readonly avatarUrl?: string;
+}
+
 /** Fila de `GET /processes`. */
 export interface IProcessListItem extends Omit<IProcess, 'candidateIds'> {
   readonly candidateCount: number;
+  /** En el orden de `technicalRefIds`; un referente que ya no existe se omite. Procesos legacy: []. */
+  readonly technicalRefs: readonly IProcessListTechnicalRef[];
 }
 
 /** Candidato resumido dentro del detalle de un proceso (nunca el documento completo). */

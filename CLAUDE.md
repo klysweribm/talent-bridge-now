@@ -97,7 +97,11 @@ Start a task with `/roadmap-task <ID | "Etapa N" | next>`: it delegates to the m
 - New code has tests (every new component tier, every new service via fake ports); new backend input has a DTO.
 - No layer-skipping, no state mixing, no silent `catch {}`, no hardcoded config.
 - `ROADMAP.md` / `DEBT_TECH.md` updated if the task moved a criterion or created/resolved debt.
-- Al cerrar cada unidad, el orquestador invoca a doc-keeper antes de proponer commits.
+- **Documentación: la lleva `doc-keeper`.** Al cerrar cada unidad, el orquestador lo invoca antes de proponer commits.
+  - *Unidad cerrada* = un bloque de trabajo entregado (un `*-task` terminado, un paso del plan) cuyos gates el orquestador volvió a ejecutar y están en verde. No cuenta: trabajo a medias, gates en rojo o sin re-ejecutar, ni un cambio que solo toca documentación.
+  - *Solo con los gates en verde.* Si algo está en rojo, se corrige primero; `doc-keeper` no documenta un estado inestable.
+  - *Qué se le pasa* (no tiene `Bash` ni el contexto de la sesión): resumen de la unidad, commits o archivos tocados, las cifras de gates que el orquestador ejecutó, **qué se verificó y qué no** (incluida la evidencia del usuario, si la hay), deuda nueva o resuelta y cualquier decisión de arquitectura.
+  - *Qué se hace con su reporte:* se muestran al usuario las ALERTAS (incongruencia código↔docs con archivo y línea) y los ADR en estado «Propuesto» (nunca aceptados por el agente), y su diff va en el commit de la unidad o en uno `docs:` aparte.
 
 ## Context & session workflow
 

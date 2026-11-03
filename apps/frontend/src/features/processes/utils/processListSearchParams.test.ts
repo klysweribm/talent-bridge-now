@@ -21,7 +21,27 @@ describe('parseProcessListParams', () => {
   });
 });
 
+describe('parseProcessListParams q', () => {
+  it('should read q trimmed and decoded', () => {
+    expect(parse('q=%20banco%20andino%20')).toEqual({ q: 'banco andino' });
+  });
+  it.each(['q=', 'q=%20%20'])('should discard empty %s', qs => {
+    expect(parse(qs)).toEqual({});
+  });
+  it('should cap q at 100 characters', () => {
+    expect(parse(`q=${'a'.repeat(150)}`).q).toHaveLength(100);
+  });
+});
+
 describe('applyProcessListParams', () => {
+  it('should write q trimmed, drop it when blank and keep foreign params', () => {
+    expect(applyProcessListParams(new URLSearchParams('x=1'), { q: '  java ' }).toString()).toBe('x=1&q=java');
+    expect(applyProcessListParams(new URLSearchParams('q=java'), { q: '   ' }).toString()).toBe('');
+  });
+  it('should write page and q together', () => {
+    expect(applyProcessListParams(new URLSearchParams(), { page: 2, q: 'java' }).toString()).toBe('page=2&q=java');
+  });
+
   it('should set page > 1 and omit page 1', () => {
     expect(applyProcessListParams(new URLSearchParams(), { page: 2 }).toString()).toBe('page=2');
     expect(applyProcessListParams(new URLSearchParams('page=2'), { page: 1 }).toString()).toBe('');

@@ -1,7 +1,7 @@
 import { OPPORTUNITY_LIMITS } from '../../../config/processOpportunity.constants';
 import { OPPORTUNITY_COPY } from '../../../config/processOpportunity.copy';
 import { useSkillDraft } from '../../../hooks/useSkillDraft';
-import { SkillChip } from '../../atoms/SkillChip/SkillChip';
+import { SkillChip } from '@shared/components/atoms/SkillChip/SkillChip';
 
 export interface SkillChipsInputProps {
   readonly id:       string;

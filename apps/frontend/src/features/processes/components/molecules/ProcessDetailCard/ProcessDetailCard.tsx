@@ -3,7 +3,7 @@ import { Icon } from '@shared/components/atoms/Icon/Icon';
 import { StatusChip } from '@shared/components/atoms/StatusChip/StatusChip';
 import { PROCESS_DETAIL_CARD_COPY as COPY } from '../../../config/processDetailCard.copy';
 import { PROCESS_LIST_COPY, formatCandidateCount } from '../../../config/processList.constants';
-import { SkillChip } from '../../atoms/SkillChip/SkillChip';
+import { SkillChip } from '@shared/components/atoms/SkillChip/SkillChip';
 
 export interface ProcessDetailCardProps {
   readonly process: IProcessDetail;

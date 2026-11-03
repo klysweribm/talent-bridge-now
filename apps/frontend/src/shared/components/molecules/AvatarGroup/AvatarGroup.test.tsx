@@ -44,4 +44,9 @@ describe('AvatarGroup', () => {
     render(<AvatarGroup avatars={[]} />);
     expect(screen.getByLabelText('0 participantes')).toBeInTheDocument();
   });
+
+  it('should use a custom accessible label when provided', () => {
+    render(<AvatarGroup avatars={SAMPLE.slice(0, 2)} label="Referentes" />);
+    expect(screen.getByLabelText('Referentes')).toBeInTheDocument();
+  });
 });

@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { IProcessListItem, PaginatedResponse } from '@ibm-talent-bridge/shared-types';
 import * as infra from '../../../infrastructure/processList.infra';
@@ -11,7 +11,7 @@ const fetchList = vi.mocked(infra.fetchProcessList);
 const search = (): string => screen.getByTestId('search').textContent ?? '';
 
 const item = (over: Partial<IProcessListItem> = {}): IProcessListItem => ({
-  id: 'p1', title: 'Backend Java Sr', clientName: 'Banco Andino', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [],
+  id: 'p1', title: 'Backend Java Sr', clientName: 'Banco Andino', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [], technicalRefs: [],
   maxCandidates: 5, createdBy: 'u1', createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
   candidateCount: 2, status: 'open', ...over,
 });
@@ -20,13 +20,16 @@ const page = (data: IProcessListItem[], extra: Partial<PaginatedResponse<IProces
 const detailStub = <p>detalle-stub</p>;
 
 describe('ProcessesPage', () => {
+  afterEach(() => { vi.useRealTimers(); });
+
   beforeEach(() => { vi.resetAllMocks(); fetchList.mockResolvedValue(page([item()])); });
 
-  it('should show the loading state, then ProcessItem rows with "N de MAX candidatos"', async () => {
+  it('should show the loading state, then ProcessItem rows with "N candidatos"', async () => {
     renderAt(<ProcessesPage />, '/processes');
     expect(screen.getByRole('status', { name: /cargando procesos/i })).toBeInTheDocument();
     expect(await screen.findByText('Backend Java Sr')).toBeInTheDocument();
-    expect(screen.getByText('Banco Andino · 2 de 5 candidatos')).toBeInTheDocument();
+    expect(screen.getByText('Banco Andino')).toBeInTheDocument();
+    expect(screen.getByText('2 candidatos')).toBeInTheDocument();
     expect(screen.getByRole('list')).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(fetchList).toHaveBeenCalledWith({});
@@ -71,10 +74,59 @@ describe('ProcessesPage', () => {
 
   it('should navigate to the detail when the row link is clicked or activated by keyboard', async () => {
     renderAt(<ProcessesPage />, '/processes', { path: '/processes/:id', element: detailStub });
-    const link = await screen.findByRole('link', { name: 'Ver detalle de Backend Java Sr' });
+    const link = await screen.findByRole('link', { name: 'Ver proceso de Backend Java Sr' });
     expect(link).toHaveAttribute('href', '/processes/p1');
     link.focus();
     await userEvent.keyboard('{Enter}');
     expect(await screen.findByText('detalle-stub')).toBeInTheDocument();
+  });
+
+  it('should show the total in the card header counter', async () => {
+    fetchList.mockResolvedValue(page([item()], { total: 12 }));
+    renderAt(<ProcessesPage />, '/processes');
+    expect(await screen.findByLabelText('Total de procesos: 12')).toHaveTextContent('12');
+    expect(screen.getByRole('region', { name: 'Procesos activos recientes' })).toBeInTheDocument();
+  });
+
+  it('should restore q from the URL into the box and the request', async () => {
+    renderAt(<ProcessesPage />, '/processes?q=banco');
+    expect(screen.getByRole('searchbox', { name: 'Filtrar por rol o cliente…' })).toHaveValue('banco');
+    await waitFor(() => expect(fetchList).toHaveBeenCalledWith({ q: 'banco' }));
+  });
+
+  it('should debounce typing, then update the URL, reset to page 1 and query with q', async () => {
+    renderAt(<ProcessesPage />, '/processes?page=3');
+    await screen.findByText('Backend Java Sr');
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    const box = screen.getByRole('searchbox');
+    await user.type(box, ' java ');
+    expect(search()).toBe('?page=3');
+    await act(async () => { await vi.advanceTimersByTimeAsync(300); });
+    expect(search()).toBe('?q=java');
+    expect(box).toHaveFocus();
+    vi.useRealTimers();
+    await waitFor(() => expect(fetchList).toHaveBeenLastCalledWith({ q: 'java' }));
+    expect(fetchList.mock.calls.filter(c => c[0]?.q).length).toBe(1);
+  });
+
+  it('should show "sin resultados" distinct from the empty state and clear the filter', async () => {
+    fetchList.mockImplementation(p => Promise.resolve(p?.q ? page([], { totalPages: 0 }) : page([item()])));
+    renderAt(<ProcessesPage />, '/processes?q=zzz');
+    expect(await screen.findByText('Sin resultados para “zzz”')).toBeInTheDocument();
+    expect(screen.queryByText('Sin procesos abiertos')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Limpiar filtro' }));
+    expect(await screen.findByText('Backend Java Sr')).toBeInTheDocument();
+    expect(search()).toBe('');
+    expect(screen.getByRole('searchbox')).toHaveValue('');
+  });
+
+  it('should keep the search box and retry on error with a filter', async () => {
+    fetchList.mockRejectedValueOnce(new Error('boom'));
+    renderAt(<ProcessesPage />, '/processes?q=java');
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(screen.getByRole('searchbox')).toHaveValue('java');
+    await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+    expect(await screen.findByText('Backend Java Sr')).toBeInTheDocument();
   });
 });

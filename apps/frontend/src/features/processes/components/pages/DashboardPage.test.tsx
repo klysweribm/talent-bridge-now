@@ -11,7 +11,7 @@ vi.mock('../../infrastructure/processList.infra');
 
 const fetchList = vi.mocked(infra.fetchProcessList);
 const item = (n: number): IProcessListItem => ({
-  id: `p${n}`, title: `Proceso ${n}`, clientName: 'ACME', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [],
+  id: `p${n}`, title: `Proceso ${n}`, clientName: 'ACME', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [], technicalRefs: [],
   maxCandidates: 5, candidateCount: 1, status: 'open', createdBy: 'u1',
   createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
 });
@@ -57,7 +57,7 @@ describe('DashboardPage', () => {
     setup();
     expect(await screen.findByRole('link', { name: 'Procesos activos: 7' })).toHaveAttribute('href', '/processes');
     expect(await screen.findByRole('region', { name: 'Requiere atención' })).toBeInTheDocument();
-    expect(await screen.findByRole('region', { name: 'Procesos activos' })).toBeInTheDocument();
+    expect(await screen.findByRole('region', { name: 'Procesos activos recientes' })).toBeInTheDocument();
     expect(await screen.findByRole('region', { name: 'Entrevistas de hoy' })).toBeInTheDocument();
     expect(await screen.findByText('Proceso 1')).toBeInTheDocument();
   });
@@ -69,7 +69,7 @@ describe('DashboardPage', () => {
     expect(await screen.findByRole('region', { name: 'Requiere atención' })).toBeInTheDocument();
     expect(await screen.findByRole('region', { name: 'Entrevistas de hoy' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /Procesos activos/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: 'Procesos activos' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Procesos activos recientes' })).not.toBeInTheDocument();
     expect(fetchList).not.toHaveBeenCalled();
   });
 

@@ -10,7 +10,7 @@ vi.mock('../../../infrastructure/processList.infra');
 
 const fetchList = vi.mocked(infra.fetchProcessList);
 const item = (n: number): IProcessListItem => ({
-  id: `p${n}`, title: `Proceso ${n}`, clientName: 'ACME', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [],
+  id: `p${n}`, title: `Proceso ${n}`, clientName: 'ACME', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [], technicalRefs: [],
   maxCandidates: 5, candidateCount: 1, status: 'open', createdBy: 'u1',
   createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
 });
@@ -24,20 +24,27 @@ describe('ActiveProcessesList', () => {
   beforeEach(() => { vi.resetAllMocks(); login('recruiter'); });
   afterEach(() => { act(() => useAuthStore.getState().clearAuth()); });
 
-  it('should show 5 real rows and a "Ver todos" link to /processes when total > 5', async () => {
+  it('should show 5 real rows and a "Ver todos los procesos (N)" link to /processes when total > 5', async () => {
     fetchList.mockResolvedValue(page(5, 8));
     renderWithProviders(<ActiveProcessesList />);
-    const section = await screen.findByRole('region', { name: 'Procesos activos' });
+    const section = await screen.findByRole('region', { name: 'Procesos activos recientes' });
     expect(await within(section).findAllByRole('listitem')).toHaveLength(5);
-    expect(within(section).getByRole('link', { name: 'Ver todos' })).toHaveAttribute('href', '/processes');
+    expect(within(section).getByRole('link', { name: 'Ver todos los procesos (8)' })).toHaveAttribute('href', '/processes');
     expect(fetchList).toHaveBeenCalledWith({ limit: 5 });
   });
 
-  it('should hide "Ver todos" when everything fits', async () => {
+  it('should hide the see-all link when everything fits', async () => {
     fetchList.mockResolvedValue(page(5, 5));
     renderWithProviders(<ActiveProcessesList />);
     expect(await screen.findAllByRole('listitem')).toHaveLength(5);
-    expect(screen.queryByRole('link', { name: 'Ver todos' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Ver todos los procesos/ })).not.toBeInTheDocument();
+  });
+
+  it('should not render a search box on the dashboard', async () => {
+    fetchList.mockResolvedValue(page(2, 2));
+    renderWithProviders(<ActiveProcessesList />);
+    await screen.findAllByRole('listitem');
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
   });
 
   it('should offer to create the first process when empty', async () => {
@@ -64,7 +71,7 @@ describe('ActiveProcessesList', () => {
   it('should render nothing and skip the API for technical_ref', () => {
     login('technical_ref');
     renderWithProviders(<ActiveProcessesList />);
-    expect(screen.queryByRole('region', { name: 'Procesos activos' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Procesos activos recientes' })).not.toBeInTheDocument();
     expect(fetchList).not.toHaveBeenCalled();
   });
 });

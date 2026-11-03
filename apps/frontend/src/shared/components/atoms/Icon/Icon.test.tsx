@@ -31,4 +31,10 @@ describe('Icon', () => {
     const { container } = render(<Icon name="mail" className="text-primary" />);
     expect(container.querySelector('span')).toHaveClass('text-primary');
   });
+
+  it.each(['chevron_right', 'group'])('should render %s as inline SVG without depending on the icon font', name => {
+    const { container } = render(<Icon name={name} />);
+    expect(container.querySelector('svg')).toBeInTheDocument();
+    expect(container.querySelector('.material-symbols-outlined')).not.toBeInTheDocument();
+  });
 });

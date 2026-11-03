@@ -21,4 +21,16 @@ export const DETAIL_ICON_DEFS: Readonly<Record<string, ISvgIconDef>> = {
       { tag: 'path', attrs: { d: 'M14 3v5h5M9 13h6M9 17h6' } },
     ],
   },
+  chevron_right: {
+    ...STROKE_DEFAULTS, viewBox: '0 0 24 24',
+    children: [{ tag: 'path', attrs: { d: 'M9 18l6-6-6-6' } }],
+  },
+  group: {
+    ...STROKE_DEFAULTS, viewBox: '0 0 24 24',
+    children: [
+      { tag: 'path', attrs: { d: 'M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2' } },
+      { tag: 'circle', attrs: { cx: 10, cy: 7, r: 4 } },
+      { tag: 'path', attrs: { d: 'M21 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75' } },
+    ],
+  },
 } as const;

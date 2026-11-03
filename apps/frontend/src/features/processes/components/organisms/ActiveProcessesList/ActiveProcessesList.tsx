@@ -1,7 +1,7 @@
 import { ListErrorState } from '@shared/components/molecules/ListErrorState';
 import { PROCESSES_PATH } from '@/router/paths';
 import {
-  ACTIVE_PROCESSES_LIMIT, PROCESS_LIST_COPY, PROCESS_LIST_SKELETON_ROWS,
+  ACTIVE_PROCESSES_LIMIT, PROCESS_LIST_COPY, PROCESS_LIST_SKELETON_ROWS, formatSeeAll,
 } from '../../../config/processList.constants';
 import { useCanSeeProcesses } from '../../../hooks/useCanSeeProcesses';
 import { useProcessList } from '../../../hooks/useProcessList';
@@ -20,11 +20,11 @@ export function ActiveProcessesList(): JSX.Element | null {
   if (!canSee) return null;
 
   const seeAll = data && data.total > ACTIVE_PROCESSES_LIMIT
-    ? { to: PROCESSES_PATH, label: PROCESS_LIST_COPY.seeAll }
+    ? { to: PROCESSES_PATH, label: formatSeeAll(data.total) }
     : undefined;
 
   return (
-    <DashboardSection title={PROCESS_LIST_COPY.activeTitle} headingId="active-processes-heading" seeAll={seeAll}>
+    <DashboardSection title={PROCESS_LIST_COPY.recentTitle} headingId="active-processes-heading" seeAll={seeAll}>
       {isError && !data ? (
         <ListErrorState message={PROCESS_LIST_COPY.errorMessage} retryLabel={PROCESS_LIST_COPY.retryLabel} onRetry={() => void refetch()} />
       ) : !data ? (
@@ -32,7 +32,7 @@ export function ActiveProcessesList(): JSX.Element | null {
       ) : data.data.length === 0 ? (
         <EmptyMessage text={PROCESS_LIST_COPY.activeEmpty} action={{ to: `${PROCESSES_PATH}/new`, label: PROCESS_LIST_COPY.createFirst }} />
       ) : (
-        <ul className="flex flex-col gap-xs">
+        <ul className="flex flex-col">
           {data.data.map(process => <ProcessItem key={process.id} process={process} />)}
         </ul>
       )}

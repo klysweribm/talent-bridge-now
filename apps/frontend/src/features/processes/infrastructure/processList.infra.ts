@@ -6,6 +6,7 @@ export function fetchProcessList(params: IProcessListParams = {}): Promise<Pagin
   const qs = new URLSearchParams();
   if (params.page) qs.set('page', String(params.page));
   if (params.limit) qs.set('limit', String(params.limit));
+  if (params.q) qs.set('q', params.q);
   const query = qs.toString();
   return httpClient.get<PaginatedResponse<IProcessListItem>>(query ? `/processes?${query}` : '/processes');
 }

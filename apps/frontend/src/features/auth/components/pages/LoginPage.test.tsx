@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LoginPage } from './LoginPage';
 import { useAuthStore } from '@features/auth/store/auth.store';
+import { AUTH_COPY } from '@features/auth/config/auth.copy';
 import { loginUser } from '@features/auth/infrastructure/auth.infra';
 
 vi.mock('@features/auth/infrastructure/auth.infra', () => ({
@@ -81,5 +82,52 @@ describe('LoginPage', () => {
   it('should render SSO button', () => {
     renderWithRouter();
     expect(screen.getByLabelText('Acceder con IBM w3id SSO')).toBeInTheDocument();
+  });
+
+  describe('split-screen layout', () => {
+    it('should hide the decorative showcase panel from assistive technology without headings, alerts or a second brand name', () => {
+      const { container } = renderWithRouter();
+      const panel = container.querySelector('[data-testid="login-showcase"]') as HTMLElement;
+      expect(panel).not.toBeNull();
+      expect(panel).toHaveAttribute('aria-hidden', 'true');
+      expect(panel.querySelectorAll('h1,h2,h3,h4,h5,h6,[role="heading"],[role="alert"]')).toHaveLength(0);
+      expect(panel.textContent).not.toContain('Talent Bridge');
+      expect(screen.getAllByText('Talent Bridge')).toHaveLength(1);
+    });
+
+    it('should render the @ibm.com suffix as a chip inside the email field', () => {
+      renderWithRouter();
+      expect(screen.getByText('@ibm.com')).toBeInTheDocument();
+    });
+  });
+
+  describe('inert controls', () => {
+    it('should not render any dead href="#" link', () => {
+      const { container } = renderWithRouter();
+      expect(container.querySelectorAll('a[href="#"]')).toHaveLength(0);
+    });
+
+    it('should disable SSO, remember-device and forgot-password and declare them unavailable', () => {
+      renderWithRouter();
+      expect(screen.getByLabelText('Acceder con IBM w3id SSO')).toBeDisabled();
+      expect(screen.getByRole('checkbox', { name: /recordar este dispositivo/i })).toBeDisabled();
+      const forgot = screen.getByRole('button', { name: AUTH_COPY.forgotPassword });
+      expect(forgot).toBeDisabled();
+      expect(forgot).toHaveAttribute('title', AUTH_COPY.unavailable);
+    });
+  });
+
+  it('should send only the email, store the token and navigate to /dashboard', async () => {
+    mockedLoginUser.mockResolvedValue({
+      user: { id: '1', email: 'ana@ibm.com', role: 'recruiter', name: 'Ana García' },
+      token: 'jwt-xyz',
+    });
+    renderWithRouter();
+    await userEvent.type(screen.getByLabelText(/correo corporativo/i), 'ana@ibm.com');
+    await userEvent.type(screen.getByLabelText('Contraseña'), 'password123');
+    await userEvent.click(screen.getByRole('button', { name: /iniciar sesión/i }));
+    await waitFor(() => expect(useAuthStore.getState().token).toBe('jwt-xyz'));
+    expect(mockedLoginUser).toHaveBeenCalledTimes(1);
+    expect(mockedLoginUser.mock.calls[0][0]).toMatchObject({ email: 'ana@ibm.com' });
   });
 });

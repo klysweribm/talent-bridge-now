@@ -1,8 +1,8 @@
 # Casos de uso — Procesos (PROC-1)
 
-> Contrato: `packages/shared-types/src/processes.ts` (`IProcess`, `ICreateProcessRequest`, `IProcessListItem`, `IProcessDetail`, `IUserOption`) y `ICandidate.processId`.
+> Contrato: `packages/shared-types/src/processes.ts` (`IProcess`, `ICreateProcessRequest`, `IUpdateProcessRequest`, `IProcessListItem`, `IProcessDetail`, `IProcessTechnicalRef`, `IUserOption`), `users.ts` (`IUserProfile`) y `ICandidate.processId`.
 > Consistencia con candidatos: ADR-013 (llamada en memoria entre servicios, sin transacciones).
-> Alcance del MVP: crear, listar y asociar o quitar candidatos. Sin etapas, estados, historial de dueño, transferencia ni entrevistas.
+> Alcance actual: crear, listar (con búsqueda), ver el detalle, editar, cambiar estado y reclutador, asociar o quitar candidatos y asignar hasta 2 referentes técnicos. Sin etapas, historial de estados, transferencia de dueño, reapertura ni entrevistas.
 
 ## Reglas de negocio
 
@@ -14,6 +14,12 @@
 - **R1–R3 (fase siguiente, no se implementan):** visibilidad `public/protected` de candidatos y filtrado por dueño en la query. Mientras tanto `GET /processes` lista todos y los candidatos sin `createdBy` son públicos.
 - **P1:** un candidato no puede estar en más de un proceso. «Disponible» = sin `processId`.
 - Un solo PM y un solo reclutador por proceso; nunca dos reclutadores.
+- **R10 (estado):** el proceso tiene `status`: `open` (Abierto), `in_progress` (Avanzando), `interviewing` (Entrevista), `closed` (Cerrado) y `cancelled` (Cancelado). Defecto al crear: `open`; un documento sin `status` se trata como `open`. Entre `open`, `in_progress` e `interviewing` se mueve libremente. `closed` y `cancelled` son **terminales**: ningún `PATCH`, ni agregar o quitar candidatos ni cambiar referentes → 400 `PROCESS_TERMINAL_STATE`. Reabrir queda fuera del MVP.
+- **R11 (cancelar y cerrar):** «Eliminar» en la UI no borra: pasa el proceso a `cancelled`, tras confirmación. Cancelar **libera** a los candidatos (`processId` → `null`, vacía `candidateIds`; primero libera y luego cambia el estado, y si falla responde 503 `PROCESS_RELEASE_FAILED` sin cambiar nada). Cerrar **conserva** a los candidatos asociados. Los referentes técnicos asignados se conservan en ambos casos.
+- **R12 (editar):** editan, cambian el estado y gestionan candidatos y referentes solo el PM dueño y el reclutador asignado. **Cambiar el reclutador** (`recruiterId`) es exclusivo del PM dueño y el nuevo debe ser un usuario `recruiter`.
+- **R13 (referentes técnicos):** hasta 2 por proceso (`technicalRefIds`), cada uno un usuario existente, activo y con rol `technical_ref`, sin repetir. El `PATCH` **reemplaza** el conjunto (`[]` lo limpia). Inválido → 400 `PROCESS_INVALID_TECHNICAL_REF`.
+- **R14 (oportunidad):** el proceso describe la oportunidad con `opportunityRole`, `skills` (1 a 15), `roleDescription` y `band` (entero de 6 a 10), obligatorios al crear. Los procesos anteriores sin estos campos se leen vacíos (`''`, `[]`, `null`) y se pueden completar con `PATCH`.
+- **R15 (errores con código):** los errores de reglas del proceso llevan un `code` estable en el cuerpo (`{ statusCode, code, message }`): `PROCESS_TERMINAL_STATE`, `PROCESS_CANDIDATE_LIMIT`, `CANDIDATE_ALREADY_ASSIGNED`, `PROCESS_RELEASE_FAILED`, `PROCESS_INVALID_TECHNICAL_REF`. El frontend traduce por `code`, nunca por el texto del mensaje.
 
 ## Resumen de permisos
 
@@ -22,14 +28,16 @@
 | Crear proceso (`POST /processes`) | ✅ (debe elegir PM) | ❌ 403 | ✅ (queda como dueño) |
 | Listar (`GET /processes`) y detalle (`GET /processes/:id`) | ✅ | ❌ 403 | ✅ |
 | Asociar o quitar candidatos | ✅ solo si es el `recruiterId` | ❌ 403 | ✅ solo si es el `ownerPmId` |
-| Listar usuarios para selectores (`GET /users?role=pm\|recruiter`) | ✅ | ❌ 403 | ✅ |
+| Editar, cambiar estado y asignar referentes (`PATCH /processes/:id`) | ✅ solo si es el `recruiterId` | ❌ 403 | ✅ solo si es el `ownerPmId` |
+| Cambiar el reclutador (`recruiterId`) | ❌ 403 | ❌ 403 | ✅ solo si es el `ownerPmId` |
+| Listar usuarios para selectores (`GET /users?role=pm\|recruiter\|technical_ref`) | ✅ | ❌ 403 | ✅ |
 
 Sin token → 401 en todos los endpoints.
 
 ## UC-PROC-1: Crear un proceso
 
 **Rol:** reclutador o PM.
-**Flujo principal:** `POST /processes` con `title`, `clientName` y, opcionalmente, `candidateIds`.
+**Flujo principal:** `POST /processes` con `title`, `clientName`, `opportunityRole`, `skills`, `roleDescription`, `band` y, opcionalmente, `candidateIds`. Nace en estado `open` y sin referentes técnicos.
 - **Crea un PM:** `ownerPmId` se toma del JWT (el del cuerpo se ignora). `recruiterId` es el que elija de `GET /users?role=recruiter`, o `null` si no elige a nadie.
 - **Crea un reclutador:** `ownerPmId` es obligatorio (se elige de `GET /users?role=pm`) y `recruiterId` es el suyo (el del cuerpo se ignora).
 **Reglas de borde / negativas:**
@@ -38,14 +46,16 @@ Sin token → 401 en todos los endpoints.
 - Con `recruiterId: null`, solo el PM dueño asocia y quita candidatos.
 - `candidateIds` por encima del límite → 400; alguno ya asignado a otro proceso → 400/409; alguno inexistente → 404.
 - El autor (`createdBy`) sale siempre del JWT, nunca del cuerpo.
-- Cambiar el reclutador después (que el PM quite al actual y asigne a otro) queda **fuera del MVP**.
+- Faltar un campo de la oportunidad, o `band` fuera de 6 a 10 o no entero, o `skills` vacía, repetida (sin distinguir mayúsculas) o con más de 15 → 400.
+- Cambiar el reclutador después lo hace el PM dueño con `PATCH` (ver UC-PROC-5).
 
 ## UC-PROC-2: Listar procesos y ver el detalle
 
 **Rol:** reclutador o PM.
-**Flujo principal:** `GET /processes?page&limit` devuelve título, cliente, `candidateCount`, `maxCandidates` y fecha. `GET /processes/:id` devuelve además los candidatos resumidos (`id`, `fullName`, `primaryRole`).
+**Flujo principal:** `GET /processes?page&limit&q` devuelve título, cliente, `status`, los campos de la oportunidad, `candidateCount`, `maxCandidates`, fecha y `technicalRefs` (`id`, `fullName`, `avatarUrl?`, en el orden asignado; incluye inactivos, omite los que ya no existen y es `[]` si no hay; sin email, banda ni descripción). `GET /processes/:id` devuelve además los candidatos resumidos (`id`, `fullName`, `primaryRole`) y `technicalRefs` con la ficha completa (`email`, `role`, `band`, `description`, `status`, `avatarUrl?`).
+**Búsqueda:** `q` (opcional, recortado, hasta 100 caracteres) filtra por coincidencia parcial, sin distinguir mayúsculas, en título, cliente y rol de la oportunidad; los caracteres especiales se tratan como texto. Vacío o en blanco equivale a no filtrar. `q` repetido o de más de 100 caracteres → 400. `total` y `totalPages` reflejan el filtro. El filtro solo reduce: no cambia lo que cada rol puede ver.
 **Reglas de borde / negativas:**
-- Lista vacía → la UI muestra «Sin procesos abiertos» y el botón «+ Nuevo proceso».
+- Lista vacía → la UI muestra «Sin procesos abiertos» y el botón «+ Nuevo proceso». Una búsqueda sin coincidencias muestra «Sin resultados» con «Limpiar filtro».
 - `:id` inexistente → 404.
 - `page` y `limit` fuera de rango → 400 (mismo patrón que bench: `DEFAULT_LIMIT 20`, `MAX_LIMIT 50`).
 
@@ -54,6 +64,7 @@ Sin token → 401 en todos los endpoints.
 **Rol:** PM dueño o reclutador del proceso.
 **Flujo principal:** `POST /processes/:id/candidates` con `{ candidateId }` y `DELETE /processes/:id/candidates/:candidateId`. El proceso y el candidato se actualizan por llamada en memoria entre servicios (ADR-013).
 **Reglas de borde / negativas:**
+- Proceso `closed` o `cancelled` → 400 `PROCESS_TERMINAL_STATE` al asociar y al quitar.
 - Candidato disponible → queda con `processId`. Quitarlo lo libera.
 - Candidato ya en otro proceso → 400/409.
 - Superar el límite → 400 con mensaje claro.
@@ -64,10 +75,22 @@ Sin token → 401 en todos los endpoints.
 ## UC-PROC-4: Selectores de usuarios
 
 **Rol:** reclutador o PM.
-**Flujo principal:** `GET /users?role=pm|recruiter&page&limit` devuelve solo `{ id, fullName }`.
+**Flujo principal:** `GET /users?role=pm|recruiter|technical_ref&page&limit` devuelve `{ id, fullName }`. Para `technical_ref` devuelve solo usuarios activos y añade `band` cuando el usuario la tiene; para `pm` y `recruiter` la respuesta sigue siendo solo `{ id, fullName }`.
 **Reglas de borde / negativas:**
-- `role` solo admite `pm` y `recruiter`. Cualquier otro valor, incluido `technical_ref`, o su ausencia → 400.
-- `technical_ref` → 403.
+- `role` solo admite `pm`, `recruiter` y `technical_ref`. Cualquier otro valor, o su ausencia → 400.
+- Un usuario `technical_ref` que llame al endpoint → 403.
+
+## UC-PROC-5: Editar, cambiar estado y asignar referentes
+
+**Rol:** PM dueño o reclutador asignado (el cambio de reclutador, solo el PM dueño).
+**Flujo principal:** `PATCH /processes/:id` con cualquier subconjunto de `title`, `clientName`, `opportunityRole`, `skills`, `roleDescription`, `band`, `recruiterId`, `status` y `technicalRefIds`. Responde con el detalle actualizado. En la UI, «Eliminar» es pasar a `cancelled` con confirmación.
+**Reglas de borde / negativas:**
+- Otro usuario, `createdBy` sin ser dueño ni asignado, o `technical_ref` → 403; sin token → 401; proceso inexistente → 404 (antes que 403).
+- `null` en cualquier campo, campo desconocido, `status` fuera de los 5 valores o validaciones de la oportunidad → 400.
+- `recruiterId` enviado por el reclutador asignado → 403; que no sea un usuario `recruiter` → 400.
+- Proceso `closed` o `cancelled` → 400 `PROCESS_TERMINAL_STATE` (un cierre concurrente tampoco se pisa: la actualización es condicional).
+- `status: 'cancelled'` libera a los candidatos (R11); `closed` los conserva.
+- `technicalRefIds` con más de 2, repetidos, inexistentes, inactivos o de otro rol → 400 `PROCESS_INVALID_TECHNICAL_REF`.
 
 ## Escenarios Gherkin
 
@@ -124,8 +147,44 @@ Feature: Procesos con varios candidatos
     Then recibe 403
 
   Scenario: GET /users con un rol no permitido
-    When se pide GET /users?role=technical_ref
+    When se pide GET /users?role=admin
     Then recibe 400
+
+  Scenario: GET /users de referentes técnicos
+    Given referentes activos e inactivos
+    When un PM o reclutador pide GET /users?role=technical_ref
+    Then recibe solo los activos, con su band si la tienen
+
+  Scenario: cancelar libera a los candidatos
+    Given un proceso con candidatos asociados
+    When el PM dueño envía PATCH con status cancelled
+    Then los candidatos quedan sin processId y el proceso queda cancelled
+
+  Scenario: cerrar conserva a los candidatos
+    Given un proceso con candidatos asociados
+    When el PM dueño envía PATCH con status closed
+    Then los candidatos siguen asociados
+
+  Scenario: un proceso terminal no se modifica
+    Given un proceso closed o cancelled
+    When se intenta PATCH, asociar o quitar un candidato, o cambiar referentes
+    Then recibe 400 con code PROCESS_TERMINAL_STATE
+
+  Scenario: solo el PM dueño cambia el reclutador
+    Given un reclutador asignado
+    When envía PATCH con recruiterId
+    Then recibe 403
+
+  Scenario: asignar referentes técnicos
+    Given dos usuarios technical_ref activos
+    When el PM dueño envía PATCH con technicalRefIds de ambos
+    Then el detalle devuelve technicalRefs con su ficha completa
+    And enviar un tercero, uno repetido o uno inactivo recibe 400 con code PROCESS_INVALID_TECHNICAL_REF
+
+  Scenario: buscar procesos
+    Given procesos de distintos clientes y roles
+    When se pide GET /processes?q=santander
+    Then solo aparecen los que coinciden y total refleja el filtro
 
   Scenario: technical_ref o sin token
     When un technical_ref llama a /processes, /candidates o /users
@@ -145,4 +204,4 @@ Feature: Procesos con varios candidatos
 
 ## Diferido (no es PROC-1)
 
-Los casos del wizard anterior (referentes técnicos `principal` y `validador`, etapas, edición con `PATCH`, cierre de procesos, búsqueda `GET /users/referents`) quedan para las features de referentes (4 y 5) y de etapas. Dependen de los tipos legados `Process`, `ProcessTechnicalRef` y `StageHistoryEntry` (DT-029/DT-037), que no se tocan en PROC-1.
+Etapas e historial de estados, reapertura de procesos, transferencia de dueño, disponibilidad de los referentes (agenda «w3») y los roles `principal`/`validador` de los referentes. Dependen de los tipos legados `Process`, `ProcessTechnicalRef` y `StageHistoryEntry` (DT-029/DT-037), que no se tocan.

@@ -92,6 +92,8 @@ export interface ICandidate extends ICreateCandidateRequest {
   readonly updatedBy?: ICandidateActor;
   /** Cuántas veces se actualizó el perfil desde su creación (0 = nunca). */
   readonly updateCount: number;
+  /** Proceso al que pertenece. Ausente = disponible. Lo deriva el proceso; no se edita desde el candidato. */
+  readonly processId?: string;
 }
 
 /** Por qué un perfil guardado coincide con el borrador. */
@@ -114,4 +116,18 @@ export interface ICandidateMatch {
 export interface ICandidateMatches {
   readonly exact?: ICandidateMatch;
   readonly similar: readonly ICandidateMatch[];
+}
+
+/** Filtro de `GET /candidates?assignment=`. Ausente = todos. */
+export type TCandidateAssignment = 'available' | 'assigned';
+
+/** Fila de `GET /candidates`: solo lo necesario para decidir a quién asociar (sin teléfono ni datos del CV). */
+export interface ICandidateListItem {
+  readonly id: string;
+  readonly fullName: string;
+  readonly email: string;
+  readonly primaryRole?: string;
+  /** Ausente = disponible. */
+  readonly processId?: string;
+  readonly createdAt: string;
 }

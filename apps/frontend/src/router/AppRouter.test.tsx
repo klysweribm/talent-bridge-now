@@ -127,24 +127,46 @@ describe('AppRouter — navigation/route consistency', () => {
     expect(screen.getByText('Esta sección está en construcción. El equipo de IBM Talent Bridge está trabajando en ella — vuelve pronto.')).toBeInTheDocument();
   });
 
-  it('should render ComingSoon for a protected detail route without a real screen yet', () => {
+  // /processes y /processes/:id ya tienen pantalla real (PROC-1): antes asertaban ComingSoon.
+  it('should render the real ProcessesPage, not ComingSoon, for /processes', () => {
     useAuthStore.getState().setAuth(DEMO_USER, validToken());
-    renderAt('/processes/42');
-    expect(screen.getByRole('heading', { level: 1, name: 'Detalle del Proceso' })).toBeInTheDocument();
-    expect(screen.getByText(/Esta sección está en construcción/)).toBeInTheDocument();
+    renderAt('/processes');
+    expect(screen.getByRole('heading', { level: 1, name: 'Procesos' })).toBeInTheDocument();
+    expect(screen.queryByText(/Esta sección está en construcción/)).not.toBeInTheDocument();
   });
 
-  it.each(['recruiter', 'pm'] as const)('should render the requirement boxes on /processes/new for a %s', role => {
+  it('should render the real ProcessDetailPage, not ComingSoon, for /processes/:id', () => {
+    useAuthStore.getState().setAuth(DEMO_USER, validToken());
+    renderAt('/processes/42');
+    expect(screen.getByRole('status', { name: 'Cargando proceso' })).toBeInTheDocument();
+    expect(screen.queryByText(/Esta sección está en construcción/)).not.toBeInTheDocument();
+  });
+
+  it.each(['recruiter', 'pm'] as const)('should render the new process wizard on /processes/new for a %s', role => {
     useAuthStore.getState().setAuth({ ...DEMO_USER, role }, validToken());
     renderAt('/processes/new');
     expect(screen.getByRole('heading', { level: 1, name: 'Nuevo proceso' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /agregar candidato/i })).toHaveAttribute('href', '/candidates/new');
+    expect(screen.getByRole('heading', { level: 2, name: 'Datos del proceso' })).toBeInTheDocument();
   });
 
   it.each(['recruiter', 'pm'] as const)('should render the real NewCandidatePage on /candidates/new for a %s', role => {
     useAuthStore.getState().setAuth({ ...DEMO_USER, role }, validToken());
     renderAt('/candidates/new');
     expect(screen.getByRole('heading', { level: 1, name: 'Agregar candidato' })).toBeInTheDocument();
+  });
+
+  it.each(['recruiter', 'pm'] as const)('should render the real CandidatesPage, not ComingSoon, on /candidates for a %s', role => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role }, validToken());
+    renderAt('/candidates');
+    expect(screen.getByRole('heading', { level: 1, name: 'Candidatos' })).toBeInTheDocument();
+    expect(screen.queryByText(/Esta sección está en construcción/)).not.toBeInTheDocument();
+  });
+
+  it('should send a technical_ref who opens /candidates to /dashboard', () => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'technical_ref' }, validToken());
+    renderAt('/candidates');
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Candidatos' })).not.toBeInTheDocument();
   });
 
   it('should send a technical_ref who opens /candidates/new to /dashboard', () => {

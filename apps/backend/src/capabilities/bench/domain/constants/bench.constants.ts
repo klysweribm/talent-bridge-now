@@ -1,8 +1,7 @@
 import type { TBenchStatus, TLanguageProficiency, TSeniority, TSkillLevelValue } from '@ibm-talent-bridge/shared-types';
 
-export const DEFAULT_PAGE = 1;
-export const DEFAULT_LIMIT = 20;
-export const MAX_LIMIT = 50;
+// Fuente común de paginación en `shared/` (la usan también `auth` y `processes`).
+export { DEFAULT_LIMIT, DEFAULT_PAGE, MAX_LIMIT } from '../../../../shared/pagination/pagination.constants';
 export const MAX_SKILLS_FILTER = 10;
 
 export const DEFAULT_STATUSES: readonly TBenchStatus[] = ['available', 'soft_booked'];

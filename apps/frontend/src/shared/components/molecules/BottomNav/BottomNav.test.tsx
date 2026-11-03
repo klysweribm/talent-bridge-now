@@ -20,11 +20,33 @@ describe('BottomNav', () => {
 });
 
 describe('BottomNav with a recruiter', () => {
-  it('should show all five recruiter items', () => {
+  it('should cap the six recruiter items at five', () => {
     const items = NAVIGATION_ITEMS.filter(item => item.roles.includes('recruiter'));
     render(<MemoryRouter><BottomNav items={items} /></MemoryRouter>);
 
-    expect(items).toHaveLength(5);
-    expect(screen.getAllByRole('link')).toHaveLength(5);
+    expect(items).toHaveLength(6);
+    expect(screen.getAllByRole('link')).toHaveLength(BOTTOM_NAV_MAX_ITEMS);
+  });
+});
+
+describe('BottomNav content per role', () => {
+  const labelsFor = (role: 'recruiter' | 'pm' | 'technical_ref'): string[] => {
+    const items = NAVIGATION_ITEMS.filter(item => item.roles.includes(role));
+    const { unmount } = render(<MemoryRouter><BottomNav items={items} /></MemoryRouter>);
+    const labels = screen.getAllByRole('link').map(link => link.getAttribute('aria-label') ?? '');
+    unmount();
+    return labels;
+  };
+
+  it('should leave Reportes out for the recruiter on mobile', () => {
+    expect(labelsFor('recruiter')).toEqual(['Inicio', 'Banca', 'Procesos', 'Candidatos', 'Entrevistas']);
+  });
+
+  it('should show five items for the PM including Candidatos and Reportes', () => {
+    expect(labelsFor('pm')).toEqual(['Inicio', 'Banca', 'Procesos', 'Candidatos', 'Reportes']);
+  });
+
+  it('should not show Candidatos to the technical referent', () => {
+    expect(labelsFor('technical_ref')).toEqual(['Inicio', 'Entrevistas', 'Feedback']);
   });
 });

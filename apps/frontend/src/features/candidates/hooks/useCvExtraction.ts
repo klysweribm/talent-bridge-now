@@ -21,14 +21,14 @@ export interface IUseCvExtraction {
 }
 
 /** Estado de la pantalla de subida (modo, archivo, validación) + la mutación de extracción. */
-export function useCvExtraction(onExtracted: (result: ICvExtractionResult) => void): IUseCvExtraction {
+export function useCvExtraction(onExtracted: (result: ICvExtractionResult, file: File) => void): IUseCvExtraction {
   const [mode, setMode] = useState<TCvExtractor>(DEFAULT_EXTRACTOR);
   const [file, setFile] = useState<File | undefined>();
   const [fileError, setFileError] = useState<string | null>(null);
   const extract = useExtractCv();
 
   const run = (target: File, chosen: TCvExtractor): void =>
-    extract.mutate({ file: target, mode: chosen }, { onSuccess: onExtracted });
+    extract.mutate({ file: target, mode: chosen }, { onSuccess: result => onExtracted(result, target) });
 
   return {
     mode, setMode, file, fileError, extract,

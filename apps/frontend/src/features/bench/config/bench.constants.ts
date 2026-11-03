@@ -46,3 +46,11 @@ export const CONTROL_CLASSES =
 export const BENCH_COLUMNS = [
   'Código', 'Nombre', 'Rol', 'Seniority', 'Skills principales', 'País', 'Disponible desde', 'Estado',
 ] as const;
+
+export const BENCH_COPY = {
+  emptyMessage:  'No hay recursos que coincidan con los filtros.',
+  emptyAction:   'Limpiar filtros',
+  errorMessage:  'No pudimos cargar la banca.',
+  retryLabel:    'Reintentar',
+  loadingLabel:  'Cargando banca',
+} as const;

@@ -1,6 +1,7 @@
 import type { UseFormRegister } from 'react-hook-form';
 import { Icon } from '@shared/components/atoms/Icon';
 import type { TLoginFormValues } from '@features/auth/hooks/useLoginForm';
+import { AUTH_COPY } from '@features/auth/config/auth.copy';
 
 export interface EmailFieldProps {
   readonly register: UseFormRegister<TLoginFormValues>;
@@ -9,8 +10,8 @@ export interface EmailFieldProps {
 
 function buildClassName(hasError: boolean): string {
   return [
-    'w-full h-10 pl-8 pr-[80px] rounded text-body-md text-text-primary bg-surface-card outline-none',
-    hasError ? 'border-2 border-status-danger' : 'border border-[#8d8d8d]',
+    'w-full h-10 pl-8 pr-20 rounded text-body-md text-text-primary bg-surface-card outline-none',
+    hasError ? 'border-2 border-status-danger' : 'border border-outline-field',
     'focus:outline-2 focus:outline-primary-interactive focus:border-transparent',
   ].join(' ');
 }
@@ -18,8 +19,8 @@ function buildClassName(hasError: boolean): string {
 function EmailFieldLabel(): JSX.Element {
   return (
     <label htmlFor="corporate-email" className="flex items-center justify-between text-body-md-medium text-text-primary">
-      <span>Correo corporativo IBM</span>
-      <span className="text-label-sm text-text-secondary">w3id ID</span>
+      <span>{AUTH_COPY.emailLabel}</span>
+      <span className="text-label-sm text-text-secondary">{AUTH_COPY.emailHint}</span>
     </label>
   );
 }
@@ -43,8 +44,8 @@ export function EmailField({ register, error }: EmailFieldProps): JSX.Element {
           aria-invalid={hasError || undefined}
           className={buildClassName(hasError)}
         />
-        <span className="absolute select-none pointer-events-none right-sm text-label-md text-text-secondary">
-          @ibm.com
+        <span className="absolute select-none pointer-events-none right-xs text-label-md text-text-secondary bg-surface-low rounded px-sm py-2xs">
+          {AUTH_COPY.emailDomain}
         </span>
       </div>
       {hasError && (

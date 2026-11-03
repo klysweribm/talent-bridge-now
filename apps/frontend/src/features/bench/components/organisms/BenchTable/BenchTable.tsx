@@ -6,7 +6,7 @@ import { BenchEmptyState } from '../../molecules/BenchEmptyState';
 import { BenchErrorState } from '../../molecules/BenchErrorState';
 import { BenchTableRow } from '../../molecules/BenchTableRow';
 import { BenchTableSkeleton } from '../../molecules/BenchTableSkeleton';
-import { Pagination } from '../../molecules/Pagination';
+import { Pagination } from '@shared/components/molecules/Pagination';
 
 export interface BenchTableProps {
   readonly onSelect: (benchCode: string) => void;

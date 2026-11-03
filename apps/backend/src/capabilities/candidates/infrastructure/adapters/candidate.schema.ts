@@ -87,6 +87,9 @@ export class CandidateModel {
   @Prop({ type: SchemaFactory.createForClass(CandidateActorModel) }) updatedBy?: CandidateActorModel;
   @Prop({ type: Number, min: 0, default: 0 }) updateCount!: number;
 
+  /** Proceso al que pertenece; ausente = disponible. Solo lo escribe el flujo de procesos, nunca `replace`. */
+  @Prop({ type: String, index: true }) processId?: string;
+
   /** Claves de búsqueda internas (UC-CAND-6): nunca salen en las respuestas. */
   @Prop({ type: String, index: true }) nameKey?: string;
   @Prop({ type: String, index: true }) phoneKey?: string;

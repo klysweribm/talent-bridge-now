@@ -12,7 +12,7 @@ const candidate = (over: Partial<ICandidate>): ICandidate => ({
 function setup(): { service: CandidateMatchService; findByEmail: jest.Mock; findSimilar: jest.Mock } {
   const findByEmail = jest.fn().mockResolvedValue(null);
   const findSimilar = jest.fn().mockResolvedValue([]);
-  const repository: ICandidateRepositoryPort = { findByEmail, findById: jest.fn(), findSimilar, create: jest.fn(), replace: jest.fn() };
+  const repository: ICandidateRepositoryPort = { findByEmail, findById: jest.fn(), findSimilar, create: jest.fn(), replace: jest.fn(), findByIds: jest.fn(), claimProcess: jest.fn(), releaseProcess: jest.fn(), findPage: jest.fn() };
   return { service: new CandidateMatchService(repository), findByEmail, findSimilar };
 }
 

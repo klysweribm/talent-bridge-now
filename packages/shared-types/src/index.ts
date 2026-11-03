@@ -1,3 +1,5 @@
+import type { TUserStatus } from './users';
+
 // ─── Roles ────────────────────────────────────────────────────────────────────
 
 export type UserRole = 'recruiter' | 'technical_ref' | 'pm';
@@ -54,6 +56,10 @@ export interface User {
   avatarUrl?: string;
   /** Solo tiene sentido para `role: 'technical_ref'`. Taxonomía (texto libre vs. catálogo) — abierto, ver ADR-013. */
   specialty?: readonly string[];
+  /** Banda (entero 6..10) y descripción del perfil; ausentes en usuarios anteriores a PROC-1c. */
+  band?: number | null;
+  description?: string;
+  status?: TUserStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -233,3 +239,5 @@ import type { TCandidateStatus } from './candidates';
 export * from './bench';
 export * from './ai';
 export * from './candidates';
+export * from './processes';
+export * from './users';

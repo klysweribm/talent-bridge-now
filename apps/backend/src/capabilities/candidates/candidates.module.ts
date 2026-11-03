@@ -5,7 +5,9 @@ import { MulterModule } from '@nestjs/platform-express';
 import { AiModule } from '../ai/ai.module';
 import { BenchModule } from '../bench/bench.module';
 import { SKILL_CATALOG_PORT } from './application/ports/skill-catalog.port';
+import { CandidateListService } from './application/services/candidate-list.service';
 import { CandidateMatchService } from './application/services/candidate-match.service';
+import { CandidateProcessLinkService } from './application/services/candidate-process-link.service';
 import { CandidateService } from './application/services/candidate.service';
 import { CvExtractionService } from './application/services/cv-extraction.service';
 import { CANDIDATE_REPOSITORY_PORT } from './domain/constants/candidate.constants';
@@ -20,12 +22,13 @@ import { LocalCvTextExtractor } from './infrastructure/adapters/local-cv-text-ex
 import { IcaCvExtractor } from './infrastructure/adapters/ica-cv-extractor.adapter';
 import { MongooseCandidateAdapter } from './infrastructure/adapters/mongoose-candidate.adapter';
 import { buildCvUploadConfig } from './infrastructure/config/cv-upload.config';
+import { AvailableCandidatesController } from './infrastructure/controllers/available-candidates.controller';
 import { CandidatesController } from './infrastructure/controllers/candidates.controller';
+import { CandidatesListController } from './infrastructure/controllers/candidates-list.controller';
 
 @Module({
   imports: [
-    AiModule,
-    BenchModule,
+    AiModule, BenchModule,
     MongooseModule.forFeature([{ name: CandidateModel.name, schema: CandidateSchema }]),
     // Tope duro en memoria: +1 byte para que el servicio devuelva el 400 claro cuando el archivo solo excede un poco.
     MulterModule.registerAsync({
@@ -34,11 +37,11 @@ import { CandidatesController } from './infrastructure/controllers/candidates.co
       useFactory: (config: ConfigService) => ({ limits: { fileSize: buildCvUploadConfig(config).maxFileBytes + 1, files: 1 } }),
     }),
   ],
-  controllers: [CandidatesController],
+  controllers: [AvailableCandidatesController, CandidatesListController, CandidatesController],
   providers: [
     CvExtractionService,
     CandidateService,
-    CandidateMatchService,
+    CandidateProcessLinkService, CandidateListService, CandidateMatchService,
     IcaCvExtractor,
     IcaTextCvExtractor,
     ClassicCvExtractor,
@@ -54,5 +57,7 @@ import { CandidatesController } from './infrastructure/controllers/candidates.co
     },
     { provide: CANDIDATE_REPOSITORY_PORT, useClass: MongooseCandidateAdapter },
   ],
+  // Procesos asocia/libera candidatos por llamada en memoria (ADR-013).
+  exports: [CandidateProcessLinkService],
 })
 export class CandidatesModule {}

@@ -52,6 +52,17 @@ const config: Config = {
         'raised':  '0 4px 8px 0 rgba(0,0,0,0.10)',
         'modal':   '0 12px 24px 0 rgba(0,0,0,0.16)',
       },
+
+      // ─── ANIMACIÓN — barra de progreso indeterminada ────────────────
+      keyframes: {
+        'progress-indeterminate': {
+          '0%':   { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(250%)' },
+        },
+      },
+      animation: {
+        'progress-indeterminate': 'progress-indeterminate 1.4s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

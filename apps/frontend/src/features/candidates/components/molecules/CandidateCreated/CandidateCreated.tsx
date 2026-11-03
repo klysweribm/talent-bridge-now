@@ -8,9 +8,12 @@ export interface CandidateCreatedProps {
   readonly candidate: ICandidate;
   readonly mode: 'created' | 'updated';
   readonly onRestart: () => void;
+  /** Destino y etiqueta del enlace de salida (dependen del origen; los resuelve el organismo). */
+  readonly exitTo: string;
+  readonly exitLabel: string;
 }
 
-export function CandidateCreated({ candidate, mode, onRestart }: CandidateCreatedProps): JSX.Element {
+export function CandidateCreated({ candidate, mode, onRestart, exitTo, exitLabel }: CandidateCreatedProps): JSX.Element {
   const title = mode === 'updated' ? RESULT_COPY.updated : RESULT_COPY.created;
   return (
     <div role="status" className="flex flex-col items-start gap-sm p-md rounded border border-status-success bg-status-success-bg">
@@ -20,7 +23,7 @@ export function CandidateCreated({ candidate, mode, onRestart }: CandidateCreate
       )}
       <div className="flex gap-sm items-center">
         <Button variant="secondary" onClick={onRestart}>Cargar otro candidato</Button>
-        <Link to="/processes/new" className="text-body-md text-primary-interactive underline">Volver al nuevo proceso</Link>
+        <Link to={exitTo} className="text-body-md text-primary-interactive underline">{exitLabel}</Link>
       </div>
     </div>
   );

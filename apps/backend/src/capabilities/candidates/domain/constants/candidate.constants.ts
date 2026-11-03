@@ -1,4 +1,4 @@
-import type { TLanguageProficiency, TSeniority, TSkillLevelValue } from '@ibm-talent-bridge/shared-types';
+import type { TCandidateAssignment, TLanguageProficiency, TSeniority, TSkillLevelValue } from '@ibm-talent-bridge/shared-types';
 
 export const CANDIDATE_SENIORITIES: readonly TSeniority[] = ['jr', 'ssr', 'sr', 'lead'];
 export const CANDIDATE_SKILL_LEVELS: readonly TSkillLevelValue[] = [1, 2, 3, 4, 5];
@@ -19,3 +19,6 @@ export const CANDIDATE_LANGUAGE_CODE_PATTERN = /^[a-z]{2}$/;
 
 export const CANDIDATE_REPOSITORY_PORT = Symbol('CANDIDATE_REPOSITORY_PORT');
 export const CANDIDATE_SIMILAR_LIMIT = 5;
+
+/** Valores válidos de `?assignment=`; `satisfies` garantiza que coinciden con `TCandidateAssignment`. */
+export const CANDIDATE_ASSIGNMENTS = ['available', 'assigned'] as const satisfies readonly TCandidateAssignment[];

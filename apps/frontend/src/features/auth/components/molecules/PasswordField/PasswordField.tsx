@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { UseFormRegister } from 'react-hook-form';
 import { Icon } from '@shared/components/atoms/Icon';
 import type { TLoginFormValues } from '@features/auth/hooks/useLoginForm';
+import { AUTH_COPY } from '@features/auth/config/auth.copy';
 
 export interface PasswordFieldProps {
   readonly register: UseFormRegister<TLoginFormValues>;
@@ -11,7 +12,7 @@ export interface PasswordFieldProps {
 function buildClassName(hasError: boolean): string {
   return [
     'w-full h-10 pl-8 pr-8 rounded text-body-md text-text-primary bg-surface-card outline-none',
-    hasError ? 'border-2 border-status-danger' : 'border border-[#8d8d8d]',
+    hasError ? 'border-2 border-status-danger' : 'border border-outline-field',
     'focus:outline-2 focus:outline-primary-interactive focus:border-transparent',
   ].join(' ');
 }
@@ -20,11 +21,16 @@ function PasswordFieldLabel(): JSX.Element {
   return (
     <div className="flex items-center justify-between">
       <label htmlFor="corporate-password" className="text-body-md-medium text-text-primary">
-        Contraseña
+        {AUTH_COPY.passwordLabel}
       </label>
-      <a href="#" className="text-label-md text-primary underline underline-offset-2">
-        ¿Olvidaste tu contraseña?
-      </a>
+      <button
+        type="button"
+        disabled
+        title={AUTH_COPY.unavailable}
+        className="text-label-md text-text-secondary bg-transparent border-none p-0 cursor-not-allowed"
+      >
+        {AUTH_COPY.forgotPassword}
+      </button>
     </div>
   );
 }

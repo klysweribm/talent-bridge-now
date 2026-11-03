@@ -1,25 +1,39 @@
-import { useActiveProcessesQuery } from '../../../hooks/useActiveProcessesQuery';
+import { ListErrorState } from '@shared/components/molecules/ListErrorState';
+import { PROCESSES_PATH } from '@/router/paths';
+import {
+  ACTIVE_PROCESSES_LIMIT, PROCESS_LIST_COPY, PROCESS_LIST_SKELETON_ROWS, formatSeeAll,
+} from '../../../config/processList.constants';
+import { useCanSeeProcesses } from '../../../hooks/useCanSeeProcesses';
+import { useProcessList } from '../../../hooks/useProcessList';
 import { DashboardSection } from '../../molecules/DashboardSection';
 import { EmptyMessage } from '../../molecules/EmptyMessage';
-import { ProcessRow } from '../../molecules/ProcessRow';
+import { ProcessItem } from '../../molecules/ProcessItem';
+import { ProcessItemSkeleton } from '../../molecules/ProcessItemSkeleton';
 
-export const ACTIVE_PROCESSES_LIMIT = 5;
+export { ACTIVE_PROCESSES_LIMIT };
+
+const PARAMS = { limit: ACTIVE_PROCESSES_LIMIT } as const;
 
 export function ActiveProcessesList(): JSX.Element | null {
-  const { data } = useActiveProcessesQuery(ACTIVE_PROCESSES_LIMIT);
-  if (!data) return null;
+  const canSee = useCanSeeProcesses();
+  const { data, isError, refetch } = useProcessList(PARAMS, { enabled: canSee });
+  if (!canSee) return null;
 
-  const seeAll = data.total > ACTIVE_PROCESSES_LIMIT
-    ? { to: '/processes?status=active', label: 'Ver todos' }
+  const seeAll = data && data.total > ACTIVE_PROCESSES_LIMIT
+    ? { to: PROCESSES_PATH, label: formatSeeAll(data.total) }
     : undefined;
 
   return (
-    <DashboardSection title="Procesos activos" headingId="active-processes-heading" seeAll={seeAll}>
-      {data.items.length === 0 ? (
-        <EmptyMessage text="Aún no hay procesos." action={{ to: '/processes/new', label: 'Crear el primero' }} />
+    <DashboardSection title={PROCESS_LIST_COPY.recentTitle} headingId="active-processes-heading" seeAll={seeAll}>
+      {isError && !data ? (
+        <ListErrorState message={PROCESS_LIST_COPY.errorMessage} retryLabel={PROCESS_LIST_COPY.retryLabel} onRetry={() => void refetch()} />
+      ) : !data ? (
+        <ProcessItemSkeleton label={PROCESS_LIST_COPY.loadingLabel} rows={PROCESS_LIST_SKELETON_ROWS} />
+      ) : data.data.length === 0 ? (
+        <EmptyMessage text={PROCESS_LIST_COPY.activeEmpty} action={{ to: `${PROCESSES_PATH}/new`, label: PROCESS_LIST_COPY.createFirst }} />
       ) : (
-        <ul className="flex flex-col gap-xs">
-          {data.items.map(process => <ProcessRow key={process.id} process={process} />)}
+        <ul className="flex flex-col">
+          {data.data.map(process => <ProcessItem key={process.id} process={process} />)}
         </ul>
       )}
     </DashboardSection>

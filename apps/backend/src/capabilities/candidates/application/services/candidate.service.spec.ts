@@ -17,7 +17,7 @@ function setup(): {
   const findById = jest.fn().mockResolvedValue(null);
   const create = jest.fn((request: ICreateCandidateRequest) => Promise.resolve(stored(request)));
   const replace = jest.fn();
-  const repository: ICandidateRepositoryPort = { findByEmail, findById, findSimilar: jest.fn(), create, replace };
+  const repository: ICandidateRepositoryPort = { findByEmail, findById, findSimilar: jest.fn(), create, replace, findByIds: jest.fn(), claimProcess: jest.fn(), releaseProcess: jest.fn(), findPage: jest.fn() };
   return { service: new CandidateService(repository), findByEmail, findById, create, replace };
 }
 

@@ -10,6 +10,8 @@ export interface AvatarGroupProps {
   readonly max?:       number;
   readonly size?:      AvatarSize;
   readonly className?: string;
+  /** Nombre accesible del grupo; por defecto «N participantes». */
+  readonly label?:     string;
 }
 
 interface IOverflowBadgeProps {
@@ -40,13 +42,14 @@ export function AvatarGroup({
   max       = 4,
   size      = 'sm',
   className = '',
+  label,
 }: AvatarGroupProps): JSX.Element {
   const visible = avatars.slice(0, max);
 
   return (
     <div
       className={`flex items-center ${className}`}
-      aria-label={`${avatars.length} participantes`}
+      aria-label={label ?? `${avatars.length} participantes`}
     >
       {visible.map((avatar, i) => (
         <span

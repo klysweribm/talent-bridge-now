@@ -47,6 +47,12 @@ export const colors = {
   outline: {
     DEFAULT:   '#747686',
     variant:   '#c4c5d7',
+    field:     '#8d8d8d',
+  },
+  // Azules de marca oscuros para el panel del login (texto claro sobre ellos: contraste > 7:1).
+  brand: {
+    deep:      '#001141',
+    mid:       '#001d6c',
   },
   status: {
     success:   '#24a148',
@@ -57,6 +63,9 @@ export const colors = {
     'danger-bg':  '#ffebeb',
     'info-bg':    '#edf5ff',
     'info-text':  '#0043ce',
+    'success-text': '#0e6027',
+    'purple-bg':  '#f6f2ff',
+    'purple-text': '#6929c4',
   },
   error: {
     DEFAULT:   '#ba1a1a',

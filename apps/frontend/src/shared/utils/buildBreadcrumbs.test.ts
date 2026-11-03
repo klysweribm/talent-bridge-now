@@ -14,6 +14,11 @@ describe('buildBreadcrumbs', () => {
     expect(buildBreadcrumbs('/processes/42').at(-1)?.label).toBe('Detalle del proceso');
   });
 
+  it('should return Inicio > Candidatos for the list and add a third level for the add form', () => {
+    expect(buildBreadcrumbs('/candidates')).toEqual([{ label: 'Inicio', to: '/dashboard' }, { label: 'Candidatos' }]);
+    expect(buildBreadcrumbs('/candidates/new').map(b => b.label)).toEqual(['Inicio', 'Candidatos', 'Agregar candidato']);
+  });
+
   it('should return nothing for unknown routes', () => {
     expect(buildBreadcrumbs('/nope')).toEqual([]);
   });

@@ -1,15 +1,19 @@
 import { Icon } from '@shared/components/atoms/Icon';
 import { IbmLogoMark } from '@features/auth/components/atoms/IbmLogoMark';
+import { AUTH_COPY } from '@features/auth/config/auth.copy';
 
+/** SSO no tiene backend todavía: el botón queda deshabilitado y declarado como no disponible. */
 export function SsoLoginButton(): JSX.Element {
   return (
     <button
       type="button"
-      aria-label="Acceder con IBM w3id SSO"
-      className="flex items-center justify-center gap-sm w-full h-10 rounded text-body-md-medium bg-surface-low text-text-primary border-none cursor-pointer transition-colors duration-150 hover:bg-surface-base"
+      disabled
+      title={AUTH_COPY.unavailable}
+      aria-label={AUTH_COPY.sso}
+      className="flex items-center justify-center gap-sm w-full h-10 rounded text-body-md-medium bg-surface-low text-text-primary border-none cursor-not-allowed opacity-60"
     >
       <IbmLogoMark />
-      <span>Acceder con IBM w3id SSO</span>
+      <span>{AUTH_COPY.sso}</span>
       <Icon name="lock_open" size={16} className="ml-auto text-text-secondary" />
     </button>
   );

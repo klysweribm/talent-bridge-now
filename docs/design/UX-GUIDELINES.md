@@ -74,7 +74,26 @@ Fuente de verdad en código: `apps/frontend/src/shared/config/navigation.ts`.
 
 La misma fila de proceso del Inicio, con filtro por estado (activo / cerrado) y paginación del lado del servidor. Es la única pantalla nueva sin mockup que entra en la demo.
 
-### 3.4 Wizard "Crear proceso" (Etapa 3) — 4 pasos
+### 3.4 Wizard "Crear proceso" — MVP de PROC-1: 3 pasos sobre un solo formulario
+
+Mockups de referencia (diseño completo, **no** es lo que se construye): `docs/design/mockups/proceso-nuevo/`
+(`paso-1-informacion-del-rol`, `paso-2-asignar-referentes`, `paso-3-cargar-candidatos`, `paso-4-confirmar-y-publicar`).
+Manda este documento donde contradigan; el shell de los mockups (sidebar, buscador, «Centro de Soporte») se ignora:
+se usa el shell real de la app (§1).
+
+**El stepper es solo orden de navegación.** Los tres pasos alimentan un único `POST /processes` al final, sin
+borradores en el servidor. El estado vive en `wizard.store.ts` (Zustand) y sobrevive a ir a `/candidates/new` y volver.
+
+| Paso del MVP | Contiene | Fuera (futuro) |
+| --- | --- | --- |
+| 1. Datos | Título*, Cliente* (texto libre, máx. 200); **Project Manager\*** solo si crea un reclutador; **Reclutador** (opcional, «Sin asignar») solo si crea un PM | Seniority, descripción del perfil, duración de entrevista, skills, expectativas del cliente, benchmark «18 días», ID de requisición, chip «Etapa inicial» |
+| 2. Candidatos | Lista de candidatos **disponibles** con casilla (nombre + rol), contador «N de MAX» con el tope del backend, deshabilitadas al llegar al tope, «+ Agregar candidato» siempre visible (lleva a `/candidates/new`) | Buscador de existentes, «% match», «Watson Enabled», alerta de coincidencia, carga de CV dentro del paso |
+| 3. Confirmar | Resumen de datos y candidatos con «Editar» por sección, **un** botón «Crear proceso», «Atrás» y «Cancelar y descartar». **0 candidatos está permitido** (aviso «Aún sin candidatos») | Vista previa de Slack, notificaciones Outlook/Slack, «Estimación de cierre», «Guardar como borrador» |
+
+El paso «Asignar referentes» del diseño (mín. 1, Principal/Validador, disponibilidad, historial de contratación) queda
+fuera del MVP: depende de las features de referentes (4 y 5) y `IProcess` no tiene ese campo.
+
+### 3.4.bis Wizard "Crear proceso" — diseño completo original (Etapa 3, referencia futura)
 
 | Paso | Contiene | Fuera |
 | --- | --- | --- |

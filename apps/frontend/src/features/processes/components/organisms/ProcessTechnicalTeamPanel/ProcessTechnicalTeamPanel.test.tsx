@@ -116,7 +116,7 @@ describe('ProcessTechnicalTeamPanel', () => {
 
   it.each([
     [apiError(400, 'PROCESS_INVALID_TECHNICAL_REF'), /ya no está disponible/],
-    [apiError(400, 'PROCESS_TERMINAL_STATE'), /cerrado o cancelado/],
+    [apiError(400, 'PROCESS_TERMINAL_STATE'), /cerrada o cancelada/],
     [apiError(403), /No tienes permiso/],
     [apiError(503), /No se modificó nada/],
   ])('should show %s as an alert and keep the picker open', async (error, text) => {

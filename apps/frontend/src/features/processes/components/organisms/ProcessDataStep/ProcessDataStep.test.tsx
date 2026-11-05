@@ -54,7 +54,7 @@ describe('ProcessDataStep', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
     expect(await screen.findByText('El título es obligatorio.')).toBeInTheDocument();
     expect(screen.getByText('El cliente es obligatorio.')).toBeInTheDocument();
-    expect(screen.getByText('Elige el PM responsable del proceso.')).toBeInTheDocument();
+    expect(screen.getByText('Elige el PM responsable de la oportunidad.')).toBeInTheDocument();
     expect(screen.getByText('Hay 7 errores en el formulario.')).toBeInTheDocument();
     ['El rol de la oportunidad es obligatorio.', 'Agrega al menos 1 tecnología.', 'Elige la banda profesional.', 'La descripción del rol es obligatoria.']
       .forEach(message => expect(screen.getByText(message)).toBeInTheDocument());

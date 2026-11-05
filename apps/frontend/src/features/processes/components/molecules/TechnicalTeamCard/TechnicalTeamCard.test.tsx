@@ -11,7 +11,7 @@ describe('TechnicalTeamCard', () => {
     render(<TechnicalTeamCard refs={[]} maxRefs={2} />);
     expect(screen.getByRole('heading', { name: 'Equipo técnico asignado' })).toBeInTheDocument();
     expect(screen.getByText('Sin asignar')).toBeInTheDocument();
-    expect(screen.getByText('Aún no hay referentes técnicos asignados a este proceso.')).toBeInTheDocument();
+    expect(screen.getByText('Aún no hay referentes técnicos asignados a esta oportunidad.')).toBeInTheDocument();
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
   });
 

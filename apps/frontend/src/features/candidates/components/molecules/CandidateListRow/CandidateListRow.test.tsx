@@ -23,9 +23,9 @@ describe('CandidateListRow', () => {
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 
-  it('should link "En un proceso" to the process detail when assigned', () => {
+  it('should link "En una oportunidad" to the process detail when assigned', () => {
     renderRow({ processId: 'p9' });
-    expect(screen.getByRole('link', { name: 'En un proceso' })).toHaveAttribute('href', '/processes/p9');
+    expect(screen.getByRole('link', { name: 'En una oportunidad' })).toHaveAttribute('href', '/processes/p9');
     expect(screen.queryByText('Disponible')).not.toBeInTheDocument();
   });
 });

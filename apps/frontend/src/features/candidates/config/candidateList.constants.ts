@@ -20,7 +20,7 @@ export const CANDIDATE_LIST_COPY = {
   loadingLabel:   'Cargando candidatos',
   noRole:         '—',
   available:      'Disponible',
-  inProcess:      'En un proceso',
+  inProcess:      'En una oportunidad',
   filterLabel:    'Filtrar candidatos',
 } as const;
 
@@ -33,11 +33,11 @@ export interface ICandidateFilterOption {
 export const CANDIDATE_FILTERS: readonly ICandidateFilterOption[] = [
   { value: undefined,   label: 'Todos',         empty: 'Aún no hay candidatos' },
   { value: 'available', label: 'Disponibles',   empty: 'No hay candidatos disponibles' },
-  { value: 'assigned',  label: 'En un proceso', empty: 'Ningún candidato está en un proceso' },
+  { value: 'assigned',  label: 'En una oportunidad', empty: 'Ningún candidato está en una oportunidad' },
 ];
 
 /** Destino y etiqueta del enlace de salida de «Candidato creado» según el origen. */
 export const CANDIDATE_EXIT_LINKS = {
-  newProcess: { label: 'Volver al nuevo proceso' },
+  newProcess: { label: 'Volver a la nueva oportunidad' },
   list:       { label: 'Ver candidatos' },
 } as const;

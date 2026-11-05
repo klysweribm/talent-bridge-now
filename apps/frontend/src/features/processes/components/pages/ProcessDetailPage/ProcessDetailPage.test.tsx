@@ -21,7 +21,7 @@ describe('ProcessDetailPage', () => {
 
   it('should show title, client, "N de MAX candidatos" and the read-only candidates', async () => {
     mount();
-    expect(screen.getByRole('status', { name: /cargando proceso/i })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: /cargando oportunidad/i })).toBeInTheDocument();
     expect(await screen.findByRole('heading', { level: 1, name: 'Backend Java Sr' })).toBeInTheDocument();
     expect(screen.getByText('Banco Andino')).toBeInTheDocument();
     expect(screen.getByText('2 de 5 candidatos')).toBeInTheDocument();
@@ -36,16 +36,16 @@ describe('ProcessDetailPage', () => {
     expect(await screen.findByText('Avanzando')).toBeInTheDocument();
   });
 
-  it('should offer a "Volver a procesos" link', async () => {
+  it('should offer a "Volver a oportunidades" link', async () => {
     mount();
-    expect(await screen.findByRole('link', { name: 'Volver a procesos' })).toHaveAttribute('href', '/processes');
+    expect(await screen.findByRole('link', { name: 'Volver a oportunidades' })).toHaveAttribute('href', '/processes');
   });
 
   it('should show an in-layout not-found error with a way back on 404', async () => {
     fetchDetail.mockRejectedValue(new HttpError(404, 'nf'));
     mount();
-    expect(await screen.findByRole('alert')).toHaveTextContent('Proceso no encontrado');
-    expect(screen.getByRole('link', { name: 'Volver a procesos' })).toHaveAttribute('href', '/processes');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Oportunidad no encontrada');
+    expect(screen.getByRole('link', { name: 'Volver a oportunidades' })).toHaveAttribute('href', '/processes');
   });
 
   it('should show a retryable generic error on other failures', async () => {

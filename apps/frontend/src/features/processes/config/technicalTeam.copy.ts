@@ -5,7 +5,7 @@ export const TECHNICAL_TEAM_COPY = {
   none:       'Sin asignar',
   assigned:   (count: number): string => `${count} asignados`,
   partial:    (count: number, max: number): string => `${count} de ${max} asignados`,
-  empty:      'Aún no hay referentes técnicos asignados a este proceso.',
+  empty:      'Aún no hay referentes técnicos asignados a esta oportunidad.',
   band:       (band: number): string => `Band ${band}`,
   inactive:   'Inactivo',
   manage:     'Gestionar equipo técnico',

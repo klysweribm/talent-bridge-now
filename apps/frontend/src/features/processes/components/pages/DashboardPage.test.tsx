@@ -61,18 +61,18 @@ describe('DashboardPage', () => {
     expect(screen.getAllByRole('button')).toHaveLength(1);
   });
 
-  it('should navigate to the wizard from "Nuevo Proceso"', async () => {
+  it('should navigate to the wizard from "Nueva oportunidad"', async () => {
     setup();
-    await userEvent.click(screen.getByRole('button', { name: 'Nuevo Proceso' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Nueva oportunidad' }));
     expect(screen.getByText('wizard')).toBeInTheDocument();
   });
 
   it.each(['recruiter', 'pm'] as const)('should compose real counter, sections and processes for %s', async role => {
     login(role);
     setup();
-    expect(await screen.findByRole('link', { name: 'Procesos activos: 7' })).toHaveAttribute('href', '/processes');
+    expect(await screen.findByRole('link', { name: 'Oportunidades activas: 7' })).toHaveAttribute('href', '/processes');
     expect(await screen.findByRole('region', { name: 'Requiere atención' })).toBeInTheDocument();
-    expect(await screen.findByRole('region', { name: 'Procesos activos recientes' })).toBeInTheDocument();
+    expect(await screen.findByRole('region', { name: 'Oportunidades activas recientes' })).toBeInTheDocument();
     expect(await screen.findByRole('region', { name: 'Entrevistas de hoy' })).toBeInTheDocument();
     expect(await screen.findByText('Proceso 1')).toBeInTheDocument();
     expectHonestWidgets();
@@ -84,8 +84,8 @@ describe('DashboardPage', () => {
     expect(await screen.findByRole('link', { name: /Feedback pendiente/ })).toBeInTheDocument();
     expect(await screen.findByRole('region', { name: 'Requiere atención' })).toBeInTheDocument();
     expect(await screen.findByRole('region', { name: 'Entrevistas de hoy' })).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /Procesos activos/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: 'Procesos activos recientes' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Oportunidades activas/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Oportunidades activas recientes' })).not.toBeInTheDocument();
     expect(fetchList).not.toHaveBeenCalled();
     expectHonestWidgets();
   });

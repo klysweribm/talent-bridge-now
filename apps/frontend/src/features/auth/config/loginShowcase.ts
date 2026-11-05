@@ -17,7 +17,7 @@ export const LOGIN_SHOWCASE = {
   },
   stats: [
     { value: '94%',    delta: '+4.2%', caption: 'Coincidencia técnica promedio' },
-    { value: '+1,200', delta: null,    caption: 'Procesos 2024' },
+    { value: '+1,200', delta: null,    caption: 'Oportunidades 2024' },
   ],
   poweredBy: 'Impulsado por IBM Watson Orchestrate & Carbon Design',
   guard:     'Enterprise Auth Guard • 256-bit',

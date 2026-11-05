@@ -39,11 +39,11 @@ describe('BottomNav content per role', () => {
   };
 
   it('should leave Reportes out for the recruiter on mobile', () => {
-    expect(labelsFor('recruiter')).toEqual(['Inicio', 'Banca', 'Procesos', 'Candidatos', 'Entrevistas']);
+    expect(labelsFor('recruiter')).toEqual(['Inicio', 'Banca', 'Oportunidades', 'Candidatos', 'Entrevistas']);
   });
 
   it('should show five items for the PM including Candidatos and Reportes', () => {
-    expect(labelsFor('pm')).toEqual(['Inicio', 'Banca', 'Procesos', 'Candidatos', 'Reportes']);
+    expect(labelsFor('pm')).toEqual(['Inicio', 'Banca', 'Oportunidades', 'Candidatos', 'Reportes']);
   });
 
   it('should not show Candidatos to the technical referent', () => {

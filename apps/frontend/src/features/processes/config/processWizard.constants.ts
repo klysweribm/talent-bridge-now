@@ -11,8 +11,8 @@ export const AVAILABLE_CANDIDATES_PAGE_SIZE = 20;
 export const SKELETON_ROWS = 5;
 
 export const WIZARD_TEXT = {
-  pageTitle:        'Nuevo proceso',
-  stepperLabel:     'Pasos para crear el proceso',
+  pageTitle:        'Nueva oportunidad',
+  stepperLabel:     'Pasos para crear la oportunidad',
   completedMark:    'completado',
   next:             'Siguiente',
   back:             'Atrás',
@@ -22,14 +22,14 @@ export const WIZARD_TEXT = {
 } as const;
 
 export const DATA_STEP_TEXT = {
-  heading:         'Datos del proceso',
+  heading:         'Datos de la oportunidad',
   title:           'Título *',
   titleHint:       'Nombre del rol o la posición que se busca.',
   client:          'Cliente *',
   clientHint:      'Empresa para la que se hace la selección.',
   pm:              'Project Manager *',
   pmPlaceholder:   'Selecciona un PM',
-  pmHint:          'Responsable del proceso.',
+  pmHint:          'Responsable de la oportunidad.',
   recruiter:       'Reclutador',
   recruiterHint:   'Opcional. Si no eliges a nadie, solo tú gestionas los candidatos.',
   unassigned:      'Sin asignar',
@@ -63,8 +63,8 @@ export const CONFIRM_STEP_TEXT = {
   bandLabel:      'Banda profesional',
   descriptionLabel: 'Expectativas de evaluación técnica',
   band:           (band: number): string => `Band ${band}`,
-  create:         'Crear proceso',
+  create:         'Crear oportunidad',
   creating:       'Creando…',
   cancel:         'Cancelar y descartar',
-  genericError:   'No se pudo crear el proceso. Intenta de nuevo.',
+  genericError:   'No se pudo crear la oportunidad. Intenta de nuevo.',
 } as const;

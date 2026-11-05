@@ -54,7 +54,7 @@ describe('ProcessDetailView actions', () => {
   describe('permissions', () => {
     it('should show every action to the owner PM', async () => {
       await mount();
-      expect(screen.getByRole('button', { name: 'Editar datos del proceso' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Editar datos de la oportunidad' })).toBeInTheDocument();
       expect(screen.getByLabelText('Estado')).toBeInTheDocument();
       expect(await screen.findByLabelText('Reclutador')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Agregar candidato' })).toBeInTheDocument();
@@ -79,12 +79,12 @@ describe('ProcessDetailView actions', () => {
     it('should offer no actions and let the user retry when the limits fail to load', async () => {
       vi.mocked(createInfra.fetchProcessLimits).mockRejectedValue(new Error('down'));
       await mount();
-      expect(await screen.findByText(/No se pudieron cargar los límites del proceso/)).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Editar datos del proceso' })).not.toBeInTheDocument();
+      expect(await screen.findByText(/No se pudieron cargar los límites de la oportunidad/)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Editar datos de la oportunidad' })).not.toBeInTheDocument();
       expect(screen.queryByLabelText('Estado')).not.toBeInTheDocument();
       mockProcessLimits();
       await (await Promise.resolve(userEvent.setup())).click(screen.getByRole('button', { name: 'Reintentar' }));
-      expect(await screen.findByRole('button', { name: 'Editar datos del proceso' })).toBeInTheDocument();
+      expect(await screen.findByRole('button', { name: 'Editar datos de la oportunidad' })).toBeInTheDocument();
     });
 
     it('should treat as terminal what the server says (terminalStatuses [open] hides the actions)', async () => {
@@ -106,7 +106,7 @@ describe('ProcessDetailView actions', () => {
   describe('edit title and client', () => {
     it('should PATCH the trimmed values and show success', async () => {
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos de la oportunidad' }));
       await user.clear(screen.getByLabelText('Título'));
       await user.type(screen.getByLabelText('Título'), '  Nuevo título ');
       await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
@@ -116,7 +116,7 @@ describe('ProcessDetailView actions', () => {
 
     it('should edit the opportunity fields and PATCH only the ones that changed', async () => {
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos de la oportunidad' }));
       await user.click(screen.getByRole('radio', { name: 'Banda 9' }));
       await user.click(screen.getByRole('button', { name: 'Quitar Spring' }));
       await user.type(screen.getByLabelText('Stack tecnológico *'), 'Kafka{Enter}');
@@ -126,7 +126,7 @@ describe('ProcessDetailView actions', () => {
 
     it('should not call the API when nothing changed and close the form', async () => {
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos de la oportunidad' }));
       await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
       expect(update).not.toHaveBeenCalled();
       expect(screen.queryByRole('button', { name: 'Guardar cambios' })).not.toBeInTheDocument();
@@ -134,7 +134,7 @@ describe('ProcessDetailView actions', () => {
 
     it('should block an empty skills list and a blank description with no request', async () => {
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos de la oportunidad' }));
       await user.click(screen.getByRole('button', { name: 'Quitar Java' }));
       await user.click(screen.getByRole('button', { name: 'Quitar Spring' }));
       await user.clear(screen.getByLabelText('Expectativas de evaluación técnica *'));
@@ -147,7 +147,7 @@ describe('ProcessDetailView actions', () => {
     it('should require a band when editing a legacy process', async () => {
       fetchDetail.mockResolvedValue({ ...DETAIL, band: null });
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos de la oportunidad' }));
       await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
       expect(await screen.findByText('Elige la banda profesional.')).toBeInTheDocument();
       expect(update).not.toHaveBeenCalled();
@@ -155,17 +155,17 @@ describe('ProcessDetailView actions', () => {
 
     it('should block an empty title with a field error and no request', async () => {
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos de la oportunidad' }));
       await user.clear(screen.getByLabelText('Título'));
       await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
       expect(await screen.findByText('El título es obligatorio.')).toBeInTheDocument();
       expect(update).not.toHaveBeenCalled();
     });
 
-    it.each([[403, undefined, /no tienes permiso/i], [400, 'PROCESS_TERMINAL_STATE', /cerrado o cancelado/i]])('should show the translated %i error', async (status, code, copy) => {
+    it.each([[403, undefined, /no tienes permiso/i], [400, 'PROCESS_TERMINAL_STATE', /cerrada o cancelada/i]])('should show the translated %i error', async (status, code, copy) => {
       update.mockRejectedValue(apiError(status, code));
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos de la oportunidad' }));
       await user.type(screen.getByLabelText('Título'), ' 2');
       await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
       expect(await screen.findByRole('alert')).toHaveTextContent(copy);
@@ -174,7 +174,7 @@ describe('ProcessDetailView actions', () => {
     it('should disable the buttons while saving', async () => {
       update.mockReturnValue(new Promise(() => undefined));
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Editar datos del proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Editar datos de la oportunidad' }));
       await user.type(screen.getByLabelText('Título'), ' 2');
       await user.click(screen.getByRole('button', { name: 'Guardar cambios' }));
       expect(await screen.findByRole('button', { name: 'Guardando…' })).toBeDisabled();
@@ -194,9 +194,9 @@ describe('ProcessDetailView actions', () => {
     it('should ask for confirmation before closing and only then PATCH', async () => {
       const user = await mount();
       await user.selectOptions(screen.getByLabelText('Estado'), 'closed');
-      const panel = screen.getByRole('group', { name: '¿Cerrar este proceso?' });
+      const panel = screen.getByRole('group', { name: '¿Cerrar esta oportunidad?' });
       expect(update).not.toHaveBeenCalled();
-      await user.click(within(panel).getByRole('button', { name: 'Sí, cerrar proceso' }));
+      await user.click(within(panel).getByRole('button', { name: 'Sí, cerrar oportunidad' }));
       await waitFor(() => expect(update).toHaveBeenCalledWith('p1', { status: 'closed' }));
     });
 
@@ -210,24 +210,24 @@ describe('ProcessDetailView actions', () => {
 
     it('should turn "Eliminar" into an inline cancel confirmation that warns candidates are freed', async () => {
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Eliminar proceso' }));
-      const panel = screen.getByRole('group', { name: '¿Eliminar este proceso?' });
+      await user.click(screen.getByRole('button', { name: 'Eliminar oportunidad' }));
+      const panel = screen.getByRole('group', { name: '¿Eliminar esta oportunidad?' });
       expect(panel).toHaveTextContent(/candidatos quedarán libres/i);
       expect(panel).toHaveFocus();
       expect(update).not.toHaveBeenCalled();
-      await user.click(within(panel).getByRole('button', { name: 'Sí, eliminar proceso' }));
+      await user.click(within(panel).getByRole('button', { name: 'Sí, eliminar oportunidad' }));
       await waitFor(() => expect(update).toHaveBeenCalledWith('p1', { status: 'cancelled' }));
     });
 
     it.each([
       [503, 'PROCESS_RELEASE_FAILED', /no se pudieron liberar/i],
       [403, undefined, /no tienes permiso/i],
-      [400, 'PROCESS_TERMINAL_STATE', /cerrado o cancelado/i],
+      [400, 'PROCESS_TERMINAL_STATE', /cerrada o cancelada/i],
     ])('should show the %i error when cancelling fails', async (status, code, copy) => {
       update.mockRejectedValue(apiError(status, code));
       const user = await mount();
-      await user.click(screen.getByRole('button', { name: 'Eliminar proceso' }));
-      await user.click(screen.getByRole('button', { name: 'Sí, eliminar proceso' }));
+      await user.click(screen.getByRole('button', { name: 'Eliminar oportunidad' }));
+      await user.click(screen.getByRole('button', { name: 'Sí, eliminar oportunidad' }));
       expect(await screen.findByRole('alert')).toHaveTextContent(copy);
     });
   });
@@ -266,7 +266,7 @@ describe('ProcessDetailView actions', () => {
     });
 
     it.each([
-      [409, 'CANDIDATE_ALREADY_ASSIGNED', /ya pertenecen a otro proceso/i],
+      [409, 'CANDIDATE_ALREADY_ASSIGNED', /ya pertenecen a otra oportunidad/i],
       [400, 'PROCESS_CANDIDATE_LIMIT', /máximo de candidatos/i],
       [403, undefined, /no tienes permiso/i],
     ])('should show the %i error when adding fails', async (status, code, copy) => {

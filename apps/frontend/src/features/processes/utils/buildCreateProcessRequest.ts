@@ -8,7 +8,7 @@ interface IWizardSnapshot {
 
 /** Arma el body de `POST /processes`: el reclutador manda ownerPmId; el PM, recruiterId solo si lo eligió. */
 export function buildCreateProcessRequest({ data, candidates }: IWizardSnapshot, role: TProcessCreatorRole): ICreateProcessRequest {
-  if (data.band === undefined) throw new Error('La banda es obligatoria para crear el proceso.');
+  if (data.band === undefined) throw new Error('La banda es obligatoria para crear la oportunidad.');
   return {
     title:           data.title,
     clientName:      data.clientName,

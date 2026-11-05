@@ -26,9 +26,9 @@ describe('NewProcessPage', () => {
     useAuthStore.getState().setAuth({ id: 'me', email: 'm@ibm.com', role: 'pm', name: 'Yo' }, 't');
     vi.mocked(infra.fetchUserOptions).mockResolvedValue(makePage([]));
     show();
-    expect(screen.getByRole('heading', { level: 1, name: 'Nuevo proceso' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Nueva oportunidad' })).toBeInTheDocument();
     expect(screen.getByText('Datos').closest('li')).toHaveAttribute('aria-current', 'step');
-    expect(screen.getByRole('heading', { level: 2, name: 'Datos del proceso' })).toHaveFocus();
+    expect(screen.getByRole('heading', { level: 2, name: 'Datos de la oportunidad' })).toHaveFocus();
   });
 
   it('should complete the whole flow as a recruiter', async () => {
@@ -45,7 +45,7 @@ describe('NewProcessPage', () => {
     await userEvent.click(checkbox);
     await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
     expect(screen.getByRole('heading', { level: 2, name: 'Confirmar y crear' })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Crear proceso' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Crear oportunidad' }));
     expect(await screen.findByText('detalle')).toBeInTheDocument();
     expect(infra.createProcess).toHaveBeenCalledWith({ title: 'Dev', clientName: 'Banco', ...OPPORTUNITY_FIXTURE, skills: ['Java', 'Spring'], ownerPmId: 'u2', candidateIds: ['c1'] });
   });
@@ -60,7 +60,7 @@ describe('NewProcessPage', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
     await userEvent.click(await screen.findByRole('button', { name: 'Siguiente' }));
     expect(screen.getByText('Aún sin candidatos')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Crear proceso' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Crear oportunidad' }));
     expect(await screen.findByText('detalle')).toBeInTheDocument();
     expect(infra.createProcess).toHaveBeenCalledWith({ title: 'Dev', clientName: 'Banco', ...OPPORTUNITY_FIXTURE, skills: ['Java', 'Spring'] });
   });

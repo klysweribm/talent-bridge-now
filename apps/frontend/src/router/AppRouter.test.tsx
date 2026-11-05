@@ -132,22 +132,22 @@ describe('AppRouter — navigation/route consistency', () => {
   it('should render the real ProcessesPage, not ComingSoon, for /processes', () => {
     useAuthStore.getState().setAuth(DEMO_USER, validToken());
     renderAt('/processes');
-    expect(screen.getByRole('heading', { level: 1, name: 'Procesos' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Oportunidades' })).toBeInTheDocument();
     expect(screen.queryByText(/Esta sección está en construcción/)).not.toBeInTheDocument();
   });
 
   it('should render the real ProcessDetailPage, not ComingSoon, for /processes/:id', () => {
     useAuthStore.getState().setAuth(DEMO_USER, validToken());
     renderAt('/processes/42');
-    expect(screen.getByRole('status', { name: 'Cargando proceso' })).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Cargando oportunidad' })).toBeInTheDocument();
     expect(screen.queryByText(/Esta sección está en construcción/)).not.toBeInTheDocument();
   });
 
   it.each(['recruiter', 'pm'] as const)('should render the new process wizard on /processes/new for a %s', role => {
     useAuthStore.getState().setAuth({ ...DEMO_USER, role }, validToken());
     renderAt('/processes/new');
-    expect(screen.getByRole('heading', { level: 1, name: 'Nuevo proceso' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 2, name: 'Datos del proceso' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Nueva oportunidad' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Datos de la oportunidad' })).toBeInTheDocument();
   });
 
   it.each(['recruiter', 'pm'] as const)('should render the real NewCandidatePage on /candidates/new for a %s', role => {
@@ -199,7 +199,7 @@ describe('AppRouter — navigation/route consistency', () => {
 
     it('should show the login and never paint the dashboard when the persisted token is expired', async () => {
       await simulateReload(makeJwtExpiringIn(-ONE_HOUR_S));
-      const wasPainted = watchForPaint('Nuevo Proceso');
+      const wasPainted = watchForPaint('Nueva oportunidad');
       renderAt('/dashboard');
 
       expect(wasPainted()).toBe(false);

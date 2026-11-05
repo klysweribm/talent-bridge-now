@@ -10,8 +10,8 @@ describe('buildBreadcrumbs', () => {
   });
 
   it('should add a third level for process creation and detail', () => {
-    expect(buildBreadcrumbs('/processes/new').map(b => b.label)).toEqual(['Inicio', 'Procesos', 'Nuevo proceso']);
-    expect(buildBreadcrumbs('/processes/42').at(-1)?.label).toBe('Detalle del proceso');
+    expect(buildBreadcrumbs('/processes/new').map(b => b.label)).toEqual(['Inicio', 'Oportunidades', 'Nueva oportunidad']);
+    expect(buildBreadcrumbs('/processes/42').at(-1)?.label).toBe('Detalle de la oportunidad');
   });
 
   it('should return Inicio > Candidatos for the list and add a third level for the add form', () => {

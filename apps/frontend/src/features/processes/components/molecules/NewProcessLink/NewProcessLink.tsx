@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { NEW_PROCESS_PATH } from '@/router/paths';
 import { PROCESS_LIST_COPY } from '../../../config/processList.constants';
 
-/** Único botón «+ Nuevo proceso»: encabezado y estado vacío lo reutilizan. */
+/** Único botón «+ Nueva oportunidad»: encabezado y estado vacío lo reutilizan. */
 export function NewProcessLink(): JSX.Element {
   return (
     <Link

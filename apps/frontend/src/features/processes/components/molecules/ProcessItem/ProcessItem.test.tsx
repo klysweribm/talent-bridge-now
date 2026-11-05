@@ -57,8 +57,8 @@ describe('ProcessItem', () => {
 
   it('should link to the detail with an accessible name', () => {
     setup();
-    const link = screen.getByRole('link', { name: 'Ver proceso de QA Lead' });
+    const link = screen.getByRole('link', { name: 'Ver oportunidad de QA Lead' });
     expect(link).toHaveAttribute('href', '/processes/p9');
-    expect(link).toHaveTextContent('Ver proceso');
+    expect(link).toHaveTextContent('Ver oportunidad');
   });
 });

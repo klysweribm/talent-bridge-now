@@ -10,6 +10,7 @@ Sources of truth — read **by section**, never whole, unless the task is about 
 
 - `PROJECT_CONTEXT.md` — only a pointer table to the owner of each topic (it no longer holds context). Domain: pending (`docs/domain.md`); entity and role types: `packages/shared-types`; stack and decisions: `docs/architecture/README.md`.
 - `docs/use-cases/` — per-feature use cases by role (what each role can/can't do, edge cases, authz rules) — source of truth for `@Roles` guards and authz tests, more granular than `docs/flows/README.md`.
+- `docs/glossary.md` — single source of domain language (UI term ↔ code term, e.g. Oportunidad = `Process`; ADR-016).
 - `good-practices/BEST-PRACTICES.md` — conventions in long form with examples (§2 frontend, §2.7 cross-cutting, §3 backend, §4.bis Stitch mockups).
 - `.clinerules` — pointer for the other agent (Bob) to this file and `.claude/rules/`; nothing to keep in sync.
 

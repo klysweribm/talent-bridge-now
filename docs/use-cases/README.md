@@ -16,6 +16,11 @@ es la versión posterior y más detallada. Si una decisión aquí requiere
 cambiar el modelo de dominio (`packages/shared-types`), eso se refleja
 primero en un ADR nuevo en `docs/architecture/README.md`, nunca al revés.
 
+El lenguaje del dominio (término de la interfaz ↔ término en código, p. ej.
+Oportunidad = `Process`) está en [`../glossary.md`](../glossary.md), única
+fuente. Estos documentos usan los términos de la interfaz salvo cuando citan
+identificadores del código.
+
 ## Convención
 
 Cada caso de uso se nombra `UC-<feature>-<n>` (ej. `UC-PROC-1`). Cada
@@ -37,6 +42,7 @@ decidido, no resuelve lo que ADR-013 dejó abierto a propósito.
 | [`auth.md`](./auth.md) | AUTH-1, AUTH-2, FE-OTP-1 (en `ROADMAP.md`) | Los 3 roles (login) |
 | [`bench.md`](./bench.md) | BENCH-1 (en `ROADMAP.md`); solo lectura, `MATCH-1` lo consumirá | Reclutador, PM (Referente Técnico: 403) |
 | [`ai.md`](./ai.md) | AI-1 (en `ROADMAP.md`); capability de IA vía ICA, la consumen otras capabilities | Reclutador, PM (Referente Técnico: 403) |
+| [`opportunities-ai.md`](./opportunities-ai.md) | OPP-AI-1 (en `ROADMAP.md`, U0 hecha); borrador de oportunidad con IA y sugerencias de la banca | Reclutador, PM (Referente Técnico: 403) |
 | [`processes.md`](./processes.md) | PROC-2 (encuadre anterior, ya no en `ROADMAP.md`) | Reclutador, Referente Técnico, PM |
 | [`candidates.md`](./candidates.md) | CAND-1 (encuadre anterior) | Reclutador, PM |
 | [`interviews.md`](./interviews.md) | INT-1 (encuadre anterior) | Reclutador, Referente Técnico |

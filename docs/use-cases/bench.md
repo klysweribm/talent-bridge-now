@@ -14,6 +14,10 @@ Los permisos por rol son provisionales hasta `RBAC-1` (`TODO(RBAC-1)` en `bench.
 | `GET /bench`, `GET /bench/skills`, `GET /bench/:benchCode` | ✅ | ❌ 403 | ✅ |
 | Cualquier llamada sin token | ❌ 401 | ❌ 401 | ❌ 401 |
 
+> **Nota (OPP-AI-1, 2026-11-05):** el match de la banca con una oportunidad usa la banda del recurso (`band`, entero
+> 6 a 10; ver `docs/glossary.md` y `opportunities-ai.md` R4), no `seniority`. El campo `band` se añade a los
+> recursos en la unidad 3.5. Los filtros de `GET /bench` de abajo no cambian.
+
 ## Contrato de consulta (resumen)
 
 | Parámetro | Regla |

@@ -18,7 +18,7 @@
 - **R11 (cancelar y cerrar):** «Eliminar» en la UI no borra: pasa la oportunidad a `cancelled`, tras confirmación. Cancelar **libera** a los candidatos (`processId` → `null`, vacía `candidateIds`; primero libera y luego cambia el estado, y si falla responde 503 `PROCESS_RELEASE_FAILED` sin cambiar nada). Cerrar **conserva** a los candidatos asociados. Los referentes técnicos asignados se conservan en ambos casos.
 - **R12 (editar):** editan, cambian el estado y gestionan candidatos y referentes solo el PM dueño y el reclutador asignado. **Cambiar el reclutador** (`recruiterId`) es exclusivo del PM dueño y el nuevo debe ser un usuario `recruiter`.
 - **R13 (referentes técnicos):** hasta 2 por oportunidad (`technicalRefIds`), cada uno un usuario existente, activo y con rol `technical_ref`, sin repetir. El `PATCH` **reemplaza** el conjunto (`[]` lo limpia). Inválido → 400 `PROCESS_INVALID_TECHNICAL_REF`.
-- **R14 (oportunidad):** la oportunidad se describe con `opportunityRole`, `skills` (1 a 15), `roleDescription` y `band` (entero de 6 a 10), obligatorios al crear. Las oportunidades anteriores sin estos campos se leen vacíos (`''`, `[]`, `null`) y se pueden completar con `PATCH`.
+- **R14 (oportunidad):** la oportunidad se describe con `opportunityRole`, `skills` (1 a 15), `roleDescription` y `band` (entero de 6 a 10), obligatorios al crear. Las oportunidades anteriores sin estos campos se leen vacíos (`''`, `[]`, `null`) y se pueden completar con `PATCH`. Además admite `startDate` **opcional** (fecha de inicio, formato `YYYY-MM-DD` y fecha de calendario real): si no se indica, se lee `null`; una fecha con formato o calendario inválido (mes 13, día 32, `2026-02-30`) → 400. `null` y vacío también → 400, así que **el `PATCH` no puede borrar `startDate`** (DT-052); en la UI vaciar el campo al editar no envía nada. Se usa en el match de la banca (R5 de `opportunities-ai.md`).
 - **R15 (errores con código):** los errores de reglas de la oportunidad llevan un `code` estable en el cuerpo (`{ statusCode, code, message }`): `PROCESS_TERMINAL_STATE`, `PROCESS_CANDIDATE_LIMIT`, `CANDIDATE_ALREADY_ASSIGNED`, `PROCESS_RELEASE_FAILED`, `PROCESS_INVALID_TECHNICAL_REF`. El frontend traduce por `code`, nunca por el texto del mensaje.
 
 ## Resumen de permisos
@@ -37,7 +37,7 @@ Sin token → 401 en todos los endpoints.
 ## UC-PROC-1: Crear una oportunidad
 
 **Rol:** reclutador o PM.
-**Flujo principal:** `POST /processes` con `title`, `clientName`, `opportunityRole`, `skills`, `roleDescription`, `band` y, opcionalmente, `candidateIds`. Nace en estado `open` y sin referentes técnicos.
+**Flujo principal:** `POST /processes` con `title`, `clientName`, `opportunityRole`, `skills`, `roleDescription`, `band` y, opcionalmente, `startDate` y `candidateIds`. Nace en estado `open` y sin referentes técnicos.
 - **Crea un PM:** `ownerPmId` se toma del JWT (el del cuerpo se ignora). `recruiterId` es el que elija de `GET /users?role=recruiter`, o `null` si no elige a nadie.
 - **Crea un reclutador:** `ownerPmId` es obligatorio (se elige de `GET /users?role=pm`) y `recruiterId` es el suyo (el del cuerpo se ignora).
 **Reglas de borde / negativas:**
@@ -46,7 +46,7 @@ Sin token → 401 en todos los endpoints.
 - Con `recruiterId: null`, solo el PM dueño asocia y quita candidatos.
 - `candidateIds` por encima del límite → 400; alguno ya asignado a otra oportunidad → 400/409; alguno inexistente → 404.
 - El autor (`createdBy`) sale siempre del JWT, nunca del cuerpo.
-- Faltar un campo de la oportunidad, o `band` fuera de 6 a 10 o no entero, o `skills` vacía, repetida (sin distinguir mayúsculas) o con más de 15 → 400.
+- Faltar un campo de la oportunidad, o `band` fuera de 6 a 10 o no entero, o `startDate` presente pero inválida, o `skills` vacía, repetida (sin distinguir mayúsculas) o con más de 15 → 400.
 - Cambiar el reclutador después lo hace el PM dueño con `PATCH` (ver UC-PROC-5).
 
 ## UC-PROC-2: Listar oportunidades y ver el detalle
@@ -83,10 +83,10 @@ Sin token → 401 en todos los endpoints.
 ## UC-PROC-5: Editar, cambiar estado y asignar referentes
 
 **Rol:** PM dueño o reclutador asignado (el cambio de reclutador, solo el PM dueño).
-**Flujo principal:** `PATCH /processes/:id` con cualquier subconjunto de `title`, `clientName`, `opportunityRole`, `skills`, `roleDescription`, `band`, `recruiterId`, `status` y `technicalRefIds`. Responde con el detalle actualizado. En la UI, «Eliminar» es pasar a `cancelled` con confirmación.
+**Flujo principal:** `PATCH /processes/:id` con cualquier subconjunto de `title`, `clientName`, `opportunityRole`, `skills`, `roleDescription`, `band`, `startDate`, `recruiterId`, `status` y `technicalRefIds`. Responde con el detalle actualizado. En la UI, «Eliminar» es pasar a `cancelled` con confirmación.
 **Reglas de borde / negativas:**
 - Otro usuario, `createdBy` sin ser dueño ni asignado, o `technical_ref` → 403; sin token → 401; oportunidad inexistente → 404 (antes que 403).
-- `null` en cualquier campo, campo desconocido, `status` fuera de los 5 valores o validaciones de la oportunidad → 400.
+- `null` en cualquier campo (incluido `startDate`, que por eso no se puede borrar), campo desconocido, `status` fuera de los 5 valores o validaciones de la oportunidad → 400.
 - `recruiterId` enviado por el reclutador asignado → 403; que no sea un usuario `recruiter` → 400.
 - Oportunidad `closed` o `cancelled` → 400 `PROCESS_TERMINAL_STATE` (un cierre concurrente tampoco se pisa: la actualización es condicional).
 - `status: 'cancelled'` libera a los candidatos (R11); `closed` los conserva.

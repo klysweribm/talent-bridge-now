@@ -84,7 +84,7 @@ Orden: primero lo que requiere acción, luego el backlog por prioridad, al final
 
 | ID | Estado | Prioridad | Depende de |
 | --- | --- | --- | --- |
-| OPP-AI-1 | 🚧 U0 (docs) ✅, 2 (textos) ✅, 2.5 (banda) ✅, 3 (skills) ✅; 3.5, U1, U2, U3 y 5.5 📌 sin arrancar: oportunidad asistida por IA (box mágico, brochure) y sugerencias de la banca | HIGH | AI-1, BENCH-1, CAND-2 |
+| OPP-AI-1 | 🚧 U0 (docs) ✅, 2 (textos) ✅, 2.5 (banda) ✅, 3 (skills) ✅, 3.5 (`band` y `startDate`) ✅; U1, U2, U3 y 5.5 📌 sin arrancar: oportunidad asistida por IA (box mágico, brochure) y sugerencias de la banca | HIGH | AI-1, BENCH-1, CAND-2 |
 | CAND-2 | ✅ cerrado en código y probado en vivo por el usuario en local (carga de CV con 3 modos, alta y actualización por correo con auditoría, IA vía ICA); queda solo la imagen de producción (DT-034) | HIGH | AI-1 |
 | AI-1 | ✅ cerrado en código y verificado en vivo: capability `ai` (ICA) con coordinator simple; ahora también archivos y consulta con definición propia (CAND-2) | HIGH | — |
 | PROC-1 | ✅ cerrado en código en `feature/PROC-1`, pendiente de tu recorrido en navegador (contrato, backend de usuarios/procesos/asociación/límites/lista de candidatos, formulario «Nuevo proceso» de 3 pasos, lista y detalle de procesos, «Candidatos» en el menú, Inicio con procesos reales; deuda DT-039 a DT-042): crear procesos, asociar de 1 a N candidatos (límite en el backend), listar procesos; PM y reclutador únicos | HIGH | CAND-2 |
@@ -154,7 +154,7 @@ archivos. Verificado en vivo por el usuario en local (ICA real, Mongo y navegado
 
 ## OPP-AI-1 — Oportunidad asistida por IA y sugerencias de la banca (HIGH)
 
-**Estado:** 🚧 U0 (documentación), 2 (textos), 2.5 (banda) y 3 (skills) ✅, todas sin commit; el resto 📌 sin arrancar · rama `feature/DT-01` · **Casos de uso:** [`docs/use-cases/opportunities-ai.md`](./docs/use-cases/opportunities-ai.md) (R1-R7) · **Lenguaje:** [`docs/glossary.md`](./docs/glossary.md) · **Decisión:** ADR-016 (Propuesto) · **Depende de:** AI-1, BENCH-1, CAND-2 · **Deuda:** DT-050, DT-051
+**Estado:** 🚧 U0 (documentación), 2 (textos), 2.5 (banda), 3 (skills) y 3.5 (banda en banca y `startDate`) ✅, todas sin commit; el resto 📌 sin arrancar · rama `feature/DT-01` · **Casos de uso:** [`docs/use-cases/opportunities-ai.md`](./docs/use-cases/opportunities-ai.md) (R1-R7) · **Lenguaje:** [`docs/glossary.md`](./docs/glossary.md) · **Decisión:** ADR-016 (Propuesto) · **Depende de:** AI-1, BENCH-1, CAND-2 · **Deuda:** DT-050, DT-052, DT-053, DT-054 (DT-051 resuelta)
 
 El PM o reclutador describe el perfil en un box mágico o sube un brochure; la IA (ICA) rellena el formulario de la oportunidad sin crear nada, y en la etapa 2 se sugieren recursos de la banca con un % de match calculado por el backend.
 
@@ -164,7 +164,7 @@ El PM o reclutador describe el perfil en un box mágico o sube un brochure; la I
 | 2 | Textos «Proceso» → «Oportunidad» en la interfaz (copy por feature) | ✅ hecha (verificado: 889 tests, typecheck, lint, `validate-quality --strict`; sin commit; no verificado: navegador) |
 | 2.5 | Documentación por la banda: la banda es un entero 6 a 10 (no jr/ssr/sr/lead); el match compara banda con banda; cierra DT-051 | ✅ hecha (solo documentación, sin commit; no aplica navegador) |
 | 3 | Módulo de skills: catálogo canónico con alias en `apps/backend/src/shared/skills/` (`normalizeSkill`, `normalizeSkills`, `skillKey`, `sameSkill`; sin barrel) | ✅ hecha (verificado: spec de 25 tests en verde con TDD, typecheck, lint 0 errores / 20 warnings como la línea base, `validate-quality --strict` 291 archivos 0 críticos; sin commit; aún nadie lo importa, lo consumen U1 y U2; no verificado: nada en vivo) |
-| 3.5 | `band` (6 a 10) en cada recurso de banca y `startDate` en la oportunidad (contrato en `shared-types`, mock de banca, schema y DTO) | 📌 sin arrancar |
+| 3.5 | `band` (6 a 10) en cada recurso de banca y `startDate` en la oportunidad (contrato en `shared-types`, mock de banca, schema, DTO y formulario) | ✅ hecha (backend + frontend, sin commit; verificado: gates y e2e contra Mongo real, y lectura en vivo de `GET /bench` y `GET /processes`; no verificado: navegador, escritura real y base ya sembrada; ver criterios) |
 | U1 | Borrador de oportunidad con IA: `POST /ai/opportunity-draft` y `/file`, box mágico y brochure | 📌 sin arrancar |
 | 5.5 | Refactor backend: `src/shared/document-text` detrás de un puerto, consumido por `candidates` y `ai`; commit propio | 📌 sin arrancar |
 | U2 | Match de la banca: `POST /bench/match` y `GET /processes/:id/bench-suggestions` (incluye 5.5) | 📌 sin arrancar |
@@ -186,8 +186,10 @@ El PM o reclutador describe el perfil en un box mágico o sube un brochure; la I
 - [x] El módulo normaliza «Reactjs» y «Nestjs» a «React» y «NestJS» y conserva las desconocidas (25 tests unitarios). Falta el escenario «Skills normalizadas» de extremo a extremo, que depende de U1 y U2.
 
 **Unidad 3.5 (banda en la banca y fecha de inicio)**
-- [ ] Cada recurso de banca lleva `band` (6 a 10) y la oportunidad admite `startDate` opcional.
-- [ ] Los filtros actuales de `GET /bench` (incluido `seniority`) no cambian; el match usa `band`, no `seniority` (ver `docs/use-cases/bench.md`).
+- [x] Cada recurso de banca lleva `band` (6 a 10; el seed rechaza 5, 11, 7.5, '8' y ausente; un documento sin `band` se lee como 6) y la oportunidad admite `startDate` opcional (`YYYY-MM-DD`, fecha real; inválida → 400, ausente → `null`). Verificado: jest 675 pasan / 4 fallan (los 4 de PDF preexistentes), e2e contra Mongo real 241/241 en 31 suites, frontend 909/909, typecheck, lint y build limpios, `validate-quality --strict` 292 archivos 0 críticos; y en vivo `GET /bench` devuelve `band` (BN-0010 ssr → 7) y `GET /processes` devuelve `startDate`.
+- [x] Los filtros actuales de `GET /bench` (incluido `seniority`) no cambian; el match usa `band`, no `seniority` (ver `docs/use-cases/bench.md`).
+- [x] Bug hallado por los tests y corregido en backend y frontend: mes 13 o día 32 lanzaba `RangeError` (500); ahora responde 400.
+- [ ] Recorrido en navegador del campo «Fecha de inicio» (paso 1, edición, resumen y tarjeta de detalle), un `POST /processes` con `startDate` real por curl, y el arranque sobre una base sembrada antes del cambio (el seeder es idempotente y reescribe `band`, sin comprobar). Limitación deliberada: el `PATCH` no puede vaciar la fecha (DT-052). Deuda nueva: DT-052 a DT-054.
 
 **U1 (borrador con IA)**
 - [ ] Texto libre rellena título, cliente, banda y stack, con «Sugerido por IA», y no se crea nada hasta «Crear oportunidad» (R1).
@@ -214,10 +216,10 @@ El PM o reclutador describe el perfil en un box mágico o sube un brochure; la I
 - [ ] Cambiar el perfil recalcula las sugerencias.
 - [ ] El mismo panel aparece en el detalle de la oportunidad creada.
 
-**Verificado:** unidad 3 con tests unitarios y gates estáticos (ver tabla); el resto es documentación. **No verificado:** nada en vivo ni en navegador.
+**Verificado:** unidad 3 con tests unitarios y gates estáticos; unidad 3.5 con gates, e2e contra Mongo real y lectura en vivo (ver criterios); el resto es documentación. **No verificado:** navegador, escrituras reales de `startDate` y base preexistente.
 
 **Open risks:**
-- Jest backend (2026-11-05): 647 pasan / 4 fallan, preexistentes y ajenos a OPP-AI-1: `classic-cv-extractor.adapter.spec` y `local-cv-text-extractor.adapter.spec` (CAND-2, lectura de PDF en `candidates`). Se abordan en la unidad 5.5; antes `local-cv-text-extractor` fallaba 2/7 solo al correrlo aislado y pasaba en la suite completa, causa sin investigar. Hasta entonces el gate de jest no queda en verde.
+- Jest backend (2026-11-06): 675 pasan / 4 fallan, preexistentes y ajenos a OPP-AI-1: `classic-cv-extractor.adapter.spec` y `local-cv-text-extractor.adapter.spec` (CAND-2, lectura de PDF en `candidates`). Se abordan en la unidad 5.5; antes `local-cv-text-extractor` fallaba 2/7 solo al correrlo aislado y pasaba en la suite completa, causa sin investigar. Hasta entonces el gate de jest no queda en verde.
 
 ---
 
@@ -767,6 +769,7 @@ DT-020 (warnings de lint del FlowLog) y DT-021 (el `Dockerfile` fija `NODE_ENV=p
 | 2026-11-03 | Registrada `OPP-AI-1` con U0 (documentación) hecha: `docs/glossary.md`, ADR-016 (Propuesto) y `docs/use-cases/opportunities-ai.md`; unidades 2, 3, U1, 5.5, U2 y U3 sin arrancar; altas DT-050 y DT-051. | La HU pide crear oportunidades con IA y sugerir recursos de la banca; antes se fijó el lenguaje y las reglas. |
 | 2026-11-03 | `OPP-AI-1` unidad 2 hecha (sin commit, rama `feature/DT-01`): textos visibles «Proceso» → «Oportunidad» en 16 archivos de producción del frontend (copy, constantes, navegación, migas, rutas, Inicio) y 21 de test; rutas, tipos, endpoints y colecciones intactos. Gates: 889 tests, typecheck, lint y `validate-quality --strict` (291 archivos, 0 críticos) en verde; recorrido en navegador sin verificar. | Alinear el lenguaje de la interfaz con el glosario antes de construir el borrador con IA. |
 | 2026-11-05 | `OPP-AI-1` unidades 2.5 y 3 hechas (sin commit, rama `feature/DT-01`): la banda es un entero 6 a 10 y el match compara banda con banda (DT-051 resuelta); nuevo `apps/backend/src/shared/skills/` (catálogo con alias, 25 tests, sin barrel, aún sin consumidores). Gates backend: typecheck y lint (0 errores / 20 warnings) limpios, `validate-quality --strict` 291 archivos 0 críticos, jest 647 pasan / 4 fallan (preexistentes, specs de CV en `candidates`). Registrada la unidad 3.5 (`band` en la banca y `startDate`). Nada verificado en vivo. | Decisión del usuario: en IBM la banda son números; el catálogo de skills lo consumen U1 y U2. |
+| 2026-11-06 | `OPP-AI-1` unidad 3.5 hecha (sin commit, rama `feature/DT-01`): `band` (6 a 10) en cada recurso de banca (seed de 30, schema, adapter) y `startDate` opcional en la oportunidad (DTO, schema, formulario, resumen y tarjeta); corregido un 500 por mes 13 o día 32 (ahora 400). Gates: jest 675/4 (preexistentes), e2e Mongo real 241/241, frontend 909/909, `validate-quality --strict` 0 críticos; `GET /bench` y `GET /processes` en vivo con los campos nuevos. Sin verificar: navegador, escritura real y base ya sembrada. Altas DT-052 a DT-054. | Insumos del match de la unidad U2: banda del recurso y fecha de inicio de la oportunidad. |
 
 ---
 

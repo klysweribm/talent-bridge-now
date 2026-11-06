@@ -61,6 +61,7 @@ export const CONFIRM_STEP_TEXT = {
   roleLabel:      'Rol de la oportunidad',
   skillsLabel:    'Stack tecnológico',
   bandLabel:      'Banda profesional',
+  startDateLabel: 'Fecha de inicio',
   descriptionLabel: 'Expectativas de evaluación técnica',
   band:           (band: number): string => `Band ${band}`,
   create:         'Crear oportunidad',

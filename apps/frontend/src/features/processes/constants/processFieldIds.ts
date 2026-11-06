@@ -7,5 +7,6 @@ export const PROCESS_FIELD_IDS = {
   opportunityRole: 'process-opportunity-role',
   skills:          'process-skills',
   band:            'process-band',
+  startDate:       'process-start-date',
   roleDescription: 'process-role-description',
 } as const;

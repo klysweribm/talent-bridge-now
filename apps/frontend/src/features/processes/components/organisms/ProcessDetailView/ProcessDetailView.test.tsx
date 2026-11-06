@@ -22,7 +22,7 @@ const available = vi.mocked(createInfra.fetchAvailableCandidates);
 
 const DETAIL: IProcessDetail = {
   id: 'p1', title: 'Backend Java', clientName: 'Banco', ownerPmId: 'pm1', recruiterId: 'rec1', status: 'open',
-  opportunityRole: 'Backend Java Sr', skills: ['Java', 'Spring'], roleDescription: 'Evaluar APIs.', band: 8, technicalRefIds: [], technicalRefs: [],
+  opportunityRole: 'Backend Java Sr', skills: ['Java', 'Spring'], roleDescription: 'Evaluar APIs.', band: 8, startDate: null, technicalRefIds: [], technicalRefs: [],
   maxCandidates: 2, createdBy: 'pm1', createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
   candidateIds: ['c1'], candidates: [{ id: 'c1', fullName: 'Lucía Fernández' }],
 };

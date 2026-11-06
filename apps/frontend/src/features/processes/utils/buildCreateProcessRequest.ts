@@ -16,6 +16,7 @@ export function buildCreateProcessRequest({ data, candidates }: IWizardSnapshot,
     skills:          data.skills,
     roleDescription: data.roleDescription,
     band:            data.band,
+    ...(data.startDate ? { startDate: data.startDate } : {}),
     ...(role === 'recruiter' ? { ownerPmId: data.ownerPmId } : data.recruiterId ? { recruiterId: data.recruiterId } : {}),
     ...(candidates.length > 0 ? { candidateIds: candidates.map(candidate => candidate.id) } : {}),
   };

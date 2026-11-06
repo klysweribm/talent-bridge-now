@@ -4,12 +4,12 @@ import { ProcessDetailCard } from './ProcessDetailCard';
 
 const FULL: IProcessDetail = {
   id: 'p1', title: 'Backend Java', clientName: 'Banco', ownerPmId: 'pm1', recruiterId: null, status: 'interviewing',
-  opportunityRole: 'Desarrollador Sr', skills: ['Java', 'Spring'], roleDescription: 'Evaluar APIs.', band: 8,
+  opportunityRole: 'Desarrollador Sr', skills: ['Java', 'Spring'], roleDescription: 'Evaluar APIs.', band: 8, startDate: '2026-12-01',
   candidateIds: ['c1'], technicalRefIds: [], maxCandidates: 5, createdBy: 'pm1',
   createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
   candidates: [{ id: 'c1', fullName: 'Ana' }], technicalRefs: [],
 };
-const LEGACY: IProcessDetail = { ...FULL, opportunityRole: '', skills: [], roleDescription: '', band: null };
+const LEGACY: IProcessDetail = { ...FULL, opportunityRole: '', skills: [], roleDescription: '', band: null, startDate: null };
 
 describe('ProcessDetailCard', () => {
   it('should show header, client, band, stack chips and expectations', () => {
@@ -38,5 +38,13 @@ describe('ProcessDetailCard', () => {
     expect(screen.queryByText('Banda profesional')).not.toBeInTheDocument();
     expect(container).not.toHaveTextContent(/null|undefined/);
     expect(screen.getByText('Banco')).toBeInTheDocument();
+  });
+
+  it('should show the start date, and omit it when there is none', () => {
+    const { rerender } = render(<ProcessDetailCard process={FULL} />);
+    expect(screen.getByText('Fecha de inicio')).toBeInTheDocument();
+    expect(screen.getByText('01/12/2026')).toBeInTheDocument();
+    rerender(<ProcessDetailCard process={LEGACY} />);
+    expect(screen.queryByText('Fecha de inicio')).not.toBeInTheDocument();
   });
 });

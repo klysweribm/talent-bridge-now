@@ -12,7 +12,7 @@ export function LocationProbe(): JSX.Element {
 export function makeResource(overrides: Partial<IBenchResource> = {}): IBenchResource {
   return {
     id: '1', benchCode: 'BN-0001', displayName: 'Lucía Fernández', primaryRole: 'Backend Developer',
-    practice: 'Cloud', seniority: 'sr',
+    practice: 'Cloud', seniority: 'sr', band: 8,
     skills: [
       { name: 'Java', level: 5, years: 8 }, { name: 'Spring Boot', level: 4, years: 6 },
       { name: 'Kafka', level: 3, years: 3 }, { name: 'SQL', level: 2, years: 2 },

@@ -8,7 +8,7 @@ export function buildOpportunityBands(limits: IOpportunityLimits): readonly numb
 /** Mensajes de validación; los números salen de los límites recibidos de `GET /processes/limits`, nunca de literales. */
 export function buildOpportunityErrors(limits: IOpportunityLimits): Readonly<Record<
   'roleRequired' | 'roleTooLong' | 'descriptionRequired' | 'descriptionTooLong' | 'skillsRequired' | 'skillsTooMany'
-  | 'skillTooLong' | 'skillsDuplicated' | 'bandRequired' | 'bandInvalid', string>> {
+  | 'skillTooLong' | 'skillsDuplicated' | 'bandRequired' | 'bandInvalid' | 'startDateInvalid', string>> {
   return {
     roleRequired:        'El rol de la oportunidad es obligatorio.',
     roleTooLong:         `El rol admite hasta ${limits.roleMax} caracteres.`,
@@ -20,5 +20,6 @@ export function buildOpportunityErrors(limits: IOpportunityLimits): Readonly<Rec
     skillsDuplicated:    'Hay tecnologías repetidas.',
     bandRequired:        'Elige la banda profesional.',
     bandInvalid:         `La banda debe ser un entero entre ${limits.bandMin} y ${limits.bandMax}.`,
+    startDateInvalid:    'Ingresa una fecha de inicio válida.',
   };
 }

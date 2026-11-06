@@ -10,6 +10,8 @@ export const OPPORTUNITY_COPY = {
   removeSkill:      (skill: string): string => `Quitar ${skill}`,
   band:             'Banda profesional *',
   bandOption:       (band: number): string => `Banda ${band}`,
+  startDate:        'Fecha de inicio',
+  startDateHint:    'Opcional. Ayuda a sugerir recursos de la banca disponibles a esa fecha.',
   description:      'Expectativas de evaluación técnica *',
   descriptionHint:  'Qué se espera evaluar en las entrevistas técnicas.',
   limitsLoading:    'Cargando los límites del formulario…',

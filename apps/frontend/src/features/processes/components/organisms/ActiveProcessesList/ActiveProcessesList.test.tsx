@@ -10,7 +10,7 @@ vi.mock('../../../infrastructure/processList.infra');
 
 const fetchList = vi.mocked(infra.fetchProcessList);
 const item = (n: number): IProcessListItem => ({
-  id: `p${n}`, title: `Proceso ${n}`, clientName: 'ACME', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [], technicalRefs: [],
+  id: `p${n}`, title: `Proceso ${n}`, clientName: 'ACME', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, startDate: null, technicalRefIds: [], technicalRefs: [],
   maxCandidates: 5, candidateCount: 1, status: 'open', createdBy: 'u1',
   createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
 });

@@ -11,7 +11,7 @@ const fetchList = vi.mocked(infra.fetchProcessList);
 const search = (): string => screen.getByTestId('search').textContent ?? '';
 
 const item = (over: Partial<IProcessListItem> = {}): IProcessListItem => ({
-  id: 'p1', title: 'Backend Java Sr', clientName: 'Banco Andino', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, technicalRefIds: [], technicalRefs: [],
+  id: 'p1', title: 'Backend Java Sr', clientName: 'Banco Andino', ownerPmId: 'pm1', recruiterId: null, opportunityRole: '', skills: [], roleDescription: '', band: null, startDate: null, technicalRefIds: [], technicalRefs: [],
   maxCandidates: 5, createdBy: 'u1', createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
   candidateCount: 2, status: 'open', ...over,
 });

@@ -7,6 +7,7 @@ import { ErrorBanner } from '../ErrorBanner';
 import { TextAreaField } from '../../atoms/TextAreaField/TextAreaField';
 import { BandSelector } from '../BandSelector/BandSelector';
 import { SkillChipsInput } from '../SkillChipsInput/SkillChipsInput';
+import { StartDateField } from '../StartDateField/StartDateField';
 
 export interface OpportunityFieldsProps {
   readonly bindings: IOpportunityBindings;
@@ -14,7 +15,7 @@ export interface OpportunityFieldsProps {
 
 const hint = (help: string, used: number, max: number): string => `${help} ${OPPORTUNITY_COPY.counter(used, max)}`;
 
-/** Los 4 campos de la oportunidad; los usan el paso 1 de creación y la edición del detalle. */
+/** Los 5 campos de la oportunidad; los usan el paso 1 de creación y la edición del detalle. */
 export function OpportunityFields({ bindings }: OpportunityFieldsProps): JSX.Element {
   const { values, errors, touch, limits } = bindings;
   if (!limits.data) {
@@ -35,6 +36,7 @@ export function OpportunityFields({ bindings }: OpportunityFieldsProps): JSX.Ele
         skills={values.skills} error={errors.skills} maxSkills={max.skillsMax} maxSkillLength={max.skillMax} onChange={bindings.onSkills}
       />
       <BandSelector bands={buildOpportunityBands(max)} id={PROCESS_FIELD_IDS.band} label={OPPORTUNITY_COPY.band} value={values.band} error={errors.band} onChange={bindings.onBand} />
+      <StartDateField id={PROCESS_FIELD_IDS.startDate} value={values.startDate ?? ''} error={errors.startDate} onChange={bindings.onStartDate} onBlur={() => touch('startDate')} />
       <TextAreaField
         id={PROCESS_FIELD_IDS.roleDescription} label={OPPORTUNITY_COPY.description} value={values.roleDescription}
         hint={hint(OPPORTUNITY_COPY.descriptionHint, values.roleDescription.length, max.descriptionMax)}

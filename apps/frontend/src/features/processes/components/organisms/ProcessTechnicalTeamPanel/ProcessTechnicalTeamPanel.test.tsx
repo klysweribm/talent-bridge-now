@@ -19,7 +19,7 @@ const ref = (id: string, status: 'active' | 'inactive' = 'active'): IProcessTech
   id, fullName: `Ref ${id}`, email: `${id}@ibm.com`, role: 'technical_ref', band: 9, description: '', status,
 });
 const PROCESS = (refs: readonly IProcessTechnicalRef[] = []): IProcessDetail => ({
-  id: 'p1', title: 'T', clientName: 'C', ownerPmId: 'pm1', recruiterId: 'rec1', status: 'open', opportunityRole: '', skills: [], roleDescription: '', band: null,
+  id: 'p1', title: 'T', clientName: 'C', ownerPmId: 'pm1', recruiterId: 'rec1', status: 'open', opportunityRole: '', skills: [], roleDescription: '', band: null, startDate: null,
   technicalRefIds: refs.map(r => r.id), technicalRefs: refs, maxCandidates: 2, createdBy: 'pm1', createdAt: '', updatedAt: '', candidateIds: [], candidates: [],
 });
 const AVAILABLE = [{ id: 'a', fullName: 'Ana Ref', band: 8 }, { id: 'b', fullName: 'Beto Ref' }, { id: 'c', fullName: 'Cami Ref', band: 7 }];

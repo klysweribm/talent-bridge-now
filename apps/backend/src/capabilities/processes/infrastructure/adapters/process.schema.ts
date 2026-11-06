@@ -23,6 +23,8 @@ export class ProcessModel {
   @Prop({ type: [String] }) skills?: string[];
   @Prop({ type: String, trim: true }) roleDescription?: string;
   @Prop({ type: Number, min: PROCESS_BAND_MIN, max: PROCESS_BAND_MAX }) band?: number;
+  // `YYYY-MM-DD`; sin `required` (opcional y ausente en procesos anteriores).
+  @Prop({ type: String }) startDate?: string;
   @Prop({ type: String, required: true, index: true }) ownerPmId!: string;
   @Prop({ type: String, default: null, index: true }) recruiterId!: string | null;
   @Prop({ type: String, enum: PROCESS_STATUSES, default: DEFAULT_PROCESS_STATUS }) status!: TProcessStatus;

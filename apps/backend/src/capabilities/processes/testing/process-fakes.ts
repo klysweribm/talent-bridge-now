@@ -38,7 +38,7 @@ const ACTOR = { id: PM_ID, email: 'pm@example.test', role: 'pm' } as const;
 
 function buildSpies(processes: TProcessMap, candidates: TCandidateMap): IProcessFakes['spies'] {
   const create = jest.fn((p: INewProcess) => {
-    const record: TProcessRecord = { ...p, status: 'open', id: `p-${processes.size + 1}`, candidateIds: [...(p.candidateIds ?? [])], technicalRefIds: [], ...STAMP };
+    const record: TProcessRecord = { ...p, startDate: p.startDate ?? null, status: 'open', id: `p-${processes.size + 1}`, candidateIds: [...(p.candidateIds ?? [])], technicalRefIds: [], ...STAMP };
     processes.set(record.id, record);
     return Promise.resolve(record);
   });
@@ -117,7 +117,7 @@ export function buildProcessFakes(): IProcessFakes {
     directory: buildDirectory(candidates, spies),
     addProcess: (overrides = {}) => {
       const record: TProcessRecord = {
-        id: 'p-0', title: 'T', clientName: 'C', ...OPPORTUNITY, skills: [...OPPORTUNITY.skills], ownerPmId: PM_ID, recruiterId: REC_ID, status: 'open', candidateIds: [], technicalRefIds: [], createdBy: ACTOR, ...STAMP, ...overrides,
+        id: 'p-0', title: 'T', clientName: 'C', ...OPPORTUNITY, skills: [...OPPORTUNITY.skills], ownerPmId: PM_ID, recruiterId: REC_ID, startDate: null, status: 'open', candidateIds: [], technicalRefIds: [], createdBy: ACTOR, ...STAMP, ...overrides,
       };
       processes.set(record.id, record);
       return record;

@@ -8,6 +8,9 @@ export const DEFAULT_STATUSES: readonly TBenchStatus[] = ['available', 'soft_boo
 
 // Arrays de runtime locales: `shared-types` es solo tipos (la imagen de producción no resuelve el alias).
 export const BENCH_SENIORITIES: readonly TSeniority[] = ['jr', 'ssr', 'sr', 'lead'];
+/** Mismo rango que la banda de la oportunidad (`PROCESS_BAND_MIN/MAX` en `processes`). */
+export const BENCH_BAND_MIN = 6;
+export const BENCH_BAND_MAX = 10;
 export const BENCH_STATUSES: readonly TBenchStatus[] = ['available', 'soft_booked', 'assigned'];
 export const SKILL_LEVEL_VALUES: readonly TSkillLevelValue[] = [1, 2, 3, 4, 5];
 export const LANGUAGE_PROFICIENCIES: readonly TLanguageProficiency[] = [

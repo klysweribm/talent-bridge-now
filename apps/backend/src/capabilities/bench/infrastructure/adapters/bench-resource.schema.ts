@@ -4,7 +4,7 @@ import type {
   ILanguageLevel, ISkillLevel, TBenchStatus, TLanguageProficiency, TSeniority, TSkillLevelValue,
 } from '@ibm-talent-bridge/shared-types';
 import {
-  BENCH_SENIORITIES, BENCH_STATUSES, LANGUAGE_PROFICIENCIES, SKILL_LEVEL_VALUES,
+  BENCH_BAND_MAX, BENCH_BAND_MIN, BENCH_SENIORITIES, BENCH_STATUSES, LANGUAGE_PROFICIENCIES, SKILL_LEVEL_VALUES,
 } from '../../domain/constants/bench.constants';
 
 export type BenchResourceDocument = HydratedDocument<BenchResourceModel>;
@@ -58,6 +58,9 @@ export class BenchResourceModel {
 
   @Prop({ type: String, required: true, enum: BENCH_SENIORITIES, index: true })
   seniority!: TSeniority;
+
+  @Prop({ type: Number, min: BENCH_BAND_MIN, max: BENCH_BAND_MAX })
+  band?: number;
 
   @Prop({ type: [SkillLevelSchema], default: [] })
   skills!: SkillLevelModel[];

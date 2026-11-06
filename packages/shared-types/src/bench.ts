@@ -31,6 +31,8 @@ export interface IBenchResource {
   readonly primaryRole: string;
   readonly practice: string;
   readonly seniority: TSeniority;
+  /** Banda profesional de IBM (entero 6 a 10); es la que usa el match con la oportunidad. */
+  readonly band: number;
   readonly skills: readonly ISkillLevel[];
   readonly languages: readonly ILanguageLevel[];
   readonly location: IBenchLocation;

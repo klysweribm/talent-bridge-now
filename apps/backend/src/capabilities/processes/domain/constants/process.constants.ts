@@ -16,6 +16,8 @@ export const PROCESS_SKILL_MAX = 60;
 /** Banda de la oportunidad: entero entre ambos valores (inclusive). */
 export const PROCESS_BAND_MIN = 6;
 export const PROCESS_BAND_MAX = 10;
+/** Fecha de inicio: solo `YYYY-MM-DD`, el mismo formato que `availableFrom` de la banca. */
+export const PROCESS_START_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 /** Máximo de referentes técnicos asignados a un proceso. */
 export const PROCESS_TECHNICAL_REFS_MAX = 2;
 /** Tope de ids aceptados en `candidateIds` . */

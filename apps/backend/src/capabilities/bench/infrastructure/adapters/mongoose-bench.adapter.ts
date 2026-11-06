@@ -4,6 +4,7 @@ import type { Model } from 'mongoose';
 import type { IBenchResource, TBenchStatus } from '@ibm-talent-bridge/shared-types';
 import { TraceFlow } from '../../../../shared/observability/trace-flow.decorator';
 import type { IBenchRepositoryPort } from '../../application/ports/bench-repository.port';
+import { BENCH_BAND_MIN } from '../../domain/constants/bench.constants';
 import type { IBenchFilters } from '../../domain/interfaces/bench-filters.interface';
 import { buildBenchQuery } from './bench-filter.query';
 import { BenchResourceModel, type BenchResourceDocument } from './bench-resource.schema';
@@ -76,6 +77,7 @@ export class MongooseBenchAdapter implements IBenchRepositoryPort {
       primaryRole: document.primaryRole,
       practice: document.practice,
       seniority: document.seniority,
+      band: document.band ?? BENCH_BAND_MIN,
       skills: document.skills.map(({ name, level, years }) => ({ name, level, years })),
       languages: document.languages.map(({ code, level }) => ({ code, level })),
       location: { country: document.location.country, city: document.location.city },

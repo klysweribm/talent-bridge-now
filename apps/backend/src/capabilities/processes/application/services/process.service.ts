@@ -34,7 +34,7 @@ export class ProcessService {
 
     const created = await this.repository.create({
       title: request.title, clientName: request.clientName, opportunityRole: request.opportunityRole, skills: request.skills,
-      roleDescription: request.roleDescription, band: request.band, ownerPmId, recruiterId, createdBy: actor, candidateIds,
+      roleDescription: request.roleDescription, band: request.band, startDate: request.startDate, ownerPmId, recruiterId, createdBy: actor, candidateIds,
     });
     await this.claims.claim(created.id, candidateIds);
     this.logger.log(`Process created: id=${created.id}`);

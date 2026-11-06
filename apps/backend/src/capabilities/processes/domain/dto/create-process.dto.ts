@@ -1,6 +1,6 @@
 import { Transform } from 'class-transformer';
 import { ArrayMaxSize, IsArray, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
-import { BandField, OpportunityRoleField, RoleDescriptionField, SkillsField, trim } from './process-field.decorators';
+import { BandField, OpportunityRoleField, RoleDescriptionField, SkillsField, StartDateField, trim } from './process-field.decorators';
 import { PROCESS_CANDIDATE_IDS_MAX, PROCESS_CLIENT_NAME_MAX, PROCESS_TITLE_MAX } from '../constants/process.constants';
 
 
@@ -23,6 +23,9 @@ export class CreateProcessDto {
 
   @BandField()
   band!: number;
+
+  @StartDateField(true)
+  startDate?: string;
 
   @IsOptional() @IsString() @IsNotEmpty()
   ownerPmId?: string;

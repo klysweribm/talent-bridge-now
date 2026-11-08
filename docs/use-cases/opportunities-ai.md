@@ -23,7 +23,22 @@ Etapa 1 del flujo (Creación) fortalecida con IA: el box mágico y el brochure g
 
 ## Códigos de error estables
 
-`AI_UNAVAILABLE`, `AI_TIMEOUT`, `OPPORTUNITY_SOURCE_UNREADABLE` (422), `OPPORTUNITY_TEXT_TOO_LONG`.
+El cuerpo de error es siempre `{ code, message }`. **El frontend ramifica por `code`, no por el status.**
+
+| `code` | Status | Cuándo | Mensaje |
+| --- | --- | --- | --- |
+| `AI_UNAVAILABLE` | 503 | ICA caído, respuesta inválida tras la reparación, o configuración del borrador ausente/inválida (falla cerrado) | genérico del servicio |
+| `AI_TIMEOUT` | 504 | Se agotó el tiempo total (una sola señal cubre la llamada y la única reparación; si el primer intento agota el tiempo no se repara) | genérico del servicio |
+| `OPPORTUNITY_TEXT_TOO_LONG` | 400 | El texto supera el máximo; no se llama a ICA | «El texto supera el máximo de N caracteres» (N sale de la config) |
+| (validación del DTO) | 400 | Texto vacío o en blanco | «El texto de la oportunidad es obligatorio» |
+| `OPPORTUNITY_SOURCE_UNREADABLE` | 422 | Brochure sin texto extraíble (unidad 6, aún no implementado) | «No pudimos leer el documento» |
+
+## Contrato de `POST /ai/opportunity-draft` (unidad 4, backend implementado)
+
+- Body `{ text }`. Respuesta 200: `{ draft: { title, clientName, opportunityRole, skills, roleDescription, band | null, startDate | null }, missingFields[], warnings[] }`.
+- No crea ni guarda nada (R1). Lo que la IA no infiere queda vacío o `null` y se lista en `missingFields` con un aviso (R2). «Senior» sin número → `band: null` más aviso (la banda es un entero 6 a 10). `skills` pasa por `normalizeSkills` (desconocidas se conservan como se escribieron).
+- Config por env (en `.env.example` y `docker-compose.yml`): `OPPORTUNITY_DRAFT_MAX_TEXT_CHARS=8000` y `OPPORTUNITY_DRAFT_TIMEOUT_MS=30000`, sin default en código. **Defaults propuestos, no confirmados por negocio.**
+- Logs del servicio: solo `chars`, `latencyMs` y `outcome` (R3). Ojo: FlowLog en desarrollo imprime el cuerpo completo (DT-055).
 
 ## Gherkin
 

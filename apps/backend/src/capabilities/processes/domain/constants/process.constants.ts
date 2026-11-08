@@ -1,4 +1,5 @@
 import type { TProcessStatus } from '@ibm-talent-bridge/shared-types';
+import { ISO_DATE_PATTERN } from '../../../../shared/validation/is-real-date';
 
 export const PROCESS_REPOSITORY_PORT = Symbol('PROCESS_REPOSITORY_PORT');
 export const PROCESSES_CONFIG = Symbol('PROCESSES_CONFIG');
@@ -17,7 +18,7 @@ export const PROCESS_SKILL_MAX = 60;
 export const PROCESS_BAND_MIN = 6;
 export const PROCESS_BAND_MAX = 10;
 /** Fecha de inicio: solo `YYYY-MM-DD`, el mismo formato que `availableFrom` de la banca. */
-export const PROCESS_START_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+export const PROCESS_START_DATE_PATTERN = ISO_DATE_PATTERN;
 /** Máximo de referentes técnicos asignados a un proceso. */
 export const PROCESS_TECHNICAL_REFS_MAX = 2;
 /** Tope de ids aceptados en `candidateIds` . */

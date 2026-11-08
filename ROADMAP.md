@@ -54,7 +54,7 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 - **DT-053:** ¿`seniority` se queda en el recurso de banca y en el filtro de `GET /bench`? Hoy no cambia; el match usa `band`.
 - ¿La unidad 5.5 necesita su propio ADR? ADR-016 sigue «Propuesto».
 - Términos [POR VALIDAR CON LUC/GUS] de la U0 sin confirmar por negocio.
-- Deuda de OPP-AI-1: DT-050, DT-052 (el `PATCH` no puede vaciar `startDate`), DT-053, DT-054 (`isRealDate` duplicado en backend y 2 archivos del frontend).
+- Deuda de OPP-AI-1: DT-050, DT-052 (el `PATCH` no puede vaciar `startDate`), DT-053, DT-054 (`isRealDate`: backend resuelto en `shared/validation`; siguen las 2 copias del frontend).
 - **Seguridad del repositorio:** la URL de `origin` lleva un token de GitHub en texto plano en `.git/config`; revocarlo, usar credential helper o SSH y reescribir la URL. Además `~/.gitconfig` tiene `http.sslverify=false`.
 - **21 commits con `Co-Authored-By`** ya en `origin`: quitarlos exige `--force`, descartado hasta nueva orden (nunca `--force`). Los de CAND-2 no la llevan; los nuevos van sin atribución.
 - **Modo `ica` (archivo):** recomendado retirarlo tras la demo (DT-033; contacto vacío y CV huérfanos en ICA si la subida expira).

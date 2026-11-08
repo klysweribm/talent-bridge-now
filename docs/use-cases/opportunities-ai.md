@@ -38,7 +38,7 @@ El cuerpo de error es siempre `{ code, message }`. **El frontend ramifica por `c
 - Body `{ text }`. Respuesta 200: `{ draft: { title, clientName, opportunityRole, skills, roleDescription, band | null, startDate | null }, missingFields[], warnings[] }`.
 - No crea ni guarda nada (R1). Lo que la IA no infiere queda vacío o `null` y se lista en `missingFields` con un aviso (R2). «Senior» sin número → `band: null` más aviso (la banda es un entero 6 a 10). `skills` pasa por `normalizeSkills` (desconocidas se conservan como se escribieron).
 - Config por env (en `.env.example` y `docker-compose.yml`): `OPPORTUNITY_DRAFT_MAX_TEXT_CHARS=8000` y `OPPORTUNITY_DRAFT_TIMEOUT_MS=30000`, sin default en código. **Defaults propuestos, no confirmados por negocio.**
-- Logs del servicio: solo `chars`, `latencyMs` y `outcome` (R3). Ojo: FlowLog en desarrollo imprime el cuerpo completo (DT-055).
+- Logs del servicio: solo `chars`, `latencyMs` y `outcome` (R3). FlowLog en desarrollo no imprime el cuerpo de este endpoint: solo `{ omitted, length }` (`@NoBodyLog()`, DT-055).
 
 ## Gherkin
 

@@ -4,7 +4,7 @@
 > `good-practices/DEBT_TECH.md` y `docs/use-cases/`. El encuadre anterior (procesos → candidatos → entrevistas →
 > feedback → reportes) espera el replanning Bench First.
 >
-> **Última actualización:** 2026-11-08 (OPP-AI-1 unidad 4 backend cerrada en `feature/OPP-AI-1`, commit B `4eb4858`; sigue la 5)
+> **Última actualización:** 2026-11-08 (OPP-AI-1 unidad 4 cerrada en `feature/OPP-AI-1` (`4eb4858`); DT-055 resuelta, `576a69e`; sigue la 5)
 
 **Cómo se mantiene:** al cerrar algo, se baja a «✅ Cerrado» en una línea y se quita de «Qué falta». Lo pendiente nunca se entierra bajo lo hecho.
 
@@ -21,7 +21,7 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 
 ### Siguiente paso
 
-**Unidad 5 de OPP-AI-1** (frontend del box mágico) en `feature/OPP-AI-1`, con la unidad 4 ya commiteada (`4eb4858`). Gherkin → plan mode, cada Scenario como test fallido antes de implementar. El frontend ramifica los errores por `code` (`AI_UNAVAILABLE` 503, `AI_TIMEOUT` 504, `OPPORTUNITY_TEXT_TOO_LONG` 400), no por status; contrato en `opportunities-ai.md`.
+**Unidad 5 de OPP-AI-1** (frontend del box mágico) en `feature/OPP-AI-1`, con la unidad 4 ya commiteada (`4eb4858`) y DT-055 resuelta (`576a69e`). Gherkin → plan mode, cada Scenario como test fallido antes de implementar. El frontend ramifica los errores por `code` (`AI_UNAVAILABLE` 503, `AI_TIMEOUT` 504, `OPPORTUNITY_TEXT_TOO_LONG` 400), no por status; contrato en `opportunities-ai.md`.
 
 ### Plan OPP-AI-1 (una sola numeración, 1..11)
 
@@ -30,7 +30,7 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 | # | Unidad (criterio de éxito en una línea) | Sección HU | Estado |
 | --- | --- | --- | --- |
 | 1-3.5 | Glosario/ADR-016, textos «Oportunidad», banda, módulo skills, `band` y `startDate` | U0-U3 (insumos) | ✅ en `main` (PR #7) |
-| 4 | Backend `POST /ai/opportunity-draft`: esquema validado, `normalizeSkills`, tope de texto y timeout por ConfigService (+ `.env.example` y compose en el mismo commit), `AI_UNAVAILABLE`/`AI_TIMEOUT`/`OPPORTUNITY_TEXT_TOO_LONG`; pm+recruiter, technical_ref 403, sin token 401 | U1 | ✅ (sin commitear: commit B `4eb4858`; `401336a` ya hecho) |
+| 4 | Backend `POST /ai/opportunity-draft`: esquema validado, `normalizeSkills`, tope de texto y timeout por ConfigService (+ `.env.example` y compose en el mismo commit), `AI_UNAVAILABLE`/`AI_TIMEOUT`/`OPPORTUNITY_TEXT_TOO_LONG`; pm+recruiter, technical_ref 403, sin token 401 | U1 | ✅ (`401336a` y `4eb4858`; FlowLog sin cuerpos: DT-055, `576a69e`) |
 | 5 | Frontend box mágico: rellena el formulario con «Sugerido por IA» y no crea nada | U1 | 📌 SIGUIENTE |
 | 5.5 | Refactor `src/shared/document-text` tras un puerto (candidates y ai), commit propio, sin cambio de comportamiento; investigar los 4 tests PDF | U2 (prerrequisito) | 📌 |
 | 6 | Backend `POST /ai/opportunity-draft/file` (PDF/DOCX/MD/TXT en memoria; 422 `OPPORTUNITY_SOURCE_UNREADABLE`) | U2 | 📌 |
@@ -50,22 +50,24 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 ### Riesgos abiertos y decisiones por tomar
 
 - **Tests PDF de `candidates`, sin explicar:** hasta la unidad 3.5 había 4 fallos (`classic-cv-extractor.adapter.spec`, `local-cv-text-extractor.adapter.spec`, lectura de PDF); en la unidad 4 el jest completo dio 778/778 sin que se tocara `candidates`. No se investigó por qué; **no se da por resuelto**: puede ser intermitente o depender del entorno. Investigarlo en la 5.5 (antes `local-cv-text-extractor` fallaba 2/7 solo aislado).
-- **Privacidad (DT-055):** FlowLog imprime el cuerpo completo de peticiones/respuestas (texto del usuario y borrador) cuando `FLOW_LOG_ENABLED=true`; contradice R3 en desarrollo. Decidir la solución antes de la unidad 6 (brochure).
+- **Residual de privacidad (DT-056):** DT-055 está resuelta (`576a69e`), pero no se verificó: los casos e2e se escribieron después del código y el camino del middleware solo lo cubre su unit; las líneas `@TraceFlow` de adapters/servicios y los headers no se auditaron; no se auditaron bench, users ni auth-session. Revisar antes de la unidad 6.
 - **Sin verificar en la unidad 4:** `AI_TIMEOUT` y `AI_UNAVAILABLE` contra ICA real (solo puerto falso en unit/e2e); los tests de config y el e2e se escribieron junto con el código, sin verlos fallar antes; el contenedor de `:3000` es una imagen antigua, no se reconstruyó ni se probó el compose.
 - **Defaults sin confirmar:** texto máximo 8000 caracteres y timeout del borrador ICA 30 s.
 - **DT-053:** ¿`seniority` se queda en el recurso de banca y en el filtro de `GET /bench`? Hoy no cambia; el match usa `band`.
 - ¿La unidad 5.5 necesita su propio ADR? ADR-016 sigue «Propuesto».
 - Términos [POR VALIDAR CON LUC/GUS] de la U0 sin confirmar por negocio.
-- Deuda de OPP-AI-1: DT-050, DT-055, DT-052 (el `PATCH` no puede vaciar `startDate`), DT-053, DT-054 (`isRealDate`: backend resuelto en `shared/validation`; siguen las 2 copias del frontend).
+- Deuda de OPP-AI-1: DT-050, DT-056, DT-052 (el `PATCH` no puede vaciar `startDate`), DT-053, DT-054 (`isRealDate`: backend resuelto en `shared/validation`; siguen las 2 copias del frontend).
 - **Seguridad del repositorio:** la URL de `origin` lleva un token de GitHub en texto plano en `.git/config`; revocarlo, usar credential helper o SSH y reescribir la URL. Además `~/.gitconfig` tiene `http.sslverify=false`.
 - **21 commits con `Co-Authored-By`** ya en `origin`: quitarlos exige `--force`, descartado hasta nueva orden (nunca `--force`). Los de CAND-2 no la llevan; los nuevos van sin atribución.
 - **Modo `ica` (archivo):** recomendado retirarlo tras la demo (DT-033; contacto vacío y CV huérfanos en ICA si la subida expira).
 - **Imagen de producción (DT-034):** `pdf-parse` arrastra `@napi-rs/canvas`, sin probar en Alpine; verificar antes de DEPLOY-1.
 - **Replanning Bench First** (ADR, `docs/domain.md`, casos de uso, `shared-types`) y `MATCH-1`; actualizar `/roadmap-task` (DT-025). Opcionales: OBS-2, DT-020, DT-027 a DT-038.
 
-### Gates y git (cierre de la unidad 4)
+### Gates y git (cierre de la unidad 4 y de DT-055)
 
-Backend: typecheck 0, lint 0 errores / 23 warnings (3 nuevos `max-lines-per-function` en specs largos), jest 82 suites 778/778, e2e contra Mongo real 32 suites 253/253 (12 nuevos). Frontend: typecheck 0 (tests sin re-ejecutar; 909/909 en la 3.5). `validate-quality --strict`: 294 archivos, 0 críticos, 0 moderados. Corrida real contra ICA (claude-haiku-5-5, puerto 3100): texto ITAU → 200 en ~5,5 s con título, cliente ITAU, rol Fullstack, skills [React, NestJS], banda 8, inicio 2026-12-01, sin vacíos; texto «backend senior con Java y Spring» → cliente vacío, banda null, aviso y `missingFields`; intento de inyección en el texto → no obedecido; carlos@ 403, sin token 401, 8001 caracteres → 400 `OPPORTUNITY_TEXT_TOO_LONG`, texto en blanco → 400; logs solo `chars`, `latencyMs`, `outcome`. Git: rama `feature/OPP-AI-1`, commit A `401336a` hecho, commit B `4eb4858`, sin push; `origin` = `klysweribm/talent-bridge-now`; commits sin atribución.
+**Tras DT-055 (sin commitear, `576a69e`):** backend typecheck 0, lint 0 errores / 25 warnings (+2 `max-lines-per-function`: `flow-log.interceptor.spec.ts` y `test/flow-log-no-body.e2e-spec.ts`), jest 84 suites 793/793, e2e contra Mongo real 33 suites 257/257; `validate-quality --strict` 294 archivos, 0 críticos, 0 moderados. Frontend no tocado ni re-ejecutado. Corrida real en el puerto 3101 (`FLOW_LOG_ENABLED=true`): 0 apariciones de las marcas ni de ITAU/NestJS en el log; el login sigue mostrando su body con el token redactado. Queda vivo un proceso de prueba en el 3101 y otro ajeno en el 3100 (decide el usuario).
+
+**Cierre de la unidad 4:** Backend: typecheck 0, lint 0 errores / 23 warnings (3 nuevos `max-lines-per-function` en specs largos), jest 82 suites 778/778, e2e contra Mongo real 32 suites 253/253 (12 nuevos). Frontend: typecheck 0 (tests sin re-ejecutar; 909/909 en la 3.5). `validate-quality --strict`: 294 archivos, 0 críticos, 0 moderados. Corrida real contra ICA (claude-haiku-5-5, puerto 3100): texto ITAU → 200 en ~5,5 s con título, cliente ITAU, rol Fullstack, skills [React, NestJS], banda 8, inicio 2026-12-01, sin vacíos; texto «backend senior con Java y Spring» → cliente vacío, banda null, aviso y `missingFields`; intento de inyección en el texto → no obedecido; carlos@ 403, sin token 401, 8001 caracteres → 400 `OPPORTUNITY_TEXT_TOO_LONG`, texto en blanco → 400; logs solo `chars`, `latencyMs`, `outcome`. Git: rama `feature/OPP-AI-1`, commit A `401336a` hecho, commit B `4eb4858`, sin push; `origin` = `klysweribm/talent-bridge-now`; commits sin atribución.
 
 ### Backlog por prioridad
 
@@ -242,6 +244,7 @@ Todo reordenamiento queda registrado aquí (fecha + razón). Una idea nueva sin 
 | 2026-11-03 a 2026-11-06 | `OPP-AI-1` unidades 2 a 3.5: textos «Oportunidad» (`5678f4e`), banda entero 6 a 10 (DT-051 resuelta), módulo `shared/skills` (`68c60dd`, 25 tests), `band` en banca y `startDate` (`e1140a6`, `c5e8ac0`; 500 por mes 13 / día 32 corregido a 400); altas DT-052 a DT-054. Gates al cierre: ver «Qué falta». | Insumos del borrador con IA y del match con la banca. |
 | 2026-11-08 | ROADMAP reordenado: guía de lo pendiente arriba, lo cerrado resumido al final, una sola numeración (1..11) para OPP-AI-1 | Dos numeraciones (plan vs secciones de la HU) confundían y el archivo mezclaba lo hecho con lo pendiente |
 | 2026-11-08 | `OPP-AI-1` unidad 4: `POST /ai/opportunity-draft` (backend), timeout total, config por env, `isRealDate` a `shared` (`401336a`); alta DT-055 (FlowLog imprime cuerpos) | Insumo del box mágico (unidad 5); gates en verde y corrida real con ICA |
+| 2026-11-08 | DT-055 resuelta (`576a69e`): `@NoBodyLog()` + `FlowLogInterceptor`/`FlowLogMiddleware` imprimen `{ omitted, length }` en IA y candidatos; alta DT-056 (residual) | R3: los logs de desarrollo no deben llevar texto del usuario, borradores ni PII de candidatos |
 
 ---
 

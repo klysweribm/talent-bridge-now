@@ -18,7 +18,8 @@ paths:
 
 ## Backend — Jest (`apps/backend`)
 
-- `*.spec.ts`, jest `rootDir` is `src`. Single file: `npx jest path/to/file.spec.ts`.
+- `*.spec.ts`, jest `rootDir` is `src`. Single file: `npm test -- path/to/file.spec.ts`.
+- Backend: usar `npm test`, no `npx jest` (los tests de PDF necesitan `--experimental-vm-modules`).
 - Unit-test services by injecting **fake ports** (plain objects implementing the port interface with `jest.fn()`), never by mocking Mongoose or an adapter module.
 - Adapters are covered by e2e/integration tests (`npm run test:e2e`, `docker-compose.test.yml`), not unit tests with a mocked Mongoose.
 - Controllers: thin, so one test per route checking the service call + status code is enough.

@@ -4,7 +4,7 @@
 > `good-practices/DEBT_TECH.md` y `docs/use-cases/`. El encuadre anterior (procesos → candidatos → entrevistas →
 > feedback → reportes) espera el replanning Bench First.
 >
-> **Última actualización:** 2026-11-08 (OPP-AI-1 unidad 5 cerrada en `feature/OPP-AI-1` (`2d750e3`), sin verificar en navegador; sigue la 5.5)
+> **Última actualización:** 2026-11-08 (OPP-AI-1 unidad 5.5 cerrada en `feature/OPP-AI-1` (refactor `shared/document-text`, sin commitear al escribir esto); la unidad 5 sigue sin verificar en navegador; sigue la 6)
 
 **Cómo se mantiene:** al cerrar algo, se baja a «✅ Cerrado» en una línea y se quita de «Qué falta». Lo pendiente nunca se entierra bajo lo hecho.
 
@@ -21,7 +21,7 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 
 ### Siguiente paso
 
-**Unidad 5.5 de OPP-AI-1** (refactor `shared/document-text` tras un puerto, commit propio, sin cambio de comportamiento; investigar los 4 tests PDF) en `feature/OPP-AI-1`. La unidad 5 (frontend del box mágico) está cerrada en código (`2d750e3`) pero **sin verificar en navegador** (ver «Pendiente de verificación humana»). Decidir antes si la 5.5 necesita ADR.
+**Unidad 6 de OPP-AI-1** (backend `POST /ai/opportunity-draft/file`: PDF/DOCX/MD/TXT en memoria, 422 `OPPORTUNITY_SOURCE_UNREADABLE`) en `feature/OPP-AI-1`. Debe importar `DocumentTextModule` en `AiModule` (hoy solo lo importa `candidates`), llevar `@NoBodyLog()` desde su creación con test de metadata, y decidir si el error de lectura pasa de 400 genérico a error de dominio propio. La unidad 5 (frontend del box mágico) está cerrada en código (`2d750e3`) pero **sin verificar en navegador** (ver «Pendiente de verificación humana»).
 
 ### Plan OPP-AI-1 (una sola numeración, 1..11)
 
@@ -32,8 +32,8 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 | 1-3.5 | Glosario/ADR-016, textos «Oportunidad», banda, módulo skills, `band` y `startDate` | U0-U3 (insumos) | ✅ en `main` (PR #7) |
 | 4 | Backend `POST /ai/opportunity-draft`: esquema validado, `normalizeSkills`, tope de texto y timeout por ConfigService (+ `.env.example` y compose en el mismo commit), `AI_UNAVAILABLE`/`AI_TIMEOUT`/`OPPORTUNITY_TEXT_TOO_LONG`; pm+recruiter, technical_ref 403, sin token 401 | U1 | ✅ (`401336a` y `4eb4858`; FlowLog sin cuerpos: DT-055, `576a69e`) |
 | 5 | Frontend box mágico: rellena solo campos vacíos con «Sugerido por IA» y no crea nada | U1 | ✅ (`2d750e3`; sin verificar en navegador) |
-| 5.5 | Refactor `src/shared/document-text` tras un puerto (candidates y ai), commit propio, sin cambio de comportamiento; investigar los 4 tests PDF | U2 (prerrequisito) | 📌 SIGUIENTE |
-| 6 | Backend `POST /ai/opportunity-draft/file` (PDF/DOCX/MD/TXT en memoria; 422 `OPPORTUNITY_SOURCE_UNREADABLE`) | U2 | 📌 |
+| 5.5 | Refactor `src/shared/document-text` tras un puerto (hoy consumido por candidates; ai lo importará en la 6), sin cambio de comportamiento; causa de los 4 tests PDF explicada | U2 (prerrequisito) | ✅ (sin commitear al cerrar el documento) |
+| 6 | Backend `POST /ai/opportunity-draft/file` (PDF/DOCX/MD/TXT en memoria; 422 `OPPORTUNITY_SOURCE_UNREADABLE`) | U2 | 📌 SIGUIENTE |
 | 7 | Frontend dropzone de brochure (generaliza el existente) | U2 | 📌 |
 | 8 | Backend `POST /bench/match`: 60 % skills, 25 % banda, 15 % disponibilidad, determinístico; ICA solo explica | U3 | 📌 |
 | 9 | `GET /processes/:id/bench-suggestions` (llamada en memoria a bench) | U3 | 📌 |
@@ -50,12 +50,13 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 
 ### Riesgos abiertos y decisiones por tomar
 
-- **Tests PDF de `candidates`, sin explicar:** hasta la unidad 3.5 había 4 fallos (`classic-cv-extractor.adapter.spec`, `local-cv-text-extractor.adapter.spec`, lectura de PDF); en la unidad 4 el jest completo dio 778/778 sin que se tocara `candidates`. No se investigó por qué; **no se da por resuelto**: puede ser intermitente o depender del entorno. Investigarlo en la 5.5 (antes `local-cv-text-extractor` fallaba 2/7 solo aislado).
+- **Tests PDF (explicado en la 5.5):** los 4 fallos (2 de `classic-cv-extractor`, 2 del spec del extractor local) ocurren con `npx jest` a secas porque `pdf-parse`/pdf.js necesita `--experimental-vm-modules` («Setting up fake worker failed: A dynamic import callback was invoked without --experimental-vm-modules»). Hay que usar `npm test` (lleva el flag), no `npx jest`; el CI usa `npm run test:cov`, que también lo lleva (`.github/workflows/backend-ci.yml`, `package.json`). Reproducido con Node 24.2 y 22.23; no era defecto del código ni intermitencia. El extractor solo registra `error.name`, por eso el mensaje real no aparecía (correcto por privacidad). Regla añadida en `.claude/rules/testing.md`.
+- **Diferencia sin investigar:** `validate-quality --strict` dio 304 archivos tras la 5.5 y 306 en la unidad 5; no se sabe a qué se debe (el refactor movió y borró archivos, pero no se contrastó).
 - **Residual de privacidad (DT-056):** DT-055 está resuelta (`576a69e`), pero no se verificó: los casos e2e se escribieron después del código y el camino del middleware solo lo cubre su unit; las líneas `@TraceFlow` de adapters/servicios y los headers no se auditaron; no se auditaron bench, users ni auth-session. Revisar antes de la unidad 6.
 - **Sin verificar en la unidad 4:** `AI_TIMEOUT` y `AI_UNAVAILABLE` contra ICA real (solo puerto falso en unit/e2e); los tests de config y el e2e se escribieron junto con el código, sin verlos fallar antes; el contenedor de `:3000` es una imagen antigua, no se reconstruyó ni se probó el compose.
 - **Defaults sin confirmar:** texto máximo 8000 caracteres y timeout del borrador ICA 30 s.
 - **DT-053:** ¿`seniority` se queda en el recurso de banca y en el filtro de `GET /bench`? Hoy no cambia; el match usa `band`.
-- ¿La unidad 5.5 necesita su propio ADR? ADR-016 sigue «Propuesto».
+- **Decidido en la 5.5:** no lleva ADR (movimiento de código bajo `shared/` que sigue el puerto + adapter de `backend-architecture.md`). ADR-016 sigue «Propuesto». El 400 «The file could not be read: it may be corrupt» es el contrato actual del puerto; un error de dominio propio se decide en las unidades 6/7.
 - Términos [POR VALIDAR CON LUC/GUS] de la U0 sin confirmar por negocio.
 - Deuda de OPP-AI-1: DT-050, DT-056, DT-052 (el `PATCH` no puede vaciar `startDate`), DT-053, DT-054 (`isRealDate`: backend resuelto en `shared/validation`; siguen las 2 copias del frontend), DT-057 (`useProcessDataForm.ts` 61/60), DT-058 (`as never` en `useOpportunityDraft`). DT-031 (FlowLog + candidatos) sigue abierta, sin decisión del usuario.
 - **Tests de la unidad 5 más débiles:** `ProcessDataStep.draft.test.tsx` (9 tests) salió en rojo solo por falta de UI, no por aserciones concretas; `AiSuggestedBadge`, `DraftFieldFrame`, `OpportunityDraftBox`, `DraftNotices`, `DraftErrorAlert` y `draftMarks` se escribieron después del código; `OpportunityDraftPanel`, `useGenerateOpportunityDraft` y `useOpportunityDraft` no tienen test propio (los cubre el del organismo). Un test de infra («should translate HTTP errors») falló varias veces por una rareza del runner con `mockRejectedValue` + `rejects.toBeInstanceOf`; quedó con otra forma y pasa, sin causa explicada.
@@ -65,7 +66,9 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 - **Imagen de producción (DT-034):** `pdf-parse` arrastra `@napi-rs/canvas`, sin probar en Alpine; verificar antes de DEPLOY-1.
 - **Replanning Bench First** (ADR, `docs/domain.md`, casos de uso, `shared-types`) y `MATCH-1`; actualizar `/roadmap-task` (DT-025). Opcionales: OBS-2, DT-020, DT-027 a DT-038.
 
-### Gates y git (cierre de la unidad 5; antes, unidad 4 y DT-055)
+### Gates y git (cierre de la unidad 5.5; antes, unidad 5, unidad 4 y DT-055)
+
+**Cierre de la unidad 5.5 (`aa1b8d5`):** Backend: typecheck 0, lint 0 errores / 25 warnings (línea base), `npm test` 84 suites 793/793, e2e contra Mongo real 33 suites 257/257; `validate-quality --strict` 304 archivos, 0 críticos, 0 moderados. Greps: 0 resultados de `cv-text-extractor|CV_TEXT_EXTRACTOR_PORT|LocalCvTextExtractor|ICvTextExtractorPort` en `src` y `test`; `ai` no importa `candidates`; `shared/document-text` no importa `capabilities/`. No verificado: uso desde `ai` (unidad 6), recorrido en navegador de la unidad 5, la diferencia 306→304 en `validate-quality`. Frontend no tocado.
 
 **Cierre de la unidad 5 (sin commitear):** Frontend: typecheck 0, lint 0 errores y 0 warnings (`--max-warnings 0`), tests 192 archivos / 945 tests (partida 182 / 909), build ok; `validate-quality --strict` 306 archivos, 0 críticos, 0 moderados. Backend: no tocado ni re-ejecutado (último estado conocido: jest 793, e2e 257, lint 25 warnings). Tokens de Tailwind usados comprobados uno a uno en `tailwind.colors.ts` / `tailwind.config.ts`. TDD en rojo por la razón correcta en `applyOpportunityDraft`, `opportunityDraft.translate` y `opportunityDraft.infra`.
 
@@ -100,11 +103,11 @@ Orden sugerido de la POC: 2e/2f → 4 y 5 → 6a y 6b mínimas → 8 → 2c → 
 
 ## 🚧 OPP-AI-1 — Oportunidad asistida por IA y sugerencias de la banca (HIGH)
 
-**Estado:** unidades 1-3.5 ✅ en `main` (PR #7; detalle en git y en `opportunities-ai.md`); unidad 4 ✅ backend (rama `feature/OPP-AI-1`, commit `4eb4858`); unidad 5 ✅ frontend (`2d750e3`, sin verificar en navegador); 5.5 SIGUIENTE; 6-11 📌 · **Casos de uso:** [`docs/use-cases/opportunities-ai.md`](./docs/use-cases/opportunities-ai.md) (R1-R7) · **Lenguaje:** [`docs/glossary.md`](./docs/glossary.md) · **Decisión:** ADR-016 (Propuesto) · **Depende de:** AI-1, BENCH-1, CAND-2 · **Commits:** `22cfeee`, `5678f4e`, `68c60dd`, `e1140a6`, `c5e8ac0`, `6d732cb`, `401336a`, `4eb4858`, `576a69e` (DT-055), unidad 5: `2d750e3`.
+**Estado:** unidades 1-3.5 ✅ en `main` (PR #7; detalle en git y en `opportunities-ai.md`); unidad 4 ✅ backend (rama `feature/OPP-AI-1`, commit `4eb4858`); unidad 5 ✅ frontend (`2d750e3`, sin verificar en navegador); 5.5 ✅ refactor `shared/document-text` (sin commitear al escribir esto); 6 SIGUIENTE; 7-11 📌 · **Casos de uso:** [`docs/use-cases/opportunities-ai.md`](./docs/use-cases/opportunities-ai.md) (R1-R7) · **Lenguaje:** [`docs/glossary.md`](./docs/glossary.md) · **Decisión:** ADR-016 (Propuesto) · **Depende de:** AI-1, BENCH-1, CAND-2 · **Commits:** `22cfeee`, `5678f4e`, `68c60dd`, `e1140a6`, `c5e8ac0`, `6d732cb`, `401336a`, `4eb4858`, `576a69e` (DT-055), unidad 5: `2d750e3`, unidad 5.5: `aa1b8d5`.
 
 El PM o reclutador describe el perfil en un box mágico o sube un brochure; la IA (ICA) rellena el formulario sin crear nada, y en la etapa 2 se sugieren recursos de la banca con un % de match calculado por el backend.
 
-**Decisiones vigentes:** la banda es un entero 6 a 10 (sin jr/ssr/sr/lead) y el match compara banda con banda (misma 100, diferencia de 1 → 50, resto 0); pesos y umbral (`MATCH_WEIGHT_*`, `MATCH_THRESHOLD=75`, `MATCH_EXPLAIN_TIMEOUT_MS=10s`) por ConfigService; ICA solo explica y nunca recibe nombre, código ni contacto; `startDate` opcional `YYYY-MM-DD` (ausente → «Disponibilidad: no evaluada» y pesos redistribuidos); «Expectativas de evaluación técnica» = `roleDescription`, que el borrador rellena; skills desconocidas se conservan como se escribieron (catálogo en `apps/backend/src/shared/skills/`, import directo, sin barrel); el texto se extrae vía `shared/document-text` (unidad 5.5), sin consumir `candidates`; logs solo con longitud, latencia y resultado; fixture de verificación ITAU: Fullstack, React + NestJS, banda 8, inicio 2026-12-01.
+**Decisiones vigentes:** la banda es un entero 6 a 10 (sin jr/ssr/sr/lead) y el match compara banda con banda (misma 100, diferencia de 1 → 50, resto 0); pesos y umbral (`MATCH_WEIGHT_*`, `MATCH_THRESHOLD=75`, `MATCH_EXPLAIN_TIMEOUT_MS=10s`) por ConfigService; ICA solo explica y nunca recibe nombre, código ni contacto; `startDate` opcional `YYYY-MM-DD` (ausente → «Disponibilidad: no evaluada» y pesos redistribuidos); «Expectativas de evaluación técnica» = `roleDescription`, que el borrador rellena; skills desconocidas se conservan como se escribieron (catálogo en `apps/backend/src/shared/skills/`, import directo, sin barrel); el texto se extrae vía `shared/document-text` (ya existe desde la 5.5; `ai` lo importará en la 6), sin consumir `candidates`; logs solo con longitud, latencia y resultado; fixture de verificación ITAU: Fullstack, React + NestJS, banda 8, inicio 2026-12-01.
 
 **Criterios pendientes**
 
@@ -117,7 +120,10 @@ El PM o reclutador describe el perfil en un box mágico o sube un brochure; la I
   - [x] Campos vacíos y `missingFields` «por completar» con aviso (R2). Pendiente de verificación humana.
   - [x] Si ICA falla: mensaje claro y formulario manual (R6), ramificando por `code` (`AI_UNAVAILABLE`, `AI_TIMEOUT`, `OPPORTUNITY_TEXT_TOO_LONG` con el `message` del servidor; sin code → `UNKNOWN`; red caída → `NETWORK`). Solo con la infra mockeada.
   - [ ] Escenario «Skills normalizadas» de extremo a extremo («Reactjs»/«Nestjs» → «React»/«NestJS»; depende también de la unidad 8).
-- **Unidad 5.5:** [ ] puerto `document-text` consumido por `candidates` y `ai`, commit propio, tests de CAND-2 en verde sin cambio de comportamiento.
+- **Unidad 5.5 ✅:**
+  - [x] Puerto `DOCUMENT_TEXT_EXTRACTOR_PORT` en `shared/document-text`, consumido por `candidates` vía `DocumentTextModule`; tests de CAND-2 en verde sin cambio de comportamiento (mismo 400, mismas constantes).
+  - [ ] `ai` lo consume: lo hace la unidad 6 (`AiModule` aún no importa `DocumentTextModule`).
+  - Menor: `DOCUMENT_PDF_MIME` duplica `CV_PDF_MIME` (queda en `cv.constants.ts`); no se registra como deuda por no cumplir el criterio de DEBT_TECH.
 - **Unidades 6-7 (HU U2):** [ ] brochure rellena igual, no se guarda en servidor ni en logs (R3); [ ] PDF sin texto extraíble → «No pudimos leer el documento» (422) y el formulario queda intacto.
 - **Unidades 8-9 (HU U3, backend):** [ ] % determinístico independiente de ICA (R4); [ ] sin `startDate` → disponibilidad no evaluada (R5); [ ] solo recursos `available` o `soft_booked`, sin acción de asignar (R7); [ ] ICA solo recibe skills, nivel, banda y disponibilidad; [ ] technical_ref 403 y sin token 401 en `POST /bench/match`.
 - **Unidad 10 (panel):** [ ] «Sugeridos de la banca» ordenados por %, con «Recomendado» desde 75 %, skills que cumple y que le faltan; [ ] ICA caído → % y desglose sin la frase de la IA; [ ] sin coincidencias → «Sin coincidencias suficientes en la banca» y «Buscar candidatos externos»; [ ] cambiar el perfil recalcula; [ ] el mismo panel en el detalle de la oportunidad.
@@ -247,6 +253,7 @@ Todo reordenamiento queda registrado aquí (fecha + razón). Una idea nueva sin 
 | 2026-11-03 | Registrada `DRAFT-1` y creado `docs/use-cases/drafts.md`; registrada `OPP-AI-1` con glosario, ADR-016 (Propuesto) y `opportunities-ai.md`; altas DT-050 y DT-051. | La sesión caduca y el formulario se pierde (DT-015); la HU pide oportunidades con IA y sugerencias de la banca. |
 | 2026-11-03 a 2026-11-06 | `OPP-AI-1` unidades 2 a 3.5: textos «Oportunidad» (`5678f4e`), banda entero 6 a 10 (DT-051 resuelta), módulo `shared/skills` (`68c60dd`, 25 tests), `band` en banca y `startDate` (`e1140a6`, `c5e8ac0`; 500 por mes 13 / día 32 corregido a 400); altas DT-052 a DT-054. Gates al cierre: ver «Qué falta». | Insumos del borrador con IA y del match con la banca. |
 | 2026-11-08 | ROADMAP reordenado: guía de lo pendiente arriba, lo cerrado resumido al final, una sola numeración (1..11) para OPP-AI-1 | Dos numeraciones (plan vs secciones de la HU) confundían y el archivo mezclaba lo hecho con lo pendiente |
+| 2026-11-08 | `OPP-AI-1` unidad 5.5: extracción de texto PDF/DOCX movida a `shared/document-text` tras `DOCUMENT_TEXT_EXTRACTOR_PORT`, sin cambio de comportamiento; backend 793/793 jest, 257/257 e2e, lint 25 warnings, `validate-quality` 304 archivos 0 críticos; causa de los 4 tests PDF: `npx jest` sin `--experimental-vm-modules`; sin ADR | Prerrequisito de la unidad 6 (brochure) para que `ai` no consuma `candidates` |
 | 2026-11-08 | `OPP-AI-1` unidad 5: box mágico en la etapa 1 (solo rellena campos vacíos, «Sugerido por IA», errores por `code`); frontend 945/192 tests, lint 0 warnings, build ok (`2d750e3`); altas DT-057 y DT-058 | Consume `POST /ai/opportunity-draft`; sin recorrido en navegador ni prueba contra el endpoint real |
 | 2026-11-08 | `OPP-AI-1` unidad 4: `POST /ai/opportunity-draft` (backend), timeout total, config por env, `isRealDate` a `shared` (`401336a`); alta DT-055 (FlowLog imprime cuerpos) | Insumo del box mágico (unidad 5); gates en verde y corrida real con ICA |
 | 2026-11-08 | DT-055 resuelta (`576a69e`): `@NoBodyLog()` + `FlowLogInterceptor`/`FlowLogMiddleware` imprimen `{ omitted, length }` en IA y candidatos; alta DT-056 (residual) | R3: los logs de desarrollo no deben llevar texto del usuario, borradores ni PII de candidatos |

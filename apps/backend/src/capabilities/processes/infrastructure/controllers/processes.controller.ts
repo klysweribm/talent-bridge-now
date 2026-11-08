@@ -8,6 +8,7 @@ import { JwtAuthGuard } from '../../../../shared/auth/jwt-auth.guard';
 import type { IJwtPayload } from '../../../../shared/auth/jwt-payload.interface';
 import { Roles } from '../../../../shared/auth/roles.decorator';
 import { RolesGuard } from '../../../../shared/auth/roles.guard';
+import { NoBodyLog } from '../../../../shared/observability/no-body-log.decorator';
 import { ProcessLimitsService } from '../../application/services/process-limits.service';
 import { ProcessService } from '../../application/services/process.service';
 import { PROCESS_SEARCH_MAX } from '../../domain/constants/process.constants';
@@ -54,6 +55,7 @@ export class ProcessesController {
   }
 
   @Get(':id')
+  @NoBodyLog()
   @ApiOperation({ summary: 'Detalle de un proceso' })
   @ApiResponse({ status: 404, description: 'Proceso inexistente' })
   detail(@Param() params: ProcessIdParamDto): Promise<IProcessDetail> {

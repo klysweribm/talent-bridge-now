@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '../../../../shared/auth/jwt-auth.guard';
 import type { IJwtPayload } from '../../../../shared/auth/jwt-payload.interface';
 import { Roles } from '../../../../shared/auth/roles.decorator';
 import { RolesGuard } from '../../../../shared/auth/roles.guard';
+import { NoBodyLog } from '../../../../shared/observability/no-body-log.decorator';
 import { ProcessCandidatesService } from '../../application/services/process-candidates.service';
 import { AddProcessCandidateDto } from '../../domain/dto/add-process-candidate.dto';
 import { ProcessCandidateParamDto } from '../../domain/dto/process-candidate-param.dto';
@@ -17,6 +18,7 @@ const toActor = (req: AuthedRequest): ICandidateActor => ({ id: req.user.sub, em
 
 @ApiTags('processes')
 @ApiBearerAuth()
+@NoBodyLog()
 @Controller('processes/:id/candidates')
 @UseGuards(JwtAuthGuard, RolesGuard)
 // TODO(RBAC-1): reemplazar por permisos

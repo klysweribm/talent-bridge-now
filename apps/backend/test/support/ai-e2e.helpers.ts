@@ -44,7 +44,7 @@ export interface IAiTestContext {
   readonly jwt: JwtService;
 }
 
-function testImports(label: string): unknown[] {
+function testImports(label: string, extra: readonly unknown[]): unknown[] {
   return [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env', '../../.env'] }),
     MongooseModule.forRootAsync({
@@ -60,6 +60,7 @@ function testImports(label: string): unknown[] {
     BenchModule,
     AiModule,
     CandidatesModule,
+    ...extra,
   ];
 }
 
@@ -67,9 +68,10 @@ export async function buildAiApp(
   label: string,
   port: IAiProviderPort,
   env: Record<string, string> = {},
+  extraImports: readonly unknown[] = [],
 ): Promise<IAiTestContext> {
   Object.assign(process.env, BASE_ENV, env, { JWT_SECRET: TEST_JWT_SECRET });
-  const moduleRef = await Test.createTestingModule({ imports: testImports(label) as never })
+  const moduleRef = await Test.createTestingModule({ imports: testImports(label, extraImports) as never })
     .overrideProvider(AI_PROVIDER_PORT)
     .useValue(port)
     .compile();

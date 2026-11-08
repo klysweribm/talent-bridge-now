@@ -81,3 +81,10 @@ export function formatAdapterLine(
 }
 
 export const REJECTED_BEFORE_HANDLER_NOTE = REJECTED_NOTE;
+
+/** Sustituto del body en handlers con texto libre/PII: solo el largo, nunca el contenido. */
+export function omitBody(body: unknown): { readonly omitted: true; readonly length: number } {
+  if (body === undefined || body === null) return { omitted: true, length: 0 };
+  const length = typeof body === 'string' ? body.length : (JSON.stringify(body)?.length ?? 0);
+  return { omitted: true, length };
+}

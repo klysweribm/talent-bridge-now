@@ -4,12 +4,14 @@ import type { ICandidateListItem, PaginatedResponse } from '@ibm-talent-bridge/s
 import { JwtAuthGuard } from '../../../../shared/auth/jwt-auth.guard';
 import { Roles } from '../../../../shared/auth/roles.decorator';
 import { RolesGuard } from '../../../../shared/auth/roles.guard';
+import { NoBodyLog } from '../../../../shared/observability/no-body-log.decorator';
 import { CandidateListService } from '../../application/services/candidate-list.service';
 import { CandidatesQueryDto } from '../../domain/dto/candidates-query.dto';
 
 /** `GET /candidates` (raíz del recurso). Se registra antes que `CandidatesController`; no compite con `:id`. */
 @ApiTags('Candidates')
 @ApiBearerAuth()
+@NoBodyLog()
 @Controller('candidates')
 @UseGuards(JwtAuthGuard, RolesGuard)
 // TODO(RBAC-1): reemplazar por permisos

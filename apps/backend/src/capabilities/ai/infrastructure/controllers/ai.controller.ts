@@ -4,6 +4,7 @@ import type { IAiAskSuccess, IAiStatus, IOpportunityDraftResponse } from '@ibm-t
 import { JwtAuthGuard } from '../../../../shared/auth/jwt-auth.guard';
 import { Roles } from '../../../../shared/auth/roles.decorator';
 import { RolesGuard } from '../../../../shared/auth/roles.guard';
+import { NoBodyLog } from '../../../../shared/observability/no-body-log.decorator';
 import { AiCoordinatorService } from '../../application/services/ai-coordinator.service';
 import { AiStatusService } from '../../application/services/ai-status.service';
 import { OpportunityDraftService } from '../../application/services/opportunity-draft.service';
@@ -33,6 +34,7 @@ export class AiController {
   }
 
   @Post('ask')
+  @NoBodyLog()
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: AI_ASK_THROTTLE_LIMIT, ttl: AI_ASK_THROTTLE_TTL_MS } })
   @ApiAiAsk()
@@ -45,6 +47,7 @@ export class AiController {
 
   /** Solo propone un borrador (R1): no crea nada. El frontend ramifica por `code`, nunca por el status. */
   @Post('opportunity-draft')
+  @NoBodyLog()
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: OPPORTUNITY_DRAFT_THROTTLE_LIMIT, ttl: OPPORTUNITY_DRAFT_THROTTLE_TTL_MS } })
   @ApiOpportunityDraft()

@@ -10,8 +10,8 @@ Entrada: resumen de la unidad cerrada (qué cambió, commits, gates, qué se ver
 y qué no).
 
 Tareas:
-1. ROADMAP.md: actualiza estado, criterios de éxito, "Estado actual / próximos
-   pasos" y una fila en el Historial (una línea). Lo cerrado baja al bloque "Cerrado".
+1. ROADMAP.md: actualiza estado, criterios de éxito, "▶ Qué falta (siguiente paso y tabla del plan)"
+   y una fila en el Historial (una línea). Lo cerrado baja al bloque "Cerrado".
 2. DEBT_TECH.md: registra la deuda nueva y mueve la resuelta a "Resueltos".
 3. docs/use-cases/: si cambió una regla de negocio, actualiza el caso de uso.
 4. Si cambió una decisión de arquitectura o de dominio, redacta un ADR en estado

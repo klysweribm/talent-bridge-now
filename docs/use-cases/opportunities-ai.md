@@ -40,6 +40,17 @@ El cuerpo de error es siempre `{ code, message }`. **El frontend ramifica por `c
 - Config por env (en `.env.example` y `docker-compose.yml`): `OPPORTUNITY_DRAFT_MAX_TEXT_CHARS=8000` y `OPPORTUNITY_DRAFT_TIMEOUT_MS=30000`, sin default en código. **Defaults propuestos, no confirmados por negocio.**
 - Logs del servicio: solo `chars`, `latencyMs` y `outcome` (R3). FlowLog en desarrollo no imprime el cuerpo de este endpoint: solo `{ omitted, length }` (`@NoBodyLog()`, DT-055).
 
+## Comportamiento de la interfaz del box mágico (unidad 5, frontend implementado)
+
+Verificado solo con tests (infra mockeada); sin recorrido en navegador ni contra el endpoint real.
+
+- **Solo rellena campos vacíos.** Nunca pisa lo escrito a mano. Lo que la IA propuso para un campo que ya tenía valor se lista como «no sobrescrito». Un `null` del borrador (`band`, `startDate`) no aplica nada. El formulario se lee al **responder**, no al hacer clic en «Generar con IA».
+- **«Sugerido por IA»** aparece en cada campo rellenado y se quita solo cuando el usuario lo edita (el valor actual deja de coincidir con el aplicado).
+- **Campos por completar (R2):** los vacíos y los de `missingFields` se resaltan con borde y texto (no solo color), más un aviso general. Los `warnings` del backend se muestran tal cual.
+- **Errores ramificados por `code`** (`error.body.code`), nunca por status: `AI_UNAVAILABLE`, `AI_TIMEOUT` y `OPPORTUNITY_TEXT_TOO_LONG` tienen mensaje propio; este último muestra el `message` del servidor (sin máximo fijo en el frontend). Sin `code` (400 de validación del DTO, 500, respuesta inesperada) → caso `UNKNOWN`; red caída (`HttpError(0)`) → caso `NETWORK`. En todos el formulario manual sigue usable y hay «reintentar» (R6).
+- **Privacidad (R3):** el texto, el resultado y los `warnings` viven en estado local del componente; no pasan por localStorage, sessionStorage ni el store del wizard. El texto se envía con `trim()`.
+- Pendiente de esta unidad: «Skills normalizadas» de extremo a extremo (depende de la unidad 8) y la verificación en navegador.
+
 ## Gherkin
 
 ```gherkin

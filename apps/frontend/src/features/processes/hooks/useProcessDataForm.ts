@@ -1,18 +1,16 @@
 import type { BaseSyntheticEvent, ChangeEvent } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useWatch, type FieldErrors } from 'react-hook-form';
-import { PROCESS_FIELD_IDS } from '../constants/processFieldIds';
+import { useForm, useWatch, type FieldErrors, type UseFormSetValue } from 'react-hook-form';
 import { buildProcessDataSchema, type TProcessDataValues } from '../schemas/processData.schema';
+import { focusFirstInvalid } from './focusFirstInvalid';
 import { noValidation } from './noValidationResolver';
 import { useOpportunityLimits } from './useOpportunityLimits';
 import { useWizardStore } from '../store/wizard.store';
 import type { TProcessCreatorRole } from '../types/processCreate.types';
-import { OPPORTUNITY_FIELD_ORDER, buildOpportunityBindings, type IOpportunityBindings, type TOpportunityField } from './opportunityBindings';
+import { buildOpportunityBindings, type IOpportunityBindings, type TOpportunityField } from './opportunityBindings';
 
 export type TProcessTextField = 'title' | 'clientName' | 'ownerPmId' | 'recruiterId';
 type TProcessFieldName = TProcessTextField | TOpportunityField;
-
-const FIELD_ORDER: readonly TProcessFieldName[] = ['title', 'clientName', 'ownerPmId', 'recruiterId', ...OPPORTUNITY_FIELD_ORDER];
 
 export interface IUseProcessDataForm {
   readonly values:       Readonly<Record<TProcessTextField, string>>;
@@ -22,15 +20,12 @@ export interface IUseProcessDataForm {
   readonly bannerCount:  number;
   readonly setField:     (name: TProcessTextField, value: string) => void;
   readonly onTextChange: (name: TProcessTextField) => (event: ChangeEvent<HTMLInputElement>) => void;
+  /** Escritura directa de cualquier campo (la usa el borrador de IA). */
+  readonly setValue:     UseFormSetValue<TProcessDataValues>;
   readonly touchField:   (name: TProcessFieldName) => void;
   readonly onSubmit:     (event?: BaseSyntheticEvent) => void;
   /** Sin los límites del servidor no se valida ni se envía. */
   readonly canSubmit:    boolean;
-}
-
-function focusFirstInvalid(invalid: FieldErrors<TProcessDataValues>): void {
-  const first = FIELD_ORDER.find(name => invalid[name]);
-  if (first) document.getElementById(PROCESS_FIELD_IDS[first])?.focus();
 }
 
 export function useProcessDataForm(role: TProcessCreatorRole): IUseProcessDataForm {
@@ -56,7 +51,7 @@ export function useProcessDataForm(role: TProcessCreatorRole): IUseProcessDataFo
   );
 
   return {
-    values, errors, opportunity, setField,
+    values, errors, opportunity, setField, setValue,
     bannerCount: submitCount > 0 ? Object.keys(errors).length : 0,
     touchField: name => { void trigger(name); },
     onTextChange: name => event => setField(name, event.target.value),

@@ -35,6 +35,8 @@ const BASE_ENV: Record<string, string> = {
   AI_RETRY_MAX_MS: '1',
   AI_TOTAL_TIMEOUT_MS: '2000',
   CV_MAX_FILE_BYTES: '4096',
+  OPPORTUNITY_DRAFT_MAX_TEXT_CHARS: '200',
+  OPPORTUNITY_DRAFT_TIMEOUT_MS: '1500',
 };
 
 export interface IAiTestContext {

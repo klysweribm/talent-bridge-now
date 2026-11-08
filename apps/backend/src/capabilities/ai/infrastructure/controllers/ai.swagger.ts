@@ -23,3 +23,13 @@ export const ApiAiAsk = (): MethodDecorator =>
     ApiResponse({ status: 429, description: 'Throttle excedido' }),
     ApiResponse({ status: 503, description: '{ ok: false, reason }: la IA no está disponible (nunca 401)' }),
   ) as MethodDecorator;
+
+export const ApiOpportunityDraft = (): MethodDecorator =>
+  applyDecorators(
+    ApiOperation({ summary: 'Borrador de oportunidad a partir de texto libre (no crea nada)' }),
+    ApiResponse({ status: 200, description: '{ draft, missingFields, warnings }: lo no inferido queda vacío' }),
+    ApiResponse({ status: 400, description: 'Texto vacío (validación) u OPPORTUNITY_TEXT_TOO_LONG: { code, message }' }),
+    ApiResponse({ status: 429, description: 'Throttle excedido' }),
+    ApiResponse({ status: 503, description: 'AI_UNAVAILABLE: { code, message } (nunca 401)' }),
+    ApiResponse({ status: 504, description: 'AI_TIMEOUT: { code, message }' }),
+  ) as MethodDecorator;

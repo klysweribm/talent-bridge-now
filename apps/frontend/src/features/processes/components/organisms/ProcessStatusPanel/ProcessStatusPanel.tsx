@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { IProcessDetail, TProcessStatus } from '@ibm-talent-bridge/shared-types';
-import { TERMINAL_PROCESS_STATUSES } from '@/config/processStatus';
 import { Button } from '@shared/components/atoms/Button';
 import { PROCESS_ACTIONS_COPY, TERMINAL_CONFIRM_COPY } from '../../../config/processActions.copy';
+import { useProcessLimits } from '../../../hooks/useProcessLimits';
 import { useUpdateProcess } from '../../../hooks/useUpdateProcess';
 import { ActionFeedback } from '../../molecules/ActionFeedback/ActionFeedback';
 import { ConfirmPanel } from '../../molecules/ConfirmPanel/ConfirmPanel';
@@ -17,18 +17,17 @@ const STATUS_SELECT_ID = 'process-status';
 
 export function ProcessStatusPanel({ process }: ProcessStatusPanelProps): JSX.Element {
   const [pending, setPending] = useState<TProcessStatus | null>(null);
+  const terminal = useProcessLimits().data?.terminalStatuses;
   const update = useUpdateProcess(process.id);
   const confirmCopy = pending ? TERMINAL_CONFIRM_COPY[pending] : undefined;
 
   const request = (status: TProcessStatus): void => {
     update.reset();
     if (status === process.status) return;
-    if (TERMINAL_PROCESS_STATUSES.includes(status)) setPending(status);
+    if (terminal?.includes(status)) setPending(status);
     else update.mutate({ status });
   };
-  const confirm = (): void => {
-    if (pending) update.mutate({ status: pending }, { onSettled: () => setPending(null) });
-  };
+  const confirm = (): void => { if (pending) update.mutate({ status: pending }, { onSettled: () => setPending(null) }); };
 
   return (
     <div className="flex flex-col gap-sm">

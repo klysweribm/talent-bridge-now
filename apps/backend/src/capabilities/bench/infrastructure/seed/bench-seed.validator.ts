@@ -1,6 +1,6 @@
 import type { IBenchResource } from '@ibm-talent-bridge/shared-types';
 import {
-  isBenchCode, isBenchStatus, isIsoDate, isLanguageLevel, isLocation, isNonEmptyArrayOf,
+  isBand, isBenchCode, isBenchStatus, isIsoDate, isLanguageLevel, isLocation, isNonEmptyArrayOf,
   isNonEmptyString, isRecord, isSeniority, isSkillLevel, type TRecord,
 } from './bench-seed.guards';
 
@@ -12,6 +12,7 @@ const FIELD_GUARDS: Readonly<Record<keyof TBenchSeedItem, (value: unknown) => bo
   primaryRole: isNonEmptyString,
   practice: isNonEmptyString,
   seniority: isSeniority,
+  band: isBand,
   skills: isNonEmptyArrayOf(isSkillLevel),
   languages: isNonEmptyArrayOf(isLanguageLevel),
   location: isLocation,

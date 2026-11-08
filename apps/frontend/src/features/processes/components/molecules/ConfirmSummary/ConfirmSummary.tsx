@@ -1,5 +1,6 @@
 import type { IProcessCandidateSummary } from '@ibm-talent-bridge/shared-types';
 import { CONFIRM_STEP_TEXT, WIZARD_TEXT } from '../../../config/processWizard.constants';
+import { formatStartDate } from '../../../utils/formatStartDate';
 import { ConfirmSection } from '../ConfirmSection';
 
 export interface ConfirmSummaryProps {
@@ -9,6 +10,7 @@ export interface ConfirmSummaryProps {
   readonly skills:          readonly string[];
   readonly roleDescription: string;
   readonly band?:           number;
+  readonly startDate?:      string;
   readonly userLabel:     string;
   readonly userName:      string;
   readonly candidates:    readonly IProcessCandidateSummary[];
@@ -32,6 +34,7 @@ export function ConfirmSummary(props: ConfirmSummaryProps): JSX.Element {
         <Row label={CONFIRM_STEP_TEXT.roleLabel} value={props.opportunityRole} />
         <Row label={CONFIRM_STEP_TEXT.skillsLabel} value={props.skills.join(', ')} />
         <Row label={CONFIRM_STEP_TEXT.bandLabel} value={props.band === undefined ? '' : CONFIRM_STEP_TEXT.band(props.band)} />
+        {props.startDate && <Row label={CONFIRM_STEP_TEXT.startDateLabel} value={formatStartDate(props.startDate)} />}
         <Row label={CONFIRM_STEP_TEXT.descriptionLabel} value={props.roleDescription} />
       </ConfirmSection>
       <ConfirmSection title={CONFIRM_STEP_TEXT.candidatesSection} editLabel={WIZARD_TEXT.edit} disabled={disabled} onEdit={props.onEditCandidates}>

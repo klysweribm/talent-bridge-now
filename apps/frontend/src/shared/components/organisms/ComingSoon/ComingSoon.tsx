@@ -1,5 +1,6 @@
 import type { JSX } from 'react';
 import { Icon } from '@shared/components/atoms/Icon';
+import { BRAND } from '@/config/brand';
 
 /**
  * ComingSoon — placeholder de marca para una sección protegida que todavía
@@ -19,8 +20,7 @@ export function ComingSoon({ label }: ComingSoonProps): JSX.Element {
       </span>
       <h1 className="text-headline-md text-text-primary">{label}</h1>
       <p className="text-body-md text-text-secondary max-w-[480px]">
-        Esta sección está en construcción. El equipo de IBM Talent Bridge está
-        trabajando en ella — vuelve pronto.
+        {`Esta sección está en construcción. El equipo de ${BRAND.productFullName} está trabajando en ella — vuelve pronto.`}
       </p>
     </div>
   );

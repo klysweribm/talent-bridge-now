@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useAuthStore } from '@features/auth/store/auth.store';
 import * as infra from '../../../infrastructure/processCreate.infra';
 import { useWizardStore } from '../../../store/wizard.store';
-import { OPPORTUNITY_FIXTURE, fillOpportunity, makePage, renderWithProviders } from '../../../test-utils';
+import { OPPORTUNITY_FIXTURE, fillOpportunity, makePage, mockProcessLimits, renderWithProviders } from '../../../test-utils';
 import { ProcessDataStep } from './ProcessDataStep';
 
 vi.mock('../../../infrastructure/processCreate.infra');
@@ -17,6 +17,7 @@ function loginAs(role: 'recruiter' | 'pm'): void {
 describe('ProcessDataStep', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    mockProcessLimits();
     vi.mocked(infra.fetchUserOptions).mockResolvedValue(USERS);
     useWizardStore.getState().reset();
   });
@@ -53,7 +54,7 @@ describe('ProcessDataStep', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
     expect(await screen.findByText('El título es obligatorio.')).toBeInTheDocument();
     expect(screen.getByText('El cliente es obligatorio.')).toBeInTheDocument();
-    expect(screen.getByText('Elige el PM responsable del proceso.')).toBeInTheDocument();
+    expect(screen.getByText('Elige el PM responsable de la oportunidad.')).toBeInTheDocument();
     expect(screen.getByText('Hay 7 errores en el formulario.')).toBeInTheDocument();
     ['El rol de la oportunidad es obligatorio.', 'Agrega al menos 1 tecnología.', 'Elige la banda profesional.', 'La descripción del rol es obligatoria.']
       .forEach(message => expect(screen.getByText(message)).toBeInTheDocument());
@@ -105,7 +106,40 @@ describe('ProcessDataStep', () => {
   it('should show the description character counter', async () => {
     loginAs('pm');
     renderWithProviders(<ProcessDataStep />);
-    await userEvent.type(screen.getByLabelText('Expectativas de evaluación técnica *'), 'abcd');
-    expect(screen.getByText(/4\/2000/)).toBeInTheDocument();
+    await userEvent.type(await screen.findByLabelText('Expectativas de evaluación técnica *'), 'abcd');
+    expect(await screen.findByText(/4\/2000/)).toBeInTheDocument();
+  });
+
+  describe('server limits', () => {
+    it('should show a loading state, no invented numbers and a disabled submit while limits are pending', async () => {
+      loginAs('pm');
+      vi.mocked(infra.fetchProcessLimits).mockReturnValue(new Promise(() => undefined));
+      renderWithProviders(<ProcessDataStep />);
+      expect(await screen.findByText('Cargando los límites del formulario…')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Siguiente' })).toBeDisabled();
+      expect(screen.queryByLabelText('Stack tecnológico *')).not.toBeInTheDocument();
+      expect(screen.queryByText(/\/2000/)).not.toBeInTheDocument();
+    });
+
+    it('should offer a retry when the limits fail and recover when it works', async () => {
+      loginAs('pm');
+      vi.mocked(infra.fetchProcessLimits).mockRejectedValueOnce(new Error('down'));
+      renderWithProviders(<ProcessDataStep />);
+      expect(await screen.findByText(/No se pudieron cargar los límites del formulario/)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Siguiente' })).toBeDisabled();
+      mockProcessLimits();
+      await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+      expect(await screen.findByLabelText('Stack tecnológico *')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Siguiente' })).toBeEnabled();
+    });
+
+    it('should lock the stack at the server cap, not at a local one (skillsMax 2)', async () => {
+      loginAs('pm');
+      mockProcessLimits({ opportunity: { skillsMax: 2 } });
+      renderWithProviders(<ProcessDataStep />);
+      await userEvent.type(await screen.findByLabelText('Stack tecnológico *'), 'A{Enter}B{Enter}');
+      expect(screen.getByLabelText('Stack tecnológico *')).toBeDisabled();
+      expect(screen.getByText('Alcanzaste el máximo de 2 tecnologías.')).toBeInTheDocument();
+    });
   });
 });

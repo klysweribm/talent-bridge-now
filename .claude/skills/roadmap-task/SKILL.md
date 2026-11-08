@@ -31,7 +31,7 @@ Delegates a task to the sub-agent whose own definition (`.claude/agents/*-task.m
    - Full-stack features: run the halves **sequentially**, never in parallel. Project principle: frontend first (mock-first), backend after. Pass the backend agent the list of `infrastructure/*.infra.ts` files + types the frontend agent produced, so the API matches the contract. Ask the user first whether to run both halves now or only the frontend one.
    - If the section explicitly crosses layers in a way the table doesn't capture, say so in the delegation prompt so the agent knows it may read one extra rule file.
 5. **Report** the sub-agent's result to the user. Don't re-read the files it touched to "double-check" — trust its gate output, and if it didn't paste gate results, ask it.
-6. **Reconcile tracking inline** (don't invoke `/update-roadmap` separately, don't spawn another agent): follow `.claude/skills/update-roadmap/SKILL.md` steps 3-7 using the verified-criteria report from step 4.
+6. **Reconcile tracking with `doc-keeper`** — only once the unit counts as closed (see `CLAUDE.md` → Definition of done: gates re-run by this session and green). Don't edit `ROADMAP.md` / `DEBT_TECH.md` / `docs/use-cases/` from the main session and don't invoke `/update-roadmap` separately. Launch `doc-keeper` with the `Agent` tool (it has no `Bash`, so pass everything in the prompt): the task id and its section, the verified / not done / not verifiable criteria from step 4, commit hashes or files touched, the gate numbers this session re-ran, what was verified and what was not, new or resolved debt, and any architecture decision. Then show the user its report (ALERTAs, proposed ADRs) and the docs diff before proposing commits.
 
 ## Restrictions
 

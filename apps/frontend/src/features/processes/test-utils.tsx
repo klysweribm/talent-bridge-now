@@ -1,8 +1,11 @@
+import { vi } from 'vitest';
 import { render, screen, type RenderResult } from '@testing-library/react';
 import type { UserEvent } from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import type { ReactElement, ReactNode } from 'react';
+import type { IProcessLimits } from '@ibm-talent-bridge/shared-types';
+import * as createInfra from './infrastructure/processCreate.infra';
 
 export function createWrapper(): ({ children }: { readonly children: ReactNode }) => JSX.Element {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -63,4 +66,22 @@ export async function fillOpportunity(user: UserEvent): Promise<void> {
   for (const skill of OPPORTUNITY_FIXTURE.skills) await user.type(screen.getByLabelText('Stack tecnológico *'), `${skill}{Enter}`);
   await user.click(screen.getByRole('radio', { name: 'Banda 8' }));
   await user.type(screen.getByLabelText('Expectativas de evaluación técnica *'), OPPORTUNITY_FIXTURE.roleDescription);
+}
+
+/** Respuesta exacta de `GET /processes/limits` del backend; ningún test repite estos números. */
+export const LIMITS_FIXTURE: IProcessLimits = {
+  maxCandidates: 5,
+  opportunity: { roleMax: 200, descriptionMax: 2000, skillsMin: 1, skillsMax: 15, skillMax: 60, bandMin: 6, bandMax: 10 },
+  technicalRefsMax: 2,
+  terminalStatuses: ['closed', 'cancelled'],
+};
+
+/** `LIMITS_FIXTURE` con cambios puntuales (p. ej. `skillsMax: 3`) para probar que el comportamiento sale del servidor. */
+export function makeLimits(overrides: Partial<Omit<IProcessLimits, 'opportunity'>> & { readonly opportunity?: Partial<IProcessLimits['opportunity']> } = {}): IProcessLimits {
+  return { ...LIMITS_FIXTURE, ...overrides, opportunity: { ...LIMITS_FIXTURE.opportunity, ...overrides.opportunity } };
+}
+
+/** Requiere `vi.mock('.../processCreate.infra')` en el test que lo usa. */
+export function mockProcessLimits(overrides: Parameters<typeof makeLimits>[0] = {}): void {
+  vi.mocked(createInfra.fetchProcessLimits).mockResolvedValue(makeLimits(overrides));
 }

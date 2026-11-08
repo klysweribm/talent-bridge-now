@@ -1,25 +1,12 @@
-import { useTodayInterviewsQuery } from '../../../hooks/useTodayInterviewsQuery';
+import { DASHBOARD_COPY } from '../../../config/dashboard.copy';
 import { DashboardSection } from '../../molecules/DashboardSection';
 import { EmptyMessage } from '../../molecules/EmptyMessage';
-import { TodayInterviewRow } from '../../molecules/TodayInterviewRow';
 
-export function TodayInterviewsList(): JSX.Element | null {
-  const { data } = useTodayInterviewsQuery();
-  if (!data) return null;
-
+// Sin capability de entrevistas: estado vacío honesto, no "No hay entrevistas hoy".
+export function TodayInterviewsList(): JSX.Element {
   return (
-    <DashboardSection
-      title="Entrevistas de hoy"
-      headingId="today-interviews-heading"
-      seeAll={{ to: '/interviews?date=today', label: 'Ver todas' }}
-    >
-      {data.length === 0 ? (
-        <EmptyMessage text="No hay entrevistas hoy." action={{ to: '/interviews', label: 'Ver agenda' }} />
-      ) : (
-        <ul className="flex flex-col gap-xs">
-          {data.map(interview => <TodayInterviewRow key={interview.id} interview={interview} />)}
-        </ul>
-      )}
+    <DashboardSection title={DASHBOARD_COPY.todayTitle} headingId="today-interviews-heading">
+      <EmptyMessage text={DASHBOARD_COPY.todayEmpty} />
     </DashboardSection>
   );
 }

@@ -15,10 +15,10 @@ export const HTTP_CONFLICT = 409;
 export const HTTP_UNAVAILABLE = 503;
 
 export const PROCESS_CREATE_ERRORS = {
-  candidateAlreadyAssigned: 'Uno o más candidatos ya pertenecen a otro proceso.',
-  candidateLimitExceeded:   'Superaste el máximo de candidatos permitido para un proceso.',
+  candidateAlreadyAssigned: 'Uno o más candidatos ya pertenecen a otra oportunidad.',
+  candidateLimitExceeded:   'Superaste el máximo de candidatos permitido para una oportunidad.',
   candidateNotFound:        'Uno o más candidatos seleccionados ya no existen.',
-  serviceUnavailable:       'No se pudo crear el proceso en este momento. No se guardó ningún cambio; intenta de nuevo.',
+  serviceUnavailable:       'No se pudo crear la oportunidad en este momento. No se guardó ningún cambio; intenta de nuevo.',
 } as const;
 
 export const PROCESS_DATA_ERRORS = {
@@ -26,7 +26,7 @@ export const PROCESS_DATA_ERRORS = {
   titleTooLong:     `El título admite hasta ${PROCESS_TEXT_MAX_LENGTH} caracteres.`,
   clientRequired:   'El cliente es obligatorio.',
   clientTooLong:    `El cliente admite hasta ${PROCESS_TEXT_MAX_LENGTH} caracteres.`,
-  ownerPmRequired:  'Elige el PM responsable del proceso.',
+  ownerPmRequired:  'Elige el PM responsable de la oportunidad.',
 } as const;
 
 /** Tamaño de página de los selectores de PM/reclutador (máximo del backend). */

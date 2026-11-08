@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useAuthStore } from '@features/auth/store/auth.store';
 import * as infra from '../../infrastructure/processCreate.infra';
 import { useWizardStore } from '../../store/wizard.store';
-import { OPPORTUNITY_FIXTURE, fillOpportunity, makeCandidate, makePage, renderAt } from '../../test-utils';
+import { OPPORTUNITY_FIXTURE, fillOpportunity, makeCandidate, makePage, mockProcessLimits, renderAt } from '../../test-utils';
 import { NewProcessPage } from './NewProcessPage';
 
 vi.mock('../../infrastructure/processCreate.infra');
@@ -16,7 +16,7 @@ describe('NewProcessPage', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     useWizardStore.getState().reset();
-    vi.mocked(infra.fetchProcessLimits).mockResolvedValue({ maxCandidates: 3 });
+    mockProcessLimits({ maxCandidates: 3 });
     vi.mocked(infra.fetchAvailableCandidates).mockResolvedValue(makePage([makeCandidate(1)]));
     vi.mocked(infra.createProcess).mockResolvedValue({ id: 'p1' } as Awaited<ReturnType<typeof infra.createProcess>>);
   });
@@ -26,9 +26,9 @@ describe('NewProcessPage', () => {
     useAuthStore.getState().setAuth({ id: 'me', email: 'm@ibm.com', role: 'pm', name: 'Yo' }, 't');
     vi.mocked(infra.fetchUserOptions).mockResolvedValue(makePage([]));
     show();
-    expect(screen.getByRole('heading', { level: 1, name: 'Nuevo proceso' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Nueva oportunidad' })).toBeInTheDocument();
     expect(screen.getByText('Datos').closest('li')).toHaveAttribute('aria-current', 'step');
-    expect(screen.getByRole('heading', { level: 2, name: 'Datos del proceso' })).toHaveFocus();
+    expect(screen.getByRole('heading', { level: 2, name: 'Datos de la oportunidad' })).toHaveFocus();
   });
 
   it('should complete the whole flow as a recruiter', async () => {
@@ -45,7 +45,7 @@ describe('NewProcessPage', () => {
     await userEvent.click(checkbox);
     await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
     expect(screen.getByRole('heading', { level: 2, name: 'Confirmar y crear' })).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Crear proceso' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Crear oportunidad' }));
     expect(await screen.findByText('detalle')).toBeInTheDocument();
     expect(infra.createProcess).toHaveBeenCalledWith({ title: 'Dev', clientName: 'Banco', ...OPPORTUNITY_FIXTURE, skills: ['Java', 'Spring'], ownerPmId: 'u2', candidateIds: ['c1'] });
   });
@@ -60,7 +60,7 @@ describe('NewProcessPage', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
     await userEvent.click(await screen.findByRole('button', { name: 'Siguiente' }));
     expect(screen.getByText('Aún sin candidatos')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Crear proceso' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Crear oportunidad' }));
     expect(await screen.findByText('detalle')).toBeInTheDocument();
     expect(infra.createProcess).toHaveBeenCalledWith({ title: 'Dev', clientName: 'Banco', ...OPPORTUNITY_FIXTURE, skills: ['Java', 'Spring'] });
   });

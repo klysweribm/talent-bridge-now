@@ -6,10 +6,10 @@ export interface IBreadcrumb {
 }
 
 const HOME_PATH = '/dashboard';
-const NEW_SEGMENT_LABEL = 'Nuevo proceso';
+const NEW_SEGMENT_LABEL = 'Nueva oportunidad';
 const NEW_CANDIDATE_SEGMENT_LABEL = 'Agregar candidato';
 const CANDIDATES_SECTION_PATH = '/candidates';
-const DETAIL_SEGMENT_LABEL = 'Detalle del proceso';
+const DETAIL_SEGMENT_LABEL = 'Detalle de la oportunidad';
 
 /**
  * Deriva el breadcrumb desde la URL. La sección sale de `NAVIGATION_ITEMS`

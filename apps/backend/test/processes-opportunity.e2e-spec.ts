@@ -16,6 +16,20 @@ describe('Processes opportunity fields', () => {
     expect(created).toMatchObject({ opportunityRole: OPPORTUNITY.opportunityRole, skills: ['React', 'AWS'], roleDescription: OPPORTUNITY.roleDescription, band: 8 });
   });
 
+  it('should store and return startDate, and read it as null when it was not sent', async () => {
+    const withDate = (await post({ ...BODY, startDate: '2026-12-01' }).expect(201)).body as IProcess;
+    expect(withDate.startDate).toBe('2026-12-01');
+    const without = (await post(BODY).expect(201)).body as IProcess;
+    expect(without.startDate).toBeNull();
+  });
+
+  it('should let a PATCH set startDate and reject an invalid one', async () => {
+    const created = (await post(BODY).expect(201)).body as IProcess;
+    const patch = (body: object): ReturnType<typeof as> => as(ctx, ctx.users.mariana, 'patch', `/processes/${created.id}`).send(body);
+    expect((await patch({ startDate: '2027-01-15' }).expect(200)).body).toMatchObject({ startDate: '2027-01-15' });
+    await patch({ startDate: '2026-02-30' }).expect(400);
+  });
+
   it.each(['opportunityRole', 'skills', 'roleDescription', 'band'])('should return 400 when %s is missing', async (field) => {
     const rest = Object.fromEntries(Object.entries(BODY).filter(([key]) => key !== field));
     await post(rest).expect(400);

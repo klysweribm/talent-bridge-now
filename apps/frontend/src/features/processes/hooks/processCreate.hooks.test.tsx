@@ -4,6 +4,8 @@ import type { ReactNode } from 'react';
 import { AVAILABLE_CANDIDATES_QUERY_KEY, USER_OPTIONS_PAGE_LIMIT } from '../config/processCreate.constants';
 import { PROCESS_LIST_QUERY_KEY } from '../config/processList.constants';
 import * as infra from '../infrastructure/processCreate.infra';
+import { useAuthStore } from '@features/auth/store/auth.store';
+import { LIMITS_FIXTURE, mockProcessLimits } from '../test-utils';
 import { useAvailableCandidates } from './useAvailableCandidates';
 import { useCreateProcess } from './useCreateProcess';
 import { useProcessLimits } from './useProcessLimits';
@@ -70,10 +72,20 @@ describe('process create hooks', () => {
   });
 
   describe('useProcessLimits', () => {
-    it('should load the limits', async () => {
-      vi.mocked(infra.fetchProcessLimits).mockResolvedValue({ maxCandidates: 5 });
+    beforeEach(() => { useAuthStore.setState({ user: { id: 'u', role: 'pm', email: 'u@ibm.com', name: 'u' }, token: 't' }); });
+    afterEach(() => useAuthStore.getState().clearAuth());
+
+    it('should never call the endpoint for a technical_ref (it answers 403)', () => {
+      useAuthStore.setState({ user: { id: 't', role: 'technical_ref', email: 't@ibm.com', name: 't' }, token: 't' });
       const { result } = renderHook(() => useProcessLimits(), { wrapper: setup().wrapper });
-      await waitFor(() => expect(result.current.data).toEqual({ maxCandidates: 5 }));
+      expect(result.current.fetchStatus).toBe('idle');
+      expect(infra.fetchProcessLimits).not.toHaveBeenCalled();
+    });
+
+    it('should load the limits', async () => {
+      mockProcessLimits();
+      const { result } = renderHook(() => useProcessLimits(), { wrapper: setup().wrapper });
+      await waitFor(() => expect(result.current.data).toEqual(LIMITS_FIXTURE));
     });
 
     it('should expose the error', async () => {

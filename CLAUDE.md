@@ -10,6 +10,7 @@ Sources of truth — read **by section**, never whole, unless the task is about 
 
 - `PROJECT_CONTEXT.md` — only a pointer table to the owner of each topic (it no longer holds context). Domain: pending (`docs/domain.md`); entity and role types: `packages/shared-types`; stack and decisions: `docs/architecture/README.md`.
 - `docs/use-cases/` — per-feature use cases by role (what each role can/can't do, edge cases, authz rules) — source of truth for `@Roles` guards and authz tests, more granular than `docs/flows/README.md`.
+- `docs/glossary.md` — single source of domain language (UI term ↔ code term, e.g. Oportunidad = `Process`; ADR-016).
 - `good-practices/BEST-PRACTICES.md` — conventions in long form with examples (§2 frontend, §2.7 cross-cutting, §3 backend, §4.bis Stitch mockups).
 - `.clinerules` — pointer for the other agent (Bob) to this file and `.claude/rules/`; nothing to keep in sync.
 
@@ -97,6 +98,11 @@ Start a task with `/roadmap-task <ID | "Etapa N" | next>`: it delegates to the m
 - New code has tests (every new component tier, every new service via fake ports); new backend input has a DTO.
 - No layer-skipping, no state mixing, no silent `catch {}`, no hardcoded config.
 - `ROADMAP.md` / `DEBT_TECH.md` updated if the task moved a criterion or created/resolved debt.
+- **Documentación: la lleva `doc-keeper`.** Al cerrar cada unidad, el orquestador lo invoca antes de proponer commits.
+  - *Unidad cerrada* = un bloque de trabajo entregado (un `*-task` terminado, un paso del plan) cuyos gates el orquestador volvió a ejecutar y están en verde. No cuenta: trabajo a medias, gates en rojo o sin re-ejecutar, ni un cambio que solo toca documentación.
+  - *Solo con los gates en verde.* Si algo está en rojo, se corrige primero; `doc-keeper` no documenta un estado inestable.
+  - *Qué se le pasa* (no tiene `Bash` ni el contexto de la sesión): resumen de la unidad, commits o archivos tocados, las cifras de gates que el orquestador ejecutó, **qué se verificó y qué no** (incluida la evidencia del usuario, si la hay), deuda nueva o resuelta y cualquier decisión de arquitectura.
+  - *Qué se hace con su reporte:* se muestran al usuario las ALERTAS (incongruencia código↔docs con archivo y línea) y los ADR en estado «Propuesto» (nunca aceptados por el agente), y su diff va en el commit de la unidad o en uno `docs:` aparte.
 
 ## Context & session workflow
 
@@ -108,5 +114,5 @@ See `.claude/memory/agentic-architecture.md` for the hub-and-spoke model (main s
 
 <!-- BEGIN TEMPORARY_SESSION_MEMORY -->
 Status: imported
-ImportedAt: 2026-11-02T00:38:21Z
+ImportedAt: 2026-11-03T20:34:35Z
 <!-- END TEMPORARY_SESSION_MEMORY -->

@@ -28,8 +28,8 @@ const PROCESSES_ROLES: readonly UserRole[] =
 
 // Rutas protegidas sin item de sidebar: mismos roles que /processes, sin pantalla real aún.
 const EXTRA_ROUTES: readonly Omit<IRouteConfig, 'element'>[] = [
-  { path: NEW_PROCESS_PATH,       label: 'Nuevo Proceso',       roles: PROCESSES_ROLES },
-  { path: `${PROCESSES_PATH}/:id`, label: 'Detalle del Proceso', roles: PROCESSES_ROLES },
+  { path: NEW_PROCESS_PATH,       label: 'Nueva oportunidad',       roles: PROCESSES_ROLES },
+  { path: `${PROCESSES_PATH}/:id`, label: 'Detalle de la oportunidad', roles: PROCESSES_ROLES },
   // CAND-2: alta de candidato; sin item de sidebar (el bottom-nav del reclutador ya tiene 5).
   { path: CANDIDATES_NEW_PATH,    label: 'Agregar candidato',   roles: PROCESSES_ROLES },
 ];

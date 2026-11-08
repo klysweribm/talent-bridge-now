@@ -4,6 +4,7 @@ import { StatusChip } from '@shared/components/atoms/StatusChip/StatusChip';
 import { PROCESS_DETAIL_CARD_COPY as COPY } from '../../../config/processDetailCard.copy';
 import { PROCESS_LIST_COPY, formatCandidateCount } from '../../../config/processList.constants';
 import { SkillChip } from '@shared/components/atoms/SkillChip/SkillChip';
+import { formatStartDate } from '../../../utils/formatStartDate';
 
 export interface ProcessDetailCardProps {
   readonly process: IProcessDetail;
@@ -63,6 +64,7 @@ export function ProcessDetailCard({ process }: ProcessDetailCardProps): JSX.Elem
       <dl className="grid grid-cols-1 sm:grid-cols-2 gap-md p-base rounded-lg bg-surface-low">
         <Fact label={COPY.client} value={process.clientName} />
         {process.band !== null && <Fact label={COPY.band} value={COPY.bandValue(process.band)} />}
+        {process.startDate !== null && <Fact label={COPY.startDate} value={formatStartDate(process.startDate)} />}
       </dl>
       <Sections process={process} />
     </article>

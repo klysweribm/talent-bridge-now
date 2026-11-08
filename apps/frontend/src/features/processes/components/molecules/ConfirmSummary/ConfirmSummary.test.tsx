@@ -29,4 +29,12 @@ describe('ConfirmSummary', () => {
     render(<ConfirmSummary {...PROPS} candidates={[]} />);
     expect(screen.getByText('Aún sin candidatos')).toBeInTheDocument();
   });
+
+  it('should show the start date only when one was chosen', () => {
+    const { rerender } = render(<ConfirmSummary {...PROPS} startDate="2026-12-01" />);
+    expect(screen.getByText('Fecha de inicio:')).toBeInTheDocument();
+    expect(screen.getByText('01/12/2026')).toBeInTheDocument();
+    rerender(<ConfirmSummary {...PROPS} />);
+    expect(screen.queryByText('Fecha de inicio:')).not.toBeInTheDocument();
+  });
 });

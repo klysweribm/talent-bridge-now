@@ -17,14 +17,14 @@ async function createOne(entry: Parameters<typeof renderPage>[1]): Promise<void>
 describe('CandidateReviewForm exit link by origin', () => {
   beforeEach(() => vi.resetAllMocks());
 
-  it('should offer "Volver al nuevo proceso" when coming from the new-process form', async () => {
+  it('should offer "Volver a la nueva oportunidad" when coming from the new-process form', async () => {
     await createOne({ pathname: '/candidates/new', state: { from: 'new-process' } });
-    expect(await screen.findByRole('link', { name: 'Volver al nuevo proceso' })).toHaveAttribute('href', '/processes/new');
+    expect(await screen.findByRole('link', { name: 'Volver a la nueva oportunidad' })).toHaveAttribute('href', '/processes/new');
   });
 
   it('should offer "Ver candidatos" otherwise', async () => {
     await createOne('/candidates/new');
     expect(await screen.findByRole('link', { name: 'Ver candidatos' })).toHaveAttribute('href', '/candidates');
-    expect(screen.queryByRole('link', { name: 'Volver al nuevo proceso' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Volver a la nueva oportunidad' })).not.toBeInTheDocument();
   });
 });

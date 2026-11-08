@@ -10,6 +10,7 @@ function validItem(overrides: Record<string, unknown> = {}): Record<string, unkn
     primaryRole: 'Backend Developer',
     practice: 'Application Development',
     seniority: 'sr',
+    band: 8,
     skills: [{ name: 'Java', level: 4, years: 6 }],
     languages: [{ code: 'es', level: 'native' }],
     location: { country: 'Argentina', city: 'Buenos Aires' },
@@ -35,6 +36,12 @@ describe('validateBenchSeed', () => {
       const count = (seniority: string): number => resources.filter((r) => r.seniority === seniority).length;
 
       expect([count('jr'), count('ssr'), count('sr'), count('lead')]).toEqual([6, 10, 10, 4]);
+    });
+
+    it('should give every resource an integer band between 6 and 10 consistent with its seniority', () => {
+      const allowed: Readonly<Record<string, readonly number[]>> = { jr: [6], ssr: [7], sr: [8, 9], lead: [10] };
+
+      expect(resources.every((r) => allowed[r.seniority].includes(r.band))).toBe(true);
     });
 
     it('should have at least 3 sr resources with Java and Spring Boot and one assigned with Java', () => {
@@ -67,6 +74,10 @@ describe('validateBenchSeed on arbitrary input', () => {
     expect(() => validateBenchSeed([validItem(), validItem({ benchCode: 'BN-0002', seniority: 'guru' })])).toThrow(
       /BN-0002.*seniority/,
     );
+  });
+
+  it.each([[5], [11], [7.5], ['8'], [undefined]])('should reject band %p', (band) => {
+    expect(() => validateBenchSeed([validItem({ benchCode: 'BN-0003', band })])).toThrow(/BN-0003.*band/);
   });
 
   it('should name the index when the benchCode is missing', () => {

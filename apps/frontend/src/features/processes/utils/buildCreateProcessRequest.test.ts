@@ -31,4 +31,11 @@ describe('buildCreateProcessRequest', () => {
   it('should refuse to build a request without band', () => {
     expect(() => buildCreateProcessRequest({ data: { ...BASE, band: undefined }, candidates: [] }, 'pm')).toThrow();
   });
+
+  it('should send startDate only when one was chosen', () => {
+    expect(buildCreateProcessRequest({ data: { ...BASE, startDate: '2026-12-01' }, candidates: [] }, 'pm')).toMatchObject({ startDate: '2026-12-01' });
+    ['', undefined].forEach(startDate => {
+      expect(Object.keys(buildCreateProcessRequest({ data: { ...BASE, startDate }, candidates: [] }, 'pm'))).not.toContain('startDate');
+    });
+  });
 });

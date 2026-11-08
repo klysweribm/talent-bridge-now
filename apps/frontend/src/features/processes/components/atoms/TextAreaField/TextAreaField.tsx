@@ -9,7 +9,7 @@ export interface TextAreaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaE
 
 export function TextAreaField({ id, label, error, hint, className = '', ...rest }: TextAreaFieldProps): JSX.Element {
   const messageId = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
-  const border = error ? 'border-2 border-status-danger' : 'border-[#8d8d8d]';
+  const border = error ? 'border-2 border-status-danger' : 'border-outline-field';
   return (
     <div className="flex flex-col gap-2xs">
       <label htmlFor={id} className="text-body-md font-medium text-text-primary">{label}</label>

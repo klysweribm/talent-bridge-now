@@ -5,9 +5,9 @@ export function buildInputClassName(hasError: boolean, hasIcon: boolean): string
   return [
     'w-full h-10 px-sm rounded text-body-md text-text-primary',
     'bg-surface-card border border-outline',
-    'placeholder:text-[#a8a8a8]',
+    'placeholder:text-text-placeholder',
     'focus:outline-2 focus:outline-primary-interactive focus:border-transparent',
-    hasError ? 'border-2 border-status-danger' : 'border-[#8d8d8d]',
+    hasError ? 'border-2 border-status-danger' : 'border-outline-field',
     hasIcon ? 'pl-8' : '',
   ].join(' ');
 }

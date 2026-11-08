@@ -6,12 +6,12 @@ describe('Breadcrumb', () => {
   it('should link parents and mark the last item as current page', () => {
     render(
       <MemoryRouter>
-        <Breadcrumb items={[{ label: 'Inicio', to: '/dashboard' }, { label: 'Procesos' }]} />
+        <Breadcrumb items={[{ label: 'Inicio', to: '/dashboard' }, { label: 'Oportunidades' }]} />
       </MemoryRouter>,
     );
 
     expect(screen.getByRole('link', { name: 'Inicio' })).toHaveAttribute('href', '/dashboard');
-    expect(screen.getByText('Procesos')).toHaveAttribute('aria-current', 'page');
-    expect(screen.queryByRole('link', { name: 'Procesos' })).not.toBeInTheDocument();
+    expect(screen.getByText('Oportunidades')).toHaveAttribute('aria-current', 'page');
+    expect(screen.queryByRole('link', { name: 'Oportunidades' })).not.toBeInTheDocument();
   });
 });

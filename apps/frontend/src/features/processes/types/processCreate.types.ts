@@ -20,4 +20,6 @@ export interface IProcessDataDraft {
   readonly skills:          readonly string[];
   readonly roleDescription: string;
   readonly band?:           number;
+  /** `YYYY-MM-DD`; '' o ausente = sin fecha de inicio. */
+  readonly startDate?:      string;
 }

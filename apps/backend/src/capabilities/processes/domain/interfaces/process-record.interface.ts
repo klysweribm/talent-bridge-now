@@ -11,6 +11,7 @@ export interface IProcessChanges {
   readonly skills?: readonly string[];
   readonly roleDescription?: string;
   readonly band?: number;
+  readonly startDate?: string;
   readonly recruiterId?: string;
   readonly status?: TProcessStatus;
   readonly candidateIds?: readonly string[];
@@ -26,6 +27,7 @@ export interface INewProcess {
   readonly skills: readonly string[];
   readonly roleDescription: string;
   readonly band: number;
+  readonly startDate?: string;
   readonly ownerPmId: string;
   readonly recruiterId: string | null;
   readonly createdBy: ICandidateActor;

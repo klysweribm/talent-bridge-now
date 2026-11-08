@@ -12,7 +12,7 @@ describe('CandidateFilter', () => {
   it('should report the chosen assignment (undefined for Todos)', async () => {
     const onChange = vi.fn();
     render(<CandidateFilter value={undefined} onChange={onChange} />);
-    await userEvent.click(screen.getByRole('button', { name: 'En un proceso' }));
+    await userEvent.click(screen.getByRole('button', { name: 'En una oportunidad' }));
     expect(onChange).toHaveBeenLastCalledWith('assigned');
     expect(screen.getByRole('button', { name: 'Todos' })).toHaveAttribute('aria-pressed', 'true');
   });

@@ -51,3 +51,20 @@ describe('CreateProcessDto opportunity fields', () => {
     expect(await errorsFor({ ...VALID, [field]: 'x'.repeat(max) })).toEqual([]);
   });
 });
+
+describe('CreateProcessDto startDate', () => {
+  it('should accept a body without startDate (it is optional)', async () => {
+    expect(await errorsFor(VALID)).toEqual([]);
+  });
+
+  it.each(['2026-12-01', '2027-01-31'])('should accept startDate %s', async (startDate) => {
+    expect(await errorsFor({ ...VALID, startDate })).toEqual([]);
+  });
+
+  it.each(['diciembre', '2026-12', '01/12/2026', '2026-02-30', '2026-13-01', '2026-12-32', '2026-12-01T10:00:00Z', 20261201, null, ''])(
+    'should reject startDate %p',
+    async (startDate) => {
+      expect(await errorsFor({ ...VALID, startDate })).toEqual(['startDate']);
+    },
+  );
+});

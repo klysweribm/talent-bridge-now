@@ -8,7 +8,7 @@ interface IWizardSnapshot {
 
 /** Arma el body de `POST /processes`: el reclutador manda ownerPmId; el PM, recruiterId solo si lo eligió. */
 export function buildCreateProcessRequest({ data, candidates }: IWizardSnapshot, role: TProcessCreatorRole): ICreateProcessRequest {
-  if (data.band === undefined) throw new Error('La banda es obligatoria para crear el proceso.');
+  if (data.band === undefined) throw new Error('La banda es obligatoria para crear la oportunidad.');
   return {
     title:           data.title,
     clientName:      data.clientName,
@@ -16,6 +16,7 @@ export function buildCreateProcessRequest({ data, candidates }: IWizardSnapshot,
     skills:          data.skills,
     roleDescription: data.roleDescription,
     band:            data.band,
+    ...(data.startDate ? { startDate: data.startDate } : {}),
     ...(role === 'recruiter' ? { ownerPmId: data.ownerPmId } : data.recruiterId ? { recruiterId: data.recruiterId } : {}),
     ...(candidates.length > 0 ? { candidateIds: candidates.map(candidate => candidate.id) } : {}),
   };

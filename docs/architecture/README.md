@@ -295,6 +295,18 @@ flowchart TB
   - ICA tarda (el tope total es de 90 s): la interfaz necesita un estado de espera claro.
 - **Consecuencias:** cambiar o añadir un extractor es añadir un adapter. El frontend pinta ambos resultados con los mismos componentes.
 
+### ADR-016: Process en código, Oportunidad en la interfaz (y taxonomía de skills)
+
+- **Estado:** Propuesto (2026-11-03). Pendiente de validar el término con LUC/GUS (ver `docs/glossary.md`).
+- **Contexto:** el negocio llama **Oportunidad** a lo que el código llama `Process` (tipo `IProcess`, rutas `/processes`, colección `processes`, estados `TProcessStatus`). Renombrar todo hoy toca el contrato público, los datos existentes y `shared-types`, sin aportar valor al usuario, y el término aún no está validado.
+- **Decisión:**
+  1. La interfaz dice "Oportunidad" (menú, títulos, botones, mensajes, estados vacíos). El código, las rutas, los endpoints, las colecciones y los tipos siguen diciendo `Process`.
+  2. Los textos visibles viven en archivos de copy por feature (`config/*.copy.ts`), así que el nombre visible se cambia en un solo lugar.
+  3. `docs/glossary.md` es la fuente única de la equivalencia.
+  4. **Taxonomía de skills (decisión tomada):** un catálogo canónico con alias en `apps/backend/src/shared/skills/`, importado directo (sin barrel) por `ai`, `bench` y `processes`. Se aplica al comparar en el match y a la salida del borrador de la IA. Las skills desconocidas se conservan tal cual, nunca se descartan. No se migran los datos existentes.
+- **Consecuencias:** la divergencia nombre visible / nombre en código es deliberada y queda documentada; cualquier texto nuevo debe usar "Oportunidad" y cualquier identificador nuevo, `Process`. Un test o revisión debe cazar el literal "proceso" en la interfaz.
+- **Criterio de migración futura del código:** renombrar el código (tipos, rutas, colecciones) solo si se cumplen las tres: (a) el negocio valida el término de forma definitiva, (b) hay una ventana en la que el cambio de contrato de la API no rompe a ningún consumidor, y (c) existe un plan de migración de la colección con reversa. Mientras tanto, no.
+
 ---
 
 ## Abierto — validar con sponsor/compliance

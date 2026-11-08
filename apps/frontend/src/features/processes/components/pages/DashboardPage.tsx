@@ -12,7 +12,7 @@ export function DashboardPage(): JSX.Element {
     <div className="px-xl py-lg flex flex-col gap-lg w-full max-w-7xl mx-auto">
       <header className="flex items-center justify-between gap-md">
         <h1 className="text-headline-md text-text-primary">Inicio</h1>
-        <Button icon="add" onClick={() => navigate('/processes/new')}>Nuevo Proceso</Button>
+        <Button icon="add" onClick={() => navigate('/processes/new')}>Nueva oportunidad</Button>
       </header>
       <SummaryCounters />
       <AttentionList />

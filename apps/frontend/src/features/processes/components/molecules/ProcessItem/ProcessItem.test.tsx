@@ -7,7 +7,7 @@ const MARTIN = { id: 'u1', fullName: 'Martín Rodríguez' };
 const SOFIA = { id: 'u2', fullName: 'Sofía Vega', avatarUrl: 'https://img.test/sofia.png' };
 
 const BASE: IProcessListItem = {
-  id: 'p9', title: 'QA Lead', clientName: 'ACME', ownerPmId: 'pm1', recruiterId: null, opportunityRole: 'QA Senior', skills: [], roleDescription: '', band: null, technicalRefIds: [], technicalRefs: [], status: 'interviewing',
+  id: 'p9', title: 'QA Lead', clientName: 'ACME', ownerPmId: 'pm1', recruiterId: null, opportunityRole: 'QA Senior', skills: [], roleDescription: '', band: null, startDate: null, technicalRefIds: [], technicalRefs: [], status: 'interviewing',
   maxCandidates: 5, candidateCount: 3, createdBy: 'u1',
   createdAt: '2026-03-05T12:00:00.000Z', updatedAt: '2026-03-05T12:00:00.000Z',
 };
@@ -57,8 +57,8 @@ describe('ProcessItem', () => {
 
   it('should link to the detail with an accessible name', () => {
     setup();
-    const link = screen.getByRole('link', { name: 'Ver proceso de QA Lead' });
+    const link = screen.getByRole('link', { name: 'Ver oportunidad de QA Lead' });
     expect(link).toHaveAttribute('href', '/processes/p9');
-    expect(link).toHaveTextContent('Ver proceso');
+    expect(link).toHaveTextContent('Ver oportunidad');
   });
 });

@@ -28,7 +28,7 @@ describe('CandidatesPage', () => {
   it.each([
     [undefined, 'Aún no hay candidatos'],
     ['available', 'No hay candidatos disponibles'],
-    ['assigned', 'Ningún candidato está en un proceso'],
+    ['assigned', 'Ningún candidato está en una oportunidad'],
   ])('should show the empty message for filter %s without duplicating the add link', async (assignment, message) => {
     fetchList.mockResolvedValue(makeListPage([], { totalPages: 0 }));
     renderAt(<CandidatesPage />, assignment ? `/candidates?assignment=${assignment}` : '/candidates');
@@ -70,6 +70,6 @@ describe('CandidatesPage', () => {
   it('should link an assigned candidate to its process', async () => {
     fetchList.mockResolvedValue(makeListPage([makeListItem({ processId: 'p7' })]));
     renderAt(<CandidatesPage />, '/candidates');
-    expect(await screen.findByRole('link', { name: 'En un proceso' })).toHaveAttribute('href', '/processes/p7');
+    expect(await screen.findByRole('link', { name: 'En una oportunidad' })).toHaveAttribute('href', '/processes/p7');
   });
 });

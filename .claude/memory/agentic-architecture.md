@@ -20,12 +20,14 @@ otro spoke directamente; siempre vuelve al hub, que decide el siguiente paso.
                     │  (decide qué y en    │     nunca delega la decisión,
                     │   qué orden)         │     solo la ejecución
                     └──────────┬──────────┘
-           ┌───────────┬───────┼───────┬───────────┐
-           ▼           ▼       ▼       ▼           ▼
-       Explore       Plan   frontend  backend    config
-      (solo lee,   (diseña,  -task    -task      -task
-       investiga)   no       (apps/   (apps/     (CI, Docker,
-                    escribe) frontend) backend)   good-practices/)
+     ┌──────────┬───────┬───────┼───────┬──────────┬────────────┐
+     ▼          ▼       ▼       ▼       ▼          ▼            ▼
+ Explore      Plan   frontend backend  config   doc-keeper
+(solo lee,  (diseña,  -task    -task    -task   (solo docs:
+ investiga)    no    (apps/   (apps/   (CI,     ROADMAP,
+             escribe) frontend) backend) Docker,  DEBT_TECH,
+                                       good-     use-cases)
+                                       practices/)
 ```
 
 ## Los spokes disponibles (`.claude/agents/*.md`)
@@ -37,9 +39,12 @@ otro spoke directamente; siempre vuelve al hub, que decide el siguiente paso.
 | `frontend-task` | Implementa en `apps/frontend` | Tareas de UI (`Etapa N`, `FE-*`) |
 | `backend-task` | Implementa en `apps/backend` | Tareas de API/dominio (`AUTH-*`, `PROC-*`, `CV-*`) |
 | `config-task` | Tooling, CI, Docker, `good-practices/` | Infra y gobierno (`HARDEN-*`, `DEPLOY-*`, Etapa 8) |
+| `doc-keeper` | Mantiene `ROADMAP.md`, `DEBT_TECH.md` y `docs/use-cases/` al día; propone ADRs; reporta incongruencias código↔docs. Sin `Bash`, nunca edita código | Al cerrar cada unidad de trabajo, **antes** de proponer commits (ver `CLAUDE.md` → Definition of done) |
 
 Cada `*-task` ya trae su propia lista de reglas a leer antes de escribir
 código (ver su frontmatter) — el hub no necesita repetírselas al delegar.
+
+`doc-keeper` es la excepción: no trae contexto de la sesión y no puede ejecutar git ni los gates (no tiene `Bash`). El hub le pasa todo en el prompt. Cuenta para el límite de concurrencia como cualquier spoke, pero como se invoca al cerrar una unidad, nunca coincide con el `*-task` de esa misma unidad.
 
 ## Límites (para evitar el 429 y no quemar tokens de más)
 

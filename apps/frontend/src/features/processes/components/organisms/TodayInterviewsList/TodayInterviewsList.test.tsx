@@ -1,22 +1,13 @@
-import { screen, within } from '@testing-library/react';
-import * as infra from '../../../infrastructure/processes.infra';
-import { renderWithProviders } from '../../../test-utils';
+import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { TodayInterviewsList } from './TodayInterviewsList';
 
 describe('TodayInterviewsList', () => {
-  afterEach(() => { vi.restoreAllMocks(); });
-
-  it('should render one row per interview', async () => {
-    renderWithProviders(<TodayInterviewsList />);
-    const section = await screen.findByRole('region', { name: 'Entrevistas de hoy' });
-    expect(within(section).getAllByRole('listitem').length).toBeGreaterThan(0);
-    expect(within(section).getByText('Sergio Vega')).toBeInTheDocument();
-  });
-
-  it('should show an empty state with an action', async () => {
-    vi.spyOn(infra, 'fetchTodayInterviews').mockResolvedValue([]);
-    renderWithProviders(<TodayInterviewsList />);
-    expect(await screen.findByText('No hay entrevistas hoy.')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Ver agenda' })).toBeInTheDocument();
+  it('should show an honest empty state and never claim there are no interviews today', () => {
+    render(<MemoryRouter><TodayInterviewsList /></MemoryRouter>);
+    expect(screen.getByRole('region', { name: 'Entrevistas de hoy' })).toBeInTheDocument();
+    expect(screen.getByText('El agendamiento de entrevistas estará disponible próximamente')).toBeInTheDocument();
+    expect(screen.queryByText(/no hay entrevistas/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('listitem')).not.toBeInTheDocument();
   });
 });

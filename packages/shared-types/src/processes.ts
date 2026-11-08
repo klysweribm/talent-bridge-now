@@ -4,9 +4,23 @@
 import type { ICandidateActor } from './candidates';
 import type { IUserProfile } from './users';
 
+/** Límites de la oportunidad (`GET /processes/limits`): origen único de los valores que valida el backend. */
+export interface IOpportunityLimits {
+  readonly roleMax: number;
+  readonly descriptionMax: number;
+  readonly skillsMin: number;
+  readonly skillsMax: number;
+  readonly skillMax: number;
+  readonly bandMin: number;
+  readonly bandMax: number;
+}
+
 /** Límites de procesos que el formulario necesita antes de que exista un proceso. */
 export interface IProcessLimits {
   readonly maxCandidates: number;
+  readonly opportunity: IOpportunityLimits;
+  readonly technicalRefsMax: number;
+  readonly terminalStatuses: readonly TProcessStatus[];
 }
 
 /**
@@ -29,6 +43,8 @@ export interface IProcess {
   readonly roleDescription: string;
   /** Banda de la oportunidad (entera); `null` solo en procesos legacy sin banda. Al escribir es siempre un entero. */
   readonly band: number | null;
+  /** Fecha de inicio (`YYYY-MM-DD`), opcional; `null` si no se indicó (incluye los procesos anteriores). */
+  readonly startDate: string | null;
   readonly candidateIds: readonly string[];
   /** Referentes técnicos asignados (máx. 2); los procesos anteriores no lo tienen: se leen como []. */
   readonly technicalRefIds: readonly string[];
@@ -49,6 +65,7 @@ export interface ICreateProcessRequest {
   readonly skills: readonly string[];
   readonly roleDescription: string;
   readonly band: number;
+  readonly startDate?: string;
   readonly ownerPmId?: string;
   readonly recruiterId?: string;
   readonly candidateIds?: readonly string[];
@@ -62,6 +79,7 @@ export interface IUpdateProcessRequest {
   readonly skills?: readonly string[];
   readonly roleDescription?: string;
   readonly band?: number;
+  readonly startDate?: string;
   readonly recruiterId?: string;
   readonly status?: TProcessStatus;
   /** Reemplaza el conjunto de referentes técnicos (máx. 2, activos); `[]` los quita todos. */

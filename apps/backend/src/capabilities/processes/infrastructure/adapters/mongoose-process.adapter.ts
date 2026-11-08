@@ -71,6 +71,7 @@ export class MongooseProcessAdapter implements IProcessRepositoryPort {
       skills: [...(document.skills ?? [])],
       roleDescription: document.roleDescription ?? '',
       band: document.band ?? null,
+      startDate: document.startDate ?? null,
       ownerPmId: document.ownerPmId,
       recruiterId: document.recruiterId ?? null,
       status: document.status ?? DEFAULT_PROCESS_STATUS,

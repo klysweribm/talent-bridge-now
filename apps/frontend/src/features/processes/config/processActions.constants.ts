@@ -8,13 +8,13 @@ export const PROCESS_ERROR_CODES = {
 } as const;
 
 export const PROCESS_ACTION_ERRORS = {
-  terminalState:            'El proceso ya está cerrado o cancelado y no admite más cambios.',
-  candidateLimit:           'Superaste el máximo de candidatos permitido para un proceso.',
-  candidateAlreadyAssigned: 'Uno o más candidatos ya pertenecen a otro proceso.',
-  releaseFailed:            'No se pudieron liberar los candidatos; el proceso no se canceló. Intenta de nuevo.',
+  terminalState:            'La oportunidad ya está cerrada o cancelada y no admite más cambios.',
+  candidateLimit:           'Superaste el máximo de candidatos permitido para una oportunidad.',
+  candidateAlreadyAssigned: 'Uno o más candidatos ya pertenecen a otra oportunidad.',
+  releaseFailed:            'No se pudieron liberar los candidatos; la oportunidad no se canceló. Intenta de nuevo.',
   invalidTechnicalRef:      'Alguno de los referentes técnicos ya no está disponible. Actualiza la lista y elige de nuevo.',
   serviceUnavailable:       'No se pudo guardar el cambio en este momento. No se modificó nada; intenta de nuevo.',
-  forbidden:                'No tienes permiso para realizar esta acción en este proceso.',
-  notFound:                 'El proceso o el candidato ya no existe.',
+  forbidden:                'No tienes permiso para realizar esta acción en esta oportunidad.',
+  notFound:                 'La oportunidad o el candidato ya no existe.',
   generic:                  'No se pudo completar la acción. Intenta de nuevo.',
 } as const;

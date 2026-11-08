@@ -1,6 +1,6 @@
 import type { ILanguageLevel, ISkillLevel } from '@ibm-talent-bridge/shared-types';
 import {
-  BENCH_SENIORITIES, BENCH_STATUSES, LANGUAGE_PROFICIENCIES, SKILL_LEVEL_VALUES,
+  BENCH_BAND_MAX, BENCH_BAND_MIN, BENCH_SENIORITIES, BENCH_STATUSES, LANGUAGE_PROFICIENCIES, SKILL_LEVEL_VALUES,
 } from '../../domain/constants/bench.constants';
 
 export type TRecord = Readonly<Record<string, unknown>>;
@@ -26,6 +26,9 @@ export const isOneOf = <T extends string>(allowed: readonly T[]) => (value: unkn
 
 export const isSeniority = isOneOf(BENCH_SENIORITIES);
 export const isBenchStatus = isOneOf(BENCH_STATUSES);
+
+export const isBand = (value: unknown): value is number =>
+  Number.isInteger(value) && (value as number) >= BENCH_BAND_MIN && (value as number) <= BENCH_BAND_MAX;
 
 export const isSkillLevel = (value: unknown): value is ISkillLevel =>
   isRecord(value) &&

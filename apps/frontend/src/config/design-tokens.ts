@@ -1,5 +1,5 @@
 /**
- * Design tokens centralizados — IBM Talent Bridge
+ * Design tokens centralizados — IBM Future Now Portal
  * Fuente de verdad: DESIGN/stitch_ibm_talent_bridge_portal/ibm_talent_bridge/DESIGN.md
  * Estos valores se usan en componentes que necesitan acceso programático
  * (ej: StageChip, StatusBadge con variantes dinámicas).

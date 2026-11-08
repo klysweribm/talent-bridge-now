@@ -41,6 +41,7 @@ export const colors = {
   text: {
     primary:   '#161616',
     secondary: '#525252',
+    placeholder: '#a8a8a8',
     on:        '#1a1c1c',
     'on-variant': '#434655',
   },

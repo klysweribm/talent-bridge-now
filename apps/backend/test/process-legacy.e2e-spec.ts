@@ -24,7 +24,7 @@ describe('Legacy processes without opportunity fields', () => {
   it('should read the detail and the list with neutral values', async () => {
     const id = await insertLegacy();
     const detail = (await as(ctx, ctx.users.ana, 'get', `/processes/${id}`).expect(200)).body as IProcessDetail;
-    expect(detail).toMatchObject({ opportunityRole: '', skills: [], roleDescription: '', band: null });
+    expect(detail).toMatchObject({ opportunityRole: '', skills: [], roleDescription: '', band: null, startDate: null });
     const list = (await as(ctx, ctx.users.ana, 'get', '/processes').expect(200)).body as PaginatedResponse<IProcessListItem>;
     expect(list.data.find((item) => item.id === id)).toMatchObject({ skills: [], band: null });
   });

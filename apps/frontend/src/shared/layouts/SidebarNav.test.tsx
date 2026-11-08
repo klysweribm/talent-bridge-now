@@ -1,3 +1,4 @@
+import { BRAND } from '@/config/brand';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -21,7 +22,7 @@ describe('SidebarNav', () => {
   it('should show the single brand, role navigation and user footer', () => {
     renderSidebar('technical_ref');
 
-    expect(screen.getByText('IBM Talent Bridge')).toBeInTheDocument();
+    expect(screen.getByText(BRAND.productFullName)).toBeInTheDocument();
     const nav = within(screen.getByRole('navigation', { name: 'Navegación principal' }));
     expect(nav.getAllByRole('link').map(l => l.getAttribute('aria-label')))
       .toEqual(['Inicio', 'Entrevistas', 'Feedback']);
@@ -54,6 +55,6 @@ describe('SidebarNav', () => {
 
     expect(useUiStore.getState().sidebarCollapsed).toBe(true);
     expect(screen.getByRole('button', { name: 'Expandir menú' })).toBeInTheDocument();
-    expect(screen.queryByText('IBM Talent Bridge')).toBeVisible();
+    expect(screen.queryByText(BRAND.productFullName)).toBeVisible();
   });
 });

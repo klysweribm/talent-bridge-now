@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useLocation } from 'react-router-dom';
 import * as infra from '../../../infrastructure/processCreate.infra';
 import { useWizardStore } from '../../../store/wizard.store';
-import { makeCandidate, makePage, renderWithProviders } from '../../../test-utils';
+import { makeCandidate, makePage, mockProcessLimits, renderWithProviders } from '../../../test-utils';
 import { ProcessCandidatesStep } from './ProcessCandidatesStep';
 
 function LocationStateProbe(): JSX.Element {
@@ -17,7 +17,7 @@ describe('ProcessCandidatesStep', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     useWizardStore.getState().reset();
-    vi.mocked(infra.fetchProcessLimits).mockResolvedValue({ maxCandidates: 2 });
+    mockProcessLimits({ maxCandidates: 2 });
     vi.mocked(infra.fetchAvailableCandidates).mockResolvedValue(makePage([makeCandidate(1), makeCandidate(2), makeCandidate(3)]));
   });
 

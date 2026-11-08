@@ -6,9 +6,10 @@ export interface CounterCardProps {
   readonly value: number | string;
   readonly to: string;
   readonly icon: string;
+  readonly hint?: string;
 }
 
-export function CounterCard({ label, value, to, icon }: CounterCardProps): JSX.Element {
+export function CounterCard({ label, value, to, icon, hint }: CounterCardProps): JSX.Element {
   return (
     <Link
       to={to}
@@ -20,6 +21,7 @@ export function CounterCard({ label, value, to, icon }: CounterCardProps): JSX.E
         {label}
       </span>
       <span className="text-display-xl text-text-primary">{value}</span>
+      {hint && <span className="text-body-sm text-text-secondary">{hint}</span>}
     </Link>
   );
 }

@@ -12,6 +12,7 @@ function resource(benchCode: string): IBenchResource {
     primaryRole: 'Backend Developer',
     practice: 'Application Development',
     seniority: 'sr',
+    band: 8,
     skills: [{ name: 'Java', level: 4, years: 6 }],
     languages: [{ code: 'es', level: 'native' }],
     location: { country: 'Argentina', city: 'Buenos Aires' },

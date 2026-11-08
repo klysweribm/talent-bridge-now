@@ -20,6 +20,7 @@ export function ProcessEditPanel({ process }: ProcessEditPanelProps): JSX.Elemen
   const initial = {
     title: process.title, clientName: process.clientName, opportunityRole: process.opportunityRole,
     skills: process.skills, roleDescription: process.roleDescription, band: process.band ?? undefined,
+    startDate: process.startDate ?? undefined,
   };
   const form = useProcessEditForm(initial, values => {
     const request = buildUpdateProcessRequest(initial, values);

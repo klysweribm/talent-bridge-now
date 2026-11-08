@@ -7,7 +7,7 @@ describe('Topbar', () => {
     render(<MemoryRouter initialEntries={['/processes/new']}><Topbar /></MemoryRouter>);
 
     expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeInTheDocument();
-    expect(screen.getByText('Nuevo proceso')).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('Nueva oportunidad')).toHaveAttribute('aria-current', 'page');
     expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });

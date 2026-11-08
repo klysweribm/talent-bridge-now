@@ -25,7 +25,7 @@ export function ProcessEditFields({ form, busy, onSubmit, onCancel }: ProcessEdi
         onChange={onTextChange('clientName')} onBlur={() => touchField('clientName')} />
       <OpportunityFields bindings={form.opportunity} />
       <div className="flex flex-wrap gap-sm">
-        <Button type="submit" className="min-h-11" disabled={busy}>{busy ? COPY.saving : COPY.save}</Button>
+        <Button type="submit" className="min-h-11" disabled={busy || !form.canSubmit}>{busy ? COPY.saving : COPY.save}</Button>
         <Button type="button" variant="secondary" className="min-h-11" disabled={busy} onClick={onCancel}>{COPY.cancel}</Button>
       </div>
     </form>

@@ -5,6 +5,7 @@
     "primaryRole": "Java Developer",
     "practice": "Application Development",
     "seniority": "jr",
+    "band": 6,
     "skills": [
       {
         "name": "Java",
@@ -46,6 +47,7 @@
     "primaryRole": "Frontend Developer",
     "practice": "Application Development",
     "seniority": "jr",
+    "band": 6,
     "skills": [
       {
         "name": "React",
@@ -87,6 +89,7 @@
     "primaryRole": "QA Automation Engineer",
     "practice": "Quality Engineering",
     "seniority": "jr",
+    "band": 6,
     "skills": [
       {
         "name": "Selenium",
@@ -128,6 +131,7 @@
     "primaryRole": "Python Developer",
     "practice": "Data & AI",
     "seniority": "jr",
+    "band": 6,
     "skills": [
       {
         "name": "Python",
@@ -169,6 +173,7 @@
     "primaryRole": "Salesforce Developer",
     "practice": "CRM",
     "seniority": "jr",
+    "band": 6,
     "skills": [
       {
         "name": "Salesforce",
@@ -214,6 +219,7 @@
     "primaryRole": "DevOps Engineer",
     "practice": "Cloud & Infrastructure",
     "seniority": "jr",
+    "band": 6,
     "skills": [
       {
         "name": "Docker",
@@ -255,6 +261,7 @@
     "primaryRole": "Node.js Developer",
     "practice": "Application Development",
     "seniority": "ssr",
+    "band": 7,
     "skills": [
       {
         "name": "Node.js",
@@ -301,6 +308,7 @@
     "primaryRole": "Angular Developer",
     "practice": "Application Development",
     "seniority": "ssr",
+    "band": 7,
     "skills": [
       {
         "name": "Angular",
@@ -342,6 +350,7 @@
     "primaryRole": "Java Developer",
     "practice": "Application Development",
     "seniority": "ssr",
+    "band": 7,
     "skills": [
       {
         "name": "Java",
@@ -388,6 +397,7 @@
     "primaryRole": ".NET Developer",
     "practice": "Application Development",
     "seniority": "ssr",
+    "band": 7,
     "skills": [
       {
         "name": ".NET",
@@ -433,6 +443,7 @@
     "primaryRole": "Data Engineer",
     "practice": "Data & AI",
     "seniority": "ssr",
+    "band": 7,
     "skills": [
       {
         "name": "Python",
@@ -479,6 +490,7 @@
     "primaryRole": "SAP Consultant",
     "practice": "ERP",
     "seniority": "ssr",
+    "band": 7,
     "skills": [
       {
         "name": "SAP",
@@ -520,6 +532,7 @@
     "primaryRole": "QA Automation Engineer",
     "practice": "Quality Engineering",
     "seniority": "ssr",
+    "band": 7,
     "skills": [
       {
         "name": "Selenium",
@@ -566,6 +579,7 @@
     "primaryRole": "React Developer",
     "practice": "Application Development",
     "seniority": "ssr",
+    "band": 7,
     "skills": [
       {
         "name": "React",
@@ -612,6 +626,7 @@
     "primaryRole": "Salesforce Developer",
     "practice": "CRM",
     "seniority": "ssr",
+    "band": 7,
     "skills": [
       {
         "name": "Salesforce",
@@ -653,6 +668,7 @@
     "primaryRole": "DevOps Engineer",
     "practice": "Cloud & Infrastructure",
     "seniority": "ssr",
+    "band": 7,
     "skills": [
       {
         "name": "OpenShift",
@@ -699,6 +715,7 @@
     "primaryRole": "Java Architect",
     "practice": "Application Development",
     "seniority": "sr",
+    "band": 8,
     "skills": [
       {
         "name": "Java",
@@ -745,6 +762,7 @@
     "primaryRole": "Java Developer",
     "practice": "Application Development",
     "seniority": "sr",
+    "band": 9,
     "skills": [
       {
         "name": "Java",
@@ -791,6 +809,7 @@
     "primaryRole": "Java Developer",
     "practice": "Application Development",
     "seniority": "sr",
+    "band": 8,
     "skills": [
       {
         "name": "Java",
@@ -837,6 +856,7 @@
     "primaryRole": "Java Developer",
     "practice": "Application Development",
     "seniority": "sr",
+    "band": 9,
     "skills": [
       {
         "name": "Java",
@@ -882,6 +902,7 @@
     "primaryRole": "Node.js Architect",
     "practice": "Application Development",
     "seniority": "sr",
+    "band": 8,
     "skills": [
       {
         "name": "Node.js",
@@ -928,6 +949,7 @@
     "primaryRole": "Mainframe Developer",
     "practice": "Legacy Modernization",
     "seniority": "sr",
+    "band": 9,
     "skills": [
       {
         "name": "COBOL",
@@ -969,6 +991,7 @@
     "primaryRole": "SAP Consultant",
     "practice": "ERP",
     "seniority": "sr",
+    "band": 8,
     "skills": [
       {
         "name": "SAP",
@@ -1015,6 +1038,7 @@
     "primaryRole": "Data Scientist",
     "practice": "Data & AI",
     "seniority": "sr",
+    "band": 9,
     "skills": [
       {
         "name": "Python",
@@ -1061,6 +1085,7 @@
     "primaryRole": "DevOps Engineer",
     "practice": "Cloud & Infrastructure",
     "seniority": "sr",
+    "band": 8,
     "skills": [
       {
         "name": "OpenShift",
@@ -1111,6 +1136,7 @@
     "primaryRole": "QA Lead",
     "practice": "Quality Engineering",
     "seniority": "sr",
+    "band": 9,
     "skills": [
       {
         "name": "Selenium",
@@ -1157,6 +1183,7 @@
     "primaryRole": "Technical Lead",
     "practice": "Application Development",
     "seniority": "lead",
+    "band": 10,
     "skills": [
       {
         "name": "Java",
@@ -1203,6 +1230,7 @@
     "primaryRole": "Cloud Solution Lead",
     "practice": "Cloud & Infrastructure",
     "seniority": "lead",
+    "band": 10,
     "skills": [
       {
         "name": "OpenShift",
@@ -1249,6 +1277,7 @@
     "primaryRole": "Delivery Lead",
     "practice": "Application Development",
     "seniority": "lead",
+    "band": 10,
     "skills": [
       {
         "name": "React",
@@ -1295,6 +1324,7 @@
     "primaryRole": "Salesforce Architect",
     "practice": "CRM",
     "seniority": "lead",
+    "band": 10,
     "skills": [
       {
         "name": "Salesforce",

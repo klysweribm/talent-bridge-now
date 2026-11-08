@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { BRAND } from '@/config/brand';
 import { ComingSoon } from './ComingSoon';
 
 describe('ComingSoon', () => {
@@ -10,5 +11,10 @@ describe('ComingSoon', () => {
   it('should render an explanatory message', () => {
     render(<ComingSoon label="Candidatos" />);
     expect(screen.getByText(/en construcción/i)).toBeInTheDocument();
+  });
+
+  it('should name the product from the brand config', () => {
+    render(<ComingSoon label="Candidatos" />);
+    expect(screen.getByText(new RegExp(`El equipo de ${BRAND.productFullName} está`))).toBeInTheDocument();
   });
 });

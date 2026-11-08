@@ -11,7 +11,7 @@ jest.setTimeout(30_000);
 /** Modo ica-text: el texto del CV se extrae en local y viaja en línea; nunca se sube el archivo. */
 describe('POST /candidates/cv-extraction mode ica-text', () => {
   const fake = fakeAiPort();
-  const fixture = (name: string): Buffer => readFileSync(join(__dirname, '../src/capabilities/candidates/testing/fixtures', name));
+  const fixture = (name: string): Buffer => readFileSync(join(__dirname, '../src/shared/document-text/testing/fixtures', name));
   let ctx: IAiTestContext;
   beforeAll(async () => { ctx = await buildAiApp('cvtext', fake.port); });
   afterAll(() => closeAiApp(ctx));

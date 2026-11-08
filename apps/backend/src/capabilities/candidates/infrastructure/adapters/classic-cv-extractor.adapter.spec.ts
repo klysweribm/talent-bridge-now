@@ -5,14 +5,14 @@ import type { ISkillCatalogPort } from '../../application/ports/skill-catalog.po
 import type { ICvFile } from '../../domain/interfaces/cv-file.interface';
 import { CV_DOCX_MIME, CV_PDF_MIME } from '../../domain/constants/cv.constants';
 import type { TAiUnavailableReason } from '@ibm-talent-bridge/shared-types';
-import type { ICvTextExtractorPort } from '../../application/ports/cv-text-extractor.port';
+import type { IDocumentTextExtractorPort } from '../../../../shared/document-text/document-text-extractor.port';
 import { ClassicCvExtractor } from './classic-cv-extractor.adapter';
 import type { CvIcaDraftService, TIcaDraftOutcome } from './cv-ica-draft.service';
-import { LocalCvTextExtractor } from './local-cv-text-extractor.adapter';
+import { LocalDocumentTextExtractor } from '../../../../shared/document-text/local-document-text-extractor.adapter';
 
 // CV inventados (Lucia Fernandez Ortega): ningún dato real.
 const fixture = (name: string, mimeType: string): ICvFile => ({
-  filename: name, mimeType, data: new Uint8Array(readFileSync(join(__dirname, '../../testing/fixtures', name))),
+  filename: name, mimeType, data: new Uint8Array(readFileSync(join(__dirname, '../../../../shared/document-text/testing/fixtures', name))),
 });
 const PDF = fixture('cv-sintetico.pdf', CV_PDF_MIME);
 const DOCX = fixture('cv-sintetico.docx', CV_DOCX_MIME);
@@ -24,7 +24,7 @@ const icaOff = (reason: TAiUnavailableReason = 'NOT_CONFIGURED'): CvIcaDraftServ
 
 function withIca(outcome: TIcaDraftOutcome | Error): { extractor: ClassicCvExtractor; draftFromText: jest.Mock } {
   const draftFromText = outcome instanceof Error ? jest.fn().mockRejectedValue(outcome) : jest.fn().mockResolvedValue(outcome);
-  const text: ICvTextExtractorPort = { extractText: jest.fn().mockResolvedValue(
+  const text: IDocumentTextExtractorPort = { extractText: jest.fn().mockResolvedValue(
     'Lucia Fernandez Ortega\nlucia.fernandez.demo@example.com\n+54 11 5555-0142\nSkills: Java, Kafka',
   ) };
   return { extractor: new ClassicCvExtractor(catalog(), text, { draftFromText } as unknown as CvIcaDraftService), draftFromText };
@@ -32,7 +32,7 @@ function withIca(outcome: TIcaDraftOutcome | Error): { extractor: ClassicCvExtra
 
 describe('ClassicCvExtractor', () => {
   it.each([['PDF', PDF], ['DOCX', DOCX]])('should extract the profile from a %s with extractor "classic"', async (_label, file) => {
-    const extractor = new ClassicCvExtractor(catalog(), new LocalCvTextExtractor(), icaOff());
+    const extractor = new ClassicCvExtractor(catalog(), new LocalDocumentTextExtractor(), icaOff());
 
     const outcome = await extractor.extract(file);
 
@@ -49,7 +49,7 @@ describe('ClassicCvExtractor', () => {
   });
 
   it('should report what it could not fill in missingFields', async () => {
-    const outcome = await new ClassicCvExtractor(catalog(), new LocalCvTextExtractor(), icaOff()).extract(PDF);
+    const outcome = await new ClassicCvExtractor(catalog(), new LocalDocumentTextExtractor(), icaOff()).extract(PDF);
 
     expect(outcome.ok && outcome.result.missingFields).toEqual(
       expect.arrayContaining(['seniority', 'yearsExperience', 'languages', 'education', 'experience', 'summary']),
@@ -59,7 +59,7 @@ describe('ClassicCvExtractor', () => {
   it('should still extract contact data when the skill catalog is unavailable, and warn', async () => {
     const failing: ISkillCatalogPort = { list: jest.fn().mockRejectedValue(new Error('bench down')) };
 
-    const outcome = await new ClassicCvExtractor(failing, new LocalCvTextExtractor(), icaOff()).extract(DOCX);
+    const outcome = await new ClassicCvExtractor(failing, new LocalDocumentTextExtractor(), icaOff()).extract(DOCX);
 
     expect(outcome.ok && outcome.result.draft.email).toBe('lucia.fernandez.demo@example.com');
     expect(outcome.ok && outcome.result.draft.skills).toBeUndefined();
@@ -69,7 +69,7 @@ describe('ClassicCvExtractor', () => {
   it('should reject a file with a valid signature but unreadable content with a 400', async () => {
     const corrupt: ICvFile = { filename: 'cv.pdf', mimeType: CV_PDF_MIME, data: new Uint8Array(Buffer.from('%PDF-1.4 basura no valida')) };
 
-    await expect(new ClassicCvExtractor(catalog(), new LocalCvTextExtractor(), icaOff()).extract(corrupt)).rejects.toBeInstanceOf(BadRequestException);
+    await expect(new ClassicCvExtractor(catalog(), new LocalDocumentTextExtractor(), icaOff()).extract(corrupt)).rejects.toBeInstanceOf(BadRequestException);
   });
 });
 

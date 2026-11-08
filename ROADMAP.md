@@ -4,7 +4,7 @@
 > `good-practices/DEBT_TECH.md` y `docs/use-cases/`. El encuadre anterior (procesos → candidatos → entrevistas →
 > feedback → reportes) espera el replanning Bench First.
 >
-> **Última actualización:** 2026-11-08 (OPP-AI-1 unidad 5.5 cerrada en `feature/OPP-AI-1` (refactor `shared/document-text`, sin commitear al escribir esto); la unidad 5 sigue sin verificar en navegador; sigue la 6)
+> **Última actualización:** 2026-11-08 (OPP-AI-1 unidad 5.5 cerrada en `feature/OPP-AI-1` (refactor `shared/document-text`, `aa1b8d5`); la unidad 5 sigue sin verificar en navegador; sigue la 6)
 
 **Cómo se mantiene:** al cerrar algo, se baja a «✅ Cerrado» en una línea y se quita de «Qué falta». Lo pendiente nunca se entierra bajo lo hecho.
 
@@ -32,7 +32,7 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 | 1-3.5 | Glosario/ADR-016, textos «Oportunidad», banda, módulo skills, `band` y `startDate` | U0-U3 (insumos) | ✅ en `main` (PR #7) |
 | 4 | Backend `POST /ai/opportunity-draft`: esquema validado, `normalizeSkills`, tope de texto y timeout por ConfigService (+ `.env.example` y compose en el mismo commit), `AI_UNAVAILABLE`/`AI_TIMEOUT`/`OPPORTUNITY_TEXT_TOO_LONG`; pm+recruiter, technical_ref 403, sin token 401 | U1 | ✅ (`401336a` y `4eb4858`; FlowLog sin cuerpos: DT-055, `576a69e`) |
 | 5 | Frontend box mágico: rellena solo campos vacíos con «Sugerido por IA» y no crea nada | U1 | ✅ (`2d750e3`; sin verificar en navegador) |
-| 5.5 | Refactor `src/shared/document-text` tras un puerto (hoy consumido por candidates; ai lo importará en la 6), sin cambio de comportamiento; causa de los 4 tests PDF explicada | U2 (prerrequisito) | ✅ (sin commitear al cerrar el documento) |
+| 5.5 | Refactor `src/shared/document-text` tras un puerto (hoy consumido por candidates; ai lo importará en la 6), sin cambio de comportamiento; causa de los 4 tests PDF explicada | U2 (prerrequisito) | ✅ (`aa1b8d5`) |
 | 6 | Backend `POST /ai/opportunity-draft/file` (PDF/DOCX/MD/TXT en memoria; 422 `OPPORTUNITY_SOURCE_UNREADABLE`) | U2 | 📌 SIGUIENTE |
 | 7 | Frontend dropzone de brochure (generaliza el existente) | U2 | 📌 |
 | 8 | Backend `POST /bench/match`: 60 % skills, 25 % banda, 15 % disponibilidad, determinístico; ICA solo explica | U3 | 📌 |

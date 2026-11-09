@@ -11,11 +11,11 @@ export const DRAFT_COPY = {
   noticesLabel:   'Avisos del borrador de IA',
   generating:     'Generando…',
   retry:          'Reintentar',
-  suggestedBadge: 'Sugerido por IA',
+  suggestedBadge: 'Sugerido por ICA',
   missingHint:    'La IA no pudo inferirlo: complétalo',
   missingNotice:  (labels: readonly string[]): string => `Por completar (la IA no pudo inferirlos): ${labels.join(', ')}.`,
   skippedNotice:  (labels: readonly string[]): string => `No sobrescrito (ya tenía valor): ${labels.join(', ')}.`,
-  appliedNotice:  'Revisa los campos marcados «Sugerido por IA» antes de continuar.',
+  appliedNotice:  'Revisa los campos marcados «Sugerido por ICA» antes de continuar.',
   fieldLabels: {
     title: 'Título', clientName: 'Cliente', opportunityRole: 'Rol de la oportunidad', skills: 'Stack tecnológico',
     roleDescription: 'Expectativas de evaluación técnica', band: 'Banda', startDate: 'Fecha de inicio',

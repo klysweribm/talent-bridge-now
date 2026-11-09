@@ -51,7 +51,7 @@ describe('ProcessDataStep — borrador con IA', () => {
     expect(screen.getByText('NestJS')).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Banda 8' })).toBeChecked();
     expect(screen.getByLabelText('Fecha de inicio')).toHaveValue('2026-12-01');
-    expect(screen.getAllByText('Sugerido por IA')).toHaveLength(7);
+    expect(screen.getAllByText('Sugerido por ICA')).toHaveLength(7);
     expect(infra.createProcess).not.toHaveBeenCalled();
     expect(useWizardStore.getState().data.title).toBe('');
   });
@@ -79,7 +79,7 @@ describe('ProcessDataStep — borrador con IA', () => {
     await waitFor(() => expect(screen.getByLabelText('Cliente *')).toHaveValue('ITAU'));
     expect(screen.getByLabelText('Título *')).toHaveValue('Mi título');
     expect(within(screen.getByRole('status', { name: 'Avisos del borrador de IA' })).getByText(/No sobrescrito.*Título/)).toBeInTheDocument();
-    expect(screen.getAllByText('Sugerido por IA')).toHaveLength(6);
+    expect(screen.getAllByText('Sugerido por ICA')).toHaveLength(6);
   });
 
   it('should drop the suggested mark of a field when the user edits it', async () => {
@@ -87,7 +87,7 @@ describe('ProcessDataStep — borrador con IA', () => {
     await generate();
     await waitFor(() => expect(screen.getByLabelText('Cliente *')).toHaveValue('ITAU'));
     await userEvent.type(screen.getByLabelText('Cliente *'), 'X');
-    expect(screen.getAllByText('Sugerido por IA')).toHaveLength(6);
+    expect(screen.getAllByText('Sugerido por ICA')).toHaveLength(6);
   });
 
   it.each([

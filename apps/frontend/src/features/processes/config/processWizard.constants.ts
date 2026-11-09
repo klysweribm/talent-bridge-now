@@ -42,7 +42,7 @@ export const CANDIDATES_STEP_TEXT = {
   heading:      'Candidatos',
   counter:      (selected: number, max: number): string => `${selected} de ${max}`,
   limitReached: (max: number): string => `Alcanzaste el máximo de ${max} candidatos`,
-  empty:        'No hay candidatos disponibles',
+  empty:        'No hay candidatos disponibles. Puedes crear uno o continuar sin candidatos.',
   loading:      'Cargando candidatos',
   error:        'No se pudieron cargar los candidatos.',
   add:          '+ Agregar candidato',

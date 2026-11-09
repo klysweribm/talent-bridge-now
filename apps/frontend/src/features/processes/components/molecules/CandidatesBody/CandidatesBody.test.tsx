@@ -10,7 +10,7 @@ describe('CandidatesBody', () => {
     const { rerender } = render(<CandidatesBody {...BASE} status="loading" />);
     expect(screen.getByRole('status', { name: 'Cargando candidatos' })).toBeInTheDocument();
     rerender(<CandidatesBody {...BASE} status="empty" />);
-    expect(screen.getByText('No hay candidatos disponibles')).toBeInTheDocument();
+    expect(screen.getByText('No hay candidatos disponibles. Puedes crear uno o continuar sin candidatos.')).toBeInTheDocument();
     rerender(<CandidatesBody {...BASE} status="error" />);
     await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
     expect(BASE.onRetry).toHaveBeenCalled();

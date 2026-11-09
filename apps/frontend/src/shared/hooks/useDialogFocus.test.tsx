@@ -5,7 +5,7 @@ import { useDialogFocus } from './useDialogFocus';
 
 function Harness({ onClose }: { readonly onClose: () => void }): JSX.Element {
   const ref = useRef<HTMLDivElement>(null);
-  useDialogFocus(ref, '#opener', onClose);
+  useDialogFocus(ref, () => document.querySelector<HTMLElement>('#opener'), onClose);
   return <div ref={ref} tabIndex={-1} role="dialog">dialog</div>;
 }
 

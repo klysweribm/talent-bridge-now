@@ -6,18 +6,18 @@ import { useWizardStore } from '../../../store/wizard.store';
 import { makeCandidate, makePage, mockProcessLimits, renderAt } from '../../../test-utils';
 import { ProcessCandidatesStep } from './ProcessCandidatesStep';
 
-const evaluated = vi.hoisted(() => vi.fn());
+// Contador plano: vi.resetAllMocks no lo toca y se lee tal cual desde la carga del archivo.
+const formModule = vi.hoisted(() => ({ evaluations: 0 }));
 
 vi.mock('../../../infrastructure/processCreate.infra');
 vi.mock('@features/candidates/components/organisms/CandidateCreateForm/CandidateCreateForm', () => {
-  evaluated();
+  formModule.evaluations += 1;
   return { CandidateCreateForm: () => <p>formulario cargado</p> };
 });
 
 describe('ProcessCandidatesStep lazy form', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    evaluated.mockClear();
     useWizardStore.getState().reset();
     useAuthStore.getState().setAuth({ id: 'me', email: 'm@ibm.com', role: 'pm', name: 'Yo' }, 't');
     mockProcessLimits({ maxCandidates: 5 });
@@ -28,13 +28,13 @@ describe('ProcessCandidatesStep lazy form', () => {
   it('should not load the candidate form while the panel stays closed', async () => {
     renderAt(<ProcessCandidatesStep />, '/wizard');
     await screen.findByRole('checkbox', { name: 'Candidato 1 · Rol 1' });
-    expect(evaluated).not.toHaveBeenCalled();
+    expect(formModule.evaluations).toBe(0);
   });
 
   it('should load the candidate form once the panel opens, behind an accessible loading state', async () => {
     renderAt(<ProcessCandidatesStep />, '/wizard');
     await userEvent.click(await screen.findByRole('button', { name: '+ Agregar candidato' }));
     expect(await screen.findByText('formulario cargado')).toBeInTheDocument();
-    expect(evaluated).toHaveBeenCalledTimes(1);
+    expect(formModule.evaluations).toBe(1);
   });
 });

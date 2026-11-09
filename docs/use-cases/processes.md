@@ -6,7 +6,7 @@
 
 ## Reglas de negocio
 
-- **R5:** la asignación de candidatos ocurre solo en el formulario de la oportunidad (crear o editar). La lista de candidatos es de solo lectura.
+- **R5:** los candidatos se asignan en dos sitios: en el paso 2 de «Nueva oportunidad» (incluido el panel lateral de alta rápida de candidatos, R5.1) y, en el detalle de la oportunidad, mediante el recuadro inline «agregar» de candidatos ya existentes (solo quien puede gestionar, R6/R12). Sin permiso, la lista de candidatos del detalle es de solo lectura.
 - **R5.1 (PROC-UX-1, decisión vigente):** Oportunidad, Candidatos y Referentes son procesos independientes. La oportunidad se crea sin candidatos ni referentes; los referentes se asocian desde el detalle; el paso 2 del wizard es opcional («Siguiente» siempre habilitado con 0 candidatos). El panel lateral «Agregar candidato» es un atajo opcional: el candidato creado ahí queda guardado definitivamente, independiente de la oportunidad, y «Cancelar y descartar» (paso 3) no lo borra. Cerrar el panel con datos pide confirmación; con guardado pendiente no se puede cerrar.
 - **R6:** asignan y quitan candidatos **únicamente** el PM dueño (`ownerPmId`) y el reclutador de la oportunidad (`recruiterId`, uno solo). Quién cargó al candidato (`ICandidate.createdBy`) es auditoría y no da permisos. Cualquier otro usuario → 403.
 - **R7:** el límite `MAX_CANDIDATES_PER_PROCESS` (defecto 5) vive solo en el backend. Superarlo → 400 con mensaje claro. El frontend lo lee de `maxCandidates` en la respuesta, nunca de una variable `VITE_`.

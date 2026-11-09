@@ -4,7 +4,7 @@
 > `good-practices/DEBT_TECH.md` y `docs/use-cases/`. El encuadre anterior (procesos → candidatos → entrevistas →
 > feedback → reportes) espera el replanning Bench First.
 >
-> **Última actualización:** 2026-11-09 (OPP-AI-1: unidad 7 ✅ en código y tests (`ce69852`, `144bae0`), sin verificar en navegador; defaults de envs `42bf836` y etiqueta ICA `af4e9c1` ya commiteados; unidad 6 cerrada en `14280d3`; la unidad 5 sigue sin verificar en navegador; siguen las unidades 8-9). PROC-UX-1 (panel «Agregar candidato» en el wizard) 🚧 en código y tests, sin commitear, sin verificar en navegador)
+> **Última actualización:** 2026-11-09 (OPP-AI-1: unidad 7 ✅ en código y tests (`ce69852`, `144bae0`), sin verificar en navegador; defaults de envs `42bf836` y etiqueta ICA `af4e9c1` ya commiteados; unidad 6 cerrada en `14280d3`; la unidad 5 sigue sin verificar en navegador; siguen las unidades 8-9). PROC-UX-1 (panel «Agregar candidato» en el wizard) 🚧 en código y tests, commiteado (`67dd657`, `c97d893`, `39b32ca`; sin push), sin verificar en navegador; DT-060 resuelta, DT-061 abierta)
 
 **Cómo se mantiene:** al cerrar algo, se baja a «✅ Cerrado» en una línea y se quita de «Qué falta». Lo pendiente nunca se entierra bajo lo hecho.
 
@@ -23,7 +23,7 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 
 **Unidades 8-9 de OPP-AI-1** (backend de sugerencias de la banca: `POST /bench/match` determinístico y `GET /processes/:id/bench-suggestions`) en `feature/OPP-AI-1`. Tabla del plan abajo. La unidad 7 (frontend del dropzone de brochure) está ✅ en código y tests (`ce69852`, `144bae0`) pero **sin verificar en navegador** (ver «Pendiente de verificación humana»); la 6 (backend) cerrada en `14280d3`; defaults del borrador (`42bf836`) y copy «ICA» (`af4e9c1`) ya commiteados; la 5 **sin verificar en navegador**.
 
-**En paralelo (no desplaza el siguiente paso):** [PROC-UX-1](#-proc-ux-1--agregar-candidato-sin-salir-del-wizard-nueva-oportunidad-medium), unidades A-C en código y tests en la misma rama, sin commitear; falta verificación humana y decidir la deuda DT-060/DT-061.
+**En paralelo (no desplaza el siguiente paso):** [PROC-UX-1](#-proc-ux-1--agregar-candidato-sin-salir-del-wizard-nueva-oportunidad-medium), unidades A-C en código y tests en la misma rama, commiteadas (`67dd657`, `c97d893`, `39b32ca`); falta verificación humana y decidir la deuda DT-061.
 
 ### Plan OPP-AI-1 (una sola numeración, 1..11)
 
@@ -153,7 +153,7 @@ El PM o reclutador describe el perfil en un box mágico o sube un brochure; la I
 
 ## 🚧 PROC-UX-1 — Agregar candidato sin salir del wizard «Nueva oportunidad» (MEDIUM)
 
-**Estado:** unidades A, B y C ✅ en código y tests (rama `feature/OPP-AI-1`, **sin commitear**; habrá un commit por unidad más uno de docs); sin verificar en navegador · **Casos de uso:** [`docs/use-cases/processes.md`](./docs/use-cases/processes.md) (R5.1) · **Deuda:** DT-060, DT-061 · **Depende de:** PROC-1, CAND-2 · **Commits:** pendientes.
+**Estado:** unidades A, B y C ✅ en código y tests (rama `feature/OPP-AI-1`, sin push); sin verificar en navegador · **Casos de uso:** [`docs/use-cases/processes.md`](./docs/use-cases/processes.md) (R5, R5.1) · **Deuda:** DT-061 abierta (DT-060 resuelta) · **Depende de:** PROC-1, CAND-2 · **Commits:** `67dd657` (funcionalidad), `c97d893` (docs), `39b32ca` (ruta `/candidates/new` lazy y limpieza).
 
 **Decisión vigente (R5.1):** Oportunidad, Candidatos y Referentes son procesos independientes. La oportunidad se crea sin candidatos ni referentes; los referentes se asocian desde el detalle; el paso 2 es opcional («Siguiente» siempre habilitado con 0 candidatos). El panel es un atajo opcional: el candidato creado ahí queda guardado definitivamente, independiente de la oportunidad, y «Cancelar y descartar» (paso 3) no lo borra.
 
@@ -174,13 +174,14 @@ El PM o reclutador describe el perfil en un box mágico o sube un brochure; la I
 - [x] pm y recruiter se comportan igual.
 - [x] `role="dialog"`, `aria-modal` y título accesible; el foco vuelve al botón.
 - [x] Banca igual salvo el cambio aceptado.
-- [ ] **No cumplido:** «el código de candidates solo se descarga si se abre el panel». Vite avisa de que `CandidateCreateForm` es importado dinámicamente por `AddCandidatePanel` y estáticamente por `NewCandidateFlow`, y las rutas no son lazy: el código de candidates ya va en el bundle principal. El test del `lazy` tampoco distingue lazy de import estático (no se comprobó mutando). Deuda DT-060.
+- [x] El código de candidates solo se descarga si se abre el panel. Verificado por build (chunk `CandidateCreateForm-*.js` aparte, 26,69 kB / gzip 8,92 kB; bundle principal 471,79 → 444,67 kB, sin aviso de import mixto) y por test mutado (0 evaluaciones del módulo con el panel cerrado, 1 al abrirlo; con import estático el test falla). **No verificada la descarga de red real en navegador.**
+- [x] `technical_ref` no alcanza el panel: `/processes`, `/processes/new`, `/candidates` y `/candidates/new` lo redirigen a `/dashboard` (tests de router).
 
-**No verificado:** recorrido real en navegador; teclado real y focus trap fuera de jsdom; estilos a 640 px; extracción real de 90 s con ICA; creación real de candidato por HTTP; rol `technical_ref` sin cubrir en tests; los 8 casos manuales del usuario.
+**No verificado:** recorrido real en navegador; teclado real y focus trap fuera de jsdom; estilos a 640 px; extracción real de 90 s con ICA; creación real de candidato por HTTP; el fallback «Cargando…» de rutas (`<Suspense>` en `AppRouter`) al navegar a `/candidates/new`; los 8 casos manuales del usuario.
 
 **Menores:** `CandidateCreateForm.onSuccess` tiene un 2º argumento `mode` no previsto en el plan; el aviso de creación con el panel desmontado solo está cubierto a nivel de hook; el test «no se llama a borrado» usa `Object.keys(candidatesInfra)` (aserción débil).
 
-**Deuda nueva:** DT-060 (lazy sin efecto; salida: rutas lazy, p. ej. `NewCandidatePage`, o quitar el `lazy`); DT-061 (acople `processes` → `candidates`; salida decidida por el usuario: inyectar el formulario desde la página del wizard con slot o render prop, no moverlo a `shared`).
+**Deuda:** DT-060 resuelta en `39b32ca` (ruta lazy); DT-061 abierta (acople `processes` → `candidates`; salida decidida por el usuario: inyectar el formulario desde la página del wizard con slot o render prop, no moverlo a `shared`).
 
 **Propuestas sin hacer:** (1) opcional del plan: `sessionStorage` del borrador del formulario y guard de salida por sidebar. (2) Detalle de una oportunidad creada: hoy no navega (AddBox inline de candidatos existentes); el mismo patrón sería un botón «Crear candidato» con el mismo `SidePanel` + `CandidateCreateForm`, esfuerzo pequeño (~1 unidad). Decisión pendiente del usuario.
 
@@ -300,7 +301,7 @@ Todo reordenamiento queda registrado aquí (fecha + razón). Una idea nueva sin 
 
 | Fecha | Cambio | Razón |
 | --- | --- | --- |
-| 2026-11-09 | Nueva tarea `PROC-UX-1` (sin commitear): `SidePanel` genérico + focus trap/scroll lock compartidos (Banca ahora es envoltorio, cambio aceptado), `CandidateCreateForm` reutilizable y panel «+ Agregar candidato» en el paso 2; frontend typecheck 0, lint 0 warnings, 203 archivos / 1037 tests, build ok, `validate-quality` 317 archivos 0 críticos; altas DT-060 (lazy sin efecto en el bundle) y DT-061 (acople processes→candidates); sin navegador | Pedido del usuario: crear candidatos sin salir del wizard; regla R5.1 (oportunidad, candidatos y referentes independientes) |
+| 2026-11-09 | Nueva tarea `PROC-UX-1` (commits `67dd657`, `c97d893`, `39b32ca`; ruta `/candidates/new` lazy, bundle principal 471,79 → 444,67 kB, DT-060 resuelta): `SidePanel` genérico + focus trap/scroll lock compartidos (Banca ahora es envoltorio, cambio aceptado), `CandidateCreateForm` reutilizable y panel «+ Agregar candidato» en el paso 2; frontend typecheck 0, lint 0 warnings, 203 archivos / 1037 tests, build ok, `validate-quality` 317 archivos 0 críticos; altas DT-060 (lazy sin efecto en el bundle) y DT-061 (acople processes→candidates); sin navegador | Pedido del usuario: crear candidatos sin salir del wizard; regla R5.1 (oportunidad, candidatos y referentes independientes) |
 | 2026-09-13 a 2026-10-18 | Roadmap inicial; Etapa 1 de FE (DT-001); `FE-OTP-1` y `AUTH-2` pasa a OTP; reorden hacia el vertical demo (`QW-1`, Etapas 2-3, `AUTH-1`); arquitectura objetivo IBM Cloud (ADR-006 a ADR-012); modelo de dominio (ADR-013); creado `docs/use-cases/`; `AUTH-1` backend verificado (bug de `@Prop` en uniones). | Backlog vivo por feature, demo al sponsor y decisiones de arquitectura que no tenían ADR. |
 | 2026-10-24 a 2026-10-30 | `AUTH-1` cerrado (DT-008/009); hardening de sesión del frontend (DT-015/016/017); limpieza de `legacy_docs/` (alcance A); `QW-2` y `OBS-1` cerrados; altas DT-018 a DT-024; Etapa 2 de FE cerrada en código; fuentes de verdad consolidadas (`.clinerules` y `PROJECT_CONTEXT.md` como punteros); `BENCH-1` implementado y verificado en vivo (DT-027 a DT-029); ROADMAP adelgazado y reordenado. | Preparar el replanning Bench First y mostrar primero lo que toca hacer. |
 | 2026-10-31 | `AI-1` iniciada: capability `ai` con ICA (ADR-014), contrato en `shared-types`, alta DT-030. | La POC necesita IA en CV, match y feedback. |

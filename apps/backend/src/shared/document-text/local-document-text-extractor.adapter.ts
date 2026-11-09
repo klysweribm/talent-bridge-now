@@ -41,7 +41,8 @@ export class LocalDocumentTextExtractor implements IDocumentTextExtractorPort {
     // pdf-parse toma la propiedad (transfiere) del TypedArray que recibe: se le pasa una copia para no dejar `file.data` inutilizable.
     const parser = new PDFParse({ data: file.data.slice() });
     try {
-      return (await parser.getText({ first: DOCUMENT_PDF_MAX_PAGES })).text;
+      // `pageJoiner: ''` evita el marcador `-- N of M --` que pdf-parse añade por defecto (ruido; un PDF sin texto solo devolvería eso).
+      return (await parser.getText({ first: DOCUMENT_PDF_MAX_PAGES, pageJoiner: '' })).text;
     } finally {
       await parser.destroy();
     }

@@ -54,7 +54,11 @@ export interface IAiStatus {
 // ─── Borrador de oportunidad (OPP-AI-1, `POST /ai/opportunity-draft`) ────────
 
 /** Códigos estables de error del borrador. El frontend ramifica por `code`, no por el status HTTP. */
-export type TOpportunityDraftErrorCode = 'AI_UNAVAILABLE' | 'AI_TIMEOUT' | 'OPPORTUNITY_TEXT_TOO_LONG';
+export type TOpportunityDraftErrorCode =
+  | 'AI_UNAVAILABLE'
+  | 'AI_TIMEOUT'
+  | 'OPPORTUNITY_TEXT_TOO_LONG'
+  | 'OPPORTUNITY_SOURCE_UNREADABLE';
 
 /** Campos del formulario de la oportunidad que la IA puede proponer. Vacío = `''`, `[]` o `null`: nunca inventado. */
 export interface IOpportunityDraftFields {

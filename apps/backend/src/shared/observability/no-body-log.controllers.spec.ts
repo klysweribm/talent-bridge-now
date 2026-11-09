@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { AiController } from '../../capabilities/ai/infrastructure/controllers/ai.controller';
 import { AvailableCandidatesController } from '../../capabilities/candidates/infrastructure/controllers/available-candidates.controller';
 import { CandidatesListController } from '../../capabilities/candidates/infrastructure/controllers/candidates-list.controller';
+import { OpportunityDraftFileController } from '../../capabilities/ai/infrastructure/controllers/opportunity-draft-file.controller';
 import { CandidatesController } from '../../capabilities/candidates/infrastructure/controllers/candidates.controller';
 import { ProcessCandidatesController } from '../../capabilities/processes/infrastructure/controllers/process-candidates.controller';
 import { ProcessesController } from '../../capabilities/processes/infrastructure/controllers/processes.controller';
@@ -14,6 +15,10 @@ const marked = (target: object): unknown => Reflect.getMetadata(NO_BODY_LOG_KEY,
 describe('@NoBodyLog() on controllers that carry free text or candidate PII', () => {
   it.each([['ask'], ['opportunityDraft']])('should mark AiController.%s', (name) => {
     expect(marked(handler(AiController, name))).toBe(true);
+  });
+
+  it('should mark OpportunityDraftFileController.opportunityDraftFile', () => {
+    expect(marked(handler(OpportunityDraftFileController, 'opportunityDraftFile'))).toBe(true);
   });
 
   it('should mark ProcessesController.detail (embeds candidate names) but not the list', () => {

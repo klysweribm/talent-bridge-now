@@ -24,6 +24,7 @@ export const DRAFT_COPY = {
     AI_UNAVAILABLE: 'El asistente de IA no está disponible en este momento. Puedes completar el formulario a mano o reintentar.',
     AI_TIMEOUT: 'El asistente de IA tardó demasiado en responder. Puedes completar el formulario a mano o reintentar.',
     OPPORTUNITY_TEXT_TOO_LONG: 'El texto es demasiado largo.',
+    OPPORTUNITY_SOURCE_UNREADABLE: 'No pudimos leer el documento. Prueba con otro archivo o completa el formulario a mano.',
     NETWORK: 'No se pudo conectar con el servidor. Revisa tu conexión y reintenta.',
     UNKNOWN: 'No se pudo generar el borrador. Revisa el texto, reintenta o completa el formulario a mano.',
   } satisfies Readonly<Record<TDraftFailureKind, string>>,

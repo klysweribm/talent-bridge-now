@@ -36,6 +36,42 @@ describe('LocalDocumentTextExtractor', () => {
   });
 });
 
+/** PDF de una página sin contenido de texto (como un escaneado), armado a mano: sin binarios en el repo. */
+function blankPdf(): IDocumentFile {
+  const objects = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 200] >>',
+  ];
+  let body = '%PDF-1.4\n';
+  const offsets = objects.map((object, index) => {
+    const offset = body.length;
+    body += `${index + 1} 0 obj\n${object}\nendobj\n`;
+    return offset;
+  });
+  const rows = offsets.map((offset) => `${String(offset).padStart(10, '0')} 00000 n \n`).join('');
+  body += `xref\n0 4\n0000000000 65535 f \n${rows}trailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n${body.length}\n%%EOF\n`;
+  return { filename: 'scan.pdf', mimeType: DOCUMENT_PDF_MIME, data: new Uint8Array(Buffer.from(body, 'latin1')) };
+}
+
+describe('LocalDocumentTextExtractor page markers', () => {
+  const MARKER = /--\s*\d+\s+of\s+\d+\s*--/;
+
+  it('should return blank text, without page markers, for a PDF with no text', async () => {
+    const text = await new LocalDocumentTextExtractor().extractText(blankPdf());
+
+    expect(text).not.toMatch(MARKER);
+    expect(text.trim()).toBe('');
+  });
+
+  it('should not leak page markers into the text of a PDF with text', async () => {
+    const text = await new LocalDocumentTextExtractor().extractText(fixture('cv-sintetico.pdf', DOCUMENT_PDF_MIME));
+
+    expect(text).toContain('Lucia Fernandez Ortega');
+    expect(text).not.toMatch(MARKER);
+  });
+});
+
 describe('LocalDocumentTextExtractor resource bounds', () => {
   /** DOCX mínimo cuyo word/document.xml se descomprime a mucho más de lo permitido, pero pesa poco comprimido (zip bomb de prueba). */
   async function bombDocx(uncompressedBytes: number): Promise<IDocumentFile> {

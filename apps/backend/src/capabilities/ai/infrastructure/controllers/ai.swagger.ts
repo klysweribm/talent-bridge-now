@@ -1,5 +1,5 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 export const ApiAiController = (): ClassDecorator =>
   applyDecorators(
@@ -29,6 +29,18 @@ export const ApiOpportunityDraft = (): MethodDecorator =>
     ApiOperation({ summary: 'Borrador de oportunidad a partir de texto libre (no crea nada)' }),
     ApiResponse({ status: 200, description: '{ draft, missingFields, warnings }: lo no inferido queda vacío' }),
     ApiResponse({ status: 400, description: 'Texto vacío (validación) u OPPORTUNITY_TEXT_TOO_LONG: { code, message }' }),
+    ApiResponse({ status: 429, description: 'Throttle excedido' }),
+    ApiResponse({ status: 503, description: 'AI_UNAVAILABLE: { code, message } (nunca 401)' }),
+    ApiResponse({ status: 504, description: 'AI_TIMEOUT: { code, message }' }),
+  ) as MethodDecorator;
+
+export const ApiOpportunityDraftFile = (): MethodDecorator =>
+  applyDecorators(
+    ApiOperation({ summary: 'Borrador de oportunidad a partir de un brochure PDF/DOCX/MD/TXT (no crea ni guarda nada)' }),
+    ApiConsumes('multipart/form-data'),
+    ApiResponse({ status: 200, description: '{ draft, missingFields, warnings }: igual que con texto libre' }),
+    ApiResponse({ status: 400, description: 'Archivo ausente, vacío, de tipo no admitido o demasiado grande; u OPPORTUNITY_TEXT_TOO_LONG' }),
+    ApiResponse({ status: 422, description: 'OPPORTUNITY_SOURCE_UNREADABLE: { code, message }' }),
     ApiResponse({ status: 429, description: 'Throttle excedido' }),
     ApiResponse({ status: 503, description: 'AI_UNAVAILABLE: { code, message } (nunca 401)' }),
     ApiResponse({ status: 504, description: 'AI_TIMEOUT: { code, message }' }),

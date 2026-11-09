@@ -1,23 +1,18 @@
 import { useState } from 'react';
-import type { ICvExtractionResult } from '@ibm-talent-bridge/shared-types';
-import { CandidateReviewForm } from '../CandidateReviewForm';
-import { CvExtractionPanel } from '../CvExtractionPanel';
+import type { ICandidate } from '@ibm-talent-bridge/shared-types';
+import { CANDIDATES_PATH } from '@/router/paths';
+import { CANDIDATE_EXIT_LINKS } from '../../../config/candidateList.constants';
+import { CandidateCreated } from '../../molecules/CandidateCreated';
+import { CandidateCreateForm } from '../CandidateCreateForm/CandidateCreateForm';
 
-/** El resultado y el archivo viajan a la revisión para mostrar la tarjeta del CV y sus palabras clave. */
-type TStep = { readonly kind: 'upload' } | { readonly kind: 'review'; readonly result?: ICvExtractionResult; readonly file?: File };
+interface ISaved { readonly candidate: ICandidate; readonly mode: 'created' | 'updated' }
 
-/** Paso 1: subir el CV (o escribir a mano). Paso 2: revisar el borrador y confirmar. */
+/** Página de alta: el formulario reutilizable y, al guardar, la confirmación con «Cargar otro» y el enlace de salida. */
 export function NewCandidateFlow(): JSX.Element {
-  const [step, setStep] = useState<TStep>({ kind: 'upload' });
-  const restart = (): void => setStep({ kind: 'upload' });
+  const [saved, setSaved] = useState<ISaved | undefined>();
 
-  if (step.kind === 'upload') {
-    return (
-      <CvExtractionPanel
-        onExtracted={(result, file) => setStep({ kind: 'review', result, file })}
-        onManual={() => setStep({ kind: 'review' })}
-      />
-    );
+  if (saved) {
+    return <CandidateCreated candidate={saved.candidate} mode={saved.mode} onRestart={() => setSaved(undefined)} exitTo={CANDIDATES_PATH} exitLabel={CANDIDATE_EXIT_LINKS.list.label} />;
   }
-  return <CandidateReviewForm result={step.result} file={step.file} onRestart={restart} />;
+  return <CandidateCreateForm onSuccess={(candidate, mode) => setSaved({ candidate, mode })} />;
 }

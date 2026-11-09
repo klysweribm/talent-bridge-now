@@ -4,12 +4,14 @@ import type { IProcessCandidateSummary, PaginatedResponse } from '@ibm-talent-br
 import { JwtAuthGuard } from '../../../../shared/auth/jwt-auth.guard';
 import { Roles } from '../../../../shared/auth/roles.decorator';
 import { RolesGuard } from '../../../../shared/auth/roles.guard';
+import { NoBodyLog } from '../../../../shared/observability/no-body-log.decorator';
 import { PaginationQueryDto } from '../../../../shared/pagination/pagination-query.dto';
 import { CandidateProcessLinkService } from '../../application/services/candidate-process-link.service';
 
 /** Va en su propio controlador, registrado antes que `CandidatesController`, para que nunca compita con `:id`. */
 @ApiTags('Candidates')
 @ApiBearerAuth()
+@NoBodyLog()
 @Controller('candidates/available')
 @UseGuards(JwtAuthGuard, RolesGuard)
 // TODO(RBAC-1): reemplazar por permisos

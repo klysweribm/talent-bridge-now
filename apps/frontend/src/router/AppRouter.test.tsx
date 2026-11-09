@@ -150,10 +150,10 @@ describe('AppRouter — navigation/route consistency', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Datos de la oportunidad' })).toBeInTheDocument();
   });
 
-  it.each(['recruiter', 'pm'] as const)('should render the real NewCandidatePage on /candidates/new for a %s', role => {
+  it.each(['recruiter', 'pm'] as const)('should render the real NewCandidatePage on /candidates/new for a %s', async role => {
     useAuthStore.getState().setAuth({ ...DEMO_USER, role }, validToken());
     renderAt('/candidates/new');
-    expect(screen.getByRole('heading', { level: 1, name: 'Agregar candidato' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Agregar candidato' })).toBeInTheDocument();
   });
 
   it.each(['recruiter', 'pm'] as const)('should render the real CandidatesPage, not ComingSoon, on /candidates for a %s', role => {
@@ -168,6 +168,13 @@ describe('AppRouter — navigation/route consistency', () => {
     renderAt('/candidates');
     expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Candidatos' })).not.toBeInTheDocument();
+  });
+
+  it('should send a technical_ref who opens /processes/new to /dashboard without rendering the wizard', () => {
+    useAuthStore.getState().setAuth({ ...DEMO_USER, role: 'technical_ref' }, validToken());
+    renderAt('/processes/new');
+    expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Nueva oportunidad' })).not.toBeInTheDocument();
   });
 
   it('should send a technical_ref who opens /candidates/new to /dashboard', () => {

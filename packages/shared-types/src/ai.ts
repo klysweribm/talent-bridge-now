@@ -50,3 +50,43 @@ export interface IAiStatus {
   readonly model: string | null;
   readonly reason?: TAiUnavailableReason;
 }
+
+// ─── Borrador de oportunidad (OPP-AI-1, `POST /ai/opportunity-draft`) ────────
+
+/** Códigos estables de error del borrador. El frontend ramifica por `code`, no por el status HTTP. */
+export type TOpportunityDraftErrorCode =
+  | 'AI_UNAVAILABLE'
+  | 'AI_TIMEOUT'
+  | 'OPPORTUNITY_TEXT_TOO_LONG'
+  | 'OPPORTUNITY_SOURCE_UNREADABLE';
+
+/** Campos del formulario de la oportunidad que la IA puede proponer. Vacío = `''`, `[]` o `null`: nunca inventado. */
+export interface IOpportunityDraftFields {
+  readonly title: string;
+  readonly clientName: string;
+  readonly opportunityRole: string;
+  readonly skills: readonly string[];
+  /** «Expectativas de evaluación técnica». */
+  readonly roleDescription: string;
+  /** Entero 6..10, o `null` si el texto no lo permite deducir (p. ej. dice solo «senior»). */
+  readonly band: number | null;
+  /** `YYYY-MM-DD` real, o `null`. */
+  readonly startDate: string | null;
+}
+
+export interface IOpportunityDraftRequest {
+  readonly text: string;
+}
+
+export interface IOpportunityDraftResponse {
+  readonly draft: IOpportunityDraftFields;
+  /** Campos que la IA no pudo inferir: el formulario los marca «por completar» (R2). */
+  readonly missingFields: readonly (keyof IOpportunityDraftFields)[];
+  readonly warnings: readonly string[];
+}
+
+/** Cuerpo de los errores propios del borrador (503, 504 y el 400 de texto demasiado largo). */
+export interface IOpportunityDraftError {
+  readonly code: TOpportunityDraftErrorCode;
+  readonly message: string;
+}

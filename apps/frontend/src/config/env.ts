@@ -11,6 +11,8 @@ export const envSchema = z.object({
   VITE_IDLE_WARNING_SECONDS: z.coerce.number().int().positive().default(60),
   // Tope de tamaño del CV validado en el cliente; el backend lo aplica con CV_MAX_FILE_BYTES.
   VITE_CV_MAX_FILE_BYTES: z.coerce.number().int().positive().default(5_242_880),
+  // Tope de tamaño del brochure validado en el cliente; el backend es la autoridad y rechaza lo que lo exceda.
+  VITE_OPPORTUNITY_SOURCE_MAX_FILE_BYTES: z.coerce.number().int().positive().default(5_242_880),
   // Mock-first opt-in: 'true' usa datos simulados y NO guarda nada. Por defecto apagado: un build que omita la
   // variable (Vite la incrusta al compilar) no debe fingir que guarda candidatos.
   VITE_CANDIDATES_USE_MOCK: z.enum(['true', 'false']).default('false').transform(value => value === 'true'),

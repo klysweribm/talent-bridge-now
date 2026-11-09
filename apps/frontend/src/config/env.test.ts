@@ -57,3 +57,14 @@ describe('env', () => {
     expect(() => envSchema.parse({ VITE_CANDIDATES_USE_MOCK: 'maybe' })).toThrow();
   });
 });
+
+describe('env — brochure de oportunidad', () => {
+  it('should default VITE_OPPORTUNITY_SOURCE_MAX_FILE_BYTES to 5 MiB when it is not set', () => {
+    expect(envSchema.parse({}).VITE_OPPORTUNITY_SOURCE_MAX_FILE_BYTES).toBe(5_242_880);
+  });
+
+  it('should accept a custom limit and reject a non-positive one', () => {
+    expect(envSchema.parse({ VITE_OPPORTUNITY_SOURCE_MAX_FILE_BYTES: '1024' }).VITE_OPPORTUNITY_SOURCE_MAX_FILE_BYTES).toBe(1024);
+    expect(() => envSchema.parse({ VITE_OPPORTUNITY_SOURCE_MAX_FILE_BYTES: '0' })).toThrow();
+  });
+});

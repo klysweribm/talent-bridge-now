@@ -7,6 +7,7 @@ import { JwtAuthGuard } from '../../../../shared/auth/jwt-auth.guard';
 import type { IJwtPayload } from '../../../../shared/auth/jwt-payload.interface';
 import { Roles } from '../../../../shared/auth/roles.decorator';
 import { RolesGuard } from '../../../../shared/auth/roles.guard';
+import { NoBodyLog } from '../../../../shared/observability/no-body-log.decorator';
 import { CandidateService } from '../../application/services/candidate.service';
 import { CvExtractionService } from '../../application/services/cv-extraction.service';
 import { CV_EXTRACTION_THROTTLE_LIMIT, CV_EXTRACTION_THROTTLE_TTL_MS } from '../../domain/constants/cv.constants';
@@ -34,6 +35,7 @@ export class CandidatesController {
   ) {}
 
   @Post('cv-extraction')
+  @NoBodyLog()
   @Throttle({ default: { limit: CV_EXTRACTION_THROTTLE_LIMIT, ttl: CV_EXTRACTION_THROTTLE_TTL_MS } })
   @UseFilters(CvUploadTooLargeFilter)
   @UseInterceptors(FileInterceptor('file'))
@@ -43,12 +45,14 @@ export class CandidatesController {
   }
 
   @Post()
+  @NoBodyLog()
   @ApiCreateCandidate()
   create(@Body() dto: CreateCandidateDto, @Req() req: AuthedRequest): Promise<ICandidate> {
     return this.candidates.create(dto, toActor(req));
   }
 
   @Put(':id')
+  @NoBodyLog()
   @ApiUpdateCandidate()
   update(@Param() params: CandidateIdParamDto, @Body() dto: CreateCandidateDto, @Req() req: AuthedRequest): Promise<ICandidate> {
     return this.candidates.update(params.id, dto, toActor(req));

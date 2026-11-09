@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { ICandidateProfileDraft, ICvExtractionResult, TCvExtractor } from '@ibm-talent-bridge/shared-types';
 import type { ICvExtractorPort, TCvExtractionOutcome } from '../../application/ports/cv-extractor.port';
 import { SKILL_CATALOG_PORT, type ISkillCatalogPort } from '../../application/ports/skill-catalog.port';
-import { CV_TEXT_EXTRACTOR_PORT, type ICvTextExtractorPort } from '../../application/ports/cv-text-extractor.port';
+import { DOCUMENT_TEXT_EXTRACTOR_PORT, type IDocumentTextExtractorPort } from '../../../../shared/document-text/document-text-extractor.port';
 import { mergeRulesWithIca } from '../../domain/classic-cv.merge';
 import { extractClassicDraft } from '../../domain/classic-cv.rules';
 import { findMissingFields } from '../../domain/cv-draft.sanitizer';
@@ -23,7 +23,7 @@ export class ClassicCvExtractor implements ICvExtractorPort {
 
   constructor(
     @Inject(SKILL_CATALOG_PORT) private readonly catalog: ISkillCatalogPort,
-    @Inject(CV_TEXT_EXTRACTOR_PORT) private readonly textExtractor: ICvTextExtractorPort,
+    @Inject(DOCUMENT_TEXT_EXTRACTOR_PORT) private readonly textExtractor: IDocumentTextExtractorPort,
     private readonly icaDraft: CvIcaDraftService,
   ) {}
 

@@ -1,451 +1,206 @@
 # Roadmap — Features planeados
 
-> Backlog de features ordenado por **lo que toca hacer**: arriba lo pendiente y lo más importante, abajo lo
-> ya cerrado. El detalle de lo cerrado vive en git, en `good-practices/DEBT_TECH.md` y en `docs/use-cases/`.
-> El encuadre anterior (procesos → candidatos → entrevistas → feedback → reportes) quedó archivado fuera de
-> este documento y espera el replanning Bench First.
+> Arriba, lo que FALTA; lo ya hecho va resumido al final. El detalle de lo cerrado vive en git,
+> `good-practices/DEBT_TECH.md` y `docs/use-cases/`. El encuadre anterior (procesos → candidatos → entrevistas →
+> feedback → reportes) espera el replanning Bench First.
 >
-> **Última actualización:** 2026-10-30 (BENCH-1 verificado en vivo; falta solo el recorrido completo en navegador)
+> **Última actualización:** 2026-11-09 (OPP-AI-1: unidad 7 ✅ en código y tests (`ce69852`, `144bae0`), sin verificar en navegador; defaults de envs `42bf836` y etiqueta ICA `af4e9c1` ya commiteados; unidad 6 cerrada en `14280d3`; la unidad 5 sigue sin verificar en navegador; siguen las unidades 8-9). PROC-UX-1 (panel «Agregar candidato» en el wizard) 🚧 en código y tests, commiteado (`67dd657`, `c97d893`, `39b32ca`; sin push), sin verificar en navegador; DT-060 resuelta, DT-061 abierta)
 
-**Cómo se mantiene:** al avanzar una feature se actualiza su fila en "Features vigentes" y, si queda
-cerrada, su sección se mueve al bloque "Cerrado" del final. Lo pendiente nunca se entierra bajo lo hecho.
+**Cómo se mantiene:** al cerrar algo, se baja a «✅ Cerrado» en una línea y se quita de «Qué falta». Lo pendiente nunca se entierra bajo lo hecho.
 
 ---
 
 ## Leyenda
 
-| Símbolo  | Significado                                                      |
-| -------- | ---------------------------------------------------------------- |
-| 🟢 Baja  | 1-2 días, sin dependencias fuertes                                |
-| 🟡 Media | 3-5 días, requiere diseño previo o coordinación con otra feature |
-| 🔴 Alta  | 6+ días, requiere integración externa (IBM Cloud) o varias capas |
-| 📌       | Sin arrancar                                                      |
-| 🚧       | En progreso                                                       |
-| ✅       | Completado                                                        |
-
-**Prioridad (HIGH \| MEDIUM \| LOW):** en un feature cerrado refleja lo que le **queda pendiente**,
-no el feature en sí.
+📌 sin arrancar · 🚧 en progreso · ✅ completado · Complejidad: 🟢 1-2 días, 🟡 3-5 días, 🔴 6+ días o integración externa.
+Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pendiente**.
 
 ---
 
-## Backlog Bench First — pendiente de replanning
+## ▶ Qué falta
 
-El producto se reencuadra como **Bench First**. `BENCH-1` ya aportó los primeros tipos de `shared-types` y su
-caso de uso (`docs/use-cases/bench.md`), pero todavía faltan los ADR y el replanning completo (alcance B). Hasta el replanning, estas son las equivalencias acordadas:
+### Siguiente paso
 
-| Encuadre anterior | Reemplazo Bench First |
-| --- | --- |
-| PROC-2 | Oportunidades + box mágico |
-| CAND-1 | BENCH (mock) + Talent Pool + carga de perfil |
-| INT-1 | Disponibilidad + booking top 5 + entrevistas por etapa |
-| FEED-1 | Feedback en 3 etapas asistido por IA |
-| REP-1 | Dashboard ejecutivo (PDF pasa a LOW) |
-| CV-1 | Acción del asistente "analizar perfil" vía ICA (`AiProviderPort`) |
+**Unidades 8-9 de OPP-AI-1** (backend de sugerencias de la banca: `POST /bench/match` determinístico y `GET /processes/:id/bench-suggestions`) en `feature/OPP-AI-1`. Tabla del plan abajo. La unidad 7 (frontend del dropzone de brochure) está ✅ en código y tests (`ce69852`, `144bae0`) pero **sin verificar en navegador** (ver «Pendiente de verificación humana»); la 6 (backend) cerrada en `14280d3`; defaults del borrador (`42bf836`) y copy «ICA» (`af4e9c1`) ya commiteados; la 5 **sin verificar en navegador**.
 
-Los IDs PROC-2, CAND-1, INT-1, FEED-1, REP-1 y CV-1 ya no existen como secciones; `/roadmap-task` debe
-actualizarse tras el replanning. Los casos de uso por rol y feature siguen en `docs/use-cases/` (encuadre
-anterior, a revisar en el replanning).
+**En paralelo (no desplaza el siguiente paso):** [PROC-UX-1](#-proc-ux-1--agregar-candidato-sin-salir-del-wizard-nueva-oportunidad-medium), unidades A-C en código y tests en la misma rama, commiteadas (`67dd657`, `c97d893`, `39b32ca`); falta verificación humana y decidir la deuda DT-061.
 
-### Funcionalidades de la POC (la ruta que se aisló para esta etapa)
+### Plan OPP-AI-1 (una sola numeración, 1..11)
 
-Esto no es todo el roadmap: son las piezas que se eligieron para tener un recorrido completo en la POC (reclutador crea el
-proceso, asigna referente, agenda, el referente evalúa con ayuda de IA). Estado a 2026-11-02, tras el commit `d9f2e1c`.
-«Verificado» dice cómo se comprobó; lo que dice «solo tests» o «no verificado» no se ha visto funcionando en vivo.
+«U0..U3» nombran solo **secciones de la HU** ([`opportunities-ai.md`](./docs/use-cases/opportunities-ai.md)); «unidad N» es el paso del plan.
 
-| # | Funcionalidad | Estado | Verificado |
+| # | Unidad (criterio de éxito en una línea) | Sección HU | Estado |
 | --- | --- | --- | --- |
-| 1 | ICA como apoyo de IA (capability `ai`) | ✅ Hecha (AI-1) | En vivo por el usuario |
-| 3 | Cargar CV (PDF/Word), extracción a JSON, formulario editable, candidato tentativo, actualización por correo | ✅ Hecha (CAND-2); falta solo la imagen de producción (DT-034) | En vivo por el usuario |
-| 2 | Crear proceso, asociar de 1 a N candidatos, listar procesos | ✅ Hecha en código y commiteada (PROC-1) | Solo tests y e2e; falta tu recorrido en navegador y los `curl` de escritura |
-| 2d | Lista de candidatos en el menú y alta de candidato sin iniciar un proceso | ✅ Hecha en código y commiteada (PROC-1) | Solo tests; `GET /candidates` en vivo exige recrear el backend |
-| 2e | Detalle del proceso con acciones: editar título y cliente, agregar y quitar candidatos, cambiar reclutador, estado y cancelar | 🚧 En curso por otro agente en esta rama | No verificado por el líder |
-| 2f | Regla de no más barrels y deuda de los existentes | 🚧 Pedida, junto con 2e | No verificado por el líder |
-| 2c | Inicio por rol con procesos reales | 🟡 Parcial: el contador y la lista de procesos del Inicio ya son reales; faltan los dashboards propios por rol y el resto de bloques sigue con datos de prueba | Solo tests |
-| 2b | Visibilidad `public/protected` de candidatos y filtrado por dueño | ⏳ Pendiente (R1-R3, fase siguiente) | — |
-| 4 | Asignar referente técnico a un proceso | ⏳ Pendiente (siguiente recomendada) | — |
-| 5 | Lista de referentes con disponibilidad y perfil expandible | ⏳ Pendiente (va con la 4) | — |
-| 6a | Booking, vista PM o reclutador | ⏳ Pendiente | — |
-| 6b | Booking, vista referente | ⏳ Pendiente | — |
-| 8 | Feedback asistido por IA | ⏳ Pendiente | — |
-| 7 | Estrellas y rating de referentes | ⏳ Pendiente, bajo esfuerzo | — |
-| 9 | Pool externo de casi-contratados | ⏳ Pendiente, bajo esfuerzo | — |
+| 1-3.5 | Glosario/ADR-016, textos «Oportunidad», banda, módulo skills, `band` y `startDate` | U0-U3 (insumos) | ✅ en `main` (PR #7) |
+| 4 | Backend `POST /ai/opportunity-draft`: esquema validado, `normalizeSkills`, tope de texto y timeout por ConfigService (+ `.env.example` y compose en el mismo commit), `AI_UNAVAILABLE`/`AI_TIMEOUT`/`OPPORTUNITY_TEXT_TOO_LONG`; pm+recruiter, technical_ref 403, sin token 401 | U1 | ✅ (`401336a` y `4eb4858`; FlowLog sin cuerpos: DT-055, `576a69e`) |
+| 5 | Frontend box mágico: rellena solo campos vacíos con «Sugerido por ICA» (antes «IA», `af4e9c1`) y no crea nada | U1 | ✅ (`2d750e3`; sin verificar en navegador) |
+| 5.5 | Refactor `src/shared/document-text` tras un puerto (hoy consumido por candidates; ai lo importará en la 6), sin cambio de comportamiento; causa de los 4 tests PDF explicada | U2 (prerrequisito) | ✅ (`aa1b8d5`) |
+| 6 | Backend `POST /ai/opportunity-draft/file` (PDF/DOCX/MD/TXT en memoria; 422 `OPPORTUNITY_SOURCE_UNREADABLE`) | U2 | ✅ (`14280d3`; no verificada contra ICA real) |
+| 7 | Frontend dropzone de brochure (generaliza el existente; traduce `OPPORTUNITY_SOURCE_UNREADABLE`) | U2 | ✅ en código y tests (`ce69852`, `144bae0`; pendiente verificación humana en navegador) |
+| 8 | Backend `POST /bench/match`: 60 % skills, 25 % banda, 15 % disponibilidad, determinístico; ICA solo explica | U3 | 📌 SIGUIENTE |
+| 9 | `GET /processes/:id/bench-suggestions` (llamada en memoria a bench) | U3 | 📌 |
+| 10 | Frontend panel «Sugeridos de la banca» (etapa 2 y detalle) | U3 | 📌 |
+| 11 | e2e 401/403/422/ICA caído y lento, corrida real con ICA, checklist de navegador, tabla Gherkin | — | 📌 |
 
-Resumen: de 12 filas de la ruta, 4 están hechas en código (1, 3, 2, 2d), 1 es parcial (2c), 2 están en curso (2e, 2f) y 7 están
-pendientes. Solo la 1 y la 3 se han visto funcionando en vivo.
+### Pendiente de verificación humana
 
-**Orden sugerido para completar la POC:** 2e y 2f (en curso) → 4 y 5 juntas (referentes: no se puede asignar a quien no se
-puede listar, y exigen sembrar referentes de demostración con especialidad y disponibilidad) → 6a y 6b mínimas → 8 (el
-referente evalúa con ayuda de ICA, lo que más luce en la demo) → 2c (dashboards por rol, que es en su mayoría composición de
-lo anterior) → 7 y 9 si sobra tiempo. La 2b queda al final salvo que la demo exija privacidad entre reclutadores.
+- **Recorrido en navegador con los 3 roles** (ana@, carlos@, mariana@ibm.com; checklist en `docs/use-cases/bench.md`): cierra DT-010, BENCH-1, QW-1, FE Etapa 2 y, con ellos, AUTH-1, QW-2 y las deudas DT-002, DT-007, DT-024. DT-010 incluye: F5 conserva la sesión, ningún link da 404, aviso de inactividad a los 360 s.
+- «Fecha de inicio» en navegador (paso 1, edición, resumen y detalle); un `POST /processes` con `startDate` real por curl; arranque sobre una base sembrada antes del cambio (el seeder reescribe `band`, sin comprobar).
+- Textos «Oportunidad» (unidad 2) y PROC-1 en navegador, y los `curl` de escritura de PROC-1 (solo cubiertos por e2e).
+- **Box mágico (unidad 5) en navegador:** login mariana@ibm.com → Nueva oportunidad → pegar el texto ITAU → «Generar con IA» → campos con «Sugerido por ICA» y nada creado → escribir un título a mano y regenerar → el título no se pisa → texto sin cliente → cliente «por completar» → apagar el backend o ICA → mensaje claro y formulario manual usable. **Requisito:** el backend debe ser uno con el código nuevo (el contenedor del `:3000` es una imagen vieja SIN el endpoint) y, opcionalmente, con las env `OPPORTUNITY_DRAFT_*` (si faltan rige el default en código). Nadie ha visto renderizados el layout, el borde, el badge ni el aviso; tampoco se probó contra el endpoint real ni ICA desde la UI (todo con la infra mockeada); sin prueba con lector de pantalla ni de editar el texto entre un fallo y el reintento.
+- **Dropzone de brochure (unidad 7) en navegador:** login mariana@ibm.com → Nueva oportunidad → arrastrar y soltar un PDF/DOCX/MD/TXT → campos rellenos solo si vacíos; archivo no admitido y archivo > límite → mensaje sin llamar al backend; brochure ilegible → «No pudimos leer el documento» y formulario intacto; el dropzone del CV (candidatos) sigue igual. No verificado: drag&drop real, estilos, foco, multipart real por HTTP (los tests solo comprueban que el `FormData` lleva `file`), DOCX real, corrida real contra ICA con un brochure. Requiere un backend con el código de la unidad 6 (la imagen del `:3000` es vieja).
+- Mensaje «Block Secrets» de Vault Radar en los commits: no bloqueante, significado desconocido.
 
-### Features vigentes
+### Riesgos abiertos y decisiones por tomar
 
-Orden: primero lo que requiere acción, luego el backlog por prioridad, al final lo cerrado.
+- **Tests PDF (explicado en la 5.5):** los 4 fallos (2 de `classic-cv-extractor`, 2 del spec del extractor local) ocurren con `npx jest` a secas porque `pdf-parse`/pdf.js necesita `--experimental-vm-modules` («Setting up fake worker failed: A dynamic import callback was invoked without --experimental-vm-modules»). Hay que usar `npm test` (lleva el flag), no `npx jest`; el CI usa `npm run test:cov`, que también lo lleva (`.github/workflows/backend-ci.yml`, `package.json`). Reproducido con Node 24.2 y 22.23; no era defecto del código ni intermitencia. El extractor solo registra `error.name`, por eso el mensaje real no aparecía (correcto por privacidad). Regla añadida en `.claude/rules/testing.md`.
+- **Diferencia 306 vs 304 de `validate-quality`: explicada (inferencia a partir de los patrones de `LIMITS`; no comprobada archivo por archivo).** `LIMITS` solo cuenta archivos bajo `capabilities/`: la 5.5 sacó de ahí el `.port.ts` y el `.adapter.ts` (306 → 304) y la unidad 6 añadió un `.controller.ts` y un `.service.ts` (304 → 306).
+- **Residual de privacidad (DT-056), sigue abierta:** DT-055 está resuelta (`576a69e`), pero no se verificó: los casos e2e se escribieron después del código y el camino del middleware solo lo cubre su unit. La revisión pensada para antes de la unidad 6 NO se hizo: `POST /ai/opportunity-draft/file` nació con `@NoBodyLog()` y test de metadata, pero la auditoría de las líneas `@TraceFlow`, los headers y los controllers de bench, users y auth-session sigue sin hacerse.
+- **Aviso de regla (sin editar):** `.claude/rules/cv-pii-handling.md` línea 26 dice «Lista cerrada: PDF y DOCX» y el brochure admite además MD y TXT. Decide el usuario si se acota la regla al CV.
+- **Sin verificar en la unidad 4:** `AI_TIMEOUT` y `AI_UNAVAILABLE` contra ICA real (solo puerto falso en unit/e2e); los tests de config y el e2e se escribieron junto con el código, sin verlos fallar antes; el contenedor de `:3000` es una imagen antigua, no se reconstruyó ni se probó el compose.
+- **Defaults sin confirmar:** texto máximo 8000 caracteres, timeout del borrador ICA 30 s y tope del brochure 5 MiB, todos propuestos, no confirmados por negocio. Los tres tienen ya default en código (`OPPORTUNITY_DRAFT_DEFAULT_MAX_TEXT_CHARS`, `OPPORTUNITY_DRAFT_DEFAULT_TIMEOUT_MS`, `OPPORTUNITY_SOURCE_DEFAULT_MAX_FILE_BYTES`). El frontend repite el tope del brochure en `VITE_OPPORTUNITY_SOURCE_MAX_FILE_BYTES` (default 5_242_880 en código y en `.env.example`); solo evita subidas inútiles, el backend es la autoridad.
+- **Resuelta (`42bf836`):** ¿las envs del borrador de texto deben tener default en código? Sí, por decisión del usuario; revoca el «falla cerrado» de la unidad 4. Ausente o vacía → default sin aviso; inválida → default y `Logger.warn` con el nombre de la variable; sin las envs el endpoint ya no responde `AI_UNAVAILABLE` por configuración (solo con `AI_CONFIG.enabled` apagado). No es deuda.
+- **Pregunta abierta (copy):** ¿los demás textos con «IA» del box mágico («Generar con IA», etc.) pasan también a «ICA»? Decide el usuario. Hoy solo cambiaron la etiqueta «Sugerido por ICA» y el aviso `appliedNotice` (`af4e9c1`).
+- **No verificado del ajuste de defaults:** arranque real del backend sin esas envs contra ICA (el e2e usa el puerto falso).
+- **Riesgos de la unidad 6:** (a) firmas PDF/DOCX/OLE duplicadas a propósito respecto de `candidates` (~10 líneas) para no cruzar capabilities (decisión del usuario: no se registra como deuda); (b) **nada verificado contra ICA real con un brochure**, ni DOCX real por HTTP (el e2e solo manda PDF y MD), ni multer con un archivo cercano a 5 MiB; (c) el frontend ya reconoce el código 422 desde la unidad 7 (antes caía en `UNKNOWN`); (d) efecto lateral aceptado y verificado del ajuste en `LocalDocumentTextExtractor` (`getText({ first, pageJoiner: '' })`): el texto de CV de `candidates` ya no lleva el `-- 1 of 1 --` final, sin cambios en los asserts de candidates.
+- **DT-053:** ¿`seniority` se queda en el recurso de banca y en el filtro de `GET /bench`? Hoy no cambia; el match usa `band`.
+- **Decidido en la 5.5:** no lleva ADR (movimiento de código bajo `shared/` que sigue el puerto + adapter de `backend-architecture.md`). ADR-016 sigue «Propuesto». El 400 «The file could not be read: it may be corrupt» es el contrato actual del puerto; en la unidad 6 se resolvió con un error de dominio propio para el brochure (`OPPORTUNITY_SOURCE_UNREADABLE`, 422); el 400 de `candidates` no cambia.
+- Términos [POR VALIDAR CON LUC/GUS] de la U0 sin confirmar por negocio.
+- Deuda de OPP-AI-1: DT-050, DT-056, DT-059 (2 warnings de longitud en specs de la unidad 6), DT-052 (el `PATCH` no puede vaciar `startDate`), DT-053, DT-054 (`isRealDate`: backend resuelto en `shared/validation`; siguen las 2 copias del frontend), DT-057 (`useProcessDataForm.ts` 61/60), DT-058 (`as never` en `useOpportunityDraft`). DT-031 (FlowLog + candidatos) sigue abierta, sin decisión del usuario.
+- **Tests de la unidad 5 más débiles:** `ProcessDataStep.draft.test.tsx` (9 tests) salió en rojo solo por falta de UI, no por aserciones concretas; `AiSuggestedBadge`, `DraftFieldFrame`, `OpportunityDraftBox`, `DraftNotices`, `DraftErrorAlert` y `draftMarks` se escribieron después del código; `OpportunityDraftPanel`, `useGenerateOpportunityDraft` y `useOpportunityDraft` no tienen test propio (los cubre el del organismo). Un test de infra («should translate HTTP errors») falló varias veces por una rareza del runner con `mockRejectedValue` + `rejects.toBeInstanceOf`; quedó con otra forma y pasa, sin causa explicada.
+- **Seguridad del repositorio:** la URL de `origin` lleva un token de GitHub en texto plano en `.git/config`; revocarlo, usar credential helper o SSH y reescribir la URL. Además `~/.gitconfig` tiene `http.sslverify=false`.
+- **21 commits con `Co-Authored-By`** ya en `origin`: quitarlos exige `--force`, descartado hasta nueva orden (nunca `--force`). Los de CAND-2 no la llevan; los nuevos van sin atribución.
+- **Modo `ica` (archivo):** recomendado retirarlo tras la demo (DT-033; contacto vacío y CV huérfanos en ICA si la subida expira).
+- **Imagen de producción (DT-034):** `pdf-parse` arrastra `@napi-rs/canvas`, sin probar en Alpine; verificar antes de DEPLOY-1.
+- **Replanning Bench First** (ADR, `docs/domain.md`, casos de uso, `shared-types`) y `MATCH-1`; actualizar `/roadmap-task` (DT-025). Opcionales: OBS-2, DT-020, DT-027 a DT-038.
 
-| ID | Estado | Prioridad | Depende de |
+### Gates y git (unidad 7; antes, ajuste de defaults, cierre de la unidad 6, unidad 5.5, unidad 5, unidad 4 y DT-055)
+
+**Cierre de la unidad 7 (`ce69852`, `144bae0`):** `FileDropzone` compartido en `shared/components/molecules/`, `CvDropzone` como wrapper fino (ids `cv-file*` y `data-testid` intactos, sus tests sin tocar), `formatFileSize` movido a `shared/utils`, `BrochureDropzone`, hooks `useGenerateOpportunityDraftFromFile` / `useDraftFileUpload` / `useDraftError`, `validateBrochureFile` (.pdf/.docx/.md/.txt + límite), infra `generateOpportunityDraftFromFile` (`POST /ai/opportunity-draft/file`, `FormData` campo `file`), `translate` reconoce `OPPORTUNITY_SOURCE_UNREADABLE`, `DraftErrorAlert` con `onRetry` opcional («Reintentar» solo en errores de texto), env `VITE_OPPORTUNITY_SOURCE_MAX_FILE_BYTES`. Gates re-ejecutados por el orquestador: frontend typecheck 0, lint 0 warnings, vitest 196 archivos / 979 tests (antes 192 / 945), build ok; `validate-quality --strict` 311 archivos, 0 críticos, 0 moderados. Backend sin cambios. **Verificado por test (infra mockeada):** sube y rellena solo vacíos, sin guardar el archivo en estado/store/storage, sin llamar a `createProcess`; tipo no admitido y > límite sin llamar a la infra; `OPPORTUNITY_SOURCE_UNREADABLE` → «No pudimos leer el documento» con formulario intacto; `AI_UNAVAILABLE`/`AI_TIMEOUT` por `code` en la ruta de archivo. **No verificado:** navegador (drag&drop, estilos, foco), corrida real contra ICA con un brochure, multipart real por HTTP, DOCX real, 5 MiB con negocio. Deuda nueva: ninguna (un warning `max-lines-per-function` se resolvió extrayendo un hook); `FileDropzone.tsx` mide 100 líneas contadas y el validador no lo marca.
+
+**Ajuste de defaults del borrador y copy ICA (`42bf836`, `f9193c7`, `af4e9c1`):** `OPPORTUNITY_DRAFT_MAX_TEXT_CHARS` y `OPPORTUNITY_DRAFT_TIMEOUT_MS` pasan a tener default en código (8000 / 30 s) y `TOpportunityDraftConfig` queda `{ maxTextChars, timeoutMs }`. Gates re-ejecutados por el orquestador: backend typecheck 0, lint 0 errores / 27 warnings (igual que antes), `npm test` 88 suites 837/837 (−1 test «falla cerrado» que ya no aplica), e2e contra Mongo real 34 suites 269/269 (el escenario «envs faltantes» pasó de 503 a 200); `validate-quality --strict` 306 archivos, 0 críticos. Frontend sin cambios en este paso (el rename a «ICA» es `af4e9c1`). **No verificado:** arranque real sin las envs contra ICA. `.env.example` coincide con los docs. Lo escrito abajo sobre «falla cerrada sin la env» describe el estado del cierre de la unidad 6 y ya no rige.
+
+**Cierre de la unidad 6 (`14280d3`):** Gates re-ejecutados por el orquestador tras los dos ajustes posteriores (extractor con `pageJoiner: ''`; default en código del tope del brochure). Backend: typecheck 0, lint 0 errores / 27 warnings (base 25; los 2 nuevos son `max-lines-per-function` en `opportunity-draft-file.service.spec.ts` y `test/ai-opportunity-draft-file.e2e-spec.ts`, DT-059), `npm test` 88 suites 838/838 (base 84/793; antes de los ajustes 839: −2 casos de «PDF sin texto con marcador» del servicio, que ya no aplican, y +1 caso de config), e2e contra Mongo real 34 suites 269/269 (base 33/257, +12; ahora también comprueba que con env inválida un archivo real sigue la ruta normal, 200). El 422 por PDF sin texto lo cubren el spec del adapter y el e2e. Frontend: typecheck 0, lint 0 warnings, 192 archivos 945/945, build ok (único cambio: una línea de copy). `validate-quality --strict` 306 archivos, 0 críticos, 0 moderados. Greps: `ai` no importa `candidates` en código no-test. **Verificado:** 401/403 sin llamar a ICA; 200 con PDF y MD/TXT por HTTP (e2e) y con DOCX en el test del servicio con extractor falso; 422 en PDF sin texto y PDF corrupto (sin llamar a ICA); 400 en xlsx, archivo ausente, sobre el tope y texto largo; validación por firma; `AI_UNAVAILABLE`/`AI_TIMEOUT` con puerto falso y falla cerrada sin la env; `@NoBodyLog()` con test de metadata; sin PII en logs (espía de Logger: ni nombre ni contenido). **No verificado:** corrida real contra ICA con un brochure; DOCX real por HTTP; multer con archivo cercano a 5 MiB; UI; 5 MiB y 8000 chars/30 s con negocio; recorrido en navegador del box mágico (unidad 5). Los tests de la línea de copy del frontend no existen (sin test propio). Deuda: DT-059 (2 warnings de longitud en specs). `ai.controller.ts` mide 61 líneas pero `validate-quality` no lo marca (0 moderados) y no se registra. Commit `8b826b5`: CLAUDE.md pide `npm test --` para tests individuales del backend.
+
+**Cierre de la unidad 5.5 (`aa1b8d5`):** Backend: typecheck 0, lint 0 errores / 25 warnings (línea base), `npm test` 84 suites 793/793, e2e contra Mongo real 33 suites 257/257; `validate-quality --strict` 304 archivos, 0 críticos, 0 moderados. Greps: 0 resultados de `cv-text-extractor|CV_TEXT_EXTRACTOR_PORT|LocalCvTextExtractor|ICvTextExtractorPort` en `src` y `test`; `ai` no importa `candidates`; `shared/document-text` no importa `capabilities/`. No verificado: uso desde `ai` (unidad 6), recorrido en navegador de la unidad 5, la diferencia 306→304 en `validate-quality`. Frontend no tocado.
+
+**Cierre de la unidad 5 (sin commitear):** Frontend: typecheck 0, lint 0 errores y 0 warnings (`--max-warnings 0`), tests 192 archivos / 945 tests (partida 182 / 909), build ok; `validate-quality --strict` 306 archivos, 0 críticos, 0 moderados. Backend: no tocado ni re-ejecutado (último estado conocido: jest 793, e2e 257, lint 25 warnings). Tokens de Tailwind usados comprobados uno a uno en `tailwind.colors.ts` / `tailwind.config.ts`. TDD en rojo por la razón correcta en `applyOpportunityDraft`, `opportunityDraft.translate` y `opportunityDraft.infra`.
+
+**Tras DT-055 (sin commitear, `576a69e`):** backend typecheck 0, lint 0 errores / 25 warnings (+2 `max-lines-per-function`: `flow-log.interceptor.spec.ts` y `test/flow-log-no-body.e2e-spec.ts`), jest 84 suites 793/793, e2e contra Mongo real 33 suites 257/257; `validate-quality --strict` 294 archivos, 0 críticos, 0 moderados. Frontend no tocado ni re-ejecutado. Corrida real en el puerto 3101 (`FLOW_LOG_ENABLED=true`): 0 apariciones de las marcas ni de ITAU/NestJS en el log; el login sigue mostrando su body con el token redactado.
+**Cierre de la unidad 4:** Backend: typecheck 0, lint 0 errores / 23 warnings (3 nuevos `max-lines-per-function` en specs largos), jest 82 suites 778/778, e2e contra Mongo real 32 suites 253/253 (12 nuevos). Frontend: typecheck 0 (tests sin re-ejecutar; 909/909 en la 3.5). `validate-quality --strict`: 294 archivos, 0 críticos, 0 moderados. Corrida real contra ICA (claude-haiku-5-5, puerto 3100): texto ITAU → 200 en ~5,5 s con título, cliente ITAU, rol Fullstack, skills [React, NestJS], banda 8, inicio 2026-12-01, sin vacíos; texto «backend senior con Java y Spring» → cliente vacío, banda null, aviso y `missingFields`; intento de inyección en el texto → no obedecido; carlos@ 403, sin token 401, 8001 caracteres → 400 `OPPORTUNITY_TEXT_TOO_LONG`, texto en blanco → 400; logs solo `chars`, `latencyMs`, `outcome`. Git: rama `feature/OPP-AI-1`, commit A `401336a` hecho, commit B `4eb4858`, sin push; `origin` = `klysweribm/talent-bridge-now`; commits sin atribución.
+
+### Backlog por prioridad
+
+| ID | Prio | Depende de | Qué es |
 | --- | --- | --- | --- |
-| OPP-AI-1 | 🚧 U0 (docs) ✅, 2 (textos) ✅, 2.5 (banda) ✅, 3 (skills) ✅, 3.5 (`band` y `startDate`) ✅; U1, U2, U3 y 5.5 📌 sin arrancar: oportunidad asistida por IA (box mágico, brochure) y sugerencias de la banca | HIGH | AI-1, BENCH-1, CAND-2 |
-| CAND-2 | ✅ cerrado en código y probado en vivo por el usuario en local (carga de CV con 3 modos, alta y actualización por correo con auditoría, IA vía ICA); queda solo la imagen de producción (DT-034) | HIGH | AI-1 |
-| AI-1 | ✅ cerrado en código y verificado en vivo: capability `ai` (ICA) con coordinator simple; ahora también archivos y consulta con definición propia (CAND-2) | HIGH | — |
-| PROC-1 | ✅ cerrado en código en `feature/PROC-1`, pendiente de tu recorrido en navegador (contrato, backend de usuarios/procesos/asociación/límites/lista de candidatos, formulario «Nuevo proceso» de 3 pasos, lista y detalle de procesos, «Candidatos» en el menú, Inicio con procesos reales; deuda DT-039 a DT-042): crear procesos, asociar de 1 a N candidatos (límite en el backend), listar procesos; PM y reclutador únicos | HIGH | CAND-2 |
-| CAND-4 | 📌 sin arrancar: retirar el modo `ica` con archivo (DT-033) y mejorar el modo clásico (país, rol, experiencia) | LOW | CAND-2 |
-| BENCH-1 | 🚧 verificado en vivo (stack, `curl` por rol, imagen de producción); falta el recorrido con los 3 roles | HIGH | AUTH-1, Etapa 2 |
-| QW-1 | 🚧 implementado, falta el recorrido en navegador (DT-010) | HIGH | — |
-| FE | 🚧 Etapas 0-2 en código; Etapa 2 pendiente de revisión en navegador | MEDIUM | — |
-| DRAFT-1 | 📌 sin arrancar (registrada; recuperar formularios no enviados tras el cierre de sesión) | MEDIUM | QW-2, PROC-1, CAND-2 |
-| FE-OTP-1 | 📌 sin arrancar | LOW | Etapa 1 (cerrada) |
-| AUTH-2 | 📌 sin arrancar | LOW | FE-OTP-1 |
-| AUTH-3 | 📌 sin arrancar | LOW | QW-2, AUTH-2 |
-| AUTH-4 | 📌 sin arrancar | LOW | AUTH-3 |
-| HARDEN-1 | 📌 sin arrancar | LOW | features de UI |
-| DEPLOY-1 | 📌 sin arrancar | LOW | HARDEN-1 |
-| AUTH-1 | ✅ cerrado en código (falta DT-010) | HIGH | QW-1 |
-| QW-2 | ✅ cerrado en código (falta DT-010) | HIGH | AUTH-1 |
-| OBS-1 | ✅ cerrado en código | LOW | — |
+| DRAFT-1 | MEDIUM | QW-2, PROC-1, CAND-2 | Recuperar formularios no enviados tras cierre de sesión (detalle abajo) |
+| CAND-4 | LOW | CAND-2 | Retirar el modo `ica` con archivo (DT-033) y mejorar el clásico (país, rol, experiencia) |
+| FE-OTP-1 | LOW | Etapa 1 | Login OTP por correo `@ibm.com` + panel de marca (spec en `docs/use-cases/auth.md`) |
+| AUTH-2 | LOW | FE-OTP-1 | Backend real de OTP con JWT |
+| AUTH-3 | LOW | QW-2, AUTH-2 | Refresh y expiración por inactividad en backend (cierra DT-018) |
+| AUTH-4 | LOW | AUTH-3 | Tokens en cookies httpOnly (cierra DT-019) |
+| HARDEN-1 | LOW | features de UI | Endurecimiento transversal (= FE Etapa 8) |
+| DEPLOY-1 | LOW | HARDEN-1 | Deploy en IBM Cloud `br-sao` |
+| Replanning Bench First / MATCH-1 | — | — | ADR, dominio, casos de uso; FE Etapas 3-7 esperan este replanning |
+| POC 2e, 2f | — | — | Detalle de proceso con acciones (editar, agregar/quitar candidatos, reclutador, estado, cancelar) y regla de no más barrels. Estado a 2026-11-02: «en curso por otro agente»; avance sin confirmar |
+| POC 2c | — | — | Dashboards propios por rol (el del referente no muestra procesos: la API le responde 403); hoy solo el contador y la lista de procesos son reales |
+| POC 2b | — | — | Visibilidad `public/protected` de candidatos y filtro por dueño (R1-R3) |
+| POC 4 y 5 | — | — | Asignar referente técnico a un proceso y lista de referentes con disponibilidad (juntas; requieren sembrar referentes) |
+| POC 6a, 6b | — | — | Booking, vista PM/reclutador y vista referente |
+| POC 8 | — | — | Feedback asistido por IA |
+| POC 7, 9 | — | — | Estrellas y rating de referentes; pool externo de casi-contratados (bajo esfuerzo) |
+
+Orden sugerido de la POC: 2e/2f → 4 y 5 → 6a y 6b mínimas → 8 → 2c → 7 y 9; la 2b al final salvo que la demo exija privacidad entre reclutadores. Equivalencias Bench First: PROC-2 = Oportunidades + box mágico; CAND-1 = BENCH + Talent Pool + carga de perfil; INT-1 = disponibilidad + booking top 5 + entrevistas por etapa; FEED-1 = feedback en 3 etapas con IA; REP-1 = dashboard ejecutivo (PDF LOW); CV-1 = acción «analizar perfil» vía ICA. Esos IDs ya no existen como secciones. Caja 3 de `/processes/new` (spec pendiente): unidad de negocio, cliente, descripción, rol, expertise, contacto en el cliente, código de proyecto, PM del proyecto (los tres últimos opcionales) y plazos de contratación.
 
 ---
 
-## Estado actual / próximo paso
+## 🚧 OPP-AI-1 — Oportunidad asistida por IA y sugerencias de la banca (HIGH)
 
-> Se actualiza al cerrar cada tarea (`/roadmap-task` o `/update-roadmap`). El detalle histórico vive en el
-> Historial de abajo y en `good-practices/DEBT_TECH.md` → Resueltos.
+**Estado:** unidades 1-3.5 ✅ en `main` (PR #7; detalle en git y en `opportunities-ai.md`); unidad 4 ✅ backend (rama `feature/OPP-AI-1`, commit `4eb4858`); unidad 5 ✅ frontend (`2d750e3`, sin verificar en navegador); 5.5 ✅ refactor `shared/document-text` (`aa1b8d5`); 6 ✅ backend del brochure (`14280d3`); 7 ✅ frontend del dropzone (en código y tests, `ce69852`, `144bae0`, sin verificar en navegador); 8 SIGUIENTE; 9-11 📌 · **Casos de uso:** [`docs/use-cases/opportunities-ai.md`](./docs/use-cases/opportunities-ai.md) (R1-R7) · **Lenguaje:** [`docs/glossary.md`](./docs/glossary.md) · **Decisión:** ADR-016 (Propuesto) · **Depende de:** AI-1, BENCH-1, CAND-2 · **Commits:** `22cfeee`, `5678f4e`, `68c60dd`, `e1140a6`, `c5e8ac0`, `6d732cb`, `401336a`, `4eb4858`, `576a69e` (DT-055), unidad 5: `2d750e3`, unidad 5.5: `aa1b8d5`, unidad 6: `14280d3`, `043f3ee`, `7c1c90a` (docs), ajuste de defaults y copy ICA: `af4e9c1`, `42bf836`, `f9193c7` (docs); unidad 7: `ce69852`, `144bae0`.
 
-**Próximos pasos, en orden:**
-0. **CAND-2 (cerrado y mergeado en `main`, PR #5):** el usuario probó en su equipo, en local, la IA (ICA) y la carga de CV
-   (alta, actualización por correo, datos adicionales) y funcionan bien.
-1. **PROC-1 (cerrado en código, rama `feature/PROC-1`; falta tu recorrido en navegador y los commits):** crear procesos,
-   asociarles de 1 a N candidatos (`MAX_CANDIDATES_PER_PROCESS` en el backend) y listarlos, con un PM y un reclutador únicos
-   por proceso; «Candidatos» en el menú; Inicio con el total y la lista reales de procesos. Plan en
-   `~/.claude/plans/mellow-finding-oasis.md`. El formulario sigue el diseño de `docs/design/mockups/proceso-nuevo/`
-   reducido a 3 pasos (Datos, Candidatos, Confirmar). Fuera del MVP y anotado como futuro: paso de referentes (features 4 y
-   5), seniority/descripción/duración/skills del rol, borradores, buscador de candidatos existentes, notificaciones
-   Outlook/Slack, etapas y semáforo del proceso. **Siguiente: dashboard por rol** (Inicio propio de reclutador, PM y
-   referente técnico; hoy el del referente no muestra procesos porque el API le responde 403).
-2. **Decidir el modo `ica` (archivo):** recomendado retirarlo tras la demo (DT-033); es el único con el defecto de contacto
-   vacío y deja CV huérfanos en ICA si la subida expira.
-3. **Imagen de producción (DT-034):** no se prueba en esta POC (corre en el equipo del usuario). Queda como deuda: `pdf-parse`
-   arrastra `@napi-rs/canvas` y sobre Alpine no está probado; verificarlo antes de DEPLOY-1.
-4. **Recorrido en navegador con los 3 roles** (ana@, carlos@, mariana@ibm.com): cierra BENCH-1 y de paso DT-010 (F5
-   conserva la sesión, ningún link da 404, aviso de inactividad a los 360 s). Con eso se pueden cerrar QW-1, AUTH-1,
-   QW-2 y la Etapa 2, y las deudas DT-002, DT-007 y DT-024.
-5. **Seguridad del repositorio:** la URL de `origin` lleva un token de GitHub en texto plano dentro de `.git/config`.
-   Revocarlo, pasar a un credential helper o SSH y reescribir la URL sin credenciales. Además `~/.gitconfig` tiene
-   `http.sslverify=false`.
-6. **Decidir qué hacer con los 21 commits con `Co-Authored-By`:** ya están en `origin`, así que quitarlos exige `--force`,
-   descartado hasta nueva orden. Los commits de CAND-2 no llevan esa línea.
-7. **Replanning Bench First** (ADR, `docs/domain.md`, casos de uso, `shared-types`) y `MATCH-1`. Al replanificar hay que
-   actualizar `/roadmap-task` (DT-025). Opcionales: OBS-2, DT-020 y las deudas DT-027 a DT-038.
+El PM o reclutador describe el perfil en un box mágico o sube un brochure; la IA (ICA) rellena el formulario sin crear nada, y en la etapa 2 se sugieren recursos de la banca con un % de match calculado por el backend.
 
-**Gates (2026-11-02, tras CAND-2):** backend 394 unit / 139 e2e (antes 112 / 74), lint 0 errores / 14 warnings, build OK;
-frontend 489 tests (antes 375), lint 0 errores (2 warnings preexistentes en `sessionCacheGuard.test.tsx`; el script
-`npm run lint` usa `--max-warnings 0` y por eso sale en rojo), build OK; `validate-quality --strict` 0 críticos sobre 177
-archivos. Verificado en vivo por el usuario en local (ICA real, Mongo y navegador); la imagen de producción no se prueba (DT-034).
+**Decisiones vigentes:** la banda es un entero 6 a 10 (sin jr/ssr/sr/lead) y el match compara banda con banda (misma 100, diferencia de 1 → 50, resto 0); pesos y umbral (`MATCH_WEIGHT_*`, `MATCH_THRESHOLD=75`, `MATCH_EXPLAIN_TIMEOUT_MS=10s`) por ConfigService; ICA solo explica y nunca recibe nombre, código ni contacto; `startDate` opcional `YYYY-MM-DD` (ausente → «Disponibilidad: no evaluada» y pesos redistribuidos); «Expectativas de evaluación técnica» = `roleDescription`, que el borrador rellena; skills desconocidas se conservan como se escribieron (catálogo en `apps/backend/src/shared/skills/`, import directo, sin barrel); el texto se extrae vía `shared/document-text` (existe desde la 5.5; `ai` lo importa desde la 6 vía `DocumentTextModule`), sin consumir `candidates`; logs solo con longitud, latencia y resultado; fixture de verificación ITAU: Fullstack, React + NestJS, banda 8, inicio 2026-12-01.
 
-**Gates de PROC-1 (2026-11-02, re-ejecutados por el líder):** línea base 394 unit / 139 e2e (backend) y 489 tests (frontend). Al cierre: backend typecheck limpio, lint 0 errores / 14 warnings, 472 unit / 178 e2e, build OK con 0 `.js` que importen `shared-types`; frontend typecheck limpio, lint 0 errores / 2 warnings, 671 tests, build OK; `validate-quality --strict` 0 críticos sobre 252 archivos. **No verificado:** todo lo visual y el navegador; los `curl` de escritura (crear proceso, asociar y quitar candidatos) solo están cubiertos por los e2e; el arranque real con el código de `GET /candidates` (el contenedor del backend debe recrearse).
+**Criterios pendientes**
 
-**Git:** rama `feature/PROC-1` (sale de `main` tras el merge de CAND-2), sin push. `origin` apunta a
-`klysweribm/talent-bridge-now`; nunca `--force`.
+- **Unidad 4 (HU U1, backend) ✅:**
+  - [x] Texto libre → borrador con vacíos y aviso (R1, R2); corrida real con ICA (ITAU) verificada.
+  - [x] ICA falla → `AI_UNAVAILABLE` 503 / `AI_TIMEOUT` 504; texto largo → `OPPORTUNITY_TEXT_TOO_LONG` 400. Verificado solo con puerto falso; no contra ICA real lento o caído.
+  - [x] Referente técnico 403 y sin token 401 en `POST /ai/opportunity-draft`.
+- **Unidad 5 (HU U1, frontend) ✅ en código y tests; falta verificación humana en navegador:**
+  - [x] Los campos rellenados (solo los vacíos; no pisa lo escrito) muestran «Sugerido por ICA» (antes «IA», `af4e9c1`), que se quita al editar; no se crea nada hasta «Crear oportunidad» (R1; test: no se llama a `createProcess`). Pendiente de verificación humana.
+  - [x] Campos vacíos y `missingFields` «por completar» con aviso (R2). Pendiente de verificación humana.
+  - [x] Si ICA falla: mensaje claro y formulario manual (R6), ramificando por `code` (`AI_UNAVAILABLE`, `AI_TIMEOUT`, `OPPORTUNITY_TEXT_TOO_LONG` con el `message` del servidor; sin code → `UNKNOWN`; red caída → `NETWORK`). Solo con la infra mockeada.
+  - [ ] Escenario «Skills normalizadas» de extremo a extremo («Reactjs»/«Nestjs» → «React»/«NestJS»; depende también de la unidad 8).
+- **Unidad 5.5 ✅:**
+  - [x] Puerto `DOCUMENT_TEXT_EXTRACTOR_PORT` en `shared/document-text`, consumido por `candidates` vía `DocumentTextModule`; tests de CAND-2 en verde sin cambio de comportamiento (mismo 400, mismas constantes).
+  - [x] `ai` lo consume: `AiModule` importa `DocumentTextModule` y `OpportunityDraftFileService` usa el puerto (unidad 6, `14280d3`).
+  - Menor: `DOCUMENT_PDF_MIME` duplica `CV_PDF_MIME` (queda en `cv.constants.ts`); no se registra como deuda por no cumplir el criterio de DEBT_TECH.
+- **Unidad 6 (HU U2, backend) ✅ (`14280d3`):**
+  - [x] Backend (R3): el brochure rellena igual que el box (delega en `OpportunityDraftService.draft`), se procesa en memoria, y los logs solo llevan `bytes`, `latencyMs`, `outcome` (test con espía de Logger); `@NoBodyLog()` con test de metadata. Verificado con PDF y MD por HTTP y DOCX con extractor falso; **no contra ICA real**.
+  - [x] Backend: PDF sin texto, corrupto o en blanco → 422 `OPPORTUNITY_SOURCE_UNREADABLE` «No pudimos leer el documento», sin llamar a ICA.
+  - [x] recruiter+pm; technical_ref 403; sin token 401.
+- **Unidad 7 (HU U2, frontend) ✅ en código y tests; falta verificación humana en navegador:**
+  - [x] El dropzone sube el brochure y rellena solo campos vacíos (parte UI de R3: no guarda el archivo ni su contenido en estado/store/storage, no llama a `createProcess`). Test de integración con infra mockeada.
+  - [x] `opportunityDraft.translate.ts` reconoce `OPPORTUNITY_SOURCE_UNREADABLE` → «No pudimos leer el documento» y el formulario queda intacto (parte UI del 422).
+  - [x] Test propio del copy y de la traducción; además tipo no admitido y > límite sin llamar a la infra, y `AI_UNAVAILABLE`/`AI_TIMEOUT` por `code` en la ruta de archivo.
+- **Unidades 8-9 (HU U3, backend):** [ ] % determinístico independiente de ICA (R4); [ ] sin `startDate` → disponibilidad no evaluada (R5); [ ] solo recursos `available` o `soft_booked`, sin acción de asignar (R7); [ ] ICA solo recibe skills, nivel, banda y disponibilidad; [ ] technical_ref 403 y sin token 401 en `POST /bench/match`.
+- **Unidad 10 (panel):** [ ] «Sugeridos de la banca» ordenados por %, con «Recomendado» desde 75 %, skills que cumple y que le faltan; [ ] ICA caído → % y desglose sin la frase de la IA; [ ] sin coincidencias → «Sin coincidencias suficientes en la banca» y «Buscar candidatos externos»; [ ] cambiar el perfil recalcula; [ ] el mismo panel en el detalle de la oportunidad.
+- **Unidad 11:** [ ] e2e, corrida real con ICA y checklist de navegador (ver «Qué falta»).
 
 ---
 
-## 🚧 En curso y por verificar
+## 🚧 PROC-UX-1 — Agregar candidato sin salir del wizard «Nueva oportunidad» (MEDIUM)
 
-> Lo que sigue abierto. Orden: lo más importante primero.
+**Estado:** unidades A, B y C ✅ en código y tests (rama `feature/OPP-AI-1`, sin push); sin verificar en navegador · **Casos de uso:** [`docs/use-cases/processes.md`](./docs/use-cases/processes.md) (R5, R5.1) · **Deuda:** DT-061 abierta (DT-060 resuelta) · **Depende de:** PROC-1, CAND-2 · **Commits:** `67dd657` (funcionalidad), `c97d893` (docs), `39b32ca` (ruta `/candidates/new` lazy y limpieza).
 
-## OPP-AI-1 — Oportunidad asistida por IA y sugerencias de la banca (HIGH)
+**Decisión vigente (R5.1):** Oportunidad, Candidatos y Referentes son procesos independientes. La oportunidad se crea sin candidatos ni referentes; los referentes se asocian desde el detalle; el paso 2 es opcional («Siguiente» siempre habilitado con 0 candidatos). El panel es un atajo opcional: el candidato creado ahí queda guardado definitivamente, independiente de la oportunidad, y «Cancelar y descartar» (paso 3) no lo borra.
 
-**Estado:** 🚧 U0 (documentación), 2 (textos), 2.5 (banda), 3 (skills) y 3.5 (banda en banca y `startDate`) ✅, todas sin commit; el resto 📌 sin arrancar · rama `feature/DT-01` · **Casos de uso:** [`docs/use-cases/opportunities-ai.md`](./docs/use-cases/opportunities-ai.md) (R1-R7) · **Lenguaje:** [`docs/glossary.md`](./docs/glossary.md) · **Decisión:** ADR-016 (Propuesto) · **Depende de:** AI-1, BENCH-1, CAND-2 · **Deuda:** DT-050, DT-052, DT-053, DT-054 (DT-051 resuelta)
+**Alcance entregado**
+- **A:** `SidePanel` genérico en `shared/components/organisms/SidePanel` (`useSidePanel()`/`forceClose`, `guardClose`, `returnFocusTo`, ancho md/lg, clic fuera, Esc, focus trap recalculado en cada Tab, cede el foco a un `alertdialog` anidado, bloqueo de scroll); hooks shared `useFocusTrap`, `useBodyScrollLock`; `useDialogFocus` movido de bench a `shared/hooks`. `BenchResourceDrawer` es un envoltorio fino. **Cambio de comportamiento aceptado en Banca:** gana clic fuera, focus trap y bloqueo de scroll; la cabecera queda fija y el cuerpo hace scroll. Gates A: typecheck 0, lint 0 warnings, 197 archivos / 995 tests, build ok, validate 311 archivos 0 críticos.
+- **B:** `CandidateCreateForm` (`features/candidates/.../CandidateCreateForm`): siempre llama `onSuccess(candidate, mode)` (el 2º argumento `mode` se añadió sobre el plan), nunca renderiza `CandidateCreated`; props `onCancel`, `stacked`, `onStateChange({busy,dirty,saving?})`. `NewCandidateFlow` lo usa y renderiza `CandidateCreated` (`/candidates/new` sin cambios visibles). `useCreateCandidate` invalida `candidate-list` (hueco previo). Gates B: 200 archivos / 1010 tests, validate 313.
+- **C:** «+ Agregar candidato» (Button, no Link) abre `AddCandidatePanel` (SidePanel lg) sin cambiar la URL; siempre visible y habilitado; lista vacía → «No hay candidatos disponibles. Puedes crear uno o continuar sin candidatos.». `onSuccess` vive en `useAddCandidateInPanel` (independiente del panel montado): invalida `available-candidates`, preselecciona si hay cupo y muestra un aviso inline persistente con «Cerrar aviso» (3 variantes: seleccionado / límite lleno «ya tienes N de N» / límite aún no cargado). Regla de cierre única: guardado pendiente bloquea; extracción en curso → «La extracción sigue en curso. ¿Cerrar y descartar?»; con datos → «¿Descartar este candidato?»; sin datos cierra; «Descartar» usa `forceClose`. Limpieza: eliminados `NEW_PROCESS_ORIGIN`, `TCandidateOrigin`, `ICandidateNavState`, `CANDIDATE_EXIT_LINKS.newProcess`, `useCandidateExitLink` y `CandidateReviewForm.exit.test.tsx` (ya no existe «Volver a la nueva oportunidad»). Gates C (re-ejecutados por el orquestador): typecheck 0, lint 0 warnings, vitest 203 archivos / 1037 tests, build ok, `validate-quality --strict` 317 archivos 0 críticos 0 moderados. Backend sin cambios.
 
-El PM o reclutador describe el perfil en un box mágico o sube un brochure; la IA (ICA) rellena el formulario de la oportunidad sin crear nada, y en la etapa 2 se sugieren recursos de la banca con un % de match calculado por el backend.
+**Criterios de éxito (marcados solo si hay test)**
+- [x] La URL no cambia al abrir, guardar o cerrar el panel.
+- [x] Cerrar conserva el wizard y la selección.
+- [x] Cerrar con datos pide confirmación; extracción o guardado en curso bloquea o advierte.
+- [x] El formulario tiene las mismas capacidades (reutiliza el mismo componente) y la lógica no está duplicada.
+- [x] Nada se guarda hasta confirmar.
+- [x] Al guardar: el panel se cierra, aparece el aviso, la lista se refresca (el candidato aparece), se preselecciona y el contador sube.
+- [x] Límite lleno → el candidato se crea pero no se selecciona.
+- [x] Sin candidatos sigue siendo posible avanzar.
+- [x] pm y recruiter se comportan igual.
+- [x] `role="dialog"`, `aria-modal` y título accesible; el foco vuelve al botón.
+- [x] Banca igual salvo el cambio aceptado.
+- [x] El código de candidates solo se descarga si se abre el panel. Verificado por build (chunk `CandidateCreateForm-*.js` aparte, 26,69 kB / gzip 8,92 kB; bundle principal 471,79 → 444,67 kB, sin aviso de import mixto) y por test mutado (0 evaluaciones del módulo con el panel cerrado, 1 al abrirlo; con import estático el test falla). **No verificada la descarga de red real en navegador.**
+- [x] `technical_ref` no alcanza el panel: `/processes`, `/processes/new`, `/candidates` y `/candidates/new` lo redirigen a `/dashboard` (tests de router).
 
-| Unidad | Alcance | Estado |
-| --- | --- | --- |
-| U0 | Documentación: glosario, ADR-016, caso de uso `opportunities-ai.md` | ✅ hecha (solo documentación, sin commit; no aplica navegador) |
-| 2 | Textos «Proceso» → «Oportunidad» en la interfaz (copy por feature) | ✅ hecha (verificado: 889 tests, typecheck, lint, `validate-quality --strict`; sin commit; no verificado: navegador) |
-| 2.5 | Documentación por la banda: la banda es un entero 6 a 10 (no jr/ssr/sr/lead); el match compara banda con banda; cierra DT-051 | ✅ hecha (solo documentación, sin commit; no aplica navegador) |
-| 3 | Módulo de skills: catálogo canónico con alias en `apps/backend/src/shared/skills/` (`normalizeSkill`, `normalizeSkills`, `skillKey`, `sameSkill`; sin barrel) | ✅ hecha (verificado: spec de 25 tests en verde con TDD, typecheck, lint 0 errores / 20 warnings como la línea base, `validate-quality --strict` 291 archivos 0 críticos; sin commit; aún nadie lo importa, lo consumen U1 y U2; no verificado: nada en vivo) |
-| 3.5 | `band` (6 a 10) en cada recurso de banca y `startDate` en la oportunidad (contrato en `shared-types`, mock de banca, schema, DTO y formulario) | ✅ hecha (backend + frontend, sin commit; verificado: gates y e2e contra Mongo real, y lectura en vivo de `GET /bench` y `GET /processes`; no verificado: navegador, escritura real y base ya sembrada; ver criterios) |
-| U1 | Borrador de oportunidad con IA: `POST /ai/opportunity-draft` y `/file`, box mágico y brochure | 📌 sin arrancar |
-| 5.5 | Refactor backend: `src/shared/document-text` detrás de un puerto, consumido por `candidates` y `ai`; commit propio | 📌 sin arrancar |
-| U2 | Match de la banca: `POST /bench/match` y `GET /processes/:id/bench-suggestions` (incluye 5.5) | 📌 sin arrancar |
-| U3 | Panel «Sugeridos de la banca» en la etapa 2 y en el detalle, con explicación de la IA | 📌 sin arrancar |
+**No verificado:** recorrido real en navegador; teclado real y focus trap fuera de jsdom; estilos a 640 px; extracción real de 90 s con ICA; creación real de candidato por HTTP; el fallback «Cargando…» de rutas (`<Suspense>` en `AppRouter`) al navegar a `/candidates/new`; los 8 casos manuales del usuario.
 
-### Criterios de éxito
+**Menores:** `CandidateCreateForm.onSuccess` tiene un 2º argumento `mode` no previsto en el plan; el aviso de creación con el panel desmontado solo está cubierto a nivel de hook; el test «no se llama a borrado» usa `Object.keys(candidatesInfra)` (aserción débil).
 
-**U0**
-- [x] Glosario, ADR-016 (Propuesto) y caso de uso con Gherkin y R1-R7 escritos y enlazados desde `CLAUDE.md` y `docs/use-cases/README.md`.
-- [ ] Términos marcados [POR VALIDAR CON LUC/GUS] confirmados por el negocio.
+**Deuda:** DT-060 resuelta en `39b32ca` (ruta lazy); DT-061 abierta (acople `processes` → `candidates`; salida decidida por el usuario: inyectar el formulario desde la página del wizard con slot o render prop, no moverlo a `shared`).
 
-**Unidad 2 (textos)**
-- [x] Menú, títulos y botones dicen «Oportunidad»; rutas y API siguen en `processes` (escenario «Textos visibles»). Verificado por tests; falta el recorrido en navegador.
-
-**Unidad 2.5 (banda)**
-- [x] Glosario, `opportunities-ai.md`, criterios y DT-051 usan «banda» (entero 6 a 10); sin tabla jr/ssr/sr/lead.
-
-**Unidad 3 (skills)**
-- [x] El módulo normaliza «Reactjs» y «Nestjs» a «React» y «NestJS» y conserva las desconocidas (25 tests unitarios). Falta el escenario «Skills normalizadas» de extremo a extremo, que depende de U1 y U2.
-
-**Unidad 3.5 (banda en la banca y fecha de inicio)**
-- [x] Cada recurso de banca lleva `band` (6 a 10; el seed rechaza 5, 11, 7.5, '8' y ausente; un documento sin `band` se lee como 6) y la oportunidad admite `startDate` opcional (`YYYY-MM-DD`, fecha real; inválida → 400, ausente → `null`). Verificado: jest 675 pasan / 4 fallan (los 4 de PDF preexistentes), e2e contra Mongo real 241/241 en 31 suites, frontend 909/909, typecheck, lint y build limpios, `validate-quality --strict` 292 archivos 0 críticos; y en vivo `GET /bench` devuelve `band` (BN-0010 ssr → 7) y `GET /processes` devuelve `startDate`.
-- [x] Los filtros actuales de `GET /bench` (incluido `seniority`) no cambian; el match usa `band`, no `seniority` (ver `docs/use-cases/bench.md`).
-- [x] Bug hallado por los tests y corregido en backend y frontend: mes 13 o día 32 lanzaba `RangeError` (500); ahora responde 400.
-- [ ] Recorrido en navegador del campo «Fecha de inicio» (paso 1, edición, resumen y tarjeta de detalle), un `POST /processes` con `startDate` real por curl, y el arranque sobre una base sembrada antes del cambio (el seeder es idempotente y reescribe `band`, sin comprobar). Limitación deliberada: el `PATCH` no puede vaciar la fecha (DT-052). Deuda nueva: DT-052 a DT-054.
-
-**U1 (borrador con IA)**
-- [ ] Texto libre rellena título, cliente, banda y stack, con «Sugerido por IA», y no se crea nada hasta «Crear oportunidad» (R1).
-- [ ] Lo que la IA no infiere queda vacío con aviso de campos por completar (R2).
-- [ ] Brochure PDF rellena igual, y no se guarda en servidor ni en logs (R3).
-- [ ] PDF sin texto extraíble: «No pudimos leer el documento» (`OPPORTUNITY_SOURCE_UNREADABLE`, 422) y el formulario queda intacto.
-- [ ] Si ICA falla, mensaje claro y el formulario se completa a mano (R6; `AI_UNAVAILABLE`, `AI_TIMEOUT`).
-- [ ] Referente técnico 403 y sin token 401 en `POST /ai/opportunity-draft`.
-
-**5.5 (refactor)**
-- [ ] `shared/document-text` detrás de un puerto, consumido por `candidates` y `ai`, en commit propio y con los tests de CAND-2 en verde sin cambios de comportamiento.
-
-**U2 (match backend)**
-- [ ] % determinístico (60 % skills, 25 % banda, 15 % disponibilidad), independiente de ICA (R4). Banda: misma 100, diferencia de 1 → 50, resto 0; requiere la unidad 3.5.
-- [ ] Sin `startDate`: «Disponibilidad: no evaluada» y pesos redistribuidos (R5).
-- [ ] Solo recursos `available` o `soft_booked`, sin acción de asignar (R7).
-- [ ] ICA solo recibe skills, nivel, banda y disponibilidad; nunca nombre, código ni contacto (R4).
-- [ ] Referente técnico 403 y sin token 401 en `POST /bench/match`.
-
-**U3 (panel)**
-- [ ] «Sugeridos de la banca» ordenados por % en la etapa 2; 75 % o más con «Recomendado»; skills que cumple y que le faltan.
-- [ ] Con ICA caído se ven % y desglose, sin la frase de la IA.
-- [ ] Sin coincidencias: «Sin coincidencias suficientes en la banca» y «Buscar candidatos externos».
-- [ ] Cambiar el perfil recalcula las sugerencias.
-- [ ] El mismo panel aparece en el detalle de la oportunidad creada.
-
-**Verificado:** unidad 3 con tests unitarios y gates estáticos; unidad 3.5 con gates, e2e contra Mongo real y lectura en vivo (ver criterios); el resto es documentación. **No verificado:** navegador, escrituras reales de `startDate` y base preexistente.
-
-**Open risks:**
-- Jest backend (2026-11-06): 675 pasan / 4 fallan, preexistentes y ajenos a OPP-AI-1: `classic-cv-extractor.adapter.spec` y `local-cv-text-extractor.adapter.spec` (CAND-2, lectura de PDF en `candidates`). Se abordan en la unidad 5.5; antes `local-cv-text-extractor` fallaba 2/7 solo al correrlo aislado y pasaba en la suite completa, causa sin investigar. Hasta entonces el gate de jest no queda en verde.
+**Propuestas sin hacer:** (1) opcional del plan: `sessionStorage` del borrador del formulario y guard de salida por sidebar. (2) Detalle de una oportunidad creada: hoy no navega (AddBox inline de candidatos existentes); el mismo patrón sería un botón «Crear candidato» con el mismo `SidePanel` + `CandidateCreateForm`, esfuerzo pequeño (~1 unidad). Decisión pendiente del usuario.
 
 ---
 
-## CAND-2 — Candidato externo desde CV (3 extractores, alta y actualización) (HIGH)
+## 📌 Backlog: detalle de lo esencial
 
-**Estado:** ✅ cerrado: implementado, con tests y probado en vivo por el usuario en local (2026-11-02) · rama `feature/CAND-2` · **Complejidad:** 🔴 Alta · **Casos de uso:** UC-CAND-5 y UC-CAND-6 en [`docs/use-cases/candidates.md`](./docs/use-cases/candidates.md) · **Decisión:** ADR-015
-
-Cargar un CV (PDF o DOCX), extraer un `ICandidateProfileDraft` y mostrarlo en un formulario editable; solo al confirmar
-se crea el `Candidate` tentativo. Tres extractores seleccionables con el mismo esquema: `ica-text` (principal, el backend
-extrae el texto y lo manda a ICA en línea), `classic` (reglas locales completadas con ICA, y que sigue funcionando si ICA
-cae) e `ica` (archivo vía `files`, solo para comparar). `/processes/new` es una cuadrícula de cajas; solo la Caja 1 es
-funcional.
-
-**Decisiones:** `pdf-parse` + `mammoth` para el modo clásico; reintento en Clásica con botón explícito, sin cambio
-silencioso; la extracción no persiste; PII a ICA aceptada para la POC (DT-030) con mitigaciones baratas
-(`.claude/rules/cv-pii-handling.md`); `Candidate` con `cvUrl` opcional y `status`.
-
-**Criterios de éxito:**
-- [x] Contrato en `shared-types` (`candidates.ts`) con typecheck verde en backend y frontend.
-- [x] ADR-015 y UC-CAND-5 / UC-CAND-6.
-- [x] Spike de ICA `files` y diagnóstico en vivo (2026-11-01): `files` no entrega el documento completo al modelo; el texto en línea sí (ver ADR-015).
-- [x] Variable `CV_MAX_FILE_BYTES` en `.env.example` y compose; `.env.example` ordenado por proyecto.
-- [x] Extensión aditiva de `ai` (subir, esperar, borrar, consulta con definición propia) con el coordinator sin lanzar.
-- [x] `POST /candidates/cv-extraction` con los tres modos, roles y 503 sin 401; el modo clásico nunca devuelve 503.
-- [x] `POST /candidates` con email único y `status: 'tentative'`, y `PUT /candidates/:id` con reemplazo total.
-- [x] Pantalla `/candidates/new` y cuadrícula en `/processes/new` (Caja 1 funcional).
-- [x] Defectos de la revisión corregidos: regex cuadráticas, límites del parser, `@TraceFlow()` en `complete`, skills con comas, mock apagado por defecto, correo fijo al actualizar, scripts de Jest para la CI.
-- [x] Prueba en vivo en local, hecha por el usuario (2026-11-02): la IA vía ICA y la carga de CV funcionan bien con CV reales (modos de extracción, alta y actualización).
-- [x] Alta y actualización contra Mongo probadas en local por el usuario.
-- [ ] Imagen de producción con un PDF (DT-034): **fuera de la POC**, queda como deuda; se verifica antes de DEPLOY-1.
-
-**Mejoras pedidas (2026-11-01):**
-- [x] **Tamaño del archivo en la pantalla de carga:** mostrar el peso del archivo elegido y el límite que debe respetar (hoy 5 MiB, `VITE_CV_MAX_FILE_BYTES`, mismo valor que `CV_MAX_FILE_BYTES` del backend). Avisar antes de enviar si lo excede.
-- [x] **Datos adicionales del candidato (pendiente verificar en Mongo y en el navegador):** mostrar, debajo del formulario y con buen formato, lo que el CV aporta y el formulario no edita: `summary` (resumen), `experience` (experiencia) y `education` (educación), además de `languages`. Es solo lectura, como información para el PM o el reclutador; no se agrega al formulario de creación.
-  - La persistencia ya existe: `POST /candidates` guarda `summary`, `experience`, `education` y `languages` en Mongo asociados al candidato (y el frontend los reenvía desde el borrador). Falta verificar en la base que quedan guardados tras crear un candidato real.
-  - Son opcionales, pero enriquecen el perfil y se podrán usar en otras etapas (listado y detalle de candidatos, match).
-  - Depende de que el extractor devuelva esos campos: ICA ya los llena; el modo clásico no (queda para su mejora).
-- [x] **Extracción de ICA incompleta (resuelta y probada en vivo por el usuario):** diagnosticado (ADR-015): `files` no entrega el documento completo al modelo; el texto en línea sí. Implementados `ica-text` y el clásico completado con ICA. Pendiente: prueba en vivo del backend real con los tres modos, tiempos y la actualización de perfiles.
-
-**CAND-2b — Actualizar un perfil desde un CV más nuevo (cerrado):**
-- [x] `PUT /candidates/:id` con reemplazo total; conserva correo, estado, creador y fecha de creación.
-- [x] Auditoría: `createdBy`, `updatedBy` (id, correo y rol del JWT, nunca del cuerpo), `updateCount`.
-- [x] Aviso suave antes de editar si el correo ya existe (`matches.exact`) y aviso no bloqueante de perfiles parecidos (`matches.similar`: mismo nombre normalizado o mismos últimos 8 dígitos del teléfono).
-- [x] Revisión profunda de deuda técnica: hallazgos verificados, defectos corregidos y el resto registrado como DT-031 a DT-038.
-- [x] Probado en vivo por el usuario en local: crear el perfil, volver a cargar el CV y actualizarlo.
-- Límites: la escritura manual no muestra el aviso de parecidos; los candidatos anteriores no tienen claves de búsqueda (DT-032); el RUT queda como campo opcional futuro (decisión con compliance).
-- Pendiente de decidir: mostrar «PM» en vez de «Project Manager» en el aviso de quién actualizó.
-
-**Fuera de alcance (siguiente):** asociar varios candidatos a un proceso (PROC-1); listado y detalle de candidatos; Cajas 2 y 3;
-persistencia del archivo (COS); pool externo; deduplicación avanzada; reintentos automáticos entre extractores; OCR;
-`stream`. **Caja 3 (especificación pendiente):** unidad de negocio (consulting, tech, infra), cliente, descripción,
-rol, expertise, contacto en el cliente (opcional), código de proyecto (opcional), PM del proyecto (opcional) y plazos
-de contratación.
-
----
-
-## AI-1 — Capability `ai`: coordinador de IA vía ICA (HIGH)
-
-**Estado:** ✅ cerrado en código y verificado en vivo (2026-11-01), sin commitear · **Complejidad:** 🟡 Media · **Casos de uso:** [`docs/use-cases/ai.md`](./docs/use-cases/ai.md) · **Decisión:** ADR-014
-
-Servicio inyectable (`AiModule`) al que cualquier capability envía una consulta y recibe una respuesta, con **tópicos**
-por segmento (hoy solo `general`). Es el cimiento de la POC: el CV a JSON, el match con la banca y el feedback asistido
-lo consumen. Reutiliza el proveedor ICA de `architecture-reviewer-app` (mapper, reintento, reparación de JSON).
-
-**Decisiones:** ICA sustituye a watsonx.ai como proveedor (solo el adapter cambia si se revierte); el coordinator nunca
-lanza (`{ ok, ... }`) y los fallos de ICA salen como 503, nunca 401; seguridad falla cerrado, disponibilidad falla
-suave; proveedor `fake` solo por `AI_PROVIDER=fake`, sin respaldo automático; salida estructurada (`jsonMode` + esquema)
-desde el inicio; `ICA_SPACE_ID` se retira; modelo por defecto `claude-haiku-5-5`. PII a ICA: aceptada para la POC
-(DT-030).
-
-**Criterios de éxito:**
-- [x] Contrato en `shared-types` (`ai.ts`), ADR-014, casos de uso y DT-030.
-- [x] Variables en `.env.example` y compose por interpolación (`${ICA_API_KEY:-}`), sin clave en `docker-compose.test.yml` (solo `AI_PROVIDER: fake`).
-- [x] Puerto, adapter ICA, mapper, reintento con backoff y reparación de JSON, con TDD (unit en Jest con `fetch` simulado).
-- [x] Coordinator que nunca lanza, con tope de tiempo total (`AI_TOTAL_TIMEOUT_MS`) y tópico `general`.
-- [x] `GET /ai/status` valida clave y modelo (`MODEL_NOT_FOUND`) sin exponer la clave; `POST /ai/ask` acotado (10/min, `query` ≤ 4000, tópicos en lista cerrada).
-- [x] e2e: 401 / 403 / 400 / 200 / 503; con el proveedor fallando, `/bench` y `/auth` responden normal.
-- [x] Gates (2026-11-01): backend 242 unit / 89 e2e, lint 0 errores / 14 warnings (sin nuevos), build OK, `validate-quality --strict` 0 críticos sobre 114 archivos.
-- [x] Arranque real con y sin clave: con clave `/ai/status` da `available: true` (`claude-haiku-5-5`) y `/ai/ask` 200; sin clave arranca (WARN `AI disabled`), `/health` `database: up`, `/ai/status` `NOT_CONFIGURED`, `/ai/ask` 503 y `/bench` 200. Pendiente: el caso de modelo inexistente (`MODEL_NOT_FOUND`) solo está cubierto por tests.
-- [x] Llamadas reales a ICA: `/ai/ask` (3,3 s) y `response_format: json_object` con un esquema de CV, que validó. Con `max_tokens` bajo (200) el JSON salió truncado (`finish_reason: length`); el tope por defecto de la app pasó a 8192 (el modelo admite 128000 y genera ~150 tokens/s), con timeouts de 60 s por llamada y 90 s en total. Sin verificar en vivo: el backend en ejecución aún no recargó esos valores. El tópico con esquema pasando por el servicio queda para AI-2.
-- [x] La clave no aparece en ningún archivo versionado ni sin ignorar (0 coincidencias) ni en los logs del contenedor (0).
-
-**Límites que deja:** sub-agentes y tool-calling (`TODO(AI-2)`), tópicos de oportunidad / CV / feedback, subida de CV y
-`files`, `stream`, almacén de credencial en memoria, persistencia de conversaciones. Alcance de ICA desde Code Engine
-`br-sao` sin verificar (riesgo de DEPLOY-1).
-
----
-
-## BENCH-1 — Banca desde mock JSON (HIGH)
-
-**Estado:** 🚧 verificado en vivo salvo el recorrido en navegador con los 3 roles · **Complejidad:** 🟡 Media · **Casos de uso:**
-[`docs/use-cases/bench.md`](./docs/use-cases/bench.md)
-
-Primer dato de negocio real: 30 recursos inventados y anonimizados (`bench.mock.json`) se siembran en la colección
-`bench_resources`; `GET /bench` (paginado y filtrable), `GET /bench/skills` y `GET /bench/:benchCode` los exponen a
-`recruiter` y `pm` (`TODO(RBAC-1)`), y `/bench` los muestra con filtros en la URL y un detalle lateral. Solo lectura.
-Es la base de `MATCH-1` y del dashboard ejecutivo. Commits: `797e4fb` (tipos), `f8fbfd5` (backend), `05dc818` (frontend) y `febf8af` (docs).
-
-**Decisiones:** reutiliza `PaginatedResponse` (campo `data`, no `items`); los tipos nuevos de `shared-types` llevan
-prefijo I/T/E y son solo tipos (la imagen de producción no resuelve el alias en runtime, así que los arrays de enum
-viven en el backend); el catálogo de skills solo incluye skills de recursos visibles por defecto; `technical_ref`
-que entra por URL se redirige a `/dashboard`; `BOTTOM_NAV_MAX_ITEMS` sube de 4 a 5.
-
-**Criterios de éxito:**
-- [x] `shared-types` con los tipos de banca, sin email, teléfono ni salario.
-- [x] Seed idempotente por `benchCode` y fail-closed (`BENCH_SEED_ENABLED=true` exacto, nunca en producción), con el
-      mock validado ítem a ítem (e2e: dos arranques dan 30 documentos).
-- [x] `GET /bench`: filtros skills (AND, sin distinguir mayúsculas), seniority, `availableBy`, país y estado;
-      paginación acotada (`limit` ≤ 50), orden estable; 401 / 403 / 400 / 404 (e2e contra Mongo real).
-- [x] Índices del schema creados (único en `benchCode`; `seniority`, `status`, `availableFrom`, `skills.name`).
-- [x] Pantalla `/bench` con filtros en la URL, página reiniciada al cambiar un filtro, estados de carga, vacío y
-      error, y detalle de un recurso (tests de componente).
-- [x] Gates en verde: backend 112 unit / 74 e2e, frontend 375 tests, 0 críticos en `validate-quality`.
-- [x] Stack recreado con podman (2026-10-30): `/health` con `database: "up"` (se leyó el cuerpo), `bench seed: 30 upserted`,
-      30 documentos (22 `available`, 5 `soft_booked`, 3 `assigned`) y los 5 índices vistos con `mongosh`, y 30 tras
-      reiniciar el backend. Ningún documento con email, teléfono o salario.
-- [x] `curl` con token de cada usuario demo contra el stack real: pm y recruiter 200 en los 3 endpoints,
-      technical_ref 403, sin token 401; `limit=500`, `limit=0`, `page=0`, `seniority=guru`, `availableBy` inválido
-      (incl. `2026-W44` y `2026-305`) y `skills=` vacío dan 400; `BN-9999` da 404; `skills=Java,Spring Boot&seniority=sr`
-      devuelve 3 recursos que cumplen ambas; el total visible es 27.
-- [x] Imagen de producción (`apps/backend/Dockerfile`, contexto en la raíz) construida y arrancada con
-      `NODE_ENV=production`: resuelve el JSON, ningún `.js` compilado importa `shared-types`, el seed se omite y
-      `/health` responde `up`. Imagen y base de prueba eliminadas.
-- [x] Primera prueba visual de `/bench` hecha por el equipo: funciona.
-- [ ] Recorrido en navegador con los tres roles (ana@, carlos@, mariana@ibm.com) siguiendo la checklist de
-      `docs/use-cases/bench.md`, junto con DT-010.
-
-**Límites que deja:** el filtro de skills usa regex sin distinguir mayúsculas, que no aprovecha el índice; el seed
-restablece los datos del mock en cada arranque; las fechas del mock son absolutas; la lista de países vive en el
-frontend; el detalle lateral no atrapa el foco con Tab (ver DT-027 a DT-029).
-
----
-
-## QW-1 — Quick wins previos a la demo (gates, robustez, fundaciones) (HIGH)
-
-**Estado:** 🚧 implementado (2026-10-15), pendiente de verificación en vivo · **Complejidad:** 🟢 Baja
-
-Gates (atoms bajo límite, ESLint y specs en backend, Dockerfile de producción, CI en Node 22), demo robusta
-(navegación única, `ComingSoon`/404 dentro del layout, `ErrorBoundary`, sesión persistida, usuarios demo
-`ana@`/`carlos@`/`mariana@ibm.com`) y fundaciones (`shared-types` en el frontend, `env.ts`, `httpClient`,
-Mongoose/helmet/throttler/health). `shared-types` se cableó en el backend con BENCH-1, solo con `import type`. Detalle en `git log` y `DEBT_TECH.md`.
-
-**Pendiente real:**
-- [ ] Recorrido en navegador: ningún link lleva a 404, F5 conserva la sesión y entran los 3 roles demo
-      (DT-010; ya cubierto por los tests de `AppRouter`).
-- [x] `/api/v1/health` reporta `database: "up"` con Mongo arriba (verificado leyendo el cuerpo, 2026-10-30).
-- [ ] `npm run lint` del frontend sale en rojo por `--max-warnings 0`: quedan 2 warnings en
-      `sessionCacheGuard.test.tsx` (0 errores desde la Etapa 2).
-
----
-
-## FE — Remediación frontend (auth + processes) (MEDIUM)
-
-**Estado:** 🚧 Etapas 0-2 en código · **Complejidad:** 🔴 Alta (multi-etapa)
-
-Especificación de UX: `docs/design/UX-GUIDELINES.md` (manda sobre cualquier mockup). Condición vigente: todo
-`useQuery` bajo el árbol de rutas protegido (DT-015, `.claude/rules/frontend-architecture.md`).
-
-- [x] Etapa 0 — fundaciones de calidad.
-- [x] Etapa 1 — `LoginPage.tsx` (golden path `features/auth`, DT-001).
-- [ ] Etapa 2 — cerrada en código, **pendiente de revisión en navegador (DT-010)**: shell y `SidebarNav`
-      (`dd77ff8`), Inicio del reclutador (`2ef1a5b`), guardas de ruta y `PublicRoute` (`0326925`). Frontend 264
-      tests y `validate-quality` con 0 críticos. DT-002, DT-007 y DT-024 siguen abiertas hasta esa revisión.
-- [ ] Etapas 3-7 — wizard/detalle de procesos y features de candidatos, entrevistas, feedback y reportes
-      (solo UI sobre mocks). Esperan el replanning Bench First.
-- [ ] Etapa 8 — endurecimiento transversal (ver HARDEN-1).
-
----
-
-## 📌 Backlog (por prioridad)
-
-> Sin arrancar. Ordenado por dependencias: cada feature espera a la anterior.
+> Sin arrancar. Cada feature espera a la anterior. FE (Etapas 3-7, esperan el replanning) y HARDEN-1 (= Etapa 8) abajo.
 
 ## DRAFT-1 — Recuperar trabajo no enviado tras el cierre de sesión (MEDIUM)
 
 **Estado:** 📌 sin arrancar (solo registrada; no implementar sin plan aprobado) · **Prioridad:** MEDIUM · **Complejidad:** 🟡 Media · **Casos de uso:** [`docs/use-cases/drafts.md`](./docs/use-cases/drafts.md)
 
-### Motivación
+Motivo: la sesión se cierra por inactividad (aviso a los 360 s) o expiración del JWT y la caché de React Query se vacía (DT-015); un formulario largo se pierde.
 
-La sesión se cierra por inactividad (aviso a los 360 s) o por expiración del JWT, y la caché de React Query se vacía al
-terminar la sesión (DT-015). Un formulario largo (nuevo proceso, agregar candidato, feedback) se pierde completo.
-
-### Alcance
-
-- **Backend:** capability `drafts`. Colección `drafts { userId, formKey, entityId?, payload, schemaVersion, updatedAt }`,
-  índice único `{ userId, formKey, entityId }` e índice TTL por `DRAFT_RETENTION_DAYS` (defecto 7, `ConfigService`).
-  Endpoints: `PUT /drafts/:formKey` (upsert), `GET /drafts/:formKey`, `DELETE /drafts/:formKey` y `GET /drafts` (lista del
-  usuario). Siempre filtrado por el `userId` del JWT; nunca se accede al borrador de otro.
-- **Frontend:** hook reutilizable `useFormDraft(formKey)`. Autoguardado con debounce (`DRAFT_AUTOSAVE_MS`, defecto 3000) y
-  guardado forzado antes del cierre por inactividad o expiración. Al volver, banner «Tienes un borrador del <fecha>:
-  Recuperar / Descartar».
-- **Formularios iniciales:** nuevo proceso, editar proceso y agregar candidato. Feedback se suma cuando exista.
-
-### Decisiones
-
-- El borrador **no crea ni modifica entidades**: solo al confirmar se guarda el proceso o el candidato, y entonces el
-  borrador se elimina.
-- Nunca se guarda el archivo del CV: solo los campos extraídos o escritos.
-- El `payload` se valida contra `schemaVersion`; si el formulario cambió de versión, el borrador se descarta con aviso,
-  nunca se carga a medias.
-- Logout manual: pregunta «¿Conservar borrador?». Inactividad o expiración: se conserva siempre.
-- Sin PII en logs: solo `userId`, `formKey` y tamaño.
-
-### Dependencias
-
-QW-2 (idle timer y logout), PROC-1 (formularios de proceso) y CAND-2 (formulario de candidato).
-
-### Preguntas abiertas
-
-1. ¿Un borrador por formulario o varios (por ejemplo, dos procesos a medio crear)? Defecto: uno por formulario nuevo y uno
-   por entidad en edición.
-2. ¿Qué pasa si, al recuperar la edición, la entidad cambió en el servidor? Defecto: avisar «el proceso cambió desde tu
-   borrador» y dejar elegir.
-3. ¿Se muestra un widget «Borradores pendientes» en el Inicio? Defecto: sí, prioridad LOW.
-
-### Criterios de éxito
-
-- [ ] Tras un cierre por inactividad o expiración, al volver a «Nuevo proceso» se ofrece recuperar el borrador con su fecha.
-- [ ] «Descartar» vacía el formulario y elimina el borrador; confirmar el proceso o el candidato también lo elimina.
-- [ ] El borrador no crea entidades (un borrador de «Agregar candidato» no aparece en Candidatos).
-- [ ] Aislamiento: el borrador de un usuario es inaccesible para otro (e2e con dos usuarios; 401 sin token).
-- [ ] Un borrador con `schemaVersion` anterior se descarta con aviso y no carga datos a medias.
-- [ ] Vence a los `DRAFT_RETENTION_DAYS` días (índice TTL) y no se ofrece al volver.
-- [ ] El archivo del CV nunca viaja al borrador; al recuperar hay que volver a adjuntarlo para reanalizarlo.
-- [ ] Logout manual con cambios sin enviar pregunta «¿Conservar borrador?»; la inactividad y la expiración conservan siempre.
-- [ ] Los logs no contienen datos del formulario (solo `userId`, `formKey` y tamaño).
+- **Alcance:** capability `drafts` (colección `drafts { userId, formKey, entityId?, payload, schemaVersion, updatedAt }`, índice único `{ userId, formKey, entityId }`, TTL `DRAFT_RETENTION_DAYS` defecto 7 por ConfigService; `PUT/GET/DELETE /drafts/:formKey` y `GET /drafts`, siempre por el `userId` del JWT). Frontend: hook `useFormDraft(formKey)`, autoguardado con debounce (`DRAFT_AUTOSAVE_MS` 3000), guardado forzado antes del cierre, banner «Recuperar / Descartar». Formularios iniciales: nuevo proceso, editar proceso, agregar candidato.
+- **Decisiones:** el borrador no crea ni modifica entidades; nunca se guarda el archivo del CV; el `payload` se valida contra `schemaVersion` (versión vieja → se descarta con aviso); logout manual pregunta «¿Conservar borrador?», inactividad/expiración conservan siempre; sin PII en logs (solo `userId`, `formKey`, tamaño).
+- **Preguntas abiertas (con defecto):** uno por formulario nuevo y uno por entidad en edición; si la entidad cambió en el servidor, avisar y dejar elegir; widget «Borradores pendientes» en Inicio (LOW).
+- **Criterios:** [ ] se ofrece recuperar tras cierre por inactividad/expiración; [ ] descartar o confirmar elimina el borrador; [ ] no crea entidades; [ ] aislamiento entre usuarios (e2e con dos usuarios, 401 sin token); [ ] `schemaVersion` vieja descartada con aviso; [ ] vence por TTL; [ ] el archivo del CV nunca viaja.
 
 ---
 
@@ -468,76 +223,10 @@ abiertos) se movió a `docs/use-cases/auth.md` → "Especificación FE-OTP-1".
 
 **Estado:** 📌 sin arrancar (backlog — no iniciar hasta que FE-OTP-1 cierre) · **Prioridad:** LOW · **Complejidad:** 🔴 Alta
 
-### Motivación
+Depende de FE-OTP-1. Casos de uso: [`docs/use-cases/auth.md`](./docs/use-cases/auth.md). Complejidad Alta (rate limiting, lockout, hash, provisión de roles).
 
-El login hoy es (o será, tras FE-OTP-1) una simulación de OTP en frontend
-(`features/auth/infrastructure/auth.infra.ts`). Sin backend real no hay forma
-de emitir un código verdadero, protegerlo contra fuerza bruta, ni de que el
-guard de rol (`router/guards/RoleRoute`) refleje una sesión real en vez de un
-mock en Zustand. Diseño vigente: el OTP se guarda hasheado en MongoDB con índice
-TTL (ADR-008) y el correo sale por `EmailSenderPort` + adapter SMTP (ADR-010); no
-hay Redis ni IBM Event Notifications en el MVP (ambos descartados).
-
-### Alcance
-
-- Casos de uso detallados: [`docs/use-cases/auth.md`](./docs/use-cases/auth.md).
-- `capability/auth`: `POST /auth/otp/request`, `POST /auth/otp/verify`,
-  `POST /auth/refresh`, `POST /auth/logout`.
-- **Generación y almacenamiento de OTP**: código de 6 dígitos criptográficamente
-  aleatorio, **hasheado** antes de guardar en **MongoDB con índice TTL**
-  (sin Redis — ver ADR-008 en `docs/architecture/README.md`), TTL de
-  ~10 min, invalidar el código anterior al solicitar uno nuevo para el mismo
-  correo.
-- **Rate limiting / anti-brute-force**: throttler en memoria de NestJS
-  (`@nestjs/throttler`, ya configurado en `app.module.ts`) para el máximo N
-  de solicitudes de OTP por email/IP en X minutos; lockout tras M intentos
-  de verificación fallidos para el mismo código/sesión (contador en el mismo
-  documento Mongo del OTP, no en Redis).
-- **Envío real**: `EmailSenderPort` + adapter SMTP (ver ADR-010) con
-  template de email dedicado en `packages/email-templates` (HTML plano, sin
-  scripts, según regla del monorepo).
-- **Provisión de usuarios/roles**: mecanismo para pre-registrar correos con
-  rol asignado (`recruiter` | `technical_ref` | `pm`) — sin esto, un login OTP
-  exitoso no tiene de dónde sacar el rol para el JWT. Definir si es una
-  colección Mongo administrada manualmente (MVP) o una pantalla de admin
-  (fuera de alcance de este task si no está ya planificada).
-- JWT con rol embebido, expiración corta + refresh token (sin cambios respecto
-  al diseño original).
-- Guard NestJS (`@UseGuards(JwtAuthGuard)`) + decorator `@Roles(...)` reusable
-  en el resto de capabilities (sin cambios).
-- Frontend: `auth.infra.ts` pasa de mock a `fetch` real (`requestOtp`/
-  `verifyOtp`); `auth.store.ts` persiste el token (ya existe la forma, cambia
-  el origen del dato).
-
-### Dependencias
-
-**FE-OTP-1** (el `infrastructure/auth.infra.ts` mock-first con `requestOtp`/
-`verifyOtp` debe existir primero para que este feature solo cambie el cuerpo
-de esas funciones, no el resto del flujo).
-
-### Complejidad y tamaño
-
-**Alta** — sube de Media a Alta respecto a la versión original (password)
-por el trabajo de seguridad específico de OTP (rate limiting, lockout, hash,
-invalidación) más la provisión de usuarios/roles, que no existía como
-problema en el diseño anterior.
-
-### Criterios de éxito
-
-- [ ] `POST /auth/otp/request` genera un código real, lo hashea antes de
-      guardar en MongoDB (índice TTL), y lo envía por `EmailSenderPort`
-      (adapter SMTP).
-- [ ] `POST /auth/otp/verify` rechaza código incorrecto/expirado/reusado con
-      401, y aplica lockout tras N intentos fallidos.
-- [ ] Rate limiting verificado: solicitar OTP repetidamente en un corto
-      período es rechazado antes de llegar a enviar email.
-- [ ] Existe un mecanismo (aunque sea manual/admin de datos) para asignar rol
-      a un correo antes de su primer login.
-- [ ] Un endpoint protegido con `@Roles('recruiter', 'pm')` rechaza a
-      `technical_ref` con 403.
-- [ ] Las guardas de ruta del frontend (`router/guards/`) siguen funcionando
-      sin cambios de contrato (mismo `UserRole`).
-- [ ] El código OTP nunca aparece en logs ni responses en texto plano.
+- **Alcance:** `POST /auth/otp/request`, `/otp/verify`, `/refresh`, `/logout`; código de 6 dígitos aleatorio, hasheado en MongoDB con índice TTL ~10 min (ADR-008, sin Redis), invalidando el anterior; throttler en memoria (`@nestjs/throttler`) y lockout tras M fallos (contador en el documento del OTP); envío por `EmailSenderPort` + SMTP (ADR-010) con plantilla en `packages/email-templates`; mecanismo para pre-registrar correo con rol (colección Mongo manual en el MVP, o admin: por decidir); `auth.infra.ts` pasa de mock a `fetch`.
+- **Criterios:** [ ] request genera, hashea y envía; [ ] verify rechaza incorrecto/expirado/reusado con 401 y aplica lockout; [ ] rate limiting rechaza antes de enviar email; [ ] hay forma de asignar rol antes del primer login; [ ] `@Roles('recruiter','pm')` rechaza `technical_ref` con 403; [ ] las guardas del frontend no cambian de contrato; [ ] el OTP nunca aparece en logs ni responses.
 
 ---
 
@@ -545,28 +234,11 @@ problema en el diseño anterior.
 
 **Estado:** 📌 sin arrancar · **Prioridad:** LOW · **Complejidad:** 🟡 Media · **Registrado:** 2026-10-27
 
-### Motivación
+Hoy el JWT dura 1 h y el logout no lo invalida (**DT-018**). Depende de QW-2 y AUTH-2 (cambia la emisión de tokens).
 
-Hoy el JWT dura 1 h y el logout no lo invalida (**DT-018**): un token robado sirve hasta `exp`. Se busca que el servidor también mate la sesión por inactividad y que no queden tokens huérfanos.
-
-### Alcance
-
-- **Diseño recomendado (patrón estándar):** access JWT corto + **refresh token opaco**, guardado con hash en Mongo (colección `sessions`) con índice TTL. El refresh rota en cada uso y se detecta su reutilización. Sin actividad no hay refresh, la sesión caduca y su registro desaparece solo por TTL.
-- Refresh bajo demanda (ante un 401 o cerca del vencimiento, y solo si hubo actividad) en vez de polling continuo, para no generar tráfico en reposo. "Renovar en cada petición" implica una escritura en BD por request y se evalúa al planificar.
-- Parámetros por env (se añaden a `.env.example` entonces): TTL del access token y TTL deslizante de la sesión. Regla validada al arrancar: TTL de sesión ≥ idle timeout + aviso (QW-2) + margen.
-- El logout revoca la sesión (cierra DT-018).
-- **Pregunta abierta:** se mencionó un TTL de 3 min y luego una renovación de 4 min; fijar un solo valor al planificar.
-
-### Dependencias
-
-QW-2 (`auth_events`, idle timer) y AUTH-2 (cambia la emisión de tokens; hacerlo antes obligaría a rehacerlo).
-
-### Criterios de éxito
-
-- [ ] Sin actividad el refresh no ocurre y la sesión desaparece de Mongo por TTL.
-- [ ] Tras el logout el access token deja de aceptarse (o caduca en minutos) y el refresh queda revocado.
-- [ ] Reutilizar un refresh ya rotado revoca la sesión.
-- [ ] DT-018 cerrada.
+- **Diseño:** access JWT corto + refresh token opaco con hash en Mongo (`sessions`, TTL), rotado en cada uso con detección de reutilización; refresh bajo demanda (401 o cerca del vencimiento, solo si hubo actividad), sin polling; TTL del access y TTL deslizante por env (se añaden a `.env.example` entonces), validando al arrancar TTL de sesión ≥ idle timeout + aviso (QW-2) + margen; el logout revoca la sesión.
+- **Pregunta abierta:** se mencionó un TTL de 3 min y luego una renovación de 4 min; fijar un valor al planificar.
+- **Criterios:** [ ] sin actividad no hay refresh y la sesión se va por TTL; [ ] tras logout el access deja de aceptarse y el refresh queda revocado; [ ] reutilizar un refresh rotado revoca la sesión; [ ] DT-018 cerrada.
 
 ---
 
@@ -574,27 +246,10 @@ QW-2 (`auth_events`, idle timer) y AUTH-2 (cambia la emisión de tokens; hacerlo
 
 **Estado:** 📌 sin arrancar · **Prioridad:** LOW · **Complejidad:** 🟡 Media · **Registrado:** 2026-10-27
 
-### Motivación
+El token vive en `sessionStorage`, legible por un XSS (**DT-019**). Depende de AUTH-3.
 
-El token vive en `sessionStorage`, legible por cualquier script si hay un XSS (**DT-019**). Una cookie `httpOnly` no es accesible desde JavaScript, y es la práctica habitual para sesiones de navegador.
-
-### Alcance
-
-- Access y refresh en cookies `httpOnly`, `Secure` (forzado en producción; configurable en local porque Safari no acepta `Secure` en `http://localhost`) y `SameSite=Lax/Strict`. La cookie de refresh con `Path=/api/v1/auth`, para que solo viaje a los endpoints de auth.
-- **Cuidados:** el navegador la envía sola, así que aparece el riesgo CSRF → `SameSite` más una cabecera personalizada obligatoria en endpoints que cambian estado. Un XSS aún puede hacer peticiones en nombre del usuario aunque no copie el token: no es una bala de plata.
-- Piezas: `cookie-parser` en el backend (**nueva dependencia: preguntar antes**), `credentials: 'include'` en `httpClient`, y CORS con credenciales (ya `true` en `main.ts`). Frontend y API comparten origen (proxy de Vite / nginx `/api`), lo que simplifica las cookies. Swagger conserva el flujo `Authorization: Bearer`.
-- El frontend deja de guardar el token en `sessionStorage`.
-
-### Dependencias
-
-AUTH-3.
-
-### Criterios de éxito
-
-- [ ] El token no es legible desde `document.cookie` ni `sessionStorage`.
-- [ ] Login, refresh y logout funcionan solo con cookies, en local y tras el proxy.
-- [ ] Una petición cross-site sin la cabecera exigida es rechazada.
-- [ ] DT-019 cerrada.
+- **Diseño:** access y refresh en cookies `httpOnly`, `Secure` (forzado en producción; configurable en local porque Safari no lo acepta en `http://localhost`), `SameSite=Lax/Strict`; refresh con `Path=/api/v1/auth`. CSRF: `SameSite` más cabecera personalizada obligatoria en endpoints que cambian estado. Piezas: `cookie-parser` (**nueva dependencia: preguntar antes**), `credentials: 'include'` en `httpClient`, CORS con credenciales; el frontend deja de guardar el token; Swagger conserva `Authorization: Bearer`. No es bala de plata contra XSS.
+- **Criterios:** [ ] el token no es legible desde `document.cookie` ni `sessionStorage`; [ ] login/refresh/logout solo con cookies, en local y tras el proxy; [ ] petición cross-site sin la cabecera es rechazada; [ ] DT-019 cerrada.
 
 ---
 
@@ -602,30 +257,10 @@ AUTH-3.
 
 **Estado:** 📌 sin arrancar · **Prioridad:** LOW · **Complejidad:** 🟢 Baja (por ítem, varios ítems)
 
-### Motivación
+Equivale a la Etapa 8 de FE; se cierra antes de DEPLOY-1 y espera a que existan todas las features de UI (la decisión sobre `@carbon/react` —instalado, 0 imports: mantener o quitar— no se puede tomar a medias).
 
-Corresponde a la Etapa 8 del plan de remediación frontend — se lista aquí
-también porque son decisiones de producto/infra, no solo de código, y deben
-cerrarse antes de DEPLOY-1.
-
-### Alcance
-
-- `validate-quality.mjs --strict` bloqueante en `.github/workflows/frontend-ci.yml`.
-- Decisión de cierre sobre `@carbon/react` (eliminar si sigue sin uso tras todas las features).
-- `config/env.ts` tipado sobre `import.meta.env`.
-- Error boundary global en `AppLayout`.
-- Tests faltantes (`useLoginForm`, `ui.store.ts`, hooks nuevos de cada feature).
-- Decisión pendiente (registrada 2026-10-15): `@carbon/react` está instalado y tiene 0 imports — mantener (y adoptar componentes) o quitar la dependencia.
-
-### Dependencias
-
-Todas las features de UI deben existir para que la decisión de `@carbon/react` sea informada (no se puede decidir "sin uso" a mitad de camino).
-
-### Criterios de éxito
-
-- [ ] CI falla si `validate-quality.mjs --strict` reporta un crítico nuevo.
-- [ ] `@carbon/react` eliminado del `package.json` o su primer uso real documentado.
-- [ ] Ningún componente puede tumbar toda la app sin pasar por el error boundary.
+- **Alcance:** `validate-quality.mjs --strict` bloqueante en `.github/workflows/frontend-ci.yml`; decisión sobre `@carbon/react`; `config/env.ts` tipado sobre `import.meta.env`; error boundary global en `AppLayout`; tests faltantes (`useLoginForm`, `ui.store.ts`, hooks nuevos).
+- **Criterios:** [ ] CI falla ante un crítico nuevo; [ ] `@carbon/react` eliminado o con primer uso documentado; [ ] ningún componente tumba la app sin pasar por el error boundary.
 
 ---
 
@@ -633,143 +268,55 @@ Todas las features de UI deben existir para que la decisión de `@carbon/react` 
 
 **Estado:** 📌 sin arrancar · **Prioridad:** LOW · **Complejidad:** 🔴 Alta
 
-### Motivación
+Hoy el MVP corre solo en Podman local. Arquitectura objetivo en ADR-006 a ADR-012 (`docs/architecture/README.md`): todo en Code Engine `br-sao`, un solo ambiente. Depende de HARDEN-1.
 
-El MVP corre hoy solo en Docker/Podman local. Falta el despliegue real
-contra IBM Cloud. Arquitectura objetivo definida y registrada como ADRs en
-`docs/architecture/README.md` (ADR-006 a ADR-012): todo en Code Engine,
-región `br-sao`, un solo ambiente demo/prod.
-
-### Alcance
-
-- **Infra IBM Cloud provisionada en `br-sao`:** Databases for MongoDB, Cloud Object Storage, un proyecto de Code Engine con dos apps (`tb-web`, `tb-api`), IBM Container Registry.
-- **`tb-web`:** `apps/frontend/Dockerfile` de producción (multi-stage, nginx no-root) sirviendo la SPA + proxy `/api` hacia `tb-api` (visibilidad `project-only`, sin CORS).
-- **`tb-api`:** visibilidad `project-only`, health check contra `GET /api/v1/health`.
-- **Secretos:** secrets de Code Engine (no Secrets Manager — queda para Fase 2); variables de entorno reales nunca committeadas (ya cubierto por `.gitignore`).
-- **CI/CD:** job de deploy en `backend-ci.yml` y `frontend-ci.yml`, solo en `main`: build → push a ICR → `ibmcloud ce app update`, autenticado con un API key de IBM Cloud guardado como secret de GitHub.
-- **Observabilidad:** IBM Cloud Logs para `tb-web` y `tb-api`.
-- **Backups:** backup automático de Databases for MongoDB (función nativa del servicio).
-- **Retención de CVs en COS:** política a definir (no bloqueante para el primer deploy).
-- **Pendiente de validar antes de cerrar** (ver "Abierto" en `docs/architecture/README.md`): disponibilidad de watsonx.ai en `br-sao`, owner/billing de la cuenta IBM Cloud, deliverability del relay SMTP corporativo, exposición internet vs. VPN IBM + dominio propio.
-
-### Dependencias
-
-HARDEN-1 (no se despliega sin el gate de CI ni la decisión de dependencias cerrada).
-
-### Criterios de éxito
-
-- [ ] La app es accesible por URL pública/interna IBM sin depender de `localhost`.
-- [ ] Los flujos de la POC Bench First (por definir en el replanning) funcionan contra servicios reales de IBM Cloud, no mocks.
-- [ ] Credenciales de servicios IBM Cloud nunca en logs, responses, ni el repo (secrets de Code Engine).
-- [ ] `tb-web` sirve la SPA y el proxy `/api` llega a `tb-api` sin CORS.
-- [ ] El pipeline de GitHub Actions despliega automáticamente en cada push a `main`.
-- [ ] `GET /api/v1/health` responde `database: "up"` contra Databases for MongoDB real.
+- **Alcance:** Databases for MongoDB, COS, proyecto Code Engine con `tb-web` (Dockerfile de producción multi-stage, nginx no-root, SPA + proxy `/api`, sin CORS) y `tb-api` (`project-only`, health `GET /api/v1/health`), ICR; secrets de Code Engine (Secrets Manager queda para Fase 2); job de deploy en `backend-ci.yml`/`frontend-ci.yml` solo en `main` (build → ICR → `ibmcloud ce app update`, API key como secret de GitHub); IBM Cloud Logs; backup nativo de Mongo; retención de CVs en COS por definir (no bloqueante). Por validar antes de cerrar (ver «Abierto» en la arquitectura): disponibilidad de watsonx.ai en `br-sao` y alcance de ICA desde Code Engine, owner/billing, relay SMTP, internet vs. VPN + dominio. También: DT-021 (`Dockerfile` fija `NODE_ENV=production`) y DT-034.
+- **Criterios:** [ ] app accesible por URL sin `localhost`; [ ] flujos de la POC contra servicios reales; [ ] credenciales nunca en logs, responses ni repo; [ ] `tb-web` llega a `tb-api` sin CORS; [ ] el pipeline despliega en cada push a `main`; [ ] `/health` con `database: "up"` contra Mongo real.
 
 ---
 
 ## ✅ Cerrado en código
 
-> Features terminadas. Se conservan por referencia; lo único que les queda abierto es el recorrido en navegador
-> (DT-010), que ya figura en "Próximos pasos".
+> Una línea por feature. Lo único que les queda abierto está en «Qué falta». Detalle en git, `DEBT_TECH.md` y los casos de uso.
 
-## AUTH-1 — Login de desarrollo con JWT real (HIGH)
-
-**Estado:** ✅ cerrado en código (2026-10-24); falta el recorrido en navegador (DT-010) · **Complejidad:** 🟢 Baja
-
-`POST /auth/dev-login` falla cerrado: solo existe con `AUTH_DEV_LOGIN_ENABLED=true` exacto y nunca con
-`NODE_ENV=production` (DT-008). `JwtAuthGuard`, `RolesGuard` y `@Roles` viven en `shared/auth/`, y el seed
-de los 3 usuarios demo es idempotente. El swap de `auth.infra.ts` de mock a `httpClient` se hizo el
-2026-10-24, y `httpClient` limpia la sesión ante un 401 con token activo (DT-009). Test de integración
-contra Mongo real en `apps/backend/test/auth.integration.e2e-spec.ts`. Casos de uso: `docs/use-cases/auth.md`.
-AUTH-2 solo cambia **cómo** se emite el JWT, no su contrato.
-
-- [x] Los 3 logins devuelven JWT con el rol correcto; 404 con `NODE_ENV=production`; 401 sin token y 403
-      con rol incorrecto en un endpoint protegido (verificado en vivo).
-- [x] `auth.infra.ts` conectado a `httpClient` (2026-10-24).
-- [ ] Recorrido manual en navegador (DT-010).
-
----
-
-## QW-2 — Higiene de sesión y entorno (HIGH)
-
-**Estado:** ✅ cerrado en código y verificado en vivo con curl + Mongo (2026-10-27) · **Complejidad:** 🟢 Baja
-
-Commits: `a1c5b96` (variables de entorno sin consumidor retiradas; `WATSONX_*`, `COS_*`, `SMTP_*`,
-`SLACK_WEBHOOK_URL`, `JWT_REFRESH_EXPIRATION` y `APPID_*` vuelven junto con su adapter), `1341f8a`
-(`POST /auth/logout` y colección `auth_events` con login y logout, TTL `AUTH_EVENT_RETENTION_DAYS`=90),
-`666fcf0` (`useLogoutMutation`) y `71cb074` (idle timer: aviso a los 360 s y cuenta atrás de 60 s por
-`VITE_IDLE_TIMEOUT_SECONDS`/`VITE_IDLE_WARNING_SECONDS`). Verificado: los 3 usuarios con su rol, una fila
-`login` y una `logout` por usuario con su `reason`, e índice TTL de 90 días. Al cerrar: backend 39 unit /
-41 e2e, frontend 202 tests.
-
-**Límites que deja:** `logout` vive en `AuthSessionController` aparte (límite de líneas); si Mongo falla al
-auditar, `devLogin` y `logout` fallan y el frontend limpia la sesión igual; `AUTH_EVENT_RETENTION_DAYS`
-inválido cae a 90 sin aviso (por decidir si debe fallar el arranque); un logout `expired` solo se registra si
-el JWT aún es válido; sin `trust proxy`, `ip` es la del proxy (DT-023); durante el aviso de inactividad solo
-"Seguir conectado" lo cancela; `httpClient` no tiene timeout.
-
-**Pendiente:**
-- [ ] Ver en navegador el aviso a los 360 s y la salida a `/login` (DT-010).
-- [ ] DT-022 (los e2e dejan filas `u-1` en `auth_events`, origen sin confirmar), DT-023 y DT-024 (esta última
-      resuelta en código por la Etapa 2; se cierra tras revisar las pantallas).
-- DT-018 y DT-019 siguen abiertas: las cierran AUTH-3 y AUTH-4.
-
----
-
-## OBS-1 — FlowLog: trazas de flujo request → adapters → response (LOW)
-
-**Estado:** ✅ cerrado en código (2026-10-27) · **Complejidad:** 🟢 Baja
-
-Código en `apps/backend/src/shared/observability/`. Apagado por defecto (`FLOW_LOG_ENABLED=false`), falla
-cerrado y nunca con `NODE_ENV=production`. Para verlo: `FLOW_LOG_ENABLED=true` en el `.env` local,
-`podman-compose up -d --force-recreate backend` y `podman-compose logs -f backend`. Qué oculta y cómo trazar
-un adapter nuevo: `.claude/rules/backend-architecture.md` → Logging.
-
-**Pendiente:** OBS-2 (sección Mongo con flag propio `FLOW_LOG_MONGO` y/o `mongod --quiet`, por decidir),
-DT-020 (warnings de lint del FlowLog) y DT-021 (el `Dockerfile` fija `NODE_ENV=production`; decidir en DEPLOY-1).
+| ID | Qué entregó | Pendiente | Referencia |
+| --- | --- | --- | --- |
+| CAND-2 | Carga de CV (PDF/DOCX) con 3 extractores (`ica-text` principal, `classic` completado con ICA, `ica` solo para comparar), alta y `PUT /candidates/:id` con auditoría y avisos de duplicados; `pdf-parse` + `mammoth`; la extracción no persiste. Probado en vivo por el usuario (2026-11-02), mergeado en PR #5 | Imagen de producción con PDF (DT-034); modo `ica` por retirar (DT-033, CAND-4); verificar en Mongo los datos adicionales; límites DT-031 a DT-038, sin claves de búsqueda en candidatos anteriores (DT-032), RUT opcional futuro (compliance), decidir «PM» vs «Project Manager» en el aviso de actualización | [candidates.md](./docs/use-cases/candidates.md), ADR-015 |
+| AI-1 | Capability `ai`: coordinator que nunca lanza, ICA como proveedor (reemplaza watsonx.ai), `fake` solo por `AI_PROVIDER=fake`, salida estructurada, modelo por defecto `claude-haiku-5-5`, fallos como 503 y nunca 401; `GET /ai/status`, `POST /ai/ask`. Verificado en vivo con ICA real | `MODEL_NOT_FOUND` solo cubierto por tests; timeouts/tokens nuevos (60 s por llamada, 90 s total, 8192 tokens) sin verificar en el backend en ejecución; límites: sub-agentes y tool-calling (`TODO(AI-2)`), `stream`, persistencia de conversaciones, PII a ICA aceptada (DT-030), alcance de ICA desde `br-sao` (DEPLOY-1) | [ai.md](./docs/use-cases/ai.md), ADR-014 |
+| PROC-1 | Crear procesos, asociar de 1 a N candidatos (`MAX_CANDIDATES_PER_PROCESS`), lista y detalle, `GET /processes/limits`, `GET /candidates`, «Candidatos» en el menú, Inicio con procesos reales; PM y reclutador únicos. Formulario de 3 pasos (mockups en `docs/design/mockups/proceso-nuevo/`) | Recorrido en navegador y `curl` de escritura; fuera del MVP: referentes, seniority/skills del rol, buscador de candidatos, notificaciones, etapas y semáforo; deuda DT-039 a DT-042 | [processes.md](./docs/use-cases/processes.md), ADR-013 |
+| BENCH-1 | Banca desde `bench.mock.json` (30 recursos, seed idempotente fail-closed): `GET /bench`, `/bench/skills`, `/bench/:benchCode` para `recruiter` y `pm` (`TODO(RBAC-1)`), pantalla `/bench`. Verificado en vivo (stack, `curl` por rol, imagen de producción). Commits `797e4fb`, `f8fbfd5`, `05dc818`, `febf8af` | Recorrido en navegador con los 3 roles (checklist en el caso de uso); límites DT-027 a DT-029 | [bench.md](./docs/use-cases/bench.md) |
+| AUTH-1 | `POST /auth/dev-login` fail-closed (`AUTH_DEV_LOGIN_ENABLED=true` exacto, nunca en producción; DT-008), `JwtAuthGuard`/`RolesGuard`/`@Roles` en `shared/auth/`, `httpClient` limpia sesión ante 401 (DT-009). Verificado en vivo | DT-010 (navegador) | [auth.md](./docs/use-cases/auth.md) |
+| QW-2 | Variables sin consumidor retiradas (`a1c5b96`), `POST /auth/logout` y `auth_events` con TTL 90 días (`1341f8a`), `useLogoutMutation` (`666fcf0`), idle timer 360 s + cuenta atrás 60 s (`71cb074`). Verificado con curl + Mongo | DT-010 (aviso a los 360 s); DT-022, DT-023, DT-024; DT-018 y DT-019 las cierran AUTH-3 y AUTH-4; límites: `AUTH_EVENT_RETENTION_DAYS` inválido cae a 90 sin aviso, logout `expired` solo si el JWT sigue válido, `httpClient` sin timeout | [auth.md](./docs/use-cases/auth.md) |
+| QW-1 | Gates, demo robusta (navegación única, `ErrorBoundary`, sesión persistida, usuarios demo) y fundaciones (`shared-types`, `env.ts`, `httpClient`, helmet/throttler/health); `/health` con `database: "up"` verificado | Recorrido en navegador (DT-010); `npm run lint` del frontend sale en rojo por `--max-warnings 0` (2 warnings en `sessionCacheGuard.test.tsx`) | `git log`, `DEBT_TECH.md` |
+| FE Etapas 0-2 | Etapa 0 calidad, Etapa 1 `LoginPage` (DT-001), Etapa 2 shell/`SidebarNav` (`dd77ff8`), Inicio del reclutador (`2ef1a5b`), guardas de ruta (`0326925`) | Revisión en navegador (DT-010) cierra DT-002, DT-007, DT-024; Etapas 3-7 esperan el replanning; Etapa 8 = HARDEN-1. UX: `docs/design/UX-GUIDELINES.md` (manda sobre cualquier mockup; todo `useQuery` bajo rutas protegidas, DT-015) | `DEBT_TECH.md` |
+| OBS-1 | FlowLog en `apps/backend/src/shared/observability/`, apagado por defecto (`FLOW_LOG_ENABLED=false`), fail-closed, nunca en producción | OBS-2 (flag `FLOW_LOG_MONGO` / `mongod --quiet`, por decidir), DT-020, DT-021 | `.claude/rules/backend-architecture.md` → Logging |
 
 ---
 
 ## Cambios a este roadmap
 
-- Cualquier reordenamiento se discute y queda registrado aquí (fecha + razón).
-- Una idea nueva sin plan de ejecución se agrega como feature con estado 📌, aunque falte completar secciones.
+Todo reordenamiento queda registrado aquí (fecha + razón). Una idea nueva sin plan se agrega como feature 📌.
 
 ### Historial
 
 | Fecha | Cambio | Razón |
 | --- | --- | --- |
-| 2026-09-13 | Roadmap inicial, migrado del plan de arquitectura original (archivado). | Hacía falta un backlog vivo por feature, distinto del plan etapa-por-etapa del refactor frontend. |
-| 2026-09-13 | Etapa 1 de FE cerrada (`LoginPage.tsx`, DT-001). | Cierre verificado con lint, typecheck, 97 tests, `validate-quality` y Playwright. |
-| 2026-09-13 | Agregado `FE-OTP-1` antes de AUTH-2 y de la Etapa 2; `AUTH-2` pasa de password a OTP (Media → Alta). | Decisión de producto: OTP por correo `@ibm.com` reduce superficie de ataque; reabre `LoginForm` como cambio de alcance. |
-| 2026-10-15 | Reordenado: `QW-1`, Etapas 2-3, `AUTH-1` y `PROC-2` delante de `FE-OTP-1`; `CV-1` candidato a adelantarse. | Demo al sponsor con un vertical real con backend; CI y navegación de la demo estaban rotos. |
-| 2026-10-15 | Arquitectura objetivo IBM Cloud (ADR-006 a ADR-012): Code Engine en `br-sao`, sin Redis, watsonx.ai por `CvAnalysisPort`, email por `EmailSenderPort`; `DEPLOY-1` con alcance concreto. | Decisiones sobre deploy, región y reemplazo de Watson NLU/Event Notifications/Redis que no tenían ADR y contradecían el código. |
-| 2026-10-15 | Modelo de dominio cerrado (ADR-013): `shared-types` actualizado, entidad `Report`, regla de consistencia `Candidate`↔`Process`; resuelta la contradicción de acceso a `/feedback`. | Al validar roles se vio que el modelo nunca se completó; se modeló antes de construir PROC-2, CAND-1, INT-1, FEED-1 y REP-1. |
-| 2026-10-18 | Creado `docs/use-cases/` (casos de uso por rol y feature); señalada sin resolver la discrepancia de acceso de PM en `/processes/new`. | La especificación de "quién puede hacer qué" estaba repartida entre 3 documentos sin casos negativos. |
-| 2026-10-18 | `AUTH-1` backend cerrado y verificado contra el proceso real; bug de `@Prop` sin `type: String` en uniones corregido. | Primer backend real; el bug pasó todos los tests y solo apareció al arrancar el proceso (verificación independiente). |
-| 2026-10-24 | `AUTH-1` cerrado en código: swap de `auth.infra.ts`, test de integración contra Mongo, DT-008 y DT-009 resueltos, `THROTTLE_TTL` corregido a ms. | La revisión halló `dev-login` abierto sin `NODE_ENV` y sesión muerta con token vencido; se resolvieron antes de PROC-2/DEPLOY-1. |
-| 2026-10-24 | Hardening de sesión del frontend: DT-017 (401 tardío), DT-015 (caché por sesión), DT-016 (JWT vencido tras F5); 146 → 178 tests. | La revisión de AUTH-1 señaló tres casos latentes que se vuelven reales con los primeros `useQuery`. |
-| 2026-10-25 | Limpieza de documentación legacy (alcance A): `legacy_docs/` fuera del contexto del agente, C4 de otro producto eliminado, ADR-004/009/013 pendientes de reemplazo. | Aislar lo obsoleto antes de rediseñar el dominio (alcance B, pendiente). |
-| 2026-10-27 | Registradas `QW-2`, `AUTH-3` y `AUTH-4`; altas DT-018 y DT-019. | El logout solo borraba estado del cliente y la sesión no caducaba por inactividad. |
-| 2026-10-27 | `OBS-1` cerrado en código: FlowLog apagado por defecto y nunca en producción; alta DT-020. | Ver el flujo request → adapter → response sin tocar cada capability ni arriesgar producción. |
-| 2026-10-27 | `QW-2` cerrado en código (`a1c5b96`, `1341f8a`, `666fcf0`, `71cb074`) y verificado con curl + Mongo; altas DT-022, DT-023, DT-024. | Falta el recorrido en navegador (DT-010); DT-018 y DT-019 siguen abiertas. |
-| 2026-10-28 | Etapa 2 de FE cerrada en código (`dd77ff8`, `2ef1a5b`, `0326925`), **pendiente de revisión en navegador (DT-010)**; 264 tests y 0 críticos en `validate-quality`. | Cierra el único crítico (DT-002) y alinea el shell y el Inicio con `UX-GUIDELINES.md`; DT-002/007/024 se resuelven tras revisar las pantallas. |
-| 2026-10-28 | `ROADMAP.md` adelgazado: encuadre anterior archivado en `legacy_docs/`, FE-OTP-1 movida a `docs/use-cases/auth.md`, tabla de equivalencias Bench First. | Preparar el replanning Bench First; el detalle sigue en git, `docs/use-cases/` y `legacy_docs/`. |
-| 2026-10-30 | `BENCH-1` implementado en código (backend, frontend y casos de uso), **falta verificación en vivo**; altas DT-027 a DT-029; los tipos de `shared-types` llevan prefijo I/T/E. | Primer dato de negocio real de Bench First, base de `MATCH-1`. |
-| 2026-10-28 | Fuentes de verdad consolidadas: `.clinerules` pasa a puntero, el estado actual se mueve de `CLAUDE.md` a este archivo y `PROJECT_CONTEXT.md` se reparte entre sus dueños y queda como puntero (el dominio anterior se archiva). | Una única fuente de verdad por tema; tokens de diseño: manda el código de Tailwind (DT-026). |
-| 2026-10-30 | `BENCH-1` verificado en vivo (stack con podman, `curl` por rol, imagen de producción); `ROADMAP.md` reordenado con lo pendiente arriba y lo cerrado al final. | Que el documento muestre primero qué toca hacer; solo queda el recorrido en navegador con los 3 roles. |
-| 2026-10-31 | `AI-1` iniciada: capability `ai` con proveedor ICA (ADR-014), contrato en `shared-types`, casos de uso y alta de DT-030 (PII hacia ICA). | La POC del fin de semana necesita IA en CV, match y feedback; ICA sustituye a watsonx.ai como proveedor. |
-| 2026-11-01 | `CAND-2` iniciada: contrato `candidates.ts` en `shared-types`, ADR-015, UC-CAND-5 y regla `cv-pii-handling`. Spike de ICA `files` pendiente (bloqueado por permisos de `curl`). | La POC necesita crear candidatos externos desde un CV, con extracción por ICA o clásica y revisión humana antes de crear. |
-| 2026-11-02 | `CAND-2` implementada: tres extractores (`ica-text`, `classic` completado con ICA, `ica`), alta y actualización por correo con auditoría y avisos de coincidencia, datos adicionales y tamaño del archivo en la pantalla de carga. Revisión de deuda técnica: corregidos regex cuadráticas, límites del parser, `@TraceFlow()` de `complete`, skills con comas, mock por defecto, correo fijo al actualizar y scripts de Jest para la CI; registradas DT-031 a DT-038. | Se pidió cargar un CV, revisarlo y crear o actualizar el candidato; el diagnóstico en vivo mostró que `files` perdía los datos de contacto y la revisión encontró defectos reales antes de commitear. |
-| 2026-11-02 | `CAND-2` cerrada: el usuario probó en local la IA y la carga de CV con CV reales y funcionan bien. Registrada `PROC-1` (procesos con varios candidatos, MVP de un día) y `CAND-4` (retirar el modo `ica`, mejorar el clásico). La imagen de producción queda como deuda (DT-034) y no se prueba en la POC. | Siguiente feature pedida: varios candidatos por proceso, con PM y reclutador únicos. |
-| 2026-11-02 | `PROC-1` arrancada en `feature/PROC-1`: línea base de gates re-ejecutada, contrato `processes.ts` en `shared-types` (más `ICandidate.processId`), `docs/use-cases/processes.md` reescrito con R5-R9 y Gherkin, nota P1 en ADR-013. | Plan aprobado por el usuario; el backend y el frontend siguen, un subagente a la vez. |
-| 2026-11-02 | `PROC-1`: backend de usuarios, procesos y asociación de candidatos (457 unit / 171 e2e), refactor de `Pagination` y estados de lista a `shared/`, lista y detalle de procesos (525 tests); un solo botón «+ Nuevo proceso». Diseño del formulario adoptado desde 4 mockups: 3 pasos sobre un solo formulario, 0 candidatos permitido, tope vía `GET /processes/limits`; mockups y §3.4 de UX-GUIDELINES guardados en `docs/design/`. | El usuario aportó los mockups del wizard y pidió un MVP que use solo lo que ya se puede construir. |
-| 2026-11-02 | `PROC-1` cerrada en código: formulario «Nuevo proceso» de 3 pasos, `GET /processes/limits`, `GET /candidates` (nombre, rol, correo, estado, fecha; sin teléfono), «Candidatos» en el menú de reclutador y PM (en móvil «Reportes» sale de la barra), Inicio con el total y la lista reales de procesos (una sola fila `ProcessItem` compartida con `/processes`) y sin etapa ni semáforo, que el proceso real no tiene. Deuda registrada: DT-039 a DT-042. | Peticiones del usuario tras revisar la UI: ver candidatos sin iniciar un proceso y datos reales en el Inicio; el dashboard por rol queda como tarea siguiente. |
-| 2026-11-03 | Registrada `DRAFT-1` (recuperar trabajo no enviado tras el cierre de sesión) y creado `docs/use-cases/drafts.md`; solo documentación, sin código. | La sesión caduca por inactividad o JWT y la caché se vacía (DT-015): un formulario largo se pierde completo. |
-| 2026-11-03 | Registrada `OPP-AI-1` con U0 (documentación) hecha: `docs/glossary.md`, ADR-016 (Propuesto) y `docs/use-cases/opportunities-ai.md`; unidades 2, 3, U1, 5.5, U2 y U3 sin arrancar; altas DT-050 y DT-051. | La HU pide crear oportunidades con IA y sugerir recursos de la banca; antes se fijó el lenguaje y las reglas. |
-| 2026-11-03 | `OPP-AI-1` unidad 2 hecha (sin commit, rama `feature/DT-01`): textos visibles «Proceso» → «Oportunidad» en 16 archivos de producción del frontend (copy, constantes, navegación, migas, rutas, Inicio) y 21 de test; rutas, tipos, endpoints y colecciones intactos. Gates: 889 tests, typecheck, lint y `validate-quality --strict` (291 archivos, 0 críticos) en verde; recorrido en navegador sin verificar. | Alinear el lenguaje de la interfaz con el glosario antes de construir el borrador con IA. |
-| 2026-11-05 | `OPP-AI-1` unidades 2.5 y 3 hechas (sin commit, rama `feature/DT-01`): la banda es un entero 6 a 10 y el match compara banda con banda (DT-051 resuelta); nuevo `apps/backend/src/shared/skills/` (catálogo con alias, 25 tests, sin barrel, aún sin consumidores). Gates backend: typecheck y lint (0 errores / 20 warnings) limpios, `validate-quality --strict` 291 archivos 0 críticos, jest 647 pasan / 4 fallan (preexistentes, specs de CV en `candidates`). Registrada la unidad 3.5 (`band` en la banca y `startDate`). Nada verificado en vivo. | Decisión del usuario: en IBM la banda son números; el catálogo de skills lo consumen U1 y U2. |
-| 2026-11-06 | `OPP-AI-1` unidad 3.5 hecha (sin commit, rama `feature/DT-01`): `band` (6 a 10) en cada recurso de banca (seed de 30, schema, adapter) y `startDate` opcional en la oportunidad (DTO, schema, formulario, resumen y tarjeta); corregido un 500 por mes 13 o día 32 (ahora 400). Gates: jest 675/4 (preexistentes), e2e Mongo real 241/241, frontend 909/909, `validate-quality --strict` 0 críticos; `GET /bench` y `GET /processes` en vivo con los campos nuevos. Sin verificar: navegador, escritura real y base ya sembrada. Altas DT-052 a DT-054. | Insumos del match de la unidad U2: banda del recurso y fecha de inicio de la oportunidad. |
+| 2026-11-09 | Nueva tarea `PROC-UX-1` (commits `67dd657`, `c97d893`, `39b32ca`; ruta `/candidates/new` lazy, bundle principal 471,79 → 444,67 kB, DT-060 resuelta): `SidePanel` genérico + focus trap/scroll lock compartidos (Banca ahora es envoltorio, cambio aceptado), `CandidateCreateForm` reutilizable y panel «+ Agregar candidato» en el paso 2; frontend typecheck 0, lint 0 warnings, 203 archivos / 1037 tests, build ok, `validate-quality` 317 archivos 0 críticos; altas DT-060 (lazy sin efecto en el bundle) y DT-061 (acople processes→candidates); sin navegador | Pedido del usuario: crear candidatos sin salir del wizard; regla R5.1 (oportunidad, candidatos y referentes independientes) |
+| 2026-09-13 a 2026-10-18 | Roadmap inicial; Etapa 1 de FE (DT-001); `FE-OTP-1` y `AUTH-2` pasa a OTP; reorden hacia el vertical demo (`QW-1`, Etapas 2-3, `AUTH-1`); arquitectura objetivo IBM Cloud (ADR-006 a ADR-012); modelo de dominio (ADR-013); creado `docs/use-cases/`; `AUTH-1` backend verificado (bug de `@Prop` en uniones). | Backlog vivo por feature, demo al sponsor y decisiones de arquitectura que no tenían ADR. |
+| 2026-10-24 a 2026-10-30 | `AUTH-1` cerrado (DT-008/009); hardening de sesión del frontend (DT-015/016/017); limpieza de `legacy_docs/` (alcance A); `QW-2` y `OBS-1` cerrados; altas DT-018 a DT-024; Etapa 2 de FE cerrada en código; fuentes de verdad consolidadas (`.clinerules` y `PROJECT_CONTEXT.md` como punteros); `BENCH-1` implementado y verificado en vivo (DT-027 a DT-029); ROADMAP adelgazado y reordenado. | Preparar el replanning Bench First y mostrar primero lo que toca hacer. |
+| 2026-10-31 | `AI-1` iniciada: capability `ai` con ICA (ADR-014), contrato en `shared-types`, alta DT-030. | La POC necesita IA en CV, match y feedback. |
+| 2026-11-01 a 2026-11-02 | `CAND-2` implementada y cerrada (3 extractores, alta y actualización con auditoría, ADR-015; revisión de deuda: DT-031 a DT-038); probada en vivo por el usuario; registradas `PROC-1` y `CAND-4`; imagen de producción como deuda (DT-034). | Cargar un CV, revisarlo y crear o actualizar el candidato; el diagnóstico mostró que `files` perdía datos de contacto. |
+| 2026-11-02 | `PROC-1` cerrada en código en `feature/PROC-1`: contrato `processes.ts`, backend de procesos/asociación/límites/`GET /candidates`, lista y detalle, formulario de 3 pasos, «Candidatos» en el menú, Inicio real (backend 472 unit / 178 e2e, frontend 671 tests, `validate-quality` 252 archivos 0 críticos); deuda DT-039 a DT-042. | MVP de un día con el diseño de 4 mockups; el dashboard por rol queda como tarea siguiente. |
+| 2026-11-03 | Registrada `DRAFT-1` y creado `docs/use-cases/drafts.md`; registrada `OPP-AI-1` con glosario, ADR-016 (Propuesto) y `opportunities-ai.md`; altas DT-050 y DT-051. | La sesión caduca y el formulario se pierde (DT-015); la HU pide oportunidades con IA y sugerencias de la banca. |
+| 2026-11-03 a 2026-11-06 | `OPP-AI-1` unidades 2 a 3.5: textos «Oportunidad» (`5678f4e`), banda entero 6 a 10 (DT-051 resuelta), módulo `shared/skills` (`68c60dd`, 25 tests), `band` en banca y `startDate` (`e1140a6`, `c5e8ac0`; 500 por mes 13 / día 32 corregido a 400); altas DT-052 a DT-054. Gates al cierre: ver «Qué falta». | Insumos del borrador con IA y del match con la banca. |
+| 2026-11-08 | ROADMAP reordenado: guía de lo pendiente arriba, lo cerrado resumido al final, una sola numeración (1..11) para OPP-AI-1 | Dos numeraciones (plan vs secciones de la HU) confundían y el archivo mezclaba lo hecho con lo pendiente |
+| 2026-11-09 | `OPP-AI-1` unidad 7 (`ce69852`, `144bae0`): dropzone de brochure (`FileDropzone` compartido, `BrochureDropzone`, hooks, infra `POST /ai/opportunity-draft/file`), `translate` reconoce `OPPORTUNITY_SOURCE_UNREADABLE`, env `VITE_OPPORTUNITY_SOURCE_MAX_FILE_BYTES`; frontend typecheck 0, lint 0 warnings, 196 archivos / 979 tests (antes 192 / 945), build ok, `validate-quality` 311 archivos 0 críticos; sin navegador, sin ICA real, sin multipart real | Cierra la parte UI de la HU U2. Siguiente: unidades 8-9 |
+| 2026-11-09 | `OPP-AI-1` ajuste (`42bf836`, `f9193c7`): `OPPORTUNITY_DRAFT_MAX_TEXT_CHARS`/`_TIMEOUT_MS` con default en código (8000 / 30 s; env inválida → default + warn; revoca «falla cerrado») y etiqueta «Sugerido por ICA» (`af4e9c1`); backend 837/837 jest (88 suites), 269/269 e2e (34), lint 27 warnings, `validate-quality` 306 archivos 0 críticos; sin arranque real contra ICA | Decisión del usuario; valores sin confirmar por negocio. Siguiente: unidad 7 |
+| 2026-11-08 | `OPP-AI-1` unidad 6 (`14280d3`): `POST /ai/opportunity-draft/file` (PDF/DOCX/MD/TXT en memoria, firma, 422 `OPPORTUNITY_SOURCE_UNREADABLE`, env `OPPORTUNITY_SOURCE_MAX_FILE_BYTES` 5 MiB sin confirmar); tope con default en código (`OPPORTUNITY_SOURCE_DEFAULT_MAX_FILE_BYTES`, env inválida → default + warn) y limpieza de marcadores de página en el adapter (`pageJoiner: ''`); backend 838/838 jest (88 suites), 269/269 e2e (34), lint 27 warnings (+2 de longitud en specs, DT-059), frontend 945/945 (solo una línea de copy), `validate-quality` 306 archivos 0 críticos; sin corrida real con ICA | Backend del brochure; la UI llega en la unidad 7 |
+| 2026-11-08 | `OPP-AI-1` unidad 5.5: extracción de texto PDF/DOCX movida a `shared/document-text` tras `DOCUMENT_TEXT_EXTRACTOR_PORT`, sin cambio de comportamiento; backend 793/793 jest, 257/257 e2e, lint 25 warnings, `validate-quality` 304 archivos 0 críticos; causa de los 4 tests PDF: `npx jest` sin `--experimental-vm-modules`; sin ADR | Prerrequisito de la unidad 6 (brochure) para que `ai` no consuma `candidates` |
+| 2026-11-08 | `OPP-AI-1` unidad 5: box mágico en la etapa 1 (solo rellena campos vacíos, «Sugerido por IA», errores por `code`); frontend 945/192 tests, lint 0 warnings, build ok (`2d750e3`); altas DT-057 y DT-058 | Consume `POST /ai/opportunity-draft`; sin recorrido en navegador ni prueba contra el endpoint real |
+| 2026-11-08 | `OPP-AI-1` unidad 4: `POST /ai/opportunity-draft` (backend), timeout total, config por env, `isRealDate` a `shared` (`401336a`); alta DT-055 (FlowLog imprime cuerpos) | Insumo del box mágico (unidad 5); gates en verde y corrida real con ICA |
+| 2026-11-08 | DT-055 resuelta (`576a69e`): `@NoBodyLog()` + `FlowLogInterceptor`/`FlowLogMiddleware` imprimen `{ omitted, length }` en IA y candidatos; alta DT-056 (residual) | R3: los logs de desarrollo no deben llevar texto del usuario, borradores ni PII de candidatos |
 
 ---
 

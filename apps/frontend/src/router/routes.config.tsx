@@ -1,15 +1,18 @@
-import type { ReactElement } from 'react';
+import { lazy, type ReactElement } from 'react';
 import { ComingSoon } from '@shared/components/organisms/ComingSoon';
 import { NAVIGATION_ITEMS } from '@shared/config/navigation';
 import type { UserRole } from '@features/auth/store/auth.store';
 import { BenchPage } from '@features/bench/components/pages/BenchPage';
 import { CandidatesPage } from '@features/candidates/components/pages/CandidatesPage/CandidatesPage';
-import { NewCandidatePage } from '@features/candidates/components/pages/NewCandidatePage';
 import { DashboardPage } from '@features/processes/components/pages/DashboardPage';
 import { ProcessDetailPage } from '@features/processes/components/pages/ProcessDetailPage/ProcessDetailPage';
 import { ProcessesPage } from '@features/processes/components/pages/ProcessesPage/ProcessesPage';
 import { NewProcessPage } from '@features/processes/components/pages/NewProcessPage';
 import { BENCH_PATH, CANDIDATES_NEW_PATH, CANDIDATES_PATH, DASHBOARD_PATH, NEW_PROCESS_PATH, PROCESSES_PATH } from './paths';
+
+// Carga diferida: aísla CandidateCreateForm fuera del bundle principal (DT-060).
+const NewCandidatePage = lazy(() => import('@features/candidates/components/pages/NewCandidatePage')
+  .then(module => ({ default: module.NewCandidatePage })));
 
 export interface IRouteConfig {
   readonly path:    string;

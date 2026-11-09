@@ -5,7 +5,7 @@ import { AiFileAskService } from '../../../ai/application/services/ai-file-ask.s
 import { AiProviderError } from '../../../ai/domain/errors/ai-provider.error';
 import { ENABLED_CONFIG } from '../../../ai/testing/ai-config.fixture';
 import { fakeAiPort, type IFakeAiPort } from '../../../ai/testing/fake-ai-port';
-import type { ICvTextExtractorPort } from '../../application/ports/cv-text-extractor.port';
+import type { IDocumentTextExtractorPort } from '../../../../shared/document-text/document-text-extractor.port';
 import type { ICvFile } from '../../domain/interfaces/cv-file.interface';
 import { VALID_DRAFT_JSON } from '../../testing/cv-fixtures';
 import { CvIcaDraftService } from './cv-ica-draft.service';
@@ -18,7 +18,7 @@ function setup(cvText = 'CV inventado de Persona Inventada'): { extractor: IcaTe
   const fake = fakeAiPort();
   const completion = new AiCompletionService(fake.port, ENABLED_CONFIG, {});
   const coordinator = new AiCoordinatorService(completion, new AiFileAskService(fake.port, ENABLED_CONFIG, completion));
-  const text: ICvTextExtractorPort = { extractText: jest.fn().mockResolvedValue(cvText) };
+  const text: IDocumentTextExtractorPort = { extractText: jest.fn().mockResolvedValue(cvText) };
   return { extractor: new IcaTextCvExtractor(text, new CvIcaDraftService(coordinator)), ...fake };
 }
 

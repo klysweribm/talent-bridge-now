@@ -12,6 +12,7 @@ Un CV es PII completa. El envío a ICA está aceptado solo para la POC (DT-030);
 ## Datos y logs
 - Nunca loguear el contenido del CV ni los campos extraídos (nombre, email, teléfono, LinkedIn, experiencia). Solo ids, longitudes, `extractor` y `reason`.
 - `@TraceFlow()` nunca sobre un método que reciba el CV, el texto extraído o el borrador.
+- Todo handler (o controller) que reciba o devuelva un CV, datos de candidatos o texto libre para la IA lleva `@NoBodyLog()` (FlowLog imprime solo `{ omitted, length }`). Un endpoint nuevo de ese tipo (p. ej. el brochure de OPP-AI-1) se marca desde su creación y con un test de metadata (DT-055).
 - El archivo del CV no se guarda (no hay COS): se procesa en memoria y se descarta. Nada en disco ni en Mongo.
 - El borrador (`ICandidateProfileDraft`) nunca se persiste. Solo `POST /candidates` crea un `Candidate`, tras confirmación humana.
 - Fixtures y tests: solo CV inventados. Prohibido cualquier dato real.

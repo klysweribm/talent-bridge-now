@@ -34,4 +34,25 @@ describe('BenchResourceDrawer', () => {
     renderAt(<BenchResourceDrawer code="BN-9999" onClose={vi.fn()} />);
     expect(await screen.findByRole('alert')).toHaveTextContent('No pudimos cargar el recurso.');
   });
+
+  it('should close when clicking outside the panel but not inside it', async () => {
+    vi.mocked(infra.fetchBenchResource).mockResolvedValue(makeResource());
+    const onClose = vi.fn();
+    renderAt(<BenchResourceDrawer code="BN-0001" onClose={onClose} />);
+    await userEvent.click(screen.getByRole('dialog'));
+    expect(onClose).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('dialog').parentElement as HTMLElement);
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('should keep Tab focus inside the drawer', async () => {
+    vi.mocked(infra.fetchBenchResource).mockResolvedValue(makeResource());
+    renderAt(<><BenchResourceDrawer code="BN-0001" onClose={vi.fn()} /><button>Fuera</button></>);
+    const close = screen.getByRole('button', { name: 'Cerrar detalle' });
+    close.focus();
+    await userEvent.tab({ shift: true });
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
+    expect(screen.getByRole('button', { name: 'Fuera' })).not.toHaveFocus();
+  });
 });

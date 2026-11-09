@@ -35,7 +35,7 @@ export class AiCompletionService {
   async completeWithDefinition(input: IAiDefinitionAskInput): Promise<{ answer: string; model: string; source: TAiSource }> {
     const config = this.config;
     if (!config.enabled) throw new AiProviderError('AI is not configured', 'NOT_CONFIGURED');
-    const signal = AbortSignal.timeout(config.totalTimeoutMs);
+    const signal = AbortSignal.timeout(input.timeoutMs ?? config.totalTimeoutMs);
     const { first, answer } = await this.run(config, input.definition, input.query, signal);
     return { answer, model: first.model, source: config.provider };
   }
@@ -54,6 +54,8 @@ export class AiCompletionService {
     ];
     const jsonMode = topic.jsonMode === true || topic.outputSchema !== undefined;
     const call = async (extra: readonly IAiMessage[]): Promise<IAiCompletion> => {
+      // Un solo signal cubre la llamada y la reparación: si ya se agotó, no se lanza otra.
+      if (signal.aborted) throw new AiProviderError('The time budget is exhausted', 'TIMEOUT');
       const result = await this.provider.complete({
         messages: [...messages, ...extra], maxTokens: config.maxTokens, jsonMode, signal, ...(fileIds ? { fileIds } : {}),
       });

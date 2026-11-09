@@ -21,7 +21,7 @@ Marca **[POR VALIDAR CON LUC/GUS]**: el término o su definición no está confi
 | Expectativas de evaluación técnica | `roleDescription` | Texto libre con lo que se evaluará técnicamente. Es el campo que la IA rellena a partir del brochure. | "Diseño de APIs REST, pruebas, AWS" |
 | Brochure | — (archivo temporal, nunca se guarda) | Documento (PDF, DOCX, MD o TXT) que describe la oportunidad. Se lee en memoria para generar el borrador y se descarta. | `Requerimiento_ITAU.pdf` |
 | Box mágico | — (componente de la etapa 1) | Área de texto donde se describe el perfil libremente y la IA propone un borrador del formulario. No crea nada. | "Fullstack senior React y NestJS para ITAU…" |
-| Borrador de oportunidad | `IOpportunityDraft` (a crear) | Propuesta de la IA que rellena el formulario. Cada campo inferido se marca "Sugerido por IA" hasta que una persona lo edite o confirme. | Título, cliente, stack |
+| Borrador de oportunidad | `IOpportunityDraftResponse` | Propuesta de la IA que rellena el formulario. Cada campo inferido se marca "Sugerido por ICA" hasta que una persona lo edite o confirme. | Título, cliente, stack |
 | Match / % de match | — (a crear en `bench`) | Puntaje de 0 a 100 entre un recurso de banca y el perfil buscado. Lo calcula el backend de forma determinística (60 % skills, 25 % banda, 15 % disponibilidad); la IA nunca lo calcula. | 82 % |
 | Recomendado (umbral) | `MATCH_THRESHOLD` (75 por defecto) | Etiqueta de un recurso cuyo match alcanza el umbral. Por debajo se muestra igual, sin etiqueta. | Recurso con 80 % |
 | Skill canónica | catálogo en `src/shared/skills/` | Nombre único de una skill, con alias que se normalizan a él. Las skills desconocidas se conservan tal cual. | `Reactjs` → `React` |

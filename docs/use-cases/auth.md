@@ -253,7 +253,7 @@ no mezclar "cambio de alcance aprobado" con "código que quedó mal". El panel
 de marca quedó recortado a logo + título + una frase de valor
 (`docs/design/UX-GUIDELINES.md` §3.1); `TestimonialCard` y
 `ProductPreviewMock` no se construyen. Al cerrar este task, actualizar `ROADMAP.md` →
-"Estado actual / próximo paso" para reflejar que Etapa 1 ahora incluye este
+"Qué falta" del ROADMAP para reflejar que Etapa 1 ahora incluye este
 ajuste, y `good-practices/DEBT_TECH.md` si algún archivo nuevo queda por
 sobre su límite de línea.
 

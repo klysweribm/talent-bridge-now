@@ -19,11 +19,5 @@ export const CV_EXTRACTORS = Symbol('CV_EXTRACTORS');
 /** Tope de caracteres del texto del CV que se envía en línea a ICA (el resto se descarta con un aviso). */
 export const CV_TEXT_MAX_CHARS = 60_000;
 
-/** Un CV real tiene pocas páginas; el resto de un PDF enorme no se lee. */
-export const CV_PDF_MAX_PAGES = 20;
-/** Tamaño máximo de lo que un DOCX puede descomprimir (zip bomb: pesa poco y ocupa gigas al abrirse). */
-export const CV_DOCX_MAX_UNCOMPRESSED_BYTES = 20 * 1024 * 1024;
-/** Tiempo máximo para extraer el texto de un archivo (el parser corre en el hilo de la petición). */
-export const CV_PARSE_TIMEOUT_MS = 15_000;
 /** Etiqueta que delimita el CV dentro del mensaje; el texto del CV no puede contener su cierre. */
 export const CV_TEXT_CLOSE_TAG = '</cv>';

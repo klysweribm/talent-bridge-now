@@ -30,4 +30,6 @@ export interface IAiFileAskInput {
 export interface IAiDefinitionAskInput {
   readonly definition: IAiTopicDefinition;
   readonly query: string;
+  /** Tope TOTAL de la consulta (llamada + reparación); sustituye a `totalTimeoutMs` de la config. */
+  readonly timeoutMs?: number;
 }

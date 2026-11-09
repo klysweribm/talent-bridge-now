@@ -7,12 +7,14 @@ import {
   type ExecutionContext,
   type NestInterceptor,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { HTTP_CODE_METADATA, METHOD_METADATA } from '@nestjs/common/constants';
 import type { Request } from 'express';
 import { Observable, catchError, tap, throwError } from 'rxjs';
 import { flowStorage } from './flow-context';
-import { deriveCapability, formatRequest, formatResponse } from './flow-log.format';
+import { deriveCapability, formatRequest, formatResponse, omitBody } from './flow-log.format';
 import { FlowLogService } from './flow-log.service';
+import { NO_BODY_LOG_KEY } from './no-body-log.decorator';
 
 function describeUser(user: unknown): string | undefined {
   if (typeof user !== 'object' || user === null) return undefined;
@@ -31,7 +33,10 @@ function successStatus(handler: object): number {
 
 @Injectable()
 export class FlowLogInterceptor implements NestInterceptor {
-  constructor(private readonly flowLog: FlowLogService) {}
+  constructor(
+    private readonly flowLog: FlowLogService,
+    private readonly reflector: Reflector,
+  ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const store = flowStorage.getStore();
@@ -39,6 +44,11 @@ export class FlowLogInterceptor implements NestInterceptor {
 
     store.reachedHandler = true;
     store.capability = deriveCapability(context.getClass().name);
+    const noBody = this.reflector.getAllAndOverride<boolean | undefined>(NO_BODY_LOG_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]) === true;
+    const printable = (body: unknown): unknown => (noBody ? omitBody(body) : body);
     const request = context.switchToHttp().getRequest<Request & { user?: unknown }>();
 
     this.flowLog.emit(
@@ -51,7 +61,7 @@ export class FlowLogInterceptor implements NestInterceptor {
         user: describeUser(request.user),
         headers: request.headers,
         query: request.query,
-        body: request.body,
+        body: printable(request.body),
       }),
     );
 
@@ -63,7 +73,7 @@ export class FlowLogInterceptor implements NestInterceptor {
             id: store.id,
             status: successStatus(context.getHandler()),
             elapsedMs: elapsed(),
-            body,
+            body: printable(body),
           }),
         ),
       ),

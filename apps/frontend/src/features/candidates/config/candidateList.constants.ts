@@ -1,14 +1,10 @@
 import type { TCandidateAssignment } from '@ibm-talent-bridge/shared-types';
-import type { TCandidateOrigin } from '../types/candidateList.types';
 
 export const CANDIDATE_LIST_QUERY_KEY = 'candidate-list';
 export const CANDIDATE_LIST_SKELETON_ROWS = 6;
 export const CANDIDATE_PAGE_LIMIT_MIN = 1;
 export const CANDIDATE_PAGE_LIMIT_MAX = 50;
 export const CANDIDATE_ASSIGNMENT_VALUES = ['available', 'assigned'] as const satisfies readonly TCandidateAssignment[];
-
-/** Origen que el paso Candidatos del formulario de procesos pasa en `state` al enlazar a «Agregar candidato». */
-export const NEW_PROCESS_ORIGIN: TCandidateOrigin = 'new-process';
 
 export const CANDIDATE_COLUMNS: readonly string[] = ['Nombre', 'Rol', 'Correo', 'Estado', 'Creado'];
 
@@ -36,8 +32,7 @@ export const CANDIDATE_FILTERS: readonly ICandidateFilterOption[] = [
   { value: 'assigned',  label: 'En una oportunidad', empty: 'Ningún candidato está en una oportunidad' },
 ];
 
-/** Destino y etiqueta del enlace de salida de «Candidato creado» según el origen. */
+/** Etiqueta del enlace de salida de «Candidato creado». */
 export const CANDIDATE_EXIT_LINKS = {
-  newProcess: { label: 'Volver a la nueva oportunidad' },
   list:       { label: 'Ver candidatos' },
 } as const;

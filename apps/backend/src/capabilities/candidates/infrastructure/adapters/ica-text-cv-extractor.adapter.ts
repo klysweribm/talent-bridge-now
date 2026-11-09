@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { TCvExtractor } from '@ibm-talent-bridge/shared-types';
 import type { ICvExtractorPort, TCvExtractionOutcome } from '../../application/ports/cv-extractor.port';
-import { CV_TEXT_EXTRACTOR_PORT, type ICvTextExtractorPort } from '../../application/ports/cv-text-extractor.port';
+import { DOCUMENT_TEXT_EXTRACTOR_PORT, type IDocumentTextExtractorPort } from '../../../../shared/document-text/document-text-extractor.port';
 import { findMissingFields } from '../../domain/cv-draft.sanitizer';
 import type { ICvFile } from '../../domain/interfaces/cv-file.interface';
 import { CvIcaDraftService } from './cv-ica-draft.service';
@@ -15,7 +15,7 @@ export class IcaTextCvExtractor implements ICvExtractorPort {
   readonly mode: TCvExtractor = 'ica-text';
 
   constructor(
-    @Inject(CV_TEXT_EXTRACTOR_PORT) private readonly text: ICvTextExtractorPort,
+    @Inject(DOCUMENT_TEXT_EXTRACTOR_PORT) private readonly text: IDocumentTextExtractorPort,
     private readonly icaDraft: CvIcaDraftService,
   ) {}
 

@@ -5,13 +5,15 @@ export interface ExtractorSelectorProps {
   readonly value: TCvExtractor;
   readonly onChange: (mode: TCvExtractor) => void;
   readonly disabled?: boolean;
+  /** Fuerza una columna aunque el viewport sea ancho (p. ej. dentro de un panel lateral). */
+  readonly stacked?: boolean;
 }
 
-export function ExtractorSelector({ value, onChange, disabled = false }: ExtractorSelectorProps): JSX.Element {
+export function ExtractorSelector({ value, onChange, disabled = false, stacked = false }: ExtractorSelectorProps): JSX.Element {
   return (
     <fieldset className="flex flex-col gap-sm" disabled={disabled}>
       <legend className="text-body-md-medium text-text-primary mb-xs">Método de extracción</legend>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
+      <div className={`grid grid-cols-1 ${stacked ? '' : 'sm:grid-cols-3'} gap-md`}>
         {EXTRACTOR_MODES.map(mode => (
           <label
             key={mode}

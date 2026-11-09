@@ -35,7 +35,7 @@ No root `package.json` and no workspace tool: each app/package is an independent
 ```bash
 # apps/backend
 npm run start:dev | build | typecheck | lint | test | test:cov | test:e2e
-npx jest path/to/file.spec.ts                 # single test (jest rootDir = src)
+npm test -- path/to/file.spec.ts              # single test (jest rootDir = src); NOT bare `npx jest` (PDF tests need --experimental-vm-modules)
 
 # apps/frontend
 npm run dev | build | typecheck | lint        # dev → localhost:5174
@@ -114,5 +114,5 @@ See `.claude/memory/agentic-architecture.md` for the hub-and-spoke model (main s
 
 <!-- BEGIN TEMPORARY_SESSION_MEMORY -->
 Status: imported
-ImportedAt: 2026-11-03T20:34:35Z
+ImportedAt: 2026-11-08T22:22:06Z
 <!-- END TEMPORARY_SESSION_MEMORY -->

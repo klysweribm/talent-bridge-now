@@ -1,8 +1,9 @@
+import { useEffect } from 'react';
 import { Button } from '@shared/components/atoms/Button';
-import type { ICvExtractionResult } from '@ibm-talent-bridge/shared-types';
+import type { ICandidate, ICvExtractionResult } from '@ibm-talent-bridge/shared-types';
 import { SUBMIT_LABELS } from '../../../config/candidates.constants';
-import { useCandidateExitLink } from '../../../hooks/useCandidateExitLink';
 import { useCandidateForm } from '../../../hooks/useCandidateForm';
+import { useReportFormState, type ICandidateCreateFormState } from '../../../hooks/useReportFormState';
 import { useCandidateSubmission } from '../../../hooks/useCandidateSubmission';
 import { formValuesToRequest } from '../../../utils/draftMapping';
 import { isValidEmail } from '../../../utils/isValidEmail';
@@ -15,7 +16,6 @@ import { CandidateMatchNotice } from '../../molecules/CandidateMatchNotice';
 import { DuplicateCandidateNotice } from '../../molecules/DuplicateCandidateNotice';
 import { SubmissionFeedback } from '../../molecules/SubmissionFeedback';
 import { ExtractionNotices } from '../../molecules/ExtractionNotices';
-import { CandidateCreated } from '../../molecules/CandidateCreated';
 
 export interface CandidateReviewFormProps {
   /** `undefined` = escritura manual (sin CV). */
@@ -23,35 +23,40 @@ export interface CandidateReviewFormProps {
   /** Archivo del CV analizado, para la tarjeta de resultado. */
   readonly file?: File;
   readonly onRestart: () => void;
+  /** Se llama una vez al guardar; el padre decide qué mostrar. */
+  readonly onSaved: (candidate: ICandidate, mode: 'created' | 'updated') => void;
+  readonly onCancel?: () => void;
+  readonly onStateChange?: (state: ICandidateCreateFormState) => void;
 }
 
-interface ISubmitRowProps { readonly isUpdate: boolean; readonly pending: boolean; readonly onRestart: () => void }
+interface ISubmitRowProps { readonly isUpdate: boolean; readonly pending: boolean; readonly onRestart: () => void; readonly onCancel?: () => void }
 
-function SubmitRow({ isUpdate, pending, onRestart }: ISubmitRowProps): JSX.Element {
+function SubmitRow({ isUpdate, pending, onRestart, onCancel }: ISubmitRowProps): JSX.Element {
   return (
     <div className="flex gap-sm">
       <Button type="submit" loading={pending}>{isUpdate ? SUBMIT_LABELS.update : SUBMIT_LABELS.create}</Button>
       <Button type="button" variant="ghost" onClick={onRestart}>Volver</Button>
+      {onCancel && <Button type="button" variant="ghost" onClick={onCancel}>Cancelar</Button>}
     </div>
   );
 }
 
 const NO_DRAFT = { draft: {}, missingFields: [], warnings: [] } as const;
 
-export function CandidateReviewForm({ result, file, onRestart }: CandidateReviewFormProps): JSX.Element {
+export function CandidateReviewForm({ result, file, onRestart, onSaved, onCancel, onStateChange }: CandidateReviewFormProps): JSX.Element {
   const { draft, missingFields, warnings } = result ?? NO_DRAFT;
-  const exit = useCandidateExitLink();
   const form = useCandidateForm(draft, result?.matches?.exact?.email);
-  const { register, handleSubmit, setValue, formState: { errors } } = form;
+  const { register, handleSubmit, setValue, formState: { errors, isDirty } } = form;
   const submission = useCandidateSubmission(result?.matches?.exact?.id);
   const { duplicate } = submission;
   const missing = resolveMissing(missingFields);
   const isUpdate = submission.mode === 'update';
   const onSubmit = handleSubmit(values => submission.submit(formValuesToRequest(values, draft)));
 
-  if (submission.isSuccess && submission.saved) {
-    return <CandidateCreated candidate={submission.saved} mode={isUpdate ? 'updated' : 'created'} onRestart={onRestart} exitTo={exit.to} exitLabel={exit.label} />;
-  }
+  const { saved } = submission;
+  const mode = isUpdate ? 'updated' : 'created';
+  useReportFormState(submission.isPending, result !== undefined || isDirty, onStateChange, submission.isPending);
+  useEffect(() => { if (saved) onSaved(saved, mode); }, [saved]); // eslint-disable-line react-hooks/exhaustive-deps -- notifica una vez por guardado
 
   return (
     <form onSubmit={event => { void onSubmit(event); }} noValidate className="flex flex-col gap-base">
@@ -66,7 +71,7 @@ export function CandidateReviewForm({ result, file, onRestart }: CandidateReview
         <DuplicateCandidateNotice existing={duplicate} onUpdateExisting={() => { setValue('email', duplicate.email); submission.switchToUpdate(duplicate); }} />
       )}
       <SubmissionFeedback error={submission.error} isUpdate={isUpdate} fromDuplicate={submission.fromDuplicate} />
-      <SubmitRow isUpdate={isUpdate} pending={submission.isPending} onRestart={onRestart} />
+      <SubmitRow isUpdate={isUpdate} pending={submission.isPending} onRestart={onRestart} onCancel={onCancel} />
     </form>
   );
 }

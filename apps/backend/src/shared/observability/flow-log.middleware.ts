@@ -6,6 +6,7 @@ import {
   REJECTED_BEFORE_HANDLER_NOTE,
   formatRequest,
   formatResponse,
+  omitBody,
 } from './flow-log.format';
 import { FlowLogService } from './flow-log.service';
 
@@ -37,7 +38,7 @@ export class FlowLogMiddleware implements NestMiddleware {
           url: req.originalUrl,
           headers: req.headers,
           query: req.query,
-          body: req.body,
+          body: omitBody(req.body),
         }),
       );
       this.flowLog.emit(

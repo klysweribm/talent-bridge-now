@@ -87,7 +87,7 @@ borradores en el servidor. El estado vive en `wizard.store.ts` (Zustand) y sobre
 | Paso del MVP | Contiene | Fuera (futuro) |
 | --- | --- | --- |
 | 1. Datos | Título*, Cliente* (texto libre, máx. 200); **Project Manager\*** solo si crea un reclutador; **Reclutador** (opcional, «Sin asignar») solo si crea un PM | Seniority, descripción del perfil, duración de entrevista, skills, expectativas del cliente, benchmark «18 días», ID de requisición, chip «Etapa inicial» |
-| 2. Candidatos | Lista de candidatos **disponibles** con casilla (nombre + rol), contador «N de MAX» con el tope del backend, deshabilitadas al llegar al tope, «+ Agregar candidato» siempre visible (lleva a `/candidates/new`) | Buscador de existentes, «% match», «Watson Enabled», alerta de coincidencia, carga de CV dentro del paso |
+| 2. Candidatos | Lista de candidatos **disponibles** con casilla (nombre + rol), contador «N de MAX» con el tope del backend, deshabilitadas al llegar al tope, «+ Agregar candidato» siempre visible y habilitado (botón que abre un panel lateral con el formulario de candidato, sin cambiar la URL; atajo opcional, PROC-UX-1). El paso es opcional: «Siguiente» siempre habilitado con 0 candidatos | Buscador de existentes, «% match», «Watson Enabled», alerta de coincidencia, carga de CV dentro del paso |
 | 3. Confirmar | Resumen de datos y candidatos con «Editar» por sección, **un** botón «Crear proceso», «Atrás» y «Cancelar y descartar». **0 candidatos está permitido** (aviso «Aún sin candidatos») | Vista previa de Slack, notificaciones Outlook/Slack, «Estimación de cierre», «Guardar como borrador» |
 
 El paso «Asignar referentes» del diseño (mín. 1, Principal/Validador, disponibilidad, historial de contratación) queda

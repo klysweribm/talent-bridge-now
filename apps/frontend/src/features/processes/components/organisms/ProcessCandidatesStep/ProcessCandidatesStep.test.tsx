@@ -1,15 +1,9 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useLocation } from 'react-router-dom';
 import * as infra from '../../../infrastructure/processCreate.infra';
 import { useWizardStore } from '../../../store/wizard.store';
 import { makeCandidate, makePage, mockProcessLimits, renderWithProviders } from '../../../test-utils';
 import { ProcessCandidatesStep } from './ProcessCandidatesStep';
-
-function LocationStateProbe(): JSX.Element {
-  const location = useLocation();
-  return location.pathname === '/candidates/new' ? <output data-testid="nav-state">{JSON.stringify(location.state)}</output> : <></>;
-}
 
 vi.mock('../../../infrastructure/processCreate.infra');
 
@@ -38,22 +32,31 @@ describe('ProcessCandidatesStep', () => {
     expect(screen.getByRole('checkbox', { name: 'Candidato 1 · Rol 1' })).toBeEnabled();
   });
 
-  it('should always show the Agregar candidato link to /candidates/new', async () => {
+  it.each([
+    ['a list with candidates', () => undefined],
+    ['an empty list', () => vi.mocked(infra.fetchAvailableCandidates).mockResolvedValue(makePage([]))],
+    ['a full limit', () => mockProcessLimits({ maxCandidates: 1 })],
+    ['a list that is still loading', () => vi.mocked(infra.fetchAvailableCandidates).mockReturnValue(new Promise(() => undefined))],
+    ['a list that failed', () => vi.mocked(infra.fetchAvailableCandidates).mockRejectedValue(new Error('boom'))],
+    ['a limit that is still loading', () => vi.mocked(infra.fetchProcessLimits).mockReturnValue(new Promise(() => undefined))],
+    ['a limit that failed', () => vi.mocked(infra.fetchProcessLimits).mockRejectedValue(new Error('boom'))],
+  ])('should always show an enabled Agregar candidato button when there is %s', async (_name, arrange) => {
+    arrange();
+    if (_name === 'a full limit') useWizardStore.setState({ candidates: [makeCandidate(1)] });
     renderWithProviders(<ProcessCandidatesStep />);
-    expect(await screen.findByRole('link', { name: '+ Agregar candidato' })).toHaveAttribute('href', '/candidates/new');
+    const button = screen.getByRole('button', { name: '+ Agregar candidato' });
+    expect(button).toBeEnabled();
+    expect(screen.queryByRole('link', { name: '+ Agregar candidato' })).not.toBeInTheDocument();
+    await screen.findByRole('button', { name: 'Siguiente' });
+    expect(screen.getByRole('button', { name: '+ Agregar candidato' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Siguiente' })).toBeEnabled();
   });
 
-  it('should tell /candidates/new that it comes from the new-process form', async () => {
-    renderWithProviders(<><ProcessCandidatesStep /><LocationStateProbe /></>);
-    await userEvent.click(await screen.findByRole('link', { name: '+ Agregar candidato' }));
-    expect(await screen.findByTestId('nav-state')).toHaveTextContent('{"from":"new-process"}');
-  });
-
-  it('should show the empty message and keep the add link when none are available', async () => {
+  it('should show the empty message with the help text and keep the add button when none are available', async () => {
     vi.mocked(infra.fetchAvailableCandidates).mockResolvedValue(makePage([]));
     renderWithProviders(<ProcessCandidatesStep />);
-    expect(await screen.findByText('No hay candidatos disponibles')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '+ Agregar candidato' })).toBeInTheDocument();
+    expect(await screen.findByText('No hay candidatos disponibles. Puedes crear uno o continuar sin candidatos.')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '+ Agregar candidato' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Siguiente' })).toBeEnabled();
   });
 

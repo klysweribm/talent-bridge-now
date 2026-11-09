@@ -12,7 +12,7 @@ jest.setTimeout(30_000);
 /** Modo clásico con CV sintéticos REALES: reglas primero, ICA (puerto falso) completa los huecos; si falla, sigue funcionando. */
 describe('POST /candidates/cv-extraction mode classic', () => {
   const fake = fakeAiPort();
-  const fixture = (name: string): Buffer => readFileSync(join(__dirname, '../src/capabilities/candidates/testing/fixtures', name));
+  const fixture = (name: string): Buffer => readFileSync(join(__dirname, '../src/shared/document-text/testing/fixtures', name));
   let ctx: IAiTestContext;
   beforeAll(async () => { ctx = await buildAiApp('cvclassic', fake.port); });
   afterAll(() => closeAiApp(ctx));
@@ -48,7 +48,7 @@ describe('POST /candidates/cv-extraction mode classic', () => {
 
 describe('POST /candidates/cv-extraction mode classic guards', () => {
   const fake = fakeAiPort();
-  const fixture = (name: string): Buffer => readFileSync(join(__dirname, '../src/capabilities/candidates/testing/fixtures', name));
+  const fixture = (name: string): Buffer => readFileSync(join(__dirname, '../src/shared/document-text/testing/fixtures', name));
   let ctx: IAiTestContext;
   beforeAll(async () => { ctx = await buildAiApp('cvclassicg', fake.port); });
   afterAll(() => closeAiApp(ctx));
@@ -66,7 +66,7 @@ describe('POST /candidates/cv-extraction mode classic guards', () => {
     const fake = fakeAiPort();
     arrange(fake);
     const ctx = await buildAiApp('cvclassicnokey', fake.port, { ICA_API_KEY: '' });
-    const pdf = readFileSync(join(__dirname, '../src/capabilities/candidates/testing/fixtures/cv-sintetico.pdf'));
+    const pdf = readFileSync(join(__dirname, '../src/shared/document-text/testing/fixtures/cv-sintetico.pdf'));
 
     const response = await send(ctx, 'pm', pdf, 'classic').expect(201);
 

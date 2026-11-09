@@ -35,6 +35,8 @@ const BASE_ENV: Record<string, string> = {
   AI_RETRY_MAX_MS: '1',
   AI_TOTAL_TIMEOUT_MS: '2000',
   CV_MAX_FILE_BYTES: '4096',
+  OPPORTUNITY_DRAFT_MAX_TEXT_CHARS: '200',
+  OPPORTUNITY_DRAFT_TIMEOUT_MS: '1500',
 };
 
 export interface IAiTestContext {
@@ -42,7 +44,7 @@ export interface IAiTestContext {
   readonly jwt: JwtService;
 }
 
-function testImports(label: string): unknown[] {
+function testImports(label: string, extra: readonly unknown[]): unknown[] {
   return [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env', '../../.env'] }),
     MongooseModule.forRootAsync({
@@ -58,6 +60,7 @@ function testImports(label: string): unknown[] {
     BenchModule,
     AiModule,
     CandidatesModule,
+    ...extra,
   ];
 }
 
@@ -65,9 +68,10 @@ export async function buildAiApp(
   label: string,
   port: IAiProviderPort,
   env: Record<string, string> = {},
+  extraImports: readonly unknown[] = [],
 ): Promise<IAiTestContext> {
   Object.assign(process.env, BASE_ENV, env, { JWT_SECRET: TEST_JWT_SECRET });
-  const moduleRef = await Test.createTestingModule({ imports: testImports(label) as never })
+  const moduleRef = await Test.createTestingModule({ imports: testImports(label, extraImports) as never })
     .overrideProvider(AI_PROVIDER_PORT)
     .useValue(port)
     .compile();

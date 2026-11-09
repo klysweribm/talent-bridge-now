@@ -11,9 +11,9 @@ Delegates a task to the sub-agent whose own definition (`.claude/agents/*-task.m
 ## Steps
 
 1. **Resolve the target.**
-   - `Etapa N` → read that stage's section in the remediation plan (path in `ROADMAP.md` → "Estado actual"; the old `~/.claude/plans/breezy-moseying-plum.md` no longer exists — DT-025).
+   - `Etapa N` → read that stage's section in the remediation plan (path in `ROADMAP.md` → "▶ Qué falta"; the old `~/.claude/plans/breezy-moseying-plum.md` no longer exists — DT-025).
    - A feature ID (`QW-2`, `FE-OTP-1`, `AUTH-2`, `AUTH-3`, `AUTH-4`, `PROC-2`, `CAND-1`, `INT-1`, `FEED-1`, `REP-1`, `CV-1`, `HARDEN-1`, `DEPLOY-1`) → read its `## <ID> — ...` section in root `ROADMAP.md` in full (Motivación/Alcance/Dependencias/Criterios de éxito).
-   - `next` / no id → `ROADMAP.md` → "Estado actual / próximo paso" says what's next; cross-check with the first non-✅ line of `ROADMAP.md` → "Orden de implementación recomendado". If they disagree, show both and ask.
+   - `next` / no id → `ROADMAP.md` → "▶ Qué falta" → "Siguiente paso" says what's next; cross-check with the first 📌 row of the active plan table in that section. If they disagree, show both and ask.
 2. **Check dependencies.** If the section's `### Dependencias` names something not ✅, tell the user before delegating — don't silently start a blocked task.
 3. **Map to a sub-agent:**
 
@@ -37,4 +37,4 @@ Delegates a task to the sub-agent whose own definition (`.claude/agents/*-task.m
 
 - Never read `good-practices/BEST-PRACTICES.md` in full from the main session, nor more than one agent's rule bundle — that defeats the split. If ambiguous between layers, ask.
 - Never mark anything ✅ on inference — only on the sub-agent's verified-criteria report or explicit user confirmation.
-- If `ROADMAP.md`'s structure changed (no `## <ID> —` sections, no "Orden de implementación" block, no `Historial` table), say so instead of guessing.
+- If `ROADMAP.md`'s structure changed (no `## <ID> —` sections, no "▶ Qué falta" block, no `Historial` table), say so instead of guessing.

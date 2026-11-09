@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import type { JSX } from 'react';
+import { Suspense, type JSX } from 'react';
 import { LoginPage } from '@features/auth/components/pages/LoginPage';
 import { AuthenticatedShell } from './guards/AuthenticatedShell';
 import { NotFoundRoute } from './guards/NotFoundRoute';
@@ -12,6 +12,7 @@ import { ROLE_GROUPS } from './routes.config';
 export function AppRouter(): JSX.Element {
   return (
     <BrowserRouter>
+      <Suspense fallback={<p role="status" className="p-lg text-body-md text-text-secondary">Cargando…</p>}>
       <Routes>
         <Route element={<PublicRoute />}>
           <Route path={LOGIN_PATH} element={<LoginPage />} />
@@ -30,6 +31,7 @@ export function AppRouter(): JSX.Element {
         <Route path={ROOT_PATH} element={<Navigate to={DASHBOARD_PATH} replace />} />
         <Route path="*" element={<NotFoundRoute />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

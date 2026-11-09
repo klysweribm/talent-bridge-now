@@ -2,7 +2,7 @@ import type { ICvExtractionResult } from '@ibm-talent-bridge/shared-types';
 import { Icon } from '@shared/components/atoms/Icon/Icon';
 import { SkillChip } from '@shared/components/atoms/SkillChip/SkillChip';
 import { CV_RESULT_COPY } from '../../../config/candidates.copy';
-import { formatFileSize } from '../../../utils/formatFileSize';
+import { formatFileSize } from '@shared/utils/formatFileSize';
 
 export interface CvResultCardProps {
   readonly file: File;

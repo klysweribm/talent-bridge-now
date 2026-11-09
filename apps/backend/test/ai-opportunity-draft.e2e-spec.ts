@@ -107,13 +107,15 @@ describe('POST /ai/opportunity-draft', () => {
 describe('POST /ai/opportunity-draft with the draft env vars missing', () => {
   const fake = fakeAiPort();
   let ctx: IAiTestContext;
-  beforeAll(async () => { ctx = await buildAiApp('draft-off', fake.port, { OPPORTUNITY_DRAFT_MAX_TEXT_CHARS: '' }); });
+  // Las envs del borrador tienen default en el código: ausentes, el endpoint sigue funcionando (ya no falla cerrado).
+  beforeAll(async () => { ctx = await buildAiApp('draft-off', fake.port, { OPPORTUNITY_DRAFT_MAX_TEXT_CHARS: '', OPPORTUNITY_DRAFT_TIMEOUT_MS: '' }); });
   afterAll(() => closeAiApp(ctx));
 
-  it('should fail closed with 503 AI_UNAVAILABLE instead of using a hidden default', async () => {
-    const res = await authed(ctx, http(ctx).post(URL).send({ text: ITAU_TEXT }), 'pm').expect(503);
+  it('should keep working with the code defaults instead of failing closed', async () => {
+    fake.complete.mockResolvedValue(completion(ITAU_JSON));
 
-    expect((res.body as { code: string }).code).toBe('AI_UNAVAILABLE');
-    expect(fake.complete).not.toHaveBeenCalled();
+    await authed(ctx, http(ctx).post(URL).send({ text: ITAU_TEXT }), 'pm').expect(200);
+
+    expect(fake.complete).toHaveBeenCalledTimes(1);
   });
 });

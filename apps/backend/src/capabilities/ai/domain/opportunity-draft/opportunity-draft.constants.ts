@@ -5,6 +5,9 @@ export const OPPORTUNITY_DRAFT_CONFIG = Symbol('OPPORTUNITY_DRAFT_CONFIG');
 /** Nombres de las variables de entorno (los valores viven en `.env.example` y en el compose). */
 export const OPPORTUNITY_DRAFT_MAX_TEXT_ENV = 'OPPORTUNITY_DRAFT_MAX_TEXT_CHARS';
 export const OPPORTUNITY_DRAFT_TIMEOUT_ENV = 'OPPORTUNITY_DRAFT_TIMEOUT_MS';
+/** Valores por defecto del borrador de texto: 8000 caracteres y 30 s totales. Propuestos, NO confirmados por negocio. */
+export const OPPORTUNITY_DRAFT_DEFAULT_MAX_TEXT_CHARS = 8000;
+export const OPPORTUNITY_DRAFT_DEFAULT_TIMEOUT_MS = 30_000;
 export const OPPORTUNITY_SOURCE_MAX_FILE_ENV = 'OPPORTUNITY_SOURCE_MAX_FILE_BYTES';
 /** Tope por defecto del brochure: 5 MiB, igual que el CV. NO confirmado por negocio. */
 export const OPPORTUNITY_SOURCE_DEFAULT_MAX_FILE_BYTES = 5_242_880;

@@ -42,7 +42,6 @@ export class OpportunityDraftService {
 
   private async generate(text: string): Promise<IOpportunityDraftResponse> {
     const config = this.config;
-    if (!config.enabled) throw new OpportunityDraftError('AI_UNAVAILABLE', OPPORTUNITY_DRAFT_MESSAGES.unavailable);
     if (text.length > config.maxTextChars) {
       throw new OpportunityDraftError('OPPORTUNITY_TEXT_TOO_LONG', OPPORTUNITY_DRAFT_MESSAGES.tooLong(config.maxTextChars));
     }

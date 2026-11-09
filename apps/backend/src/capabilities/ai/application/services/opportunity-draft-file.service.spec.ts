@@ -17,7 +17,7 @@ const ITAU_JSON = {
   title: 'Fullstack para ITAU', clientName: 'ITAU', opportunityRole: 'Fullstack', skills: ['Reactjs', 'Nestjs'],
   roleDescription: 'Prueba técnica de React y NestJS', band: 8, startDate: '2026-12-01',
 };
-const DRAFT_CONFIG: TOpportunityDraftConfig = { enabled: true, maxTextChars: 100, timeoutMs: 30_000 };
+const DRAFT_CONFIG: TOpportunityDraftConfig = { maxTextChars: 100, timeoutMs: 30_000 };
 const SOURCE_CONFIG: TOpportunitySourceConfig = { maxFileBytes: 1000 };
 const completion = (value: unknown): { content: string; finishReason: string; model: string } => ({ content: JSON.stringify(value), finishReason: 'stop', model: 'm' });
 const withHead = (head: readonly number[], tail: string): Buffer => Buffer.concat([Buffer.from(head), Buffer.from(tail, 'latin1')]);

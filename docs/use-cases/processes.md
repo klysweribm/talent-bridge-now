@@ -7,6 +7,7 @@
 ## Reglas de negocio
 
 - **R5:** la asignación de candidatos ocurre solo en el formulario de la oportunidad (crear o editar). La lista de candidatos es de solo lectura.
+- **R5.1 (PROC-UX-1, decisión vigente):** Oportunidad, Candidatos y Referentes son procesos independientes. La oportunidad se crea sin candidatos ni referentes; los referentes se asocian desde el detalle; el paso 2 del wizard es opcional («Siguiente» siempre habilitado con 0 candidatos). El panel lateral «Agregar candidato» es un atajo opcional: el candidato creado ahí queda guardado definitivamente, independiente de la oportunidad, y «Cancelar y descartar» (paso 3) no lo borra. Cerrar el panel con datos pide confirmación; con guardado pendiente no se puede cerrar.
 - **R6:** asignan y quitan candidatos **únicamente** el PM dueño (`ownerPmId`) y el reclutador de la oportunidad (`recruiterId`, uno solo). Quién cargó al candidato (`ICandidate.createdBy`) es auditoría y no da permisos. Cualquier otro usuario → 403.
 - **R7:** el límite `MAX_CANDIDATES_PER_PROCESS` (defecto 5) vive solo en el backend. Superarlo → 400 con mensaje claro. El frontend lo lee de `maxCandidates` en la respuesta, nunca de una variable `VITE_`.
 - **R8:** toda regla se aplica en el backend. Ocultar un botón no cuenta como control.
@@ -199,7 +200,16 @@ Feature: Oportunidades con varios candidatos
   Scenario: sin candidatos disponibles en el formulario
     Given que no hay candidatos sin processId
     When se abre «Nueva oportunidad»
-    Then la caja Candidatos se ve deshabilitada y solo queda «Agregar candidato»
+    Then se ve «No hay candidatos disponibles. Puedes crear uno o continuar sin candidatos.»
+    And «+ Agregar candidato» sigue visible y habilitado, y «Siguiente» sigue habilitado
+
+  Scenario: agregar un candidato desde el panel lateral del paso 2 (PROC-UX-1)
+    Given que estoy en el paso 2 de «Nueva oportunidad»
+    When pulso «+ Agregar candidato» y guardo el formulario en el panel
+    Then el panel se cierra, la URL no cambia y el wizard conserva datos y selección
+    And el candidato queda guardado y aparece en la lista; se preselecciona si hay cupo
+    And si el límite está lleno, no se selecciona y un aviso persistente lo explica
+    And «Cancelar y descartar» (paso 3) no borra ese candidato
 ```
 
 ## Diferido (no es PROC-1)

@@ -4,7 +4,7 @@
 > `good-practices/DEBT_TECH.md` y `docs/use-cases/`. El encuadre anterior (procesos → candidatos → entrevistas →
 > feedback → reportes) espera el replanning Bench First.
 >
-> **Última actualización:** 2026-11-09 (OPP-AI-1: unidad 7 ✅ en código y tests (`ce69852`, `144bae0`), sin verificar en navegador; defaults de envs `42bf836` y etiqueta ICA `af4e9c1` ya commiteados; unidad 6 cerrada en `14280d3`; la unidad 5 sigue sin verificar en navegador; siguen las unidades 8-9)
+> **Última actualización:** 2026-11-09 (OPP-AI-1: unidad 7 ✅ en código y tests (`ce69852`, `144bae0`), sin verificar en navegador; defaults de envs `42bf836` y etiqueta ICA `af4e9c1` ya commiteados; unidad 6 cerrada en `14280d3`; la unidad 5 sigue sin verificar en navegador; siguen las unidades 8-9). PROC-UX-1 (panel «Agregar candidato» en el wizard) 🚧 en código y tests, sin commitear, sin verificar en navegador)
 
 **Cómo se mantiene:** al cerrar algo, se baja a «✅ Cerrado» en una línea y se quita de «Qué falta». Lo pendiente nunca se entierra bajo lo hecho.
 
@@ -22,6 +22,8 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 ### Siguiente paso
 
 **Unidades 8-9 de OPP-AI-1** (backend de sugerencias de la banca: `POST /bench/match` determinístico y `GET /processes/:id/bench-suggestions`) en `feature/OPP-AI-1`. Tabla del plan abajo. La unidad 7 (frontend del dropzone de brochure) está ✅ en código y tests (`ce69852`, `144bae0`) pero **sin verificar en navegador** (ver «Pendiente de verificación humana»); la 6 (backend) cerrada en `14280d3`; defaults del borrador (`42bf836`) y copy «ICA» (`af4e9c1`) ya commiteados; la 5 **sin verificar en navegador**.
+
+**En paralelo (no desplaza el siguiente paso):** [PROC-UX-1](#-proc-ux-1--agregar-candidato-sin-salir-del-wizard-nueva-oportunidad-medium), unidades A-C en código y tests en la misma rama, sin commitear; falta verificación humana y decidir la deuda DT-060/DT-061.
 
 ### Plan OPP-AI-1 (una sola numeración, 1..11)
 
@@ -149,6 +151,41 @@ El PM o reclutador describe el perfil en un box mágico o sube un brochure; la I
 
 ---
 
+## 🚧 PROC-UX-1 — Agregar candidato sin salir del wizard «Nueva oportunidad» (MEDIUM)
+
+**Estado:** unidades A, B y C ✅ en código y tests (rama `feature/OPP-AI-1`, **sin commitear**; habrá un commit por unidad más uno de docs); sin verificar en navegador · **Casos de uso:** [`docs/use-cases/processes.md`](./docs/use-cases/processes.md) (R5.1) · **Deuda:** DT-060, DT-061 · **Depende de:** PROC-1, CAND-2 · **Commits:** pendientes.
+
+**Decisión vigente (R5.1):** Oportunidad, Candidatos y Referentes son procesos independientes. La oportunidad se crea sin candidatos ni referentes; los referentes se asocian desde el detalle; el paso 2 es opcional («Siguiente» siempre habilitado con 0 candidatos). El panel es un atajo opcional: el candidato creado ahí queda guardado definitivamente, independiente de la oportunidad, y «Cancelar y descartar» (paso 3) no lo borra.
+
+**Alcance entregado**
+- **A:** `SidePanel` genérico en `shared/components/organisms/SidePanel` (`useSidePanel()`/`forceClose`, `guardClose`, `returnFocusTo`, ancho md/lg, clic fuera, Esc, focus trap recalculado en cada Tab, cede el foco a un `alertdialog` anidado, bloqueo de scroll); hooks shared `useFocusTrap`, `useBodyScrollLock`; `useDialogFocus` movido de bench a `shared/hooks`. `BenchResourceDrawer` es un envoltorio fino. **Cambio de comportamiento aceptado en Banca:** gana clic fuera, focus trap y bloqueo de scroll; la cabecera queda fija y el cuerpo hace scroll. Gates A: typecheck 0, lint 0 warnings, 197 archivos / 995 tests, build ok, validate 311 archivos 0 críticos.
+- **B:** `CandidateCreateForm` (`features/candidates/.../CandidateCreateForm`): siempre llama `onSuccess(candidate, mode)` (el 2º argumento `mode` se añadió sobre el plan), nunca renderiza `CandidateCreated`; props `onCancel`, `stacked`, `onStateChange({busy,dirty,saving?})`. `NewCandidateFlow` lo usa y renderiza `CandidateCreated` (`/candidates/new` sin cambios visibles). `useCreateCandidate` invalida `candidate-list` (hueco previo). Gates B: 200 archivos / 1010 tests, validate 313.
+- **C:** «+ Agregar candidato» (Button, no Link) abre `AddCandidatePanel` (SidePanel lg) sin cambiar la URL; siempre visible y habilitado; lista vacía → «No hay candidatos disponibles. Puedes crear uno o continuar sin candidatos.». `onSuccess` vive en `useAddCandidateInPanel` (independiente del panel montado): invalida `available-candidates`, preselecciona si hay cupo y muestra un aviso inline persistente con «Cerrar aviso» (3 variantes: seleccionado / límite lleno «ya tienes N de N» / límite aún no cargado). Regla de cierre única: guardado pendiente bloquea; extracción en curso → «La extracción sigue en curso. ¿Cerrar y descartar?»; con datos → «¿Descartar este candidato?»; sin datos cierra; «Descartar» usa `forceClose`. Limpieza: eliminados `NEW_PROCESS_ORIGIN`, `TCandidateOrigin`, `ICandidateNavState`, `CANDIDATE_EXIT_LINKS.newProcess`, `useCandidateExitLink` y `CandidateReviewForm.exit.test.tsx` (ya no existe «Volver a la nueva oportunidad»). Gates C (re-ejecutados por el orquestador): typecheck 0, lint 0 warnings, vitest 203 archivos / 1037 tests, build ok, `validate-quality --strict` 317 archivos 0 críticos 0 moderados. Backend sin cambios.
+
+**Criterios de éxito (marcados solo si hay test)**
+- [x] La URL no cambia al abrir, guardar o cerrar el panel.
+- [x] Cerrar conserva el wizard y la selección.
+- [x] Cerrar con datos pide confirmación; extracción o guardado en curso bloquea o advierte.
+- [x] El formulario tiene las mismas capacidades (reutiliza el mismo componente) y la lógica no está duplicada.
+- [x] Nada se guarda hasta confirmar.
+- [x] Al guardar: el panel se cierra, aparece el aviso, la lista se refresca (el candidato aparece), se preselecciona y el contador sube.
+- [x] Límite lleno → el candidato se crea pero no se selecciona.
+- [x] Sin candidatos sigue siendo posible avanzar.
+- [x] pm y recruiter se comportan igual.
+- [x] `role="dialog"`, `aria-modal` y título accesible; el foco vuelve al botón.
+- [x] Banca igual salvo el cambio aceptado.
+- [ ] **No cumplido:** «el código de candidates solo se descarga si se abre el panel». Vite avisa de que `CandidateCreateForm` es importado dinámicamente por `AddCandidatePanel` y estáticamente por `NewCandidateFlow`, y las rutas no son lazy: el código de candidates ya va en el bundle principal. El test del `lazy` tampoco distingue lazy de import estático (no se comprobó mutando). Deuda DT-060.
+
+**No verificado:** recorrido real en navegador; teclado real y focus trap fuera de jsdom; estilos a 640 px; extracción real de 90 s con ICA; creación real de candidato por HTTP; rol `technical_ref` sin cubrir en tests; los 8 casos manuales del usuario.
+
+**Menores:** `CandidateCreateForm.onSuccess` tiene un 2º argumento `mode` no previsto en el plan; el aviso de creación con el panel desmontado solo está cubierto a nivel de hook; el test «no se llama a borrado» usa `Object.keys(candidatesInfra)` (aserción débil).
+
+**Deuda nueva:** DT-060 (lazy sin efecto; salida: rutas lazy, p. ej. `NewCandidatePage`, o quitar el `lazy`); DT-061 (acople `processes` → `candidates`; salida decidida por el usuario: inyectar el formulario desde la página del wizard con slot o render prop, no moverlo a `shared`).
+
+**Propuestas sin hacer:** (1) opcional del plan: `sessionStorage` del borrador del formulario y guard de salida por sidebar. (2) Detalle de una oportunidad creada: hoy no navega (AddBox inline de candidatos existentes); el mismo patrón sería un botón «Crear candidato» con el mismo `SidePanel` + `CandidateCreateForm`, esfuerzo pequeño (~1 unidad). Decisión pendiente del usuario.
+
+---
+
 ## 📌 Backlog: detalle de lo esencial
 
 > Sin arrancar. Cada feature espera a la anterior. FE (Etapas 3-7, esperan el replanning) y HARDEN-1 (= Etapa 8) abajo.
@@ -263,6 +300,7 @@ Todo reordenamiento queda registrado aquí (fecha + razón). Una idea nueva sin 
 
 | Fecha | Cambio | Razón |
 | --- | --- | --- |
+| 2026-11-09 | Nueva tarea `PROC-UX-1` (sin commitear): `SidePanel` genérico + focus trap/scroll lock compartidos (Banca ahora es envoltorio, cambio aceptado), `CandidateCreateForm` reutilizable y panel «+ Agregar candidato» en el paso 2; frontend typecheck 0, lint 0 warnings, 203 archivos / 1037 tests, build ok, `validate-quality` 317 archivos 0 críticos; altas DT-060 (lazy sin efecto en el bundle) y DT-061 (acople processes→candidates); sin navegador | Pedido del usuario: crear candidatos sin salir del wizard; regla R5.1 (oportunidad, candidatos y referentes independientes) |
 | 2026-09-13 a 2026-10-18 | Roadmap inicial; Etapa 1 de FE (DT-001); `FE-OTP-1` y `AUTH-2` pasa a OTP; reorden hacia el vertical demo (`QW-1`, Etapas 2-3, `AUTH-1`); arquitectura objetivo IBM Cloud (ADR-006 a ADR-012); modelo de dominio (ADR-013); creado `docs/use-cases/`; `AUTH-1` backend verificado (bug de `@Prop` en uniones). | Backlog vivo por feature, demo al sponsor y decisiones de arquitectura que no tenían ADR. |
 | 2026-10-24 a 2026-10-30 | `AUTH-1` cerrado (DT-008/009); hardening de sesión del frontend (DT-015/016/017); limpieza de `legacy_docs/` (alcance A); `QW-2` y `OBS-1` cerrados; altas DT-018 a DT-024; Etapa 2 de FE cerrada en código; fuentes de verdad consolidadas (`.clinerules` y `PROJECT_CONTEXT.md` como punteros); `BENCH-1` implementado y verificado en vivo (DT-027 a DT-029); ROADMAP adelgazado y reordenado. | Preparar el replanning Bench First y mostrar primero lo que toca hacer. |
 | 2026-10-31 | `AI-1` iniciada: capability `ai` con ICA (ADR-014), contrato en `shared-types`, alta DT-030. | La POC necesita IA en CV, match y feedback. |

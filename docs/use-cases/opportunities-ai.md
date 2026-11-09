@@ -31,14 +31,28 @@ El cuerpo de error es siempre `{ code, message }`. **El frontend ramifica por `c
 | `AI_TIMEOUT` | 504 | Se agotó el tiempo total (una sola señal cubre la llamada y la única reparación; si el primer intento agota el tiempo no se repara) | genérico del servicio |
 | `OPPORTUNITY_TEXT_TOO_LONG` | 400 | El texto supera el máximo; no se llama a ICA | «El texto supera el máximo de N caracteres» (N sale de la config) |
 | (validación del DTO) | 400 | Texto vacío o en blanco | «El texto de la oportunidad es obligatorio» |
-| `OPPORTUNITY_SOURCE_UNREADABLE` | 422 | Brochure sin texto extraíble (unidad 6, aún no implementado) | «No pudimos leer el documento» |
+| `OPPORTUNITY_SOURCE_UNREADABLE` | 422 | Brochure PDF/DOCX sin texto extraíble, corrupto o con texto en blanco; no se llama a ICA (unidad 6, backend implementado; el frontend lo traduce en la unidad 7) | «No pudimos leer el documento» |
+| (validación del archivo) | 400 | Archivo ausente, vacío, de tipo no admitido (por firma) o mayor al tope `OPPORTUNITY_SOURCE_MAX_FILE_BYTES`; solo `POST /ai/opportunity-draft/file` | mensaje del servidor |
+
+`OPPORTUNITY_TEXT_TOO_LONG` (400), `AI_UNAVAILABLE` (503) y `AI_TIMEOUT` (504) también aplican a `POST /ai/opportunity-draft/file`, con el mismo cuerpo.
 
 ## Contrato de `POST /ai/opportunity-draft` (unidad 4, backend implementado)
 
 - Body `{ text }`. Respuesta 200: `{ draft: { title, clientName, opportunityRole, skills, roleDescription, band | null, startDate | null }, missingFields[], warnings[] }`.
 - No crea ni guarda nada (R1). Lo que la IA no infiere queda vacío o `null` y se lista en `missingFields` con un aviso (R2). «Senior» sin número → `band: null` más aviso (la banda es un entero 6 a 10). `skills` pasa por `normalizeSkills` (desconocidas se conservan como se escribieron).
-- Config por env (en `.env.example` y `docker-compose.yml`): `OPPORTUNITY_DRAFT_MAX_TEXT_CHARS=8000` y `OPPORTUNITY_DRAFT_TIMEOUT_MS=30000`, sin default en código. **Defaults propuestos, no confirmados por negocio.**
+- Config por env (en `.env.example` y `docker-compose.yml`): `OPPORTUNITY_DRAFT_MAX_TEXT_CHARS=8000` y `OPPORTUNITY_DRAFT_TIMEOUT_MS=30000`, sin default en código (env ausente o inválida → falla cerrado con `AI_UNAVAILABLE`). **Defaults propuestos, no confirmados por negocio.** Pregunta abierta: ¿estas dos envs deben tener también default en código (8000 / 30000)? El usuario decidirá.
 - Logs del servicio: solo `chars`, `latencyMs` y `outcome` (R3). FlowLog en desarrollo no imprime el cuerpo de este endpoint: solo `{ omitted, length }` (`@NoBodyLog()`, DT-055).
+
+## Contrato de `POST /ai/opportunity-draft/file` (unidad 6, backend implementado, sin commitear)
+
+- `multipart/form-data` con el campo `file`. Formatos: PDF, DOCX, MD y TXT. Respuesta 200: la misma `IOpportunityDraftResponse` que el box mágico (el servicio delega en `OpportunityDraftService.draft(texto)`, así que comparten tope de texto, timeout total y sanitizado).
+- **Validación por firma, no por MIME ni extensión:** PDF (`%PDF-`) y DOCX (ZIP que contiene `word/`) se reconocen por sus primeros bytes; MD/TXT se aceptan si no tienen bytes NUL y decodifican como UTF-8. Un `.doc` heredado (OLE), un `.xlsx` o un binario con extensión `.pdf` se rechazan con 400. Las firmas están duplicadas a propósito respecto de `candidates` para no cruzar capabilities.
+- **En memoria (R3):** PDF/DOCX se leen con `DOCUMENT_TEXT_EXTRACTOR_PORT` (`DocumentTextModule`, importado por `AiModule`); MD/TXT se decodifican como UTF-8. Nada se guarda en disco, base de datos ni logs.
+- **Errores:** 400 (archivo ausente, vacío, tipo no admitido, mayor al tope — el 413 de multer se convierte en 400 con `opportunity-source-too-large.filter.ts` — y `OPPORTUNITY_TEXT_TOO_LONG`); **422 `OPPORTUNITY_SOURCE_UNREADABLE`** (PDF sin texto, corrupto o texto en blanco; no se llama a ICA); 503 `AI_UNAVAILABLE`; 504 `AI_TIMEOUT`. Cuerpo siempre `{ code, message }`.
+- **Config por env** (en `.env.example` y `docker-compose.yml`): `OPPORTUNITY_SOURCE_MAX_FILE_BYTES=5242880` (5 MiB). **Sí tiene default en código** (`OPPORTUNITY_SOURCE_DEFAULT_MAX_FILE_BYTES = 5_242_880` en `opportunity-draft.constants.ts`, mismo criterio que `CV_DEFAULT_MAX_FILE_BYTES`): env ausente o vacía → default sin aviso; inválida → default y `Logger.warn` con el nombre de la variable (nunca su valor); válida → ese valor. El archivo siempre está acotado. (La propiedad de «falla cerrado, sin default» vale solo para `OPPORTUNITY_DRAFT_MAX_TEXT_CHARS` y `OPPORTUNITY_DRAFT_TIMEOUT_MS`, decisión de la unidad 4.) **5 MiB es un valor propuesto, no confirmado por negocio.**
+- **Permisos:** recruiter y pm; technical_ref 403; sin token 401. Throttle con las mismas constantes que el endpoint de texto.
+- **Privacidad:** el controller propio (`opportunity-draft-file.controller.ts`) lleva `@NoBodyLog()` desde su creación, con test de metadata. Los logs del servicio solo registran `bytes`, `latencyMs` y `outcome` (nunca nombre ni contenido; test con espía de Logger). Sin `@TraceFlow()`.
+- Verificado con puerto de IA falso (PDF y MD por HTTP, DOCX solo con extractor falso en el test del servicio). **No verificado contra ICA real ni con un DOCX real por HTTP.**
 
 ## Comportamiento de la interfaz del box mágico (unidad 5, frontend implementado)
 

@@ -30,8 +30,6 @@ export const EXTRACTOR_HINTS: Readonly<Record<TCvExtractor, string>> = {
 export const CLASSIC_COMPLETED_LABEL = 'Clásica completada con IA';
 
 export const EXTRACTION_MAX_SECONDS = 90;
-export const BYTES_PER_KIB = 1024;
-export const BYTES_PER_MIB = BYTES_PER_KIB * BYTES_PER_KIB;
 
 export const LANGUAGE_LEVEL_LABELS: Readonly<Record<TLanguageProficiency, string>> = {
   basic: 'Básico',

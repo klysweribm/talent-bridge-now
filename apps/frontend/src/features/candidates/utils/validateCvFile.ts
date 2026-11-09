@@ -1,5 +1,5 @@
 import { CV_ACCEPTED_EXTENSIONS, CV_MAX_FILE_BYTES } from '../config/candidates.constants';
-import { formatFileSize, formatSizeLimit } from './formatFileSize';
+import { formatFileSize, formatSizeLimit } from '@shared/utils/formatFileSize';
 
 /** Validación previa al envío (la firma real la comprueba el backend). Devuelve el motivo o `null`. */
 export function validateCvFile(file: File): string | null {

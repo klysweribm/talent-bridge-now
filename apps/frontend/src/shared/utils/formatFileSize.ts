@@ -1,4 +1,5 @@
-import { BYTES_PER_KIB, BYTES_PER_MIB } from '../config/candidates.constants';
+const BYTES_PER_KIB = 1024;
+const BYTES_PER_MIB = BYTES_PER_KIB * BYTES_PER_KIB;
 
 const ONE_DECIMAL = new Intl.NumberFormat('es', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const WHOLE_OR_ONE_DECIMAL = new Intl.NumberFormat('es', { maximumFractionDigits: 1 });

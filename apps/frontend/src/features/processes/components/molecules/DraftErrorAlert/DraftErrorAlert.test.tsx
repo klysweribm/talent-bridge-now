@@ -10,4 +10,10 @@ describe('DraftErrorAlert', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
+
+  it('should not render a retry button when there is no onRetry', () => {
+    render(<DraftErrorAlert message="No pudimos leer el documento" />);
+    expect(screen.getByRole('alert')).toHaveTextContent('No pudimos leer el documento');
+    expect(screen.queryByRole('button', { name: 'Reintentar' })).not.toBeInTheDocument();
+  });
 });

@@ -1,4 +1,5 @@
 import { HttpError } from '@shared/infrastructure/httpError';
+import { DRAFT_COPY } from '../config/opportunityDraft.copy';
 import { OpportunityDraftFailure } from './opportunityDraft.errors';
 import { translateOpportunityDraftError } from './opportunityDraft.translate';
 
@@ -23,6 +24,18 @@ describe('translateOpportunityDraftError', () => {
     const failure = translated(new HttpError(400, 'Error HTTP 400', { code: 'OPPORTUNITY_TEXT_TOO_LONG', message: 'El texto supera el máximo de 123 caracteres' }));
     expect(failure.code).toBe('OPPORTUNITY_TEXT_TOO_LONG');
     expect(failure.serverMessage).toBe('El texto supera el máximo de 123 caracteres');
+  });
+
+  it('should map OPPORTUNITY_SOURCE_UNREADABLE by code whatever the status and use the local copy', () => {
+    const failure = translated(new HttpError(422, 'x', { code: 'OPPORTUNITY_SOURCE_UNREADABLE', message: 'texto del servidor' }));
+    expect(failure.code).toBe('OPPORTUNITY_SOURCE_UNREADABLE');
+    expect(failure.serverMessage).toBeUndefined();
+    expect(failure.message).toBe(DRAFT_COPY.errors.OPPORTUNITY_SOURCE_UNREADABLE);
+    expect(translated(new HttpError(500, 'x', { code: 'OPPORTUNITY_SOURCE_UNREADABLE' })).code).toBe('OPPORTUNITY_SOURCE_UNREADABLE');
+  });
+
+  it('should show the "No pudimos leer el documento" copy for an unreadable source', () => {
+    expect(DRAFT_COPY.errors.OPPORTUNITY_SOURCE_UNREADABLE).toMatch(/^No pudimos leer el documento/);
   });
 
   it('should give a generic failure when there is no code (DTO validation 400, 503 without code)', () => {

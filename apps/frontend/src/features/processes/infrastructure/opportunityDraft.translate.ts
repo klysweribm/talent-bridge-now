@@ -1,7 +1,7 @@
 import { HttpError } from '@shared/infrastructure/httpError';
 import { OpportunityDraftFailure } from './opportunityDraft.errors';
 
-const SERVER_CODES = ['AI_UNAVAILABLE', 'AI_TIMEOUT', 'OPPORTUNITY_TEXT_TOO_LONG'] as const;
+const SERVER_CODES = ['AI_UNAVAILABLE', 'AI_TIMEOUT', 'OPPORTUNITY_TEXT_TOO_LONG', 'OPPORTUNITY_SOURCE_UNREADABLE'] as const;
 type TServerCode = typeof SERVER_CODES[number];
 const NETWORK_STATUS = 0;
 

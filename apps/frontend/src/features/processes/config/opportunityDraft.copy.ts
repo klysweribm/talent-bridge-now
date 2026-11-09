@@ -1,4 +1,6 @@
 import type { TOpportunityDraftErrorCode } from '@ibm-talent-bridge/shared-types';
+import { formatFileSize, formatSizeLimit } from '@shared/utils/formatFileSize';
+import { OPPORTUNITY_SOURCE_MAX_FILE_BYTES } from './opportunitySource.constants';
 
 /** Fallos del borrador sin `code` del servidor (validación del DTO, red caída, respuesta inesperada). */
 export type TDraftFailureKind = TOpportunityDraftErrorCode | 'UNKNOWN' | 'NETWORK';
@@ -16,6 +18,17 @@ export const DRAFT_COPY = {
   missingNotice:  (labels: readonly string[]): string => `Por completar (la IA no pudo inferirlos): ${labels.join(', ')}.`,
   skippedNotice:  (labels: readonly string[]): string => `No sobrescrito (ya tenía valor): ${labels.join(', ')}.`,
   appliedNotice:  'Revisa los campos marcados «Sugerido por ICA» antes de continuar.',
+  brochure: {
+    fileLabel: 'Archivo del brochure',
+    prompt: 'O arrastra un brochure aquí o haz clic para seleccionar',
+    supported: (limit: string): string => `Formatos soportados: PDF, DOCX, MD o TXT (máximo ${limit})`,
+  },
+  fileErrors: {
+    type: 'Solo se aceptan archivos PDF, DOCX, MD o TXT.',
+    empty: 'El archivo está vacío.',
+    tooLarge: (bytes: number): string =>
+      `El archivo pesa ${formatFileSize(bytes)} y el máximo es ${formatSizeLimit(OPPORTUNITY_SOURCE_MAX_FILE_BYTES)}.`,
+  },
   fieldLabels: {
     title: 'Título', clientName: 'Cliente', opportunityRole: 'Rol de la oportunidad', skills: 'Stack tecnológico',
     roleDescription: 'Expectativas de evaluación técnica', band: 'Banda', startDate: 'Fecha de inicio',

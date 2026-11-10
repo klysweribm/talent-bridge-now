@@ -2,6 +2,7 @@ import { lazy, type ReactElement } from 'react';
 import { ComingSoon } from '@shared/components/organisms/ComingSoon';
 import { NAVIGATION_ITEMS } from '@shared/config/navigation';
 import type { UserRole } from '@features/auth/store/auth.store';
+import { BookingPage } from '@features/booking/components/pages/BookingPage';
 import { BenchPage } from '@features/bench/components/pages/BenchPage';
 import { CandidatesPage } from '@features/candidates/components/pages/CandidatesPage/CandidatesPage';
 import { DashboardPage } from '@features/processes/components/pages/DashboardPage';
@@ -44,6 +45,7 @@ const REAL_PAGES: Readonly<Record<string, ReactElement>> = {
   [PROCESSES_PATH]:       <ProcessesPage />,
   [`${PROCESSES_PATH}/:id`]: <ProcessDetailPage />,
   [NEW_PROCESS_PATH]:     <NewProcessPage />,
+  '/interviews':          <BookingPage />,
   [CANDIDATES_PATH]:      <CandidatesPage />,
   [CANDIDATES_NEW_PATH]:  <NewCandidatePage />,
 };

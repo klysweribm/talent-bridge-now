@@ -9,14 +9,14 @@ export interface ProcessReferentsProps {
 
 export function ProcessReferents({ referents }: ProcessReferentsProps): JSX.Element {
   if (referents.length === 0) {
-    return <span className="text-body-md text-text-secondary">{PROCESS_LIST_COPY.noReferents}</span>;
+    return <span className="text-body text-carbon-gray-70">{PROCESS_LIST_COPY.noReferents}</span>;
   }
   const avatars = referents.map(r => ({ name: r.fullName, imageUrl: r.avatarUrl }));
   return (
     <span className="inline-flex items-center gap-sm min-w-0">
-      <span className="text-body-md text-text-secondary">{PROCESS_LIST_COPY.referentsLabel}</span>
-      <AvatarGroup avatars={avatars} max={REFERENTS_AVATAR_MAX} label={PROCESS_LIST_COPY.referentsGroup} />
-      <span className="text-body-md text-text-primary truncate">{joinNames(referents.map(r => abbreviateName(r.fullName)))}</span>
+      <span className="text-body text-carbon-gray-70">{PROCESS_LIST_COPY.referentsLabel}</span>
+      <AvatarGroup avatars={avatars} size="compact" max={REFERENTS_AVATAR_MAX} label={PROCESS_LIST_COPY.referentsGroup} />
+      <span className="text-body text-carbon-gray-100 truncate">{joinNames(referents.map(r => abbreviateName(r.fullName)))}</span>
     </span>
   );
 }

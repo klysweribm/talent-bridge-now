@@ -10,11 +10,11 @@ export function SsoLoginButton(): JSX.Element {
       disabled
       title={AUTH_COPY.unavailable}
       aria-label={AUTH_COPY.sso}
-      className="flex items-center justify-center gap-sm w-full h-10 rounded text-body-md-medium bg-surface-low text-text-primary border-none cursor-not-allowed opacity-60"
+      className="flex items-center justify-center gap-sm w-full h-12 px-base rounded-none text-body bg-carbon-gray-10 text-carbon-gray-100 border-none cursor-not-allowed opacity-60"
     >
       <IbmLogoMark />
       <span>{AUTH_COPY.sso}</span>
-      <Icon name="lock_open" size={16} className="ml-auto text-text-secondary" />
+      <Icon name="lock_open" size={16} className="ml-auto text-carbon-gray-70" />
     </button>
   );
 }

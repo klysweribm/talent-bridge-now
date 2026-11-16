@@ -11,11 +11,11 @@ vi.mock('@features/auth/infrastructure/auth.infra', () => ({ logoutUser: vi.fn()
 
 const mockedLogout = logoutUser as ReturnType<typeof vi.fn>;
 
-function renderButton(collapsed = false): ReturnType<typeof render> {
+function renderButton(): ReturnType<typeof render> {
   const client = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
   return render(
     <QueryClientProvider client={client}>
-      <MemoryRouter><LogoutButton collapsed={collapsed} /></MemoryRouter>
+      <MemoryRouter><LogoutButton /></MemoryRouter>
     </QueryClientProvider>,
   );
 }
@@ -48,12 +48,5 @@ describe('LogoutButton', () => {
 
     await waitFor(() => expect(useAuthStore.getState().token).toBeNull());
     expect(useAuthStore.getState().user).toBeNull();
-  });
-
-  it('should hide the visible text but keep the accessible name when collapsed', () => {
-    renderButton(true);
-
-    expect(screen.getByRole('button', { name: 'Cerrar sesión' })).toBeInTheDocument();
-    expect(screen.queryByText('Cerrar sesión')).not.toBeInTheDocument();
   });
 });

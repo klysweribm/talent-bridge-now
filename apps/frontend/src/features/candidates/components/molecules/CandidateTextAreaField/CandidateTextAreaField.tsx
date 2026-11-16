@@ -1,5 +1,6 @@
 import { forwardRef, type TextareaHTMLAttributes } from 'react';
 import { describedBy, FieldMessages } from '../CandidateTextField/fieldMessages';
+import { FIELD_LABEL, FIELD_MISSING, textareaClasses } from '../CandidateTextField/fieldStyles';
 
 export interface CandidateTextAreaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   readonly label: string;
@@ -16,8 +17,8 @@ export const CandidateTextAreaField = forwardRef<HTMLTextAreaElement, CandidateT
     const id = `candidate-${name}`;
 
     return (
-      <div className={`flex flex-col gap-2xs md:col-span-2 ${missing ? 'border-l-4 border-status-warning pl-sm bg-status-warning-bg' : ''}`}>
-        <label htmlFor={id} className="text-body-md font-medium text-text-primary">{label}</label>
+      <div className={`flex flex-col gap-2xs md:col-span-2 ${missing ? FIELD_MISSING : ''}`}>
+        <label htmlFor={id} className={FIELD_LABEL}>{label}</label>
         <textarea
           {...rest}
           ref={ref}
@@ -26,8 +27,7 @@ export const CandidateTextAreaField = forwardRef<HTMLTextAreaElement, CandidateT
           rows={rows}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy({ id, error, hint, missing })}
-          className={`w-full px-sm py-xs rounded text-body-md text-text-primary bg-surface-card border ${
-            error ? 'border-2 border-status-danger' : 'border-outline'}`}
+          className={textareaClasses(Boolean(error))}
         />
         <FieldMessages id={id} error={error} hint={hint} missing={missing} />
       </div>

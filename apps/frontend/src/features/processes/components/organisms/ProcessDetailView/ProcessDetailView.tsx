@@ -11,14 +11,14 @@ export interface ProcessDetailViewProps {
   readonly id: string;
 }
 
-const BACK_CLASS = 'text-body-md-medium text-primary-interactive hover:underline';
+const BACK_CLASS = 'text-body text-carbon-blue-60 hover:underline';
 
 export function ProcessDetailView({ id }: ProcessDetailViewProps): JSX.Element {
   const { data, isPending, error, refetch } = useProcessDetail(id);
   const back = <Link to={PROCESSES_PATH} className={BACK_CLASS}>{PROCESS_LIST_COPY.backToList}</Link>;
 
   if (error instanceof HttpError && error.status === NOT_FOUND_STATUS) {
-    return <div role="alert" className="flex flex-col items-center gap-md py-2xl text-center"><p className="text-body-lg text-status-danger">{PROCESS_LIST_COPY.notFound}</p>{back}</div>;
+    return <div role="alert" className="flex flex-col items-center gap-md py-2xl text-center"><p className="text-body text-carbon-red">{PROCESS_LIST_COPY.notFound}</p>{back}</div>;
   }
   if (error) {
     return (
@@ -29,14 +29,13 @@ export function ProcessDetailView({ id }: ProcessDetailViewProps): JSX.Element {
     );
   }
   if (isPending || !data) {
-    return <div role="status" aria-label={PROCESS_LIST_COPY.detailLoading} className="h-24 rounded bg-surface-high animate-pulse" />;
+    return <div role="status" aria-label={PROCESS_LIST_COPY.detailLoading} className="h-24 bg-carbon-gray-20 animate-pulse" />;
   }
 
   return (
     <div className="flex flex-col gap-lg">
       {back}
-      <ProcessDetailCard process={data} />
-      <ProcessActions process={data} />
+      <ProcessActions process={data}><ProcessDetailCard process={data} /></ProcessActions>
     </div>
   );
 }

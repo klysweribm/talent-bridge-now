@@ -25,8 +25,7 @@ export function Avatar({ name, imageUrl, size = 'md', className = '' }: AvatarPr
     <span
       aria-label={name}
       title={name}
-      style={{ backgroundColor: getColorFromName(name) }}
-      className={avatarClassName(size, 'initials', className)}
+      className={`${avatarClassName(size, 'initials', className)} ${getColorFromName(name)}`}
     >
       {getInitials(name)}
     </span>

@@ -1,4 +1,5 @@
 import type { ICandidateListItem } from '@ibm-talent-bridge/shared-types';
+import { TABLE_CLASSES, TABLE_HEAD_CELL, TABLE_HEAD_ROW } from '@shared/components/table.constants';
 import { TableSkeleton } from '@shared/components/molecules/TableSkeleton';
 import { CANDIDATE_COLUMNS, CANDIDATE_LIST_COPY, CANDIDATE_LIST_SKELETON_ROWS } from '../../../config/candidateList.constants';
 import { CandidateListRow } from '../CandidateListRow/CandidateListRow';
@@ -10,12 +11,12 @@ export interface CandidateTableProps {
 
 export function CandidateTable({ rows }: CandidateTableProps): JSX.Element {
   return (
-    <div className="overflow-x-auto bg-surface-card border border-outline-variant rounded-lg">
-      <table className="w-full text-left">
+    <div className="overflow-x-auto bg-white">
+      <table className={`${TABLE_CLASSES} min-w-[760px]`}>
         <thead>
-          <tr className="h-10 border-b border-outline-variant">
+          <tr className={TABLE_HEAD_ROW}>
             {CANDIDATE_COLUMNS.map(column => (
-              <th key={column} scope="col" className="px-base text-label-md text-text-secondary">{column}</th>
+              <th key={column} scope="col" className={TABLE_HEAD_CELL}>{column}</th>
             ))}
           </tr>
         </thead>

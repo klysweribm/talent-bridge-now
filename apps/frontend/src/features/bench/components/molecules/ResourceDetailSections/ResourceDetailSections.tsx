@@ -9,7 +9,7 @@ export interface ResourceDetailSectionsProps {
   readonly resource: IBenchResource;
 }
 
-const H3 = 'text-title-md text-text-primary mb-sm';
+const H3 = 'text-h2 text-carbon-gray-100 mb-sm';
 
 export function ResourceDetailSections({ resource }: ResourceDetailSectionsProps): JSX.Element {
   return (
@@ -17,19 +17,19 @@ export function ResourceDetailSections({ resource }: ResourceDetailSectionsProps
       <div className="flex items-center gap-sm">
         <SeniorityBadge seniority={resource.seniority} />
         <BenchStatusBadge status={resource.status} />
-        <span className="text-body-md text-text-secondary">{resource.primaryRole} · {resource.practice}</span>
+        <span className="text-body text-carbon-gray-70">{resource.primaryRole} · {resource.practice}</span>
       </div>
       <ResourceSkillsSection skills={resource.skills} />
       <ResourceLanguagesSection languages={resource.languages} />
       <section aria-label="Ubicación y disponibilidad">
         <h3 className={H3}>Ubicación y disponibilidad</h3>
-        <dl className="grid grid-cols-2 gap-sm text-body-md">
-          <dt className="text-text-secondary">Ubicación</dt>
-          <dd className="text-text-primary">{resource.location.city}, {resource.location.country}</dd>
-          <dt className="text-text-secondary">En banca desde</dt>
-          <dd className="text-text-primary">{formatBenchDate(resource.benchSince)}</dd>
-          <dt className="text-text-secondary">Disponible desde</dt>
-          <dd className="text-text-primary">{formatAvailability(resource.availableFrom)}</dd>
+        <dl className="grid grid-cols-2 gap-x-base gap-y-sm text-body">
+          <dt className="text-carbon-gray-70">Ubicación</dt>
+          <dd className="text-carbon-gray-100">{resource.location.city}, {resource.location.country}</dd>
+          <dt className="text-carbon-gray-70">En banca desde</dt>
+          <dd className="text-carbon-gray-100">{formatBenchDate(resource.benchSince)}</dd>
+          <dt className="text-carbon-gray-70">Disponible desde</dt>
+          <dd className="text-carbon-gray-100">{formatAvailability(resource.availableFrom)}</dd>
         </dl>
       </section>
     </div>

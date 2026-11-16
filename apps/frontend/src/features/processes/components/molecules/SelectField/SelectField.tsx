@@ -15,8 +15,8 @@ export interface SelectFieldProps {
 export function SelectField({ id, label, placeholder, options, value, error, hint, onChange, onBlur }: SelectFieldProps): JSX.Element {
   const messageId = error ? `${id}-error` : hint ? `${id}-hint` : undefined;
   return (
-    <div className="flex flex-col gap-2xs">
-      <label htmlFor={id} className="text-body-md font-medium text-text-primary">{label}</label>
+    <div className="flex flex-col gap-sm">
+      <label htmlFor={id} className="text-label text-carbon-gray-70">{label}</label>
       <select
         id={id}
         value={value}
@@ -24,13 +24,13 @@ export function SelectField({ id, label, placeholder, options, value, error, hin
         aria-describedby={messageId}
         onChange={event => onChange(event.target.value)}
         onBlur={onBlur}
-        className={`w-full h-10 px-sm rounded text-body-md text-text-primary bg-surface-card border focus:outline-2 focus:outline-primary-interactive ${error ? 'border-2 border-status-danger' : 'border-outline'}`}
+        className={`w-full h-10 px-base rounded-none text-body text-carbon-gray-100 bg-carbon-gray-10 border-0 border-b border-carbon-gray-50 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-carbon-blue-60 ${error ? 'ring-2 ring-inset ring-carbon-red' : ''}`}
       >
         <option value="">{placeholder}</option>
         {options.map(option => <option key={option.id} value={option.id}>{option.fullName}</option>)}
       </select>
-      {error && <span id={`${id}-error`} className="text-label-md text-status-danger">{error}</span>}
-      {!error && hint && <span id={`${id}-hint`} className="text-label-md text-text-secondary">{hint}</span>}
+      {error && <span id={`${id}-error`} className="text-label text-carbon-red">{error}</span>}
+      {!error && hint && <span id={`${id}-hint`} className="text-label text-carbon-gray-70">{hint}</span>}
     </div>
   );
 }

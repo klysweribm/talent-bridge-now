@@ -14,14 +14,14 @@ export function CounterCard({ label, value, to, icon, hint }: CounterCardProps):
     <Link
       to={to}
       aria-label={`${label}: ${value}`}
-      className="row-interactive bg-surface-card border border-surface-high rounded-xl shadow-raised p-base flex flex-col gap-sm"
+      className="bg-white px-base pt-base pb-5 min-h-[136px] flex flex-col gap-lg hover:bg-carbon-gray-hover transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-carbon-blue-60"
     >
-      <span className="flex items-center gap-xs text-body-md-medium text-text-secondary">
-        <Icon name={icon} size={18} className="text-primary-interactive" />
+      <span className="flex items-center justify-between gap-sm text-body text-carbon-gray-70">
         {label}
+        <Icon name={icon} size={20} className="text-carbon-blue-60" />
       </span>
-      <span className="text-display-xl text-text-primary">{value}</span>
-      {hint && <span className="text-body-sm text-text-secondary">{hint}</span>}
+      <span className="text-kpi text-carbon-gray-100">{value}</span>
+      {hint && <span className="text-label text-carbon-gray-70 -mt-md">{hint}</span>}
     </Link>
   );
 }

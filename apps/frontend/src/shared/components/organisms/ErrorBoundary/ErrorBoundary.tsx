@@ -37,11 +37,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     return (
       <div className="flex flex-col items-center justify-center gap-base h-full min-h-[60vh] px-xl py-2xl text-center">
-        <span className="w-16 h-16 rounded-full bg-status-danger-bg flex items-center justify-center text-status-danger">
-          <Icon name="error" size={32} />
-        </span>
-        <h1 className="text-headline-md text-text-primary">Algo salió mal</h1>
-        <p className="text-body-md text-text-secondary max-w-[480px]">
+        <Icon name="error" size={32} className="text-carbon-red" />
+        <h1 className="text-h1 text-carbon-gray-100">Algo salió mal</h1>
+        <p className="text-body text-carbon-gray-70 max-w-[480px]">
           Ocurrió un error inesperado al renderizar esta sección. Puedes
           intentar de nuevo o volver más tarde.
         </p>

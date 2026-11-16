@@ -173,7 +173,7 @@ describe('SidePanel', () => {
     document.body.style.overflow = '';
   });
 
-  it.each([['md', 'max-w-md'], ['lg', 'max-w-[640px]']] as const)(
+  it.each([['md', 'max-w-[440px]'], ['lg', 'max-w-[640px]']] as const)(
     'should apply the %s width class',
     (width, cls) => {
       render(<Panel width={width} />);

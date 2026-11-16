@@ -1,9 +1,6 @@
 import { createElement, type CSSProperties, type JSX } from 'react';
-import { DETAIL_ICON_DEFS } from './detail-icon-paths';
-import { AUTH_ICON_DEFS, type ISvgIconDef } from './icon-paths';
-import { NAV_ICON_DEFS } from './nav-icon-paths';
-
-const SVG_ICON_DEFS: Readonly<Record<string, ISvgIconDef>> = { ...AUTH_ICON_DEFS, ...NAV_ICON_DEFS, ...DETAIL_ICON_DEFS };
+import type { ISvgIconDef } from './icon-paths';
+import { SVG_ICON_DEFS } from './icon-registry';
 
 /**
  * Icon — wrapper unificado para iconos del sistema.

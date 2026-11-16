@@ -7,21 +7,14 @@ describe('SidebarNavList', () => {
   it('should render one link per item and mark the active one', () => {
     render(
       <MemoryRouter initialEntries={['/bench']}>
-        <SidebarNavList items={NAVIGATION_ITEMS.slice(0, 2)} collapsed={false} />
+        <SidebarNavList items={NAVIGATION_ITEMS.slice(0, 2)} />
       </MemoryRouter>,
     );
 
     expect(screen.getAllByRole('link')).toHaveLength(2);
-    expect(screen.getByRole('link', { name: 'Banca' })).toHaveAttribute('aria-current', 'page');
+    const active = screen.getByRole('link', { name: 'Banca' });
+    expect(active).toHaveAttribute('aria-current', 'page');
+    expect(active).toHaveClass('border-carbon-blue-60', 'font-semibold');
     expect(screen.getByRole('link', { name: 'Inicio' })).not.toHaveAttribute('aria-current');
-  });
-
-  it('should hide labels but keep accessible names when collapsed', () => {
-    render(
-      <MemoryRouter><SidebarNavList items={NAVIGATION_ITEMS.slice(0, 1)} collapsed /></MemoryRouter>,
-    );
-
-    expect(screen.getByRole('link', { name: 'Inicio' })).toBeInTheDocument();
-    expect(screen.getByText('Inicio')).toHaveClass('hidden');
   });
 });

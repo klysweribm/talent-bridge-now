@@ -1,22 +1,13 @@
-import { BRAND } from '@/config/brand';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { BRAND } from '@/config/brand';
 import { SidebarHeader } from './SidebarHeader';
 
 describe('SidebarHeader', () => {
-  it('should show the brand and call onToggle', async () => {
-    const onToggle = vi.fn();
-    render(<SidebarHeader collapsed={false} onToggle={onToggle} />);
+  it('should show the two-part brand without a collapse toggle', () => {
+    render(<SidebarHeader />);
 
-    expect(screen.getByText(BRAND.productFullName)).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Colapsar menú' }));
-    expect(onToggle).toHaveBeenCalledTimes(1);
-  });
-
-  it('should hide the brand text and offer to expand when collapsed', () => {
-    render(<SidebarHeader collapsed onToggle={vi.fn()} />);
-
-    expect(screen.getByText(BRAND.productFullName)).toHaveClass('hidden');
-    expect(screen.getByRole('button', { name: 'Expandir menú' })).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getByText(BRAND.companyName)).toBeInTheDocument();
+    expect(screen.getByText(BRAND.productShortName)).toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });

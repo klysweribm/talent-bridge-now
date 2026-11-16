@@ -14,13 +14,13 @@ const BOX_ID = 'process-draft-text';
 /** Texto libre + «Generar con IA». Presentacional: no sabe de red ni de formulario. */
 export function OpportunityDraftBox({ text, isPending, onText, onGenerate }: OpportunityDraftBoxProps): JSX.Element {
   return (
-    <section className="flex flex-col items-start gap-sm rounded border border-outline-field p-md">
+    <section className="flex flex-col items-start gap-sm border border-carbon-gray-20 bg-white p-base">
       <TextAreaField
         id={BOX_ID} label={DRAFT_COPY.boxLabel} hint={DRAFT_COPY.boxHint} placeholder={DRAFT_COPY.boxPlaceholder}
         value={text} onChange={event => onText(event.target.value)} readOnly={isPending}
       />
       <Button
-        type="button" variant="secondary" className="min-h-11"
+        type="button" variant="secondary" size="lg"
         disabled={text.trim() === ''} loading={isPending} onClick={onGenerate}
       >
         {isPending ? DRAFT_COPY.generating : DRAFT_COPY.generate}

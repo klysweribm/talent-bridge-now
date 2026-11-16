@@ -21,7 +21,7 @@ export function ReferentAgendaPanel({ referent, onClose }: ReferentAgendaPanelPr
   return (
     <SidePanel title={BOOKING_COPY.panelTitle(referent.name)} titleId="booking-panel-title" width="lg"
       closeLabel={BOOKING_COPY.panelClose} onClose={onClose}>
-      <p className="mb-base text-body-md text-text-secondary">
+      <p className="mb-base text-body text-carbon-gray-70">
         {free > 0 ? BOOKING_COPY.hoursFree(free) : BOOKING_COPY.noHours}
       </p>
       <WeekCalendar weekDates={getWeekDates()} slots={slots} mode="view" onBook={(id) => bookSlot(id, recruiter)} />

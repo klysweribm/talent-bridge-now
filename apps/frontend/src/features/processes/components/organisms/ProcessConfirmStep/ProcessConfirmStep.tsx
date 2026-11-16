@@ -27,8 +27,8 @@ export function ProcessConfirmStep(): JSX.Element {
         onEditCandidates={() => setStep('candidates')}
       />
       <StepFooter backLabel={WIZARD_TEXT.back} onBack={() => setStep('candidates')} disabled={busy}>
-        <Button type="button" variant="ghost" className="min-h-11" disabled={busy} onClick={confirm.discard}>{CONFIRM_STEP_TEXT.cancel}</Button>
-        <Button type="button" className="min-h-11" disabled={busy} onClick={confirm.submit}>
+        <Button type="button" variant="ghost" disabled={busy} onClick={confirm.discard}>{CONFIRM_STEP_TEXT.cancel}</Button>
+        <Button type="button" size="lg" disabled={busy} onClick={confirm.submit}>
           {busy ? CONFIRM_STEP_TEXT.creating : CONFIRM_STEP_TEXT.create}
         </Button>
       </StepFooter>

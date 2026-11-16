@@ -8,7 +8,7 @@ export function BenchCounter(): JSX.Element | null {
   if (!data) return null;
 
   return (
-    <p className="text-body-md text-text-secondary">
+    <p className="text-body text-carbon-gray-70">
       {data.total} {data.total === 1 ? 'recurso' : 'recursos'} en banca
     </p>
   );

@@ -22,20 +22,17 @@ export interface INavItem {
 }
 
 export const NAVIGATION_ITEMS: readonly INavItem[] = [
-  { path: '/dashboard',  label: 'Inicio',      mobileLabel: 'Inicio',   icon: 'dashboard',  roles: ['recruiter', 'pm', 'technical_ref'] },
-  { path: '/bench',      label: 'Banca',       mobileLabel: 'Banca',    icon: 'bench',      roles: ['recruiter', 'pm'] },
-  { path: '/processes',  label: 'Oportunidades', mobileLabel: 'Oportunidades', icon: 'processes',  roles: ['recruiter', 'pm'] },
-  { path: '/candidates', label: 'Candidatos',   mobileLabel: 'Candidatos', icon: 'candidates', roles: ['recruiter', 'pm'] },
+  { path: '/dashboard',  label: 'Inicio',      mobileLabel: 'Inicio',   icon: 'fn-grid',  roles: ['recruiter', 'pm', 'technical_ref'] },
+  { path: '/bench',      label: 'Banca',       mobileLabel: 'Banca',    icon: 'fn-people',      roles: ['recruiter', 'pm'] },
+  { path: '/processes',  label: 'Oportunidades', mobileLabel: 'Oportunidades', icon: 'fn-briefcase',  roles: ['recruiter', 'pm'] },
+  { path: '/candidates', label: 'Candidatos',   mobileLabel: 'Candidatos', icon: 'fn-person', roles: ['recruiter', 'pm'] },
   { path: '/interviews', label: 'Entrevistas', mobileLabel: 'Agenda',   icon: 'interviews', roles: ['recruiter', 'technical_ref'] },
   { path: '/feedback',   label: 'Feedback',    mobileLabel: 'Feedback', icon: 'feedback',   roles: ['technical_ref'] },
-  { path: '/reports',    label: 'Reportes',    mobileLabel: 'Reportes', icon: 'reports',    roles: ['recruiter', 'pm'] },
+  { path: '/reports',    label: 'Reportes',    mobileLabel: 'Reportes', icon: 'fn-bars',    roles: ['recruiter', 'pm'] },
 ] as const;
 
 /** Rutas protegidas que aún no tienen pantalla real — renderizan `ComingSoon`. */
 export const COMING_SOON_PATHS: readonly string[] = [
-  '/processes',
-  '/processes/:id',
-  '/interviews',
   '/feedback',
   '/reports',
 ] as const;

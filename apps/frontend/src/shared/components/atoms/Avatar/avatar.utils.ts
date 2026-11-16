@@ -3,17 +3,19 @@
  * mantener el componente bajo el límite de líneas de un atom.
  */
 
-export type AvatarSize = 'sm' | 'md' | 'lg';
+/** sm 24 · compact 28 · md 32 · lg 40 (prototipo Future Now). */
+export type AvatarSize = 'sm' | 'compact' | 'md' | 'lg';
 
 export const AVATAR_SIZE_CLASSES: Readonly<Record<AvatarSize, string>> = {
-  sm: 'w-6 h-6 text-[10px]',
-  md: 'w-8 h-8 text-[12px]',
-  lg: 'w-10 h-10 text-[14px]',
+  sm:      'w-6 h-6 text-[10px] border-2 border-white',
+  compact: 'w-7 h-7 text-[11px]',
+  md:      'w-8 h-8 text-[12px]',
+  lg:      'w-10 h-10 text-[13px]',
 } as const;
 
 const AVATAR_PALETTE = [
-  '#0043ce', '#0f62fe', '#004ccd', '#6929c4',
-  '#003099', '#005d5d', '#9f1853', '#a2191f',
+  'bg-carbon-blue-60', 'bg-carbon-blue-70', 'bg-carbon-blue-80', 'bg-carbon-chart-purple',
+  'bg-carbon-chart-teal', 'bg-carbon-chart-cyan', 'bg-carbon-gray-80', 'bg-carbon-red',
 ] as const;
 
 /** Genera iniciales a partir del nombre completo (máx 2 letras) */
@@ -26,7 +28,7 @@ export function getInitials(name: string): string {
     .join('');
 }
 
-/** Deriva un color de fondo estable desde el nombre (determinístico) */
+/** Deriva una clase de fondo (token Carbon) estable desde el nombre (determinístico) */
 export function getColorFromName(name: string): string {
   const index = name
     .split('')
@@ -37,6 +39,6 @@ export function getColorFromName(name: string): string {
 export function avatarClassName(size: AvatarSize, variant: 'image' | 'initials', className: string): string {
   const base = variant === 'image'
     ? ['rounded-full object-cover flex-shrink-0']
-    : ['rounded-full flex-shrink-0 inline-flex items-center justify-center', 'font-medium text-white select-none'];
+    : ['rounded-full flex-shrink-0 inline-flex items-center justify-center', 'font-semibold text-white select-none'];
   return [...base, AVATAR_SIZE_CLASSES[size], className].join(' ');
 }

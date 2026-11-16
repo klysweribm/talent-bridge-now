@@ -68,10 +68,24 @@ export const colors = {
     'purple-bg':  '#f6f2ff',
     'purple-text': '#6929c4',
   },
+  // Fondos de velo (scrim) tras paneles y diálogos.
+  scrim: { DEFAULT: 'rgba(22,22,22,0.5)', light: 'rgba(22,22,22,0.3)' },
   error: {
     DEFAULT:   '#ba1a1a',
     container: '#ffdad6',
     'on-container': '#93000a',
     on:        '#ffffff',
+  },
+  // Paleta Carbon g10 (rediseño IBM Future Now): fuente única de los valores de marca.
+  carbon: {
+    'gray-10': '#f4f4f4', 'gray-20': '#e0e0e0', 'gray-30': '#c6c6c6', 'gray-50': '#8d8d8d',
+    'gray-60': '#6f6f6f', 'gray-70': '#525252', 'gray-80': '#393939', 'gray-100': '#161616',
+    'gray-hover': '#e8e8e8', 'gray-hover-2': '#2e2e2e', 'gray-80-hover': '#474747',
+    'blue-10': '#edf5ff', 'blue-20': '#d0e2ff', 'blue-30': '#a6c8ff', 'blue-60': '#0f62fe',
+    'blue-60-hover': '#0050e6', 'blue-70': '#0043ce', 'blue-80': '#002d9c',
+    'red-10': '#fff1f1', red: '#da1e28', 'red-hover': '#b81921',
+    green: '#24a148', 'green-tag-bg': '#a7f0ba', 'green-tag-text': '#0e6027', 'green-toast': '#defbe6',
+    yellow: '#f1c21b', 'yellow-tag-bg': '#fcf4d6', 'yellow-tag-text': '#483700', 'yellow-dot': '#b28600', 'yellow-ring': 'rgba(177,142,0,0.3)',
+    'chart-purple': '#6929c4', 'chart-cyan': '#1192e8', 'chart-teal': '#005d5d',
   },
 } as const;

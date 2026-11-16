@@ -1,10 +1,7 @@
-import { BRAND } from '@/config/brand';
 import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { useAuthStore, type UserRole } from '@features/auth/store/auth.store';
-import { useUiStore } from '@shared/store/ui.store';
 import { SidebarNav } from './SidebarNav';
 
 function renderSidebar(role: UserRole): ReturnType<typeof render> {
@@ -17,12 +14,9 @@ function renderSidebar(role: UserRole): ReturnType<typeof render> {
 }
 
 describe('SidebarNav', () => {
-  beforeEach(() => { useUiStore.setState({ sidebarCollapsed: false }); });
-
-  it('should show the single brand, role navigation and user footer', () => {
+  it('should show the role navigation and user footer', () => {
     renderSidebar('technical_ref');
 
-    expect(screen.getByText(BRAND.productFullName)).toBeInTheDocument();
     const nav = within(screen.getByRole('navigation', { name: 'Navegación principal' }));
     expect(nav.getAllByRole('link').map(l => l.getAttribute('aria-label')))
       .toEqual(['Inicio', 'Entrevistas', 'Feedback']);
@@ -46,15 +40,5 @@ describe('SidebarNav', () => {
 
     expect(screen.queryByText('Centro de Soporte')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /tema/i })).not.toBeInTheDocument();
-  });
-
-  it('should collapse and expand from the header toggle', async () => {
-    renderSidebar('recruiter');
-
-    await userEvent.click(screen.getByRole('button', { name: 'Colapsar menú' }));
-
-    expect(useUiStore.getState().sidebarCollapsed).toBe(true);
-    expect(screen.getByRole('button', { name: 'Expandir menú' })).toBeInTheDocument();
-    expect(screen.queryByText(BRAND.productFullName)).toBeVisible();
   });
 });

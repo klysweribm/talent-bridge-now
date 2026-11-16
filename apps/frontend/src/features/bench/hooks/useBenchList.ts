@@ -3,10 +3,12 @@ import type { IBenchQuery, IBenchResource, PaginatedResponse } from '@ibm-talent
 import { BENCH_QUERY_KEY } from '../config/bench.constants';
 import { fetchBench } from '../infrastructure/bench.infra';
 
-export function useBenchList(query: IBenchQuery): UseQueryResult<PaginatedResponse<IBenchResource>> {
+/** `enabled=false` evita la petición (p. ej. roles sin acceso a Banca). */
+export function useBenchList(query: IBenchQuery, enabled = true): UseQueryResult<PaginatedResponse<IBenchResource>> {
   return useQuery({
     queryKey: [BENCH_QUERY_KEY, 'list', query],
     queryFn: () => fetchBench(query),
     placeholderData: keepPreviousData,
+    enabled,
   });
 }

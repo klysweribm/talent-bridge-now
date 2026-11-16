@@ -15,8 +15,6 @@ export function IdleWarningModal(): JSX.Element | null {
   if (secondsLeft === null) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-text-primary/50 px-base">
-      <IdleWarningDialog secondsLeft={secondsLeft} onStay={stayConnected} onLogout={() => logout('manual')} />
-    </div>
+    <IdleWarningDialog secondsLeft={secondsLeft} onStay={stayConnected} onLogout={() => logout('manual')} />
   );
 }

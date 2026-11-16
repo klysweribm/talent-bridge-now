@@ -8,13 +8,13 @@ export function BenchPage(): JSX.Element {
   const { code, select, close } = useSelectedResource();
 
   return (
-    <div className="px-xl py-lg flex flex-col gap-lg w-full max-w-7xl mx-auto">
+    <div className="flex flex-col gap-lg w-full max-w-content-wide mx-auto px-xl pt-lg pb-3xl">
       <header className="flex flex-col gap-xs">
-        <h1 className="text-headline-md text-text-primary">Banca</h1>
+        <h1 className="text-h1 text-carbon-gray-100">Banca</h1>
         <BenchCounter />
       </header>
       <BenchFiltersPanel />
-      <BenchTable onSelect={select} />
+      <BenchTable onSelect={select} selectedCode={code} />
       {code && <BenchResourceDrawer code={code} onClose={close} />}
     </div>
   );

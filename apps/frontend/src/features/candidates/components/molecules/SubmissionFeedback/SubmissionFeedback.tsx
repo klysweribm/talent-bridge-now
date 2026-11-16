@@ -17,8 +17,8 @@ export function SubmissionFeedback({ error, isUpdate, fromDuplicate }: Submissio
   if (!error && !(isUpdate && fromDuplicate)) return null;
   return (
     <>
-      {isUpdate && fromDuplicate && <p role="status" className="text-body-md text-text-primary">{DUPLICATE_COPY.updatingExisting}</p>}
-      {error && <p role="alert" className="text-body-md text-status-danger">{errorText(error, isUpdate)}</p>}
+      {isUpdate && fromDuplicate && <p role="status" className="text-body text-carbon-gray-100">{DUPLICATE_COPY.updatingExisting}</p>}
+      {error && <p role="alert" className="text-body text-carbon-red">{errorText(error, isUpdate)}</p>}
     </>
   );
 }

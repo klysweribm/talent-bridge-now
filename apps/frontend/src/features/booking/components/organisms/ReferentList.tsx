@@ -13,12 +13,12 @@ export function ReferentList(): JSX.Element {
   const selected = REFERENTS.find(r => r.id === selectedId);
 
   return (
-    <section className="flex flex-col gap-base">
-      <h1 className="text-headline-md text-text-primary">{BOOKING_COPY.listTitle}</h1>
+    <section className="mx-auto flex w-full max-w-content-max flex-col gap-base px-xl pb-3xl pt-lg">
+      <h1 className="text-h1 text-carbon-gray-100">{BOOKING_COPY.listTitle}</h1>
       <input type="search" value={query} onChange={e => setQuery(e.target.value)}
         aria-label={BOOKING_COPY.searchLabel} placeholder={BOOKING_COPY.searchPlaceholder}
-        className="w-full max-w-sm rounded-md border border-outline-field bg-surface-card px-md py-sm text-body-md" />
-      {visible.length === 0 && <p className="text-body-md text-text-secondary">{BOOKING_COPY.noMatches}</p>}
+        className="h-10 w-full max-w-sm border-0 border-b border-carbon-gray-50 bg-carbon-gray-10 px-base text-body text-carbon-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-carbon-blue-60" />
+      {visible.length === 0 && <p className="text-body text-carbon-gray-70">{BOOKING_COPY.noMatches}</p>}
       <div className="grid gap-base sm:grid-cols-2 lg:grid-cols-3">
         {visible.map(r => (
           <ReferentCard key={r.id} referent={r} onSelect={() => setSelectedId(r.id)}

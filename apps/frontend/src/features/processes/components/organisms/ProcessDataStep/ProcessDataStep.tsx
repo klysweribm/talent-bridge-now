@@ -34,8 +34,8 @@ export function ProcessDataStep(): JSX.Element {
         onUser={value => form.setField(userField, value)} onBlurUser={() => form.touchField(userField)}
       />
       <OpportunityFields bindings={form.opportunity} marks={draft.marks} />
-      <div className="flex justify-end">
-        <Button type="submit" className="min-h-11" disabled={!form.canSubmit}>{WIZARD_TEXT.next}</Button>
+      <div className="sticky bottom-0 z-10 flex justify-end border-t border-carbon-gray-20 bg-carbon-gray-10 py-base">
+        <Button type="submit" size="lg" disabled={!form.canSubmit}>{WIZARD_TEXT.next}</Button>
       </div>
     </form>
   );

@@ -28,8 +28,8 @@ export function InputField({
   const hasError = Boolean(error);
 
   return (
-    <div className={`flex flex-col gap-2xs ${className}`}>
-      <label htmlFor={inputId} className="text-body-md font-medium text-text-primary">
+    <div className={`flex flex-col gap-sm ${className}`}>
+      <label htmlFor={inputId} className="text-label text-carbon-gray-70">
         {label}
       </label>
 

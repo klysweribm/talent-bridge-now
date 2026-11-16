@@ -1,3 +1,4 @@
+import { InlineNotification } from '@shared/components/molecules/InlineNotification';
 import { Button } from '@shared/components/atoms/Button';
 
 export interface CvExtractionErrorProps {
@@ -8,9 +9,9 @@ export interface CvExtractionErrorProps {
 
 export function CvExtractionError({ message, onRetryClassic }: CvExtractionErrorProps): JSX.Element {
   return (
-    <div role="alert" className="flex flex-col items-start gap-sm p-md rounded border border-status-danger bg-status-danger-bg">
-      <p className="text-body-md text-text-primary">{message}</p>
-      {onRetryClassic && <Button variant="secondary" onClick={onRetryClassic}>Reintentar con Clásica</Button>}
-    </div>
+    <InlineNotification kind="error" role="alert">
+      <p>{message}</p>
+      {onRetryClassic && <Button variant="secondary" size="sm" onClick={onRetryClassic}>Reintentar con Clásica</Button>}
+    </InlineNotification>
   );
 }

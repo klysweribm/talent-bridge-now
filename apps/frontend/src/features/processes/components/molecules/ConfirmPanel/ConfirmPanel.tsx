@@ -17,12 +17,12 @@ export function ConfirmPanel({ title, message, confirmLabel, cancelLabel, busyLa
   const panelRef = useRef<HTMLElement>(null);
   useEffect(() => { panelRef.current?.focus(); }, []);
   return (
-    <section ref={panelRef} tabIndex={-1} role="group" aria-labelledby="confirm-panel-title" className="flex flex-col gap-sm p-base focus:outline-none rounded-lg border border-status-danger bg-status-danger-bg">
-      <h2 id="confirm-panel-title" className="text-title-md text-text-primary">{title}</h2>
-      <p className="text-body-md text-text-secondary">{message}</p>
+    <section ref={panelRef} tabIndex={-1} role="group" aria-labelledby="confirm-panel-title" className="flex flex-col gap-sm p-base focus:outline-none border-l-[3px] border-carbon-red bg-carbon-red-10">
+      <h2 id="confirm-panel-title" className="text-h2 text-carbon-gray-100">{title}</h2>
+      <p className="text-body text-carbon-gray-70">{message}</p>
       <div className="flex flex-wrap gap-sm">
-        <Button type="button" variant="secondary" className="min-h-11" disabled={busy} onClick={onCancel}>{cancelLabel}</Button>
-        <Button type="button" className="min-h-11" disabled={busy} onClick={onConfirm}>{busy ? busyLabel : confirmLabel}</Button>
+        <Button type="button" variant="outline" disabled={busy} onClick={onCancel}>{cancelLabel}</Button>
+        <Button type="button" disabled={busy} onClick={onConfirm}>{busy ? busyLabel : confirmLabel}</Button>
       </div>
     </section>
   );

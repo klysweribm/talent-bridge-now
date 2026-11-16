@@ -19,8 +19,8 @@ function PanelNotice({ notice, onDismiss }: { readonly notice: string | undefine
 function CounterRow({ counter, onAdd }: { readonly counter: string; readonly onAdd: (event: MouseEvent<HTMLButtonElement>) => void }): JSX.Element {
   return (
     <div className="flex flex-wrap items-center justify-between gap-md">
-      <p className="text-body-md text-text-secondary">{counter}</p>
-      <Button type="button" variant="secondary" className="min-h-11" onClick={onAdd}>{CANDIDATES_STEP_TEXT.add}</Button>
+      <p className="text-body text-carbon-gray-70">{counter}</p>
+      <Button type="button" variant="secondary" size="lg" onClick={onAdd}>{CANDIDATES_STEP_TEXT.add}</Button>
     </div>
   );
 }
@@ -35,7 +35,7 @@ export function ProcessCandidatesStep(): JSX.Element {
       <StepHeading>{CANDIDATES_STEP_TEXT.heading}</StepHeading>
       <CounterRow counter={maxCandidates !== undefined ? CANDIDATES_STEP_TEXT.counter(step.selectedCount, maxCandidates) : ''} onAdd={panel.openFrom} />
       <PanelNotice notice={panel.notice} onDismiss={panel.dismissNotice} />
-      {step.limitReached && maxCandidates !== undefined && <p role="status" className="text-body-md text-status-warning">{CANDIDATES_STEP_TEXT.limitReached(maxCandidates)}</p>}
+      {step.limitReached && maxCandidates !== undefined && <p role="status" className="text-body text-carbon-yellow-tag-text">{CANDIDATES_STEP_TEXT.limitReached(maxCandidates)}</p>}
       <CandidatesBody
         status={step.status}
         rows={step.rows}
@@ -46,7 +46,7 @@ export function ProcessCandidatesStep(): JSX.Element {
       />
       {step.totalPages > 1 && <Pagination page={step.page} totalPages={step.totalPages} onPageChange={step.setPage} />}
       <StepFooter backLabel={WIZARD_TEXT.back} onBack={() => setStep('data')}>
-        <Button type="button" className="min-h-11" onClick={() => setStep('confirm')}>{WIZARD_TEXT.next}</Button>
+        <Button type="button" size="lg" onClick={() => setStep('confirm')}>{WIZARD_TEXT.next}</Button>
       </StepFooter>
       {panel.open && <AddCandidatePanel onClose={panel.closePanel} onSuccess={panel.onSuccess} returnFocusTo={panel.returnFocusTo} />}
     </div>

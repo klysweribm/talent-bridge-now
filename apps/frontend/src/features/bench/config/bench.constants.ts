@@ -40,8 +40,12 @@ export const BENCH_QUERY_KEY = 'bench';
 export const SKILLS_STALE_TIME_MS = 1000 * 60 * 30;
 export const RESOURCE_PARAM = 'resource';
 
+/** Campo relleno del prototipo: fondo gray-10, solo borde inferior. */
 export const CONTROL_CLASSES =
-  'h-10 px-sm border border-outline-variant rounded bg-surface-card text-body-md text-text-primary';
+  'h-10 w-full appearance-none rounded-none border-0 border-b border-carbon-gray-50 bg-carbon-gray-10 pl-base pr-10 text-body text-carbon-gray-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-carbon-blue-60';
+export const FIELD_LABEL_CLASSES = 'text-label text-carbon-gray-70';
+export const LANGUAGE_LEVEL_ORDER: readonly TLanguageProficiency[] = ['basic', 'intermediate', 'advanced', 'native'];
+export const SKILL_LEVEL_MAX = 5;
 
 export const BENCH_COLUMNS = [
   'Código', 'Nombre', 'Rol', 'Seniority', 'Skills principales', 'País', 'Disponible desde', 'Estado',
@@ -53,4 +57,5 @@ export const BENCH_COPY = {
   errorMessage:  'No pudimos cargar la banca.',
   retryLabel:    'Reintentar',
   loadingLabel:  'Cargando banca',
+  closeDetail:   'Cerrar',
 } as const;

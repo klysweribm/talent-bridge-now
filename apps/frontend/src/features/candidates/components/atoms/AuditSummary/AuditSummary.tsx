@@ -11,7 +11,7 @@ export interface AuditSummaryProps {
 /** Última actualización, quién y cuántas veces; siempre con texto, nunca solo color. */
 export function AuditSummary({ updatedAt, updatedBy, updateCount }: AuditSummaryProps): JSX.Element {
   return (
-    <ul className="flex flex-col gap-2xs text-body-md text-text-primary">
+    <ul className="flex flex-col gap-2xs text-body">
       <li>{AUDIT_COPY.lastUpdate} {formatUpdatedAt(updatedAt)}</li>
       <li>{updatedBy ? `${AUDIT_COPY.by} ${describeActor(updatedBy)}` : AUDIT_COPY.noActor}</li>
       <li>{describeUpdateCount(updateCount)}</li>

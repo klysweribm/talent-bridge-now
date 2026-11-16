@@ -33,7 +33,7 @@ export function ProcessEditPanel({ process }: ProcessEditPanelProps): JSX.Elemen
     <div className="flex flex-col gap-sm">
       {editing
         ? <ProcessEditFields form={form} busy={update.isPending} onSubmit={form.onSubmit} onCancel={close} />
-        : <Button type="button" variant="secondary" className="min-h-11 self-start" onClick={() => { update.reset(); setEditing(true); }}>{COPY.open}</Button>}
+        : <Button type="button" variant="outline" className="self-start" onClick={() => { update.reset(); setEditing(true); }}>{COPY.open}</Button>}
       <ActionFeedback error={update.error?.message} success={!editing && update.isSuccess ? COPY.saved : undefined} />
     </div>
   );

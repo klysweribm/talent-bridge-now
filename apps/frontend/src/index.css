@@ -1,7 +1,10 @@
 /* ─── IBM Plex Sans — self-hosted via @fontsource (sin Google Fonts) ── */
+@import '@fontsource/ibm-plex-sans/300.css';
 @import '@fontsource/ibm-plex-sans/400.css';
 @import '@fontsource/ibm-plex-sans/500.css';
 @import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
 
 @tailwind base;
 @tailwind components;
@@ -110,41 +113,6 @@ body {
   --ease-entrance:    cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
-/* ─── Sidebar collapse ───────────────────────────────────────
-   Duración 1s (--anim-slow) con ease-in-out para el efecto
-   suave de 0→100% solicitado. Se aplica en width + opacity
-   del contenido de texto para evitar overflow visible.
-   ─────────────────────────────────────────────────────────── */
-.sidebar-collapse {
-  transition:
-    width        var(--anim-slow) var(--ease-in-out),
-    min-width    var(--anim-slow) var(--ease-in-out);
-  overflow: hidden;
-  will-change: width;
-}
-
-.sidebar-text {
-  transition:
-    opacity      calc(var(--anim-slow) * 0.4) var(--ease-in-out),
-    transform    calc(var(--anim-slow) * 0.4) var(--ease-in-out);
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-/* Collapsed: texto desaparece rápido, luego el width cierra */
-.sidebar-collapsed .sidebar-text {
-  opacity: 0;
-  transform: translateX(-8px);
-  pointer-events: none;
-}
-
-/* Expanded: texto aparece al final de la animación de apertura */
-.sidebar-expanded .sidebar-text {
-  opacity: 1;
-  transform: translateX(0);
-  transition-delay: calc(var(--anim-slow) * 0.5);
-}
-
 /* ─── Hover interactivo en filas de lista ────────────────────
    Manito (cursor pointer) + elevación sutil con translateY.
    ─────────────────────────────────────────────────────────── */
@@ -167,22 +135,9 @@ body {
   transition-duration: var(--anim-instant);
 }
 
-/* ─── Icono de colapso — rotación ────────────────────────────*/
-.collapse-icon {
-  transition: transform var(--anim-slow) var(--ease-in-out);
-  flex-shrink: 0;
-}
-
-.sidebar-collapsed .collapse-icon {
-  transform: rotate(180deg);
-}
-
 /* ─── Respeto a prefers-reduced-motion ───────────────────────*/
 @media (prefers-reduced-motion: reduce) {
-  .sidebar-collapse,
-  .sidebar-text,
-  .row-interactive,
-  .collapse-icon {
+  .row-interactive {
     transition: none !important;
   }
 }

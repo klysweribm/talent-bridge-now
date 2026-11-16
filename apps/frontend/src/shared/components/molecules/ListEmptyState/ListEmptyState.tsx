@@ -13,8 +13,8 @@ export interface ListEmptyStateProps {
 
 export function ListEmptyState({ message, actionLabel, onAction, children }: ListEmptyStateProps): JSX.Element {
   return (
-    <div className="flex flex-col items-center gap-md py-2xl text-center">
-      <p className="text-body-lg text-text-secondary">{message}</p>
+    <div className="flex flex-col items-center gap-md px-base py-2xl text-center">
+      <p className="text-body text-carbon-gray-70">{message}</p>
       {actionLabel && onAction && <Button variant="secondary" onClick={onAction}>{actionLabel}</Button>}
       {children}
     </div>

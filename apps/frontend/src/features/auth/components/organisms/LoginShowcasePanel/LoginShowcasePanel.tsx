@@ -15,23 +15,23 @@ export function LoginShowcasePanel(): JSX.Element {
       className="hidden lg:flex flex-col justify-between gap-xl p-2xl text-white bg-gradient-to-br from-brand-deep via-brand-mid to-primary"
     >
       <div className="flex items-center justify-between">
-        <span className="text-label-md tracking-widest">{s.label}</span>
-        <span className="flex items-center gap-sm rounded-full bg-white/10 border border-white/20 px-md py-xs text-label-md">
-          <span className="w-2 h-2 rounded-full bg-status-success" />
+        <span className="text-label tracking-widest">{s.label}</span>
+        <span className="flex items-center gap-sm rounded-pill bg-white/10 border border-white/20 px-md py-xs text-label">
+          <span className="w-2 h-2 rounded-full bg-carbon-green" />
           {s.cloudPill}
         </span>
       </div>
 
       <div className="flex flex-col gap-lg">
-        <span className="text-label-md uppercase tracking-widest text-primary-fixed-dim">{s.eyebrow}</span>
-        <p className="m-0 text-display-xl max-w-xl">
+        <span className="text-label uppercase tracking-widest text-primary-fixed-dim">{s.eyebrow}</span>
+        <p className="m-0 text-h1 max-w-xl">
           {s.headlineLead} <span className="text-primary-fixed-dim">{s.headlineEm}</span>
         </p>
         <ShowcaseProfileCard />
         <ShowcaseStatsCard />
       </div>
 
-      <div className="flex items-center justify-between gap-md text-label-md text-primary-fixed-dim">
+      <div className="flex items-center justify-between gap-md text-label text-primary-fixed-dim">
         <span>{s.poweredBy}</span>
         <span>{s.guard}</span>
       </div>

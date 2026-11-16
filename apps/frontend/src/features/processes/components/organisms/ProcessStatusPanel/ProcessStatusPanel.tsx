@@ -31,9 +31,9 @@ export function ProcessStatusPanel({ process }: ProcessStatusPanelProps): JSX.El
 
   return (
     <div className="flex flex-col gap-sm">
-      <div className="flex flex-wrap items-end gap-md">
+      <div className="flex flex-col gap-md">
         <StatusSelect id={STATUS_SELECT_ID} label={COPY.label} value={process.status} disabled={update.isPending} onChange={request} />
-        <Button type="button" variant="danger" className="min-h-11" disabled={update.isPending} onClick={() => request('cancelled')}>{COPY.remove}</Button>
+        <Button type="button" variant="danger-outline" className="self-start" disabled={update.isPending} onClick={() => request('cancelled')}>{COPY.remove}</Button>
       </div>
       {pending && confirmCopy && (
         <ConfirmPanel

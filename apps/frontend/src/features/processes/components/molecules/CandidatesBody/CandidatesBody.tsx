@@ -18,16 +18,16 @@ export function CandidatesBody({ status, rows, checkedIds, lockUnchecked, onTogg
   if (status === 'loading') {
     return (
       <div role="status" aria-label={CANDIDATES_STEP_TEXT.loading} className="flex flex-col gap-sm">
-        {Array.from({ length: SKELETON_ROWS }, (_, index) => <div key={index} className="h-14 rounded bg-surface-high animate-pulse" />)}
+        {Array.from({ length: SKELETON_ROWS }, (_, index) => <div key={index} className="h-14 bg-carbon-gray-20 animate-pulse" />)}
       </div>
     );
   }
   if (status === 'error') {
     return <ListErrorState message={CANDIDATES_STEP_TEXT.error} retryLabel={WIZARD_TEXT.retry} onRetry={onRetry} />;
   }
-  if (status === 'empty') return <p className="text-body-lg text-text-secondary">{CANDIDATES_STEP_TEXT.empty}</p>;
+  if (status === 'empty') return <p className="text-body text-carbon-gray-70">{CANDIDATES_STEP_TEXT.empty}</p>;
   return (
-    <ul className="flex flex-col divide-y divide-surface-high rounded-lg border border-surface-high bg-surface-card">
+    <ul className="flex flex-col divide-y divide-carbon-gray-20 border border-carbon-gray-20 bg-white">
       {rows.map(candidate => {
         const checked = checkedIds.includes(candidate.id);
         return (

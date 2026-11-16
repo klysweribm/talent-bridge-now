@@ -19,15 +19,15 @@ export function describedBy({ id, error, hint, missing, success }: IFieldMessage
 
 /** Un solo mensaje bajo el campo: el error manda sobre la ayuda y la ayuda sobre el aviso de "no detectado". */
 export function FieldMessages({ id, error, hint, missing, success }: IFieldMessagesProps): JSX.Element | null {
-  if (error) return <span id={`${id}-error`} role="alert" className="text-label-md text-status-danger">{error}</span>;
-  if (hint) return <span id={`${id}-help`} className="text-label-md text-text-secondary">{hint}</span>;
+  if (error) return <span id={`${id}-error`} role="alert" className="text-label text-carbon-red">{error}</span>;
+  if (hint) return <span id={`${id}-help`} className="text-label text-carbon-gray-70">{hint}</span>;
   if (success) {
     return (
-      <span id={`${id}-success`} className="inline-flex items-center gap-xs text-label-md text-status-success-text">
+      <span id={`${id}-success`} className="inline-flex items-center gap-xs text-label text-carbon-green-tag-text">
         <Icon name="check_circle" size={16} />{success}
       </span>
     );
   }
-  if (missing) return <span id={`${id}-hint`} className="text-label-md text-text-secondary">{MISSING_HINT}</span>;
+  if (missing) return <span id={`${id}-hint`} className="text-label text-carbon-gray-70">{MISSING_HINT}</span>;
   return null;
 }

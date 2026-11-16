@@ -8,16 +8,16 @@ export interface BreadcrumbProps {
 
 export function Breadcrumb({ items }: BreadcrumbProps): JSX.Element {
   return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex items-center gap-sm text-body-md text-text-secondary">
+    <nav aria-label="Breadcrumb" className="px-xl pt-base">
+      <ol className="flex items-center gap-sm text-body text-carbon-gray-70">
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
           return (
             <Fragment key={item.label}>
               {index > 0 && <li aria-hidden="true">/</li>}
-              <li aria-current={isLast ? 'page' : undefined} className={isLast ? 'text-text-primary font-medium' : ''}>
+              <li aria-current={isLast ? 'page' : undefined} className={isLast ? 'text-carbon-gray-100' : ''}>
                 {item.to && !isLast
-                  ? <Link to={item.to} className="hover:text-primary-interactive">{item.label}</Link>
+                  ? <Link to={item.to} className="text-carbon-blue-60 hover:underline">{item.label}</Link>
                   : item.label}
               </li>
             </Fragment>

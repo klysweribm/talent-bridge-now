@@ -10,8 +10,8 @@ export function NewProcessPage(): JSX.Element {
   const setStep = useWizardStore(state => state.setStep);
 
   return (
-    <div className="px-base md:px-xl py-lg flex flex-col gap-lg w-full max-w-3xl mx-auto">
-      <h1 className="text-headline-md text-text-primary">{WIZARD_TEXT.pageTitle}</h1>
+    <div className="px-xl pt-lg pb-3xl flex flex-col gap-lg w-full max-w-content-narrow mx-auto">
+      <h1 className="text-h1 text-carbon-gray-100">{WIZARD_TEXT.pageTitle}</h1>
       <ProcessStepper current={step} onNavigate={setStep} disabled={false} />
       {step === 'data' && <ProcessDataStep />}
       {step === 'candidates' && <ProcessCandidatesStep />}

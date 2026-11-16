@@ -16,7 +16,7 @@ export interface ProcessTechnicalTeamPanelProps {
 export function ProcessTechnicalTeamPanel({ process, canEdit }: ProcessTechnicalTeamPanelProps): JSX.Element {
   const editor = useTechnicalTeamEditor(process);
   const manage = canEdit && (
-    <Button type="button" variant="secondary" className="min-h-11 self-start" aria-expanded={editor.open} onClick={editor.toggleOpen}>
+    <Button type="button" variant="outline" size="sm" className="self-start" aria-expanded={editor.open} onClick={editor.toggleOpen}>
       {editor.open ? COPY.closeManage : COPY.manage}
     </Button>
   );

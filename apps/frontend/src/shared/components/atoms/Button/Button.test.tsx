@@ -36,7 +36,7 @@ describe('Button', () => {
 
   it('should apply danger variant class when variant=danger', () => {
     render(<Button variant="danger">Eliminar</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-status-danger');
+    expect(screen.getByRole('button')).toHaveClass('bg-carbon-red');
   });
 
   it('should pass extra HTML attributes to the button element', () => {

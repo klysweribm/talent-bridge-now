@@ -12,9 +12,9 @@ export interface DraftFieldFrameProps {
 export function DraftFieldFrame({ mark, children }: DraftFieldFrameProps): JSX.Element {
   if (mark === 'missing') {
     return (
-      <div className="flex flex-col gap-2xs border-l-4 border-status-warning bg-status-warning-bg p-sm">
+      <div className="flex flex-col gap-2xs border-l-[3px] border-carbon-yellow bg-carbon-yellow-tag-bg p-sm">
         {children}
-        <span className="text-label-md font-medium text-text-primary">{DRAFT_COPY.missingHint}</span>
+        <span className="text-label font-semibold text-carbon-yellow-tag-text">{DRAFT_COPY.missingHint}</span>
       </div>
     );
   }

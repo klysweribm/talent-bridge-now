@@ -16,8 +16,8 @@ export function AdditionalCandidateData({ draft }: AdditionalCandidateDataProps)
   const { experience = [], education = [], languages = [] } = draft;
   if (!experience.length && !education.length && !languages.length) return null;
   return (
-    <section aria-labelledby="additional-candidate-data" className="flex flex-col gap-base p-base rounded border border-outline-variant bg-surface-card">
-      <h3 id="additional-candidate-data" className="text-headline-sm text-text-primary">{EXTRA_SECTION_LABELS.title}</h3>
+    <section aria-labelledby="additional-candidate-data" className="flex flex-col gap-base bg-white p-lg">
+      <h3 id="additional-candidate-data" className="text-h3 text-carbon-gray-100">{EXTRA_SECTION_LABELS.title}</h3>
       {experience.length > 0 && <ExperienceList items={experience} />}
       {education.length > 0 && <EducationList items={education} />}
       {languages.length > 0 && <LanguageList items={languages} />}

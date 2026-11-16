@@ -1,4 +1,4 @@
-import { CONTROL_CLASSES } from '../../../config/bench.constants';
+import { CONTROL_CLASSES, FIELD_LABEL_CLASSES } from '../../../config/bench.constants';
 
 export interface AvailableByFieldProps {
   readonly value:    string | undefined;
@@ -8,7 +8,7 @@ export interface AvailableByFieldProps {
 export function AvailableByField({ value, onChange }: AvailableByFieldProps): JSX.Element {
   return (
     <div className="flex flex-col gap-xs">
-      <label htmlFor="bench-available-by" className="text-label-md text-text-secondary">Disponible antes de</label>
+      <label htmlFor="bench-available-by" className={FIELD_LABEL_CLASSES}>Disponible antes de</label>
       <input
         id="bench-available-by"
         type="date"

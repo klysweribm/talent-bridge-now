@@ -26,7 +26,7 @@ export function OpportunityFields({ bindings, marks = {} }: OpportunityFieldsPro
   if (!limits.data) {
     return limits.failed
       ? <ErrorBanner message={OPPORTUNITY_COPY.limitsError} actionLabel={OPPORTUNITY_COPY.limitsRetry} onAction={limits.retry} />
-      : <p role="status" className="text-body-md text-text-secondary">{OPPORTUNITY_COPY.limitsLoading}</p>;
+      : <p role="status" className="text-body text-carbon-gray-70">{OPPORTUNITY_COPY.limitsLoading}</p>;
   }
   return <OpportunityFieldList bindings={bindings} marks={marks} max={limits.data} />;
 }

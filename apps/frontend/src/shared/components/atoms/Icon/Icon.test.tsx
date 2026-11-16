@@ -37,4 +37,13 @@ describe('Icon', () => {
     expect(container.querySelector('svg')).toBeInTheDocument();
     expect(container.querySelector('.material-symbols-outlined')).not.toBeInTheDocument();
   });
+
+  it.each(['search', 'bell', 'chevron-down', 'fn-grid', 'status-check', 'status-warning'])(
+    'should render the Future Now stroke/status SVG for %s instead of the font glyph',
+    name => {
+      const { container } = render(<Icon name={name} />);
+      expect(container.querySelector('svg')).toBeInTheDocument();
+      expect(container.querySelector('.material-symbols-outlined')).not.toBeInTheDocument();
+    },
+  );
 });

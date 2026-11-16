@@ -14,7 +14,7 @@ export function InputFieldIcon({ icon }: InputFieldIconProps): JSX.Element | nul
   return (
     <span
       aria-hidden="true"
-      className="material-symbols-outlined absolute left-sm text-[18px] text-text-secondary pointer-events-none"
+      className="material-symbols-outlined absolute left-sm text-[18px] text-carbon-gray-70 pointer-events-none"
     >
       {icon}
     </span>

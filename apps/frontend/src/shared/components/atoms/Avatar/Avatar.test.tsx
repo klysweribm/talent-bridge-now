@@ -38,3 +38,15 @@ describe('Avatar', () => {
     expect(screen.getByLabelText('Test')).toHaveClass('w-10');
   });
 });
+
+describe('Avatar palette', () => {
+  it('should pick a deterministic Carbon token class from the name', () => {
+    render(<Avatar name="Test" />);
+    expect(screen.getByLabelText('Test').className).toMatch(/bg-carbon-/);
+  });
+
+  it('should support the 28px compact size', () => {
+    render(<Avatar name="Test" size="compact" />);
+    expect(screen.getByLabelText('Test')).toHaveClass('w-7');
+  });
+});

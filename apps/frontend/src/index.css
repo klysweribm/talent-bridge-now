@@ -3,9 +3,8 @@
 @import '@fontsource/ibm-plex-sans/400.css';
 @import '@fontsource/ibm-plex-sans/500.css';
 @import '@fontsource/ibm-plex-sans/600.css';
-/* TODO(F0): activar al instalar @fontsource/ibm-plex-mono (aún no está en node_modules)
 @import '@fontsource/ibm-plex-mono/400.css';
-@import '@fontsource/ibm-plex-mono/500.css'; */
+@import '@fontsource/ibm-plex-mono/500.css';
 
 @tailwind base;
 @tailwind components;

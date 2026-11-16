@@ -5,7 +5,7 @@ export interface IbmLogoMarkProps {
 export function IbmLogoMark({ className = '' }: IbmLogoMarkProps): JSX.Element {
   return (
     <svg
-      className={`w-5 h-5 flex-shrink-0 text-primary ${className}`}
+      className={`w-5 h-5 flex-shrink-0 text-carbon-gray-100 ${className}`}
       fill="currentColor"
       viewBox="0 0 32 32"
       aria-hidden="true"

@@ -4,7 +4,7 @@
 > `good-practices/DEBT_TECH.md` y `docs/use-cases/`. El encuadre anterior (procesos → candidatos → entrevistas →
 > feedback → reportes) espera el replanning Bench First.
 >
-> **Última actualización:** 2026-11-09 (OPP-AI-1: unidad 7 ✅ en código y tests (`ce69852`, `144bae0`), sin verificar en navegador; defaults de envs `42bf836` y etiqueta ICA `af4e9c1` ya commiteados; unidad 6 cerrada en `14280d3`; la unidad 5 sigue sin verificar en navegador; siguen las unidades 8-9). PROC-UX-1 (panel «Agregar candidato» en el wizard) 🚧 en código y tests, commiteado (`67dd657`, `c97d893`, `39b32ca`; sin push), sin verificar en navegador; DT-060 resuelta, DT-061 abierta)
+> **Última actualización:** 2026-11-10 (UI-REDESIGN-1 F0-F10 implementado en el árbol de trabajo, sin commitear y sin verificar en navegador; ver su sección). Anterior: 2026-11-09 (OPP-AI-1: unidad 7 ✅ en código y tests (`ce69852`, `144bae0`), sin verificar en navegador; defaults de envs `42bf836` y etiqueta ICA `af4e9c1` ya commiteados; unidad 6 cerrada en `14280d3`; la unidad 5 sigue sin verificar en navegador; siguen las unidades 8-9). PROC-UX-1 (panel «Agregar candidato» en el wizard) 🚧 en código y tests, commiteado (`67dd657`, `c97d893`, `39b32ca`; sin push), sin verificar en navegador; DT-060 resuelta, DT-061 abierta)
 
 **Cómo se mantiene:** al cerrar algo, se baja a «✅ Cerrado» en una línea y se quita de «Qué falta». Lo pendiente nunca se entierra bajo lo hecho.
 
@@ -22,6 +22,8 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 ### Siguiente paso
 
 **Unidades 8-9 de OPP-AI-1** (backend de sugerencias de la banca: `POST /bench/match` determinístico y `GET /processes/:id/bench-suggestions`) en `feature/OPP-AI-1`. Tabla del plan abajo. La unidad 7 (frontend del dropzone de brochure) está ✅ en código y tests (`ce69852`, `144bae0`) pero **sin verificar en navegador** (ver «Pendiente de verificación humana»); la 6 (backend) cerrada en `14280d3`; defaults del borrador (`42bf836`) y copy «ICA» (`af4e9c1`) ya commiteados; la 5 **sin verificar en navegador**.
+
+**Prioritario antes de seguir con más UI:** [UI-REDESIGN-1](#-ui-redesign-1--rediseño-ibm-future-now-carbon-g10-fases-f0-f10-high) está implementado (F0-F10, sin commitear por pedido del usuario) pero **sin verificar visualmente**: revisión del usuario en navegador, comparación con el prototipo y decisión de las deudas DT-062 a DT-071. Los cambios de código están en el árbol de trabajo de `feature/new-ui`.
 
 **En paralelo (no desplaza el siguiente paso):** [PROC-UX-1](#-proc-ux-1--agregar-candidato-sin-salir-del-wizard-nueva-oportunidad-medium), unidades A-C en código y tests en la misma rama, commiteadas (`67dd657`, `c97d893`, `39b32ca`); falta verificación humana y decidir la deuda DT-061.
 
@@ -49,6 +51,7 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 - Textos «Oportunidad» (unidad 2) y PROC-1 en navegador, y los `curl` de escritura de PROC-1 (solo cubiertos por e2e).
 - **Box mágico (unidad 5) en navegador:** login mariana@ibm.com → Nueva oportunidad → pegar el texto ITAU → «Generar con IA» → campos con «Sugerido por ICA» y nada creado → escribir un título a mano y regenerar → el título no se pisa → texto sin cliente → cliente «por completar» → apagar el backend o ICA → mensaje claro y formulario manual usable. **Requisito:** el backend debe ser uno con el código nuevo (el contenedor del `:3000` es una imagen vieja SIN el endpoint) y, opcionalmente, con las env `OPPORTUNITY_DRAFT_*` (si faltan rige el default en código). Nadie ha visto renderizados el layout, el borde, el badge ni el aviso; tampoco se probó contra el endpoint real ni ICA desde la UI (todo con la infra mockeada); sin prueba con lector de pantalla ni de editar el texto entre un fallo y el reintento.
 - **Dropzone de brochure (unidad 7) en navegador:** login mariana@ibm.com → Nueva oportunidad → arrastrar y soltar un PDF/DOCX/MD/TXT → campos rellenos solo si vacíos; archivo no admitido y archivo > límite → mensaje sin llamar al backend; brochure ilegible → «No pudimos leer el documento» y formulario intacto; el dropzone del CV (candidatos) sigue igual. No verificado: drag&drop real, estilos, foco, multipart real por HTTP (los tests solo comprueban que el `FormData` lleva `file`), DOCX real, corrida real contra ICA con un brochure. Requiere un backend con el código de la unidad 6 (la imagen del `:3000` es vieja).
+- **Rediseño UI-REDESIGN-1 en navegador (nada visto por nadie):** comparar cada pantalla con `DESIGN/IBM Future Now - Prototipo.html`; hover, foco y teclado en los paneles de búsqueda y notificaciones; layout móvil (BottomNav); `position: sticky` del aside del detalle dentro del contenedor de scroll; SidePanel de 440 px; login; cambios de comportamiento listados en la sección de la feature.
 - Mensaje «Block Secrets» de Vault Radar en los commits: no bloqueante, significado desconocido.
 
 ### Riesgos abiertos y decisiones por tomar
@@ -106,7 +109,7 @@ Prioridad (HIGH \| MEDIUM \| LOW): en una feature cerrada, lo que le **queda pen
 | POC 2c | — | — | Dashboards propios por rol (el del referente no muestra procesos: la API le responde 403); hoy solo el contador y la lista de procesos son reales |
 | POC 2b | — | — | Visibilidad `public/protected` de candidatos y filtro por dueño (R1-R3) |
 | POC 4 y 5 | — | — | Asignar referente técnico a un proceso y lista de referentes con disponibilidad (juntas; requieren sembrar referentes) |
-| POC 6a, 6b | — | — | Booking, vista PM/reclutador y vista referente |
+| POC 6a, 6b | — | — | Booking, vista PM/reclutador y vista referente. Parcial: existe la maqueta visual con datos simulados (commit `d7eb269`, PR #9; sin backend ni agenda real), restilizada en UI-REDESIGN-1 (F8) |
 | POC 8 | — | — | Feedback asistido por IA |
 | POC 7, 9 | — | — | Estrellas y rating de referentes; pool externo de casi-contratados (bajo esfuerzo) |
 
@@ -184,6 +187,31 @@ El PM o reclutador describe el perfil en un box mágico o sube un brochure; la I
 **Deuda:** DT-060 resuelta en `39b32ca` (ruta lazy); DT-061 abierta (acople `processes` → `candidates`; salida decidida por el usuario: inyectar el formulario desde la página del wizard con slot o render prop, no moverlo a `shared`).
 
 **Propuestas sin hacer:** (1) opcional del plan: `sessionStorage` del borrador del formulario y guard de salida por sidebar. (2) Detalle de una oportunidad creada: hoy no navega (AddBox inline de candidatos existentes); el mismo patrón sería un botón «Crear candidato» con el mismo `SidePanel` + `CandidateCreateForm`, esfuerzo pequeño (~1 unidad). Decisión pendiente del usuario.
+
+---
+
+## 🚧 UI-REDESIGN-1 — Rediseño «IBM Future Now» (Carbon g10), fases F0-F10 (HIGH)
+
+**Estado:** implementado, sin verificar visualmente (rama `feature/new-ui`, árbol de trabajo sin commitear por pedido del usuario) · **Decisión:** ADR-017 (Propuesto) · **Referencia visual:** `DESIGN/IBM Future Now - Prototipo.html` · **Depende de:** Etapa 2, BENCH-1, PROC-1, CAND-2, PROC-UX-1 · **Deuda:** DT-062 a DT-071 (DT-044 absorbida por DT-066) · **Solo frontend:** backend no tocado.
+
+**Alcance entregado**
+- **F0** tokens `carbon-*` (única fuente), escala tipográfica, `rounded-pill`, sombras, `h-header` 48 / `w-sidebar` 256, `max-w-content-*`, mono, Plex Sans 300. **F1** átomos (Button outline/danger-outline/xl/lg, InputField relleno, StatusBadge/StatusChip/StageChip, SkillChip, Avatar, ProgressBar, Icon). **F2** shell: header negro 48 px «IBM Future Now», sidebar fijo 256 px sin colapso (`sidebarCollapsed` eliminado de `ui.store`), breadcrumb en el contenido, BottomNav móvil, búsqueda global y notificaciones (mocks). **F3** compartidos (KpiStrip, KpiCard, ModalDialog, Toast sin cablear, InlineNotification, Stepper, FileRow, SidePanel 440 px, Pagination, FileDropzone). **F4** Inicio. **F5** Banca. **F6** Oportunidades y detalle (aside sticky). **F7** Candidatos. **F8** Booking, wizard, asistente ICA, ComingSoon/NotFound/ErrorBoundary. **F9** Login (tipografía, tamaños y formas). **F10** barrido de tokens.
+- Gates (re-ejecutados por el orquestador tras F10): frontend typecheck 0, lint 0 warnings, vitest 221 archivos / 1095 tests (base 205 / 1042), build ok, `validate-quality --strict` 337 archivos, 0 críticos, 0 moderados.
+
+**Cambios de comportamiento a confirmar con el usuario:** botones de cabecera del dashboard ocultos a `technical_ref` (antes visibles y rebotaban); Button `secondary` ahora gris oscuro relleno; SidePanel con × icónico (mismo `aria-label`, sin texto «Cerrar»); `ProcessStepper` sin número visible (sr-only); StatusChip con punto; mapeo de color de estados invertido (open=verde, in_progress=azul, interviewing=morado, closed=gris, cancelled=rojo; antes closed verde y open gris); sidebar ya no colapsa; orden DOM del detalle cambió; `#ffebeb` → `#fff1f1` en fondos de error.
+
+**Criterios de éxito**
+- [x] Paleta `carbon-*` como única fuente de tokens (F0).
+- [x] Typecheck, lint, vitest, build y `validate-quality --strict` en verde (cifras arriba).
+- [x] Contraste WCAG de los pares ajustados calculado por script (`text-placeholder` falla AA: DT-067).
+- [x] Backend sin cambios.
+- [ ] Verificación visual en navegador de todas las pantallas (nadie arrancó el dev server).
+- [ ] Comparación pantalla a pantalla con el prototipo.
+- [ ] Hover, foco y teclado en los paneles de búsqueda y notificaciones; layout móvil; sticky en el contenedor de scroll.
+- [ ] Instalar `@fontsource/ibm-plex-mono` y descomentar los `@import` de `index.css` (DT-070).
+- [ ] Revisión y aceptación del usuario (incluidos los cambios de comportamiento y ADR-017).
+
+**Sin equivalente en la app (no inventado):** ver DT-068. **Backend pendiente:** búsqueda global (DT-062) y notificaciones (DT-063).
 
 ---
 
@@ -301,6 +329,7 @@ Todo reordenamiento queda registrado aquí (fecha + razón). Una idea nueva sin 
 
 | Fecha | Cambio | Razón |
 | --- | --- | --- |
+| 2026-11-10 | Nueva tarea `UI-REDESIGN-1` (rediseño «IBM Future Now», Carbon g10, fases F0-F10, sin commits por pedido del usuario): tokens `carbon-*`, átomos, shell (header 48 px, sidebar fijo sin colapso, búsqueda y notificaciones mock), Inicio, Banca, Oportunidades, Candidatos, Booking, wizard, Login; frontend typecheck 0, lint 0 warnings, 221 archivos / 1095 tests (antes 205 / 1042), build ok, `validate-quality` 337 archivos 0 críticos 0 moderados; altas DT-062 a DT-071; ADR-017 Propuesto; NADA verificado en navegador ni contra el prototipo | Pedido del usuario: igualar el prototipo `DESIGN/IBM Future Now - Prototipo.html` |
 | 2026-11-09 | Nueva tarea `PROC-UX-1` (commits `67dd657`, `c97d893`, `39b32ca`; ruta `/candidates/new` lazy, bundle principal 471,79 → 444,67 kB, DT-060 resuelta): `SidePanel` genérico + focus trap/scroll lock compartidos (Banca ahora es envoltorio, cambio aceptado), `CandidateCreateForm` reutilizable y panel «+ Agregar candidato» en el paso 2; frontend typecheck 0, lint 0 warnings, 203 archivos / 1037 tests, build ok, `validate-quality` 317 archivos 0 críticos; altas DT-060 (lazy sin efecto en el bundle) y DT-061 (acople processes→candidates); sin navegador | Pedido del usuario: crear candidatos sin salir del wizard; regla R5.1 (oportunidad, candidatos y referentes independientes) |
 | 2026-09-13 a 2026-10-18 | Roadmap inicial; Etapa 1 de FE (DT-001); `FE-OTP-1` y `AUTH-2` pasa a OTP; reorden hacia el vertical demo (`QW-1`, Etapas 2-3, `AUTH-1`); arquitectura objetivo IBM Cloud (ADR-006 a ADR-012); modelo de dominio (ADR-013); creado `docs/use-cases/`; `AUTH-1` backend verificado (bug de `@Prop` en uniones). | Backlog vivo por feature, demo al sponsor y decisiones de arquitectura que no tenían ADR. |
 | 2026-10-24 a 2026-10-30 | `AUTH-1` cerrado (DT-008/009); hardening de sesión del frontend (DT-015/016/017); limpieza de `legacy_docs/` (alcance A); `QW-2` y `OBS-1` cerrados; altas DT-018 a DT-024; Etapa 2 de FE cerrada en código; fuentes de verdad consolidadas (`.clinerules` y `PROJECT_CONTEXT.md` como punteros); `BENCH-1` implementado y verificado en vivo (DT-027 a DT-029); ROADMAP adelgazado y reordenado. | Preparar el replanning Bench First y mostrar primero lo que toca hacer. |

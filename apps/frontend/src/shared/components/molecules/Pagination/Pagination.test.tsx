@@ -23,4 +23,10 @@ describe('Pagination', () => {
     rerender(<Pagination page={3} totalPages={3} onPageChange={vi.fn()} />);
     expect(screen.getByRole('button', { name: 'Siguiente' })).toBeDisabled();
   });
+
+  it('should show the items range when totalItems is given', () => {
+    render(<Pagination page={2} totalPages={3} totalItems={25} onPageChange={vi.fn()} />);
+    expect(screen.getByText('Elementos por página: 10')).toBeInTheDocument();
+    expect(screen.getByText('11–20 de 25 elementos')).toBeInTheDocument();
+  });
 });

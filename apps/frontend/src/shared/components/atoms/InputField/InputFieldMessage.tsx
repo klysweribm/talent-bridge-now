@@ -17,7 +17,7 @@ export function InputFieldMessage({ inputId, error, hint }: InputFieldMessagePro
       <span
         id={`${inputId}-error`}
         role="alert"
-        className="text-label-md text-status-danger flex items-center gap-2xs"
+        className="text-body-sm text-carbon-red flex items-center gap-2xs"
       >
         <span aria-hidden="true" className="material-symbols-outlined text-[14px]">
           error
@@ -29,7 +29,7 @@ export function InputFieldMessage({ inputId, error, hint }: InputFieldMessagePro
 
   if (hint) {
     return (
-      <span id={`${inputId}-hint`} className="text-label-md text-text-secondary">
+      <span id={`${inputId}-hint`} className="text-body-sm text-carbon-gray-60">
         {hint}
       </span>
     );

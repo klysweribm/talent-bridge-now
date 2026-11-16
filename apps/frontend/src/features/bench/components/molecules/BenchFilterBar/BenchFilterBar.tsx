@@ -20,12 +20,12 @@ export interface BenchFilterBarProps {
 
 export function BenchFilterBar(props: BenchFilterBarProps): JSX.Element {
   return (
-    <div className="flex flex-wrap items-start gap-base p-base bg-surface-card border border-outline-variant rounded-lg">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] items-end gap-base bg-white p-base">
       <SkillFilter options={props.skillOptions} selected={props.skills} onChange={props.onSkillsChange} />
       <SeniorityToggles selected={props.seniority} onChange={props.onSeniorityChange} />
       <AvailableByField value={props.availableBy} onChange={props.onAvailableByChange} />
       <CountryField value={props.country} onChange={props.onCountryChange} />
-      <Button variant="ghost" size="sm" className="self-end" onClick={props.onClear}>Limpiar filtros</Button>
+      <Button variant="ghost" size="md" className="justify-self-start" onClick={props.onClear}>Limpiar filtros</Button>
     </div>
   );
 }

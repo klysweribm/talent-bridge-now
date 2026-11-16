@@ -4,7 +4,7 @@ import { AuthFooter } from '@features/auth/components/molecules/AuthFooter';
 
 export function LoginPage(): JSX.Element {
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-surface-card">
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-carbon-gray-10">
       <LoginShowcasePanel />
 
       <main className="flex flex-col items-center justify-center p-lg">

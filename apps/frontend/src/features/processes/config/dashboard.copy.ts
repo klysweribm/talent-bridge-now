@@ -1,4 +1,8 @@
 export const DASHBOARD_COPY = {
+  title:           'Inicio',
+  newProcess:      'Nueva oportunidad',
+  addCandidate:    'Agregar candidato',
+  summaryLabel:    'Resumen',
   noValue:         '—',
   comingSoon:      'Próximamente',
   interviewsToday: 'Entrevistas hoy',

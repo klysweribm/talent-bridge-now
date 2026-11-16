@@ -8,5 +8,5 @@ export interface StepHeadingProps {
 export function StepHeading({ children }: StepHeadingProps): JSX.Element {
   const ref = useRef<HTMLHeadingElement>(null);
   useEffect(() => { ref.current?.focus(); }, []);
-  return <h2 ref={ref} tabIndex={-1} className="text-title-md text-text-primary focus:outline-none">{children}</h2>;
+  return <h2 ref={ref} tabIndex={-1} className="text-h3 text-carbon-gray-100 focus:outline-none">{children}</h2>;
 }

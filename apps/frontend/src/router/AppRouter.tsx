@@ -12,7 +12,7 @@ import { ROLE_GROUPS } from './routes.config';
 export function AppRouter(): JSX.Element {
   return (
     <BrowserRouter>
-      <Suspense fallback={<p role="status" className="p-lg text-body-md text-text-secondary">Cargando…</p>}>
+      <Suspense fallback={<p role="status" className="p-lg text-body text-carbon-gray-70">Cargando…</p>}>
       <Routes>
         <Route element={<PublicRoute />}>
           <Route path={LOGIN_PATH} element={<LoginPage />} />

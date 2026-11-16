@@ -9,9 +9,9 @@ export function TableSkeleton({ label, columnCount, rows }: TableSkeletonProps):
   return (
     <tbody role="status" aria-label={label}>
       {Array.from({ length: rows }, (_, index) => (
-        <tr key={index} className="h-14 border-b border-outline-variant">
+        <tr key={index} className="h-12 border-b border-carbon-gray-20">
           <td colSpan={columnCount} className="px-base">
-            <div className="h-4 rounded bg-surface-high animate-pulse" />
+            <div className="h-4 rounded bg-carbon-gray-20 animate-pulse" />
           </td>
         </tr>
       ))}

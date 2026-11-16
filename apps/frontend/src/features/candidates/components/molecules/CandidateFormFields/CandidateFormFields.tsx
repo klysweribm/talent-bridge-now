@@ -47,7 +47,7 @@ export function CandidateFormFields(form: CandidateFormFieldsProps): JSX.Element
   const email: IFieldExtra = { required: true, label: `${FIELD_LABELS.email} *`, readOnly: emailLocked, hint: emailLocked ? EMAIL_LOCKED_HINT : undefined, success: emailValid ? EMAIL_VALID_COPY : undefined };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-base">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-x-lg gap-y-base bg-white p-lg">
       <TextFieldFor name="fullName" form={form} extra={{ required: true, label: `${FIELD_LABELS.fullName} *` }} />
       <TextFieldFor name="email" form={form} extra={email} />
       <TextFieldFor name="phone" form={form} />

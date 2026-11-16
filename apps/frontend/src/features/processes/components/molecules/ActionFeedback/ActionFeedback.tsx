@@ -8,6 +8,6 @@ export interface ActionFeedbackProps {
 /** Error (role="alert") o éxito (role="status") de una acción; el error tiene prioridad. */
 export function ActionFeedback({ error, success }: ActionFeedbackProps): JSX.Element | null {
   if (error) return <ErrorBanner message={error} />;
-  if (success) return <p role="status" className="text-body-md text-status-success-text">{success}</p>;
+  if (success) return <p role="status" className="text-body text-carbon-green-tag-text">{success}</p>;
   return null;
 }

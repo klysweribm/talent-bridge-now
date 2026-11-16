@@ -13,7 +13,7 @@ export function LoginForm(): JSX.Element {
   const { register, errors, handleSubmit, loading, error } = useLoginForm();
 
   return (
-    <div className="w-full max-w-[480px] flex flex-col">
+    <div className="w-full max-w-[480px] flex flex-col bg-white border border-carbon-gray-20 p-xl">
       <BrandHeader />
 
       <div className="mt-lg mb-lg">
@@ -26,13 +26,13 @@ export function LoginForm(): JSX.Element {
         <RememberDeviceField />
 
         {error && (
-          <div role="alert" className="flex items-center gap-xs bg-status-danger-bg text-status-danger text-body-md rounded px-sm py-2xs">
-            <Icon name="error" size={16} />
+          <div role="alert" className="flex items-center gap-sm bg-carbon-red-10 border-l-4 border-carbon-red text-carbon-gray-100 text-body px-base py-sm">
+            <Icon name="error" size={16} className="text-carbon-red" />
             {error}
           </div>
         )}
 
-        <Button type="submit" loading={loading} className="mt-2xs w-full">
+        <Button type="submit" loading={loading} className="mt-2xs w-full" size="lg">
           {loading ? AUTH_COPY.submitting : AUTH_COPY.submit}
           {!loading && <span aria-hidden="true" className="flex"><Icon name="arrow_forward" size={16} /></span>}
         </Button>

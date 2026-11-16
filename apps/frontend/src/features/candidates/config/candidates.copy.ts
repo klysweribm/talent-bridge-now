@@ -26,3 +26,6 @@ export const CV_RESULT_COPY = {
 } as const;
 
 export const EMAIL_VALID_COPY = 'Formato válido';
+
+/** Etiqueta del método de extracción recomendado (`DEFAULT_EXTRACTOR`). */
+export const EXTRACTOR_RECOMMENDED_TAG = 'Recomendado';

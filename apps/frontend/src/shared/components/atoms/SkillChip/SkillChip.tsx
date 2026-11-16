@@ -10,12 +10,12 @@ export interface SkillChipProps {
 
 export function SkillChip({ label, onRemove, removeLabel, disabled = false }: SkillChipProps): JSX.Element {
   return (
-    <span className="inline-flex items-center gap-xs min-h-6 px-sm rounded-full bg-surface-base text-label-md font-medium text-text-primary">
+    <span className={`inline-flex items-center gap-xs h-6 rounded-pill bg-carbon-blue-20 text-label text-carbon-blue-80 ${onRemove ? 'pl-sm pr-xs' : 'px-sm'}`}>
       {label}
       {onRemove && (
         <button
           type="button" onClick={onRemove} disabled={disabled} aria-label={removeLabel ?? label}
-          className="inline-flex items-center justify-center rounded-full text-text-secondary hover:text-text-primary focus-visible:outline-2 focus-visible:outline-primary-interactive disabled:opacity-50"
+          className="inline-flex items-center justify-center w-[18px] h-[18px] rounded-full text-carbon-blue-80 hover:bg-carbon-blue-30 focus-visible:outline-2 focus-visible:outline-carbon-blue-60 disabled:opacity-50"
         >
           <Icon name="close" size={14} />
         </button>

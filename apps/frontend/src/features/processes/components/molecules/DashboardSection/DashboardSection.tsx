@@ -12,12 +12,12 @@ export function DashboardSection({ title, headingId, seeAll, children }: Dashboa
   return (
     <section
       aria-labelledby={headingId}
-      className="bg-surface-card border border-surface-high rounded-xl shadow-raised p-base flex flex-col gap-base"
+      className="bg-white flex flex-col"
     >
-      <div className="flex items-center justify-between gap-sm">
-        <h2 id={headingId} className="text-headline-sm text-text-primary">{title}</h2>
+      <div className="flex items-center justify-between gap-sm p-base border-b border-carbon-gray-20">
+        <h2 id={headingId} className="text-h2 text-carbon-gray-100">{title}</h2>
         {seeAll && (
-          <Link to={seeAll.to} className="text-label-md text-primary-interactive hover:underline">
+          <Link to={seeAll.to} className="text-body text-carbon-blue-60 hover:underline">
             {seeAll.label}
           </Link>
         )}

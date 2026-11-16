@@ -8,9 +8,9 @@ export interface KpiCardProps {
 }
 
 const TREND_STYLES = {
-  up:      { icon: 'trending_up',   color: 'text-status-success' },
-  down:    { icon: 'trending_down', color: 'text-status-danger' },
-  neutral: { icon: 'trending_flat', color: 'text-text-secondary' },
+  up:      { icon: 'trending_up',   color: 'text-carbon-green' },
+  down:    { icon: 'trending_down', color: 'text-carbon-red' },
+  neutral: { icon: 'trending_flat', color: 'text-carbon-gray-70' },
 } as const;
 
 interface IKpiTrendProps {
@@ -23,7 +23,7 @@ function KpiTrend({ trend, trendLabel }: IKpiTrendProps): JSX.Element | null {
   if (!trendConfig || !trendLabel) return null;
 
   return (
-    <div className={`flex items-center gap-2xs text-label-md ${trendConfig.color}`}>
+    <div className={`flex items-center gap-2xs text-label ${trendConfig.color}`}>
       <span aria-hidden="true" className="material-symbols-outlined text-[14px]">
         {trendConfig.icon}
       </span>
@@ -32,6 +32,7 @@ function KpiTrend({ trend, trendLabel }: IKpiTrendProps): JSX.Element | null {
   );
 }
 
+/** Celda de KPI del prototipo: blanca, sin radio ni sombra; se compone dentro de `KpiStrip`. */
 export function KpiCard({
   label,
   value,
@@ -43,22 +44,18 @@ export function KpiCard({
   return (
     <article
       aria-label={`${label}: ${value}`}
-      className={['bg-surface-card border border-[#e0e0e0] rounded-lg p-base', 'flex flex-col gap-xs', className].join(' ')}
+      className={['bg-white px-base pt-base pb-5 min-h-[136px] flex flex-col gap-lg', className].join(' ')}
     >
       <div className="flex items-center justify-between">
-        <span className="text-label-md text-text-secondary uppercase tracking-wide">
-          {label}
-        </span>
+        <span className="text-body text-carbon-gray-70">{label}</span>
         {icon && (
-          <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-primary-container">
+          <span aria-hidden="true" className="material-symbols-outlined text-[20px] text-carbon-blue-60">
             {icon}
           </span>
         )}
       </div>
 
-      <span className="text-headline-sm font-semibold text-text-primary">
-        {value}
-      </span>
+      <span className="text-kpi text-carbon-gray-100">{value}</span>
 
       <KpiTrend trend={trend} trendLabel={trendLabel} />
     </article>

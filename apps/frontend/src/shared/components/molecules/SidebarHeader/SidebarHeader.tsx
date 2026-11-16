@@ -1,38 +1,12 @@
 import type { JSX } from 'react';
-import { Button } from '@shared/components/atoms/Button';
-import { Icon } from '@shared/components/atoms/Icon';
 import { BRAND } from '@/config/brand';
 
-export interface SidebarHeaderProps {
-  readonly collapsed: boolean;
-  readonly onToggle:  () => void;
-}
-
-export function SidebarHeader({ collapsed, onToggle }: SidebarHeaderProps): JSX.Element {
-  const toggleLabel = collapsed ? 'Expandir menú' : 'Colapsar menú';
-
+/** Celda de marca del header (sin colapso desde el rediseño): ancho del sidebar en desktop. */
+export function SidebarHeader(): JSX.Element {
   return (
-    <div className="flex items-center gap-sm px-md h-14 flex-shrink-0 border-b border-outline-variant">
-      <span
-        aria-hidden="true"
-        className="flex-shrink-0 flex items-center justify-center w-8 h-6 rounded bg-primary-container text-primary-on text-label-md font-bold"
-      >
-        IBM
-      </span>
-      <span className={collapsed ? 'hidden' : 'flex-1 truncate text-title-md text-text-primary'}>
-        {BRAND.productFullName}
-      </span>
-      <Button
-        variant="ghost"
-        size="sm"
-        aria-label={toggleLabel}
-        title={toggleLabel}
-        aria-expanded={!collapsed}
-        onClick={onToggle}
-        className="!px-xs flex-shrink-0"
-      >
-        <Icon name="chevron_left" size={16} className={collapsed ? 'rotate-180' : ''} />
-      </Button>
+    <div className="flex items-center px-base md:w-sidebar md:border-r border-carbon-gray-80 text-body text-white whitespace-nowrap">
+      <span className="font-semibold tracking-[0.5px]">{BRAND.companyName}</span>
+      <span className="ml-1">{BRAND.productShortName}</span>
     </div>
   );
 }

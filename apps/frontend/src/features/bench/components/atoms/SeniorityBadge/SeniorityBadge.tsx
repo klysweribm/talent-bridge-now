@@ -9,7 +9,7 @@ export function SeniorityBadge({ seniority }: SeniorityBadgeProps): JSX.Element 
   const label = SENIORITY_OPTIONS.find(option => option.value === seniority)?.label ?? seniority;
 
   return (
-    <span className="inline-flex items-center h-6 px-sm rounded bg-surface-high text-label-md font-medium text-text-primary">
+    <span className="inline-flex items-center h-6 px-sm rounded-pill bg-carbon-gray-20 text-label text-carbon-gray-100">
       {label}
     </span>
   );

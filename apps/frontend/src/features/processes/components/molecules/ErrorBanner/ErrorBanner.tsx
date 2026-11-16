@@ -1,4 +1,5 @@
 import { Button } from '@shared/components/atoms/Button';
+import { InlineNotification } from '@shared/components/molecules/InlineNotification';
 
 export interface ErrorBannerProps {
   readonly message:      string;
@@ -9,9 +10,9 @@ export interface ErrorBannerProps {
 
 export function ErrorBanner({ message, actionLabel, onAction }: ErrorBannerProps): JSX.Element {
   return (
-    <div role="alert" className="flex items-center justify-between gap-md p-md rounded border border-status-danger bg-status-danger-bg text-body-md text-status-danger">
+    <InlineNotification kind="error" role="alert">
       <span>{message}</span>
       {actionLabel && onAction && <Button type="button" variant="secondary" size="sm" onClick={onAction}>{actionLabel}</Button>}
-    </div>
+    </InlineNotification>
   );
 }

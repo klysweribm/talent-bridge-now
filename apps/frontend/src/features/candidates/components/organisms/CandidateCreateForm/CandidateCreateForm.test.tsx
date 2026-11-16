@@ -116,12 +116,12 @@ describe('CandidateCreateForm', () => {
     renderPage(<CandidateCreateForm onSuccess={vi.fn()} stacked />);
     const grid = screen.getAllByRole('radio')[0].closest('div');
     expect(grid).toHaveClass('grid-cols-1');
-    expect(grid).not.toHaveClass('sm:grid-cols-3');
+    expect(grid).not.toHaveClass('grid-cols-[repeat(auto-fit,minmax(200px,1fr))]');
   });
 
-  it('should keep the three-column breakpoint layout when not stacked', () => {
+  it('should keep the auto-fit grid layout when not stacked', () => {
     renderPage(<CandidateCreateForm onSuccess={vi.fn()} />);
-    expect(screen.getAllByRole('radio')[0].closest('div')).toHaveClass('sm:grid-cols-3');
+    expect(screen.getAllByRole('radio')[0].closest('div')).toHaveClass('grid-cols-[repeat(auto-fit,minmax(200px,1fr))]');
   });
 
   it('should not render Cancelar when onCancel is not given', async () => {

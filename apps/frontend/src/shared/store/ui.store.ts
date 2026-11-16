@@ -1,22 +1,25 @@
 import { create } from 'zustand';
 
 /**
- * UI Store — estado de preferencias de interfaz.
- * SOLO estado cliente puro: nunca datos de servidor aquí.
- * - sidebarCollapsed: sidebar expandido/colapsado (default: false = expandido)
+ * UI Store — estado de interfaz del shell. SOLO estado cliente puro.
+ * - activePanel: panel flotante del header abierto (búsqueda o notificaciones), uno a la vez.
  */
+export type TShellPanel = 'search' | 'notifications';
 
 interface UiState {
-  readonly sidebarCollapsed: boolean;
+  readonly activePanel: TShellPanel | null;
 }
 
 interface UiActions {
-  toggleSidebarCollapsed: () => void;
+  togglePanel: (panel: TShellPanel) => void;
+  closePanel:  () => void;
 }
 
 export const useUiStore = create<UiState & UiActions>()((set) => ({
-  sidebarCollapsed: false,
+  activePanel: null,
 
-  toggleSidebarCollapsed: () =>
-    set(state => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+  togglePanel: (panel) =>
+    set(state => ({ activePanel: state.activePanel === panel ? null : panel })),
+
+  closePanel: () => set({ activePanel: null }),
 }));

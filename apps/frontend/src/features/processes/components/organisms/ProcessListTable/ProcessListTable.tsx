@@ -51,7 +51,7 @@ export function ProcessListTable(): JSX.Element {
   const { data, isError, refetch } = useProcessList(params);
 
   return (
-    <section aria-labelledby={HEADING_ID} className="bg-surface-card border border-surface-high rounded-xl shadow-raised p-base flex flex-col gap-base">
+    <section aria-labelledby={HEADING_ID} className="bg-white border border-carbon-gray-20 p-lg flex flex-col gap-base">
       <ProcessListHeader headingId={HEADING_ID} total={data?.total} query={draft} onQueryChange={setDraft} onClear={clear} />
       <ProcessListBody data={data} isError={isError} q={params.q} onRetry={() => void refetch()} onClear={clear} onPage={setPage} />
     </section>

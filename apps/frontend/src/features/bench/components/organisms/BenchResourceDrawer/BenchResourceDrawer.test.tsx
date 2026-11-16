@@ -56,3 +56,13 @@ describe('BenchResourceDrawer', () => {
     expect(screen.getByRole('button', { name: 'Fuera' })).not.toHaveFocus();
   });
 });
+
+describe('BenchResourceDrawer footer', () => {
+  it('should close from the footer "Cerrar" button', async () => {
+    vi.mocked(infra.fetchBenchResource).mockResolvedValue(makeResource());
+    const onClose = vi.fn();
+    renderAt(<BenchResourceDrawer code="BN-0001" onClose={onClose} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});

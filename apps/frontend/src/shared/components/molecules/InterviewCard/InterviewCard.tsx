@@ -14,9 +14,9 @@ export interface InterviewCardProps {
 
 function buildClassName(isClickable: boolean, className: string): string {
   return [
-    'bg-surface-card border border-[#e0e0e0] rounded-lg p-base',
+    'bg-white border border-carbon-gray-20 p-base',
     'flex flex-col gap-sm',
-    isClickable ? 'cursor-pointer hover:border-primary-interactive transition-colors duration-150' : '',
+    isClickable ? 'cursor-pointer hover:border-carbon-blue-60 transition-colors duration-150' : '',
     className,
   ].join(' ');
 }
@@ -30,13 +30,13 @@ interface IInterviewCardMetaProps {
 function InterviewCardMeta({ date, time, referentName }: IInterviewCardMetaProps): JSX.Element {
   return (
     <>
-      <div className="flex items-center gap-xs text-body-md text-text-secondary">
+      <div className="flex items-center gap-xs text-body text-carbon-gray-70">
         <span aria-hidden="true" className="material-symbols-outlined text-[16px]">calendar_today</span>
         <time dateTime={date}>{date}</time>
         <span aria-hidden="true" className="material-symbols-outlined text-[16px] ml-sm">schedule</span>
         <span>{time}</span>
       </div>
-      <div className="flex items-center gap-xs text-body-md text-text-secondary">
+      <div className="flex items-center gap-xs text-body text-carbon-gray-70">
         <span aria-hidden="true" className="material-symbols-outlined text-[16px]">person</span>
         <span>{referentName}</span>
       </div>
@@ -56,8 +56,8 @@ function InterviewCardHeader({ candidateName, role, stage }: IInterviewCardHeade
       <div className="flex items-center gap-sm min-w-0">
         <Avatar name={candidateName} size="md" />
         <div className="min-w-0">
-          <p className="text-title-md text-text-primary truncate">{candidateName}</p>
-          <p className="text-body-md text-text-secondary truncate">{role}</p>
+          <p className="text-h2 text-carbon-gray-100 truncate">{candidateName}</p>
+          <p className="text-body text-carbon-gray-70 truncate">{role}</p>
         </div>
       </div>
       <StageChip stage={stage} />

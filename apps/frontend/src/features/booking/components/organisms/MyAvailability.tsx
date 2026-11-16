@@ -14,10 +14,10 @@ export function MyAvailability(): JSX.Element {
   const free = mine.filter(s => s.bookedBy === undefined).length;
 
   return (
-    <section className="flex flex-col gap-base">
-      <h1 className="text-headline-md text-text-primary">{BOOKING_COPY.myTitle}</h1>
-      <p className="text-body-lg text-text-secondary">{BOOKING_COPY.hoursSummary(free)}</p>
-      <div className="rounded-lg bg-surface-card p-base">
+    <section className="mx-auto flex w-full max-w-content-max flex-col gap-base px-xl pb-3xl pt-lg">
+      <h1 className="text-h1 text-carbon-gray-100">{BOOKING_COPY.myTitle}</h1>
+      <p className="text-body text-carbon-gray-70">{BOOKING_COPY.hoursSummary(free)}</p>
+      <div className="border border-carbon-gray-20 bg-white p-base">
         <WeekCalendar weekDates={getWeekDates()} slots={mine} mode="edit"
           onAdd={(date, h) => addSlot(email, date, h)} onRemove={removeSlot} />
       </div>

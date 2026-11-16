@@ -15,16 +15,14 @@ export interface NotFoundViewProps {
 export function NotFoundView({ backTo, backLabel }: NotFoundViewProps): JSX.Element {
   return (
     <div className="flex flex-col items-center justify-center gap-base h-full min-h-[60vh] px-xl py-2xl text-center">
-      <span className="w-16 h-16 rounded-full bg-status-danger-bg flex items-center justify-center text-status-danger">
-        <Icon name="error" size={32} />
-      </span>
-      <h1 className="text-headline-md text-text-primary">Página no encontrada</h1>
-      <p className="text-body-md text-text-secondary max-w-[480px]">
+      <Icon name="error" size={32} className="text-carbon-red" />
+      <h1 className="text-h1 text-carbon-gray-100">Página no encontrada</h1>
+      <p className="text-body text-carbon-gray-70 max-w-[480px]">
         La ruta que buscas no existe o fue movida.
       </p>
       <Link
         to={backTo}
-        className="inline-flex items-center gap-xs px-base h-10 rounded-lg bg-primary-container hover:bg-primary text-white text-body-md-medium transition-colors"
+        className="relative inline-flex h-10 items-center bg-carbon-blue-60 pl-base pr-2xl text-body text-white transition-colors hover:bg-carbon-blue-60-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-carbon-blue-60"
       >
         {backLabel}
       </Link>

@@ -20,7 +20,7 @@ export interface ConfirmSummaryProps {
 }
 
 const Row = ({ label, value }: { readonly label: string; readonly value: string }): JSX.Element => (
-  <p className="text-body-md whitespace-pre-line break-words"><span className="text-text-secondary">{label}: </span><span className="text-text-primary">{value}</span></p>
+  <p className="text-body whitespace-pre-line break-words"><span className="text-carbon-gray-70">{label}: </span><span className="text-carbon-gray-100">{value}</span></p>
 );
 
 export function ConfirmSummary(props: ConfirmSummaryProps): JSX.Element {
@@ -39,11 +39,11 @@ export function ConfirmSummary(props: ConfirmSummaryProps): JSX.Element {
       </ConfirmSection>
       <ConfirmSection title={CONFIRM_STEP_TEXT.candidatesSection} editLabel={WIZARD_TEXT.edit} disabled={disabled} onEdit={props.onEditCandidates}>
         {candidates.length === 0 ? (
-          <p className="text-body-md text-text-secondary">{CONFIRM_STEP_TEXT.noCandidates}</p>
+          <p className="text-body text-carbon-gray-70">{CONFIRM_STEP_TEXT.noCandidates}</p>
         ) : (
           <ul className="flex flex-col gap-xs">
             {candidates.map(candidate => (
-              <li key={candidate.id} className="text-body-md text-text-primary">
+              <li key={candidate.id} className="text-body text-carbon-gray-100">
                 {candidate.primaryRole ? `${candidate.fullName} · ${candidate.primaryRole}` : candidate.fullName}
               </li>
             ))}

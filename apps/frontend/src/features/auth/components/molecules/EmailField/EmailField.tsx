@@ -10,17 +10,17 @@ export interface EmailFieldProps {
 
 function buildClassName(hasError: boolean): string {
   return [
-    'w-full h-10 pl-8 pr-20 rounded text-body-md text-text-primary bg-surface-card outline-none',
-    hasError ? 'border-2 border-status-danger' : 'border border-outline-field',
-    'focus:outline-2 focus:outline-primary-interactive focus:border-transparent',
+    'w-full h-10 pl-8 pr-20 text-body text-carbon-gray-100 bg-carbon-gray-10 rounded-none border-0 border-b border-carbon-gray-50 outline-none',
+    hasError ? 'ring-2 ring-inset ring-carbon-red' : '',
+    'focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-carbon-blue-60',
   ].join(' ');
 }
 
 function EmailFieldLabel(): JSX.Element {
   return (
-    <label htmlFor="corporate-email" className="flex items-center justify-between text-body-md-medium text-text-primary">
+    <label htmlFor="corporate-email" className="flex items-center justify-between text-label text-carbon-gray-70">
       <span>{AUTH_COPY.emailLabel}</span>
-      <span className="text-label-sm text-text-secondary">{AUTH_COPY.emailHint}</span>
+      <span className="text-label text-carbon-gray-70">{AUTH_COPY.emailHint}</span>
     </label>
   );
 }
@@ -32,7 +32,7 @@ export function EmailField({ register, error }: EmailFieldProps): JSX.Element {
     <div className="flex flex-col gap-2xs">
       <EmailFieldLabel />
       <div className="relative flex items-center">
-        <span className="absolute pointer-events-none select-none flex items-center left-sm text-outline">
+        <span className="absolute pointer-events-none select-none flex items-center left-sm text-carbon-gray-50">
           <Icon name="mail" size={20} />
         </span>
         <input
@@ -44,12 +44,12 @@ export function EmailField({ register, error }: EmailFieldProps): JSX.Element {
           aria-invalid={hasError || undefined}
           className={buildClassName(hasError)}
         />
-        <span className="absolute select-none pointer-events-none right-xs text-label-md text-text-secondary bg-surface-low rounded px-sm py-2xs">
+        <span className="absolute select-none pointer-events-none right-xs text-label text-carbon-gray-70 px-sm py-2xs">
           {AUTH_COPY.emailDomain}
         </span>
       </div>
       {hasError && (
-        <span role="alert" className="text-label-md text-status-danger">{error}</span>
+        <span role="alert" className="text-label text-carbon-red">{error}</span>
       )}
     </div>
   );

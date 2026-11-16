@@ -4,9 +4,9 @@ import { ProcessListTable } from '../../organisms/ProcessListTable/ProcessListTa
 
 export function ProcessesPage(): JSX.Element {
   return (
-    <div className="px-xl py-lg flex flex-col gap-lg w-full max-w-7xl mx-auto">
+    <div className="px-xl pt-lg pb-3xl flex flex-col gap-lg w-full max-w-content-max mx-auto">
       <header className="flex items-center justify-between gap-md">
-        <h1 className="text-headline-md text-text-primary">{PROCESS_LIST_COPY.title}</h1>
+        <h1 className="text-h1 text-carbon-gray-100">{PROCESS_LIST_COPY.title}</h1>
         <NewProcessLink />
       </header>
       <ProcessListTable />

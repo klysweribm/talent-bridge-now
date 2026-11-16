@@ -25,8 +25,8 @@ function AddBox({ process }: { readonly process: IProcessDetail }): JSX.Element 
   const limitReached = process.candidates.length >= process.maxCandidates;
   return (
     <div className="flex flex-col gap-sm">
-      <p className="text-body-md text-text-secondary">{CANDIDATES_STEP_TEXT.counter(process.candidates.length, process.maxCandidates)}</p>
-      {limitReached && <p role="status" className="text-body-md text-status-warning">{COPY.limitReached(process.maxCandidates)}</p>}
+      <p className="text-body text-carbon-gray-70">{CANDIDATES_STEP_TEXT.counter(process.candidates.length, process.maxCandidates)}</p>
+      {limitReached && <p role="status" className="text-body text-carbon-yellow-tag-text">{COPY.limitReached(process.maxCandidates)}</p>}
       <CandidatesBody status={available.status} rows={available.rows} checkedIds={[]} lockUnchecked={limitReached || add.isPending}
         onToggle={candidate => { add.reset(); add.mutate(candidate.id); }} onRetry={available.retry} />
       {available.totalPages > 1 && <Pagination page={available.page} totalPages={available.totalPages} onPageChange={available.setPage} />}
@@ -39,11 +39,11 @@ export function ProcessCandidatesPanel({ process, canManage }: ProcessCandidates
   const [adding, setAdding] = useState(false);
   const { remove } = useProcessCandidateActions(process.id);
   return (
-    <section aria-labelledby="process-candidates-heading" className="flex flex-col gap-md">
+    <section aria-labelledby="process-candidates-heading" className="flex flex-col gap-base bg-white border border-carbon-gray-20 p-lg">
       <div className="flex items-center justify-between gap-md">
-        <h2 id="process-candidates-heading" className="text-title-md text-text-primary">{PROCESS_LIST_COPY.candidatesHeading}</h2>
+        <h2 id="process-candidates-heading" className="text-h2 text-carbon-gray-100">{PROCESS_LIST_COPY.candidatesHeading}</h2>
         {canManage && (
-          <Button type="button" variant="secondary" className="min-h-11" aria-expanded={adding} onClick={() => setAdding(open => !open)}>
+          <Button type="button" variant="outline" size="sm" aria-expanded={adding} onClick={() => setAdding(open => !open)}>
             {adding ? COPY.closeAdd : COPY.add}
           </Button>
         )}

@@ -1,5 +1,6 @@
 import { useRef, useState, type DragEvent, type KeyboardEvent } from 'react';
 import { Icon } from '@shared/components/atoms/Icon/Icon';
+import { ZONE_BASE_CLASSES, ZONE_STYLE, type TZoneState } from './fileDropzone.constants';
 
 export interface FileDropzoneProps {
   /** Prefijo de los ids (`<prefijo>-file`, `-file-prompt`, `-file-limit`, `-file-error`). */
@@ -15,20 +16,13 @@ export interface FileDropzoneProps {
   readonly disabled?: boolean;
 }
 
-type TZoneState = 'idle' | 'dragging' | 'error';
-
-const ZONE_STYLE: Readonly<Record<TZoneState, string>> = {
-  idle: 'border-outline-field bg-surface-card hover:bg-surface-low',
-  dragging: 'border-primary-interactive bg-status-info-bg',
-  error: 'border-status-danger bg-status-danger-bg',
-};
 
 function Prompt({ ids, prompt, supportedHint }: { readonly ids: IZoneIds; readonly prompt: string; readonly supportedHint: string }): JSX.Element {
   return (
     <>
-      <Icon name="upload_file" size={32} className="text-primary-interactive" />
-      <span id={ids.prompt} className="text-body-md-medium text-text-primary">{prompt}</span>
-      <span id={ids.limit} className="text-label-md text-text-secondary">{supportedHint}</span>
+      <Icon name="upload_file" size={24} className="text-carbon-blue-60" />
+      <span id={ids.prompt} className="text-body text-carbon-blue-60">{prompt}</span>
+      <span id={ids.limit} className="text-label text-carbon-gray-70">{supportedHint}</span>
     </>
   );
 }
@@ -90,11 +84,11 @@ export function FileDropzone(props: FileDropzoneProps): JSX.Element {
         data-testid={testId} data-state={state} role="button" tabIndex={disabled ? -1 : 0}
         aria-disabled={disabled || undefined} aria-labelledby={ids.prompt} aria-describedby={describedBy}
         {...handlers}
-        className={`flex min-h-11 flex-col items-center justify-center gap-xs rounded border-2 border-dashed p-lg text-center cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-interactive aria-disabled:cursor-not-allowed aria-disabled:opacity-50 ${ZONE_STYLE[state]}`}
+        className={`${ZONE_BASE_CLASSES} ${ZONE_STYLE[state]}`}
       >
         <Prompt ids={ids} prompt={prompt} supportedHint={supportedHint} />
       </div>
-      {error && <p id={ids.error} role="alert" className="text-label-md text-status-danger">{error}</p>}
+      {error && <p id={ids.error} role="alert" className="text-label text-carbon-red">{error}</p>}
     </div>
   );
 }

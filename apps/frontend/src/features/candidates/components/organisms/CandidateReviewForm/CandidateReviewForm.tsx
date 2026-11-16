@@ -33,9 +33,9 @@ interface ISubmitRowProps { readonly isUpdate: boolean; readonly pending: boolea
 
 function SubmitRow({ isUpdate, pending, onRestart, onCancel }: ISubmitRowProps): JSX.Element {
   return (
-    <div className="flex gap-sm">
-      <Button type="submit" loading={pending}>{isUpdate ? SUBMIT_LABELS.update : SUBMIT_LABELS.create}</Button>
-      <Button type="button" variant="ghost" onClick={onRestart}>Volver</Button>
+    <div className="sticky bottom-0 z-10 flex flex-wrap gap-sm border-t border-carbon-gray-20 bg-carbon-gray-10 py-base">
+      <Button type="submit" size="lg" className="min-w-[240px]" loading={pending}>{isUpdate ? SUBMIT_LABELS.update : SUBMIT_LABELS.create}</Button>
+      <Button type="button" variant="secondary" size="lg" className="min-w-[160px]" onClick={onRestart}>Volver</Button>
       {onCancel && <Button type="button" variant="ghost" onClick={onCancel}>Cancelar</Button>}
     </div>
   );

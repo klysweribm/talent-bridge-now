@@ -3,12 +3,7 @@ import { useLogoutMutation } from '@features/auth/hooks/useLogoutMutation';
 import { Button } from '@shared/components/atoms/Button';
 import { Icon } from '@shared/components/atoms/Icon';
 
-export interface LogoutButtonProps {
-  /** Oculta el texto (sidebar colapsado); el nombre accesible se mantiene. */
-  readonly collapsed?: boolean;
-}
-
-export function LogoutButton({ collapsed = false }: LogoutButtonProps): JSX.Element {
+export function LogoutButton(): JSX.Element {
   const logout = useLogoutMutation();
 
   return (
@@ -21,7 +16,7 @@ export function LogoutButton({ collapsed = false }: LogoutButtonProps): JSX.Elem
       className="w-full !justify-start"
     >
       <Icon name="logout" size={18} />
-      {!collapsed && <span>Cerrar sesión</span>}
+      <span>Cerrar sesión</span>
     </Button>
   );
 }

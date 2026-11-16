@@ -23,7 +23,7 @@ interface IHourRowProps extends Omit<WeekCalendarProps, never> {
 function HourRow({ hour: h, weekDates, slots, mode, onAdd, onRemove, onBook }: IHourRowProps): JSX.Element {
   return (
     <div className="contents">
-      <div className="text-label-sm text-text-secondary self-center">{fmt(h)}</div>
+      <div className="text-label text-carbon-gray-70 self-center">{fmt(h)}</div>
       {weekDates.map((date, i) => {
         const slot = slots.find(s => s.date === date && s.startHour === h);
         return (
@@ -41,14 +41,14 @@ export function WeekCalendar(props: WeekCalendarProps): JSX.Element {
   const rest = props;
   return (
     <div className="overflow-x-auto">
-      <div className="grid min-w-[480px] grid-cols-[3rem_repeat(5,minmax(0,1fr))] gap-xs" role="grid">
+      <div className="grid min-w-[480px] grid-cols-[3rem_repeat(5,minmax(0,1fr))] gap-px" role="grid">
         <div />
         {DAY_LABELS.map((d, i) => (
-          <div key={d} className="text-center text-label-md text-text-secondary">{d} {weekDates[i].slice(8)}</div>
+          <div key={d} className="bg-carbon-gray-20 py-sm text-center text-label font-semibold text-carbon-gray-100">{d} {weekDates[i].slice(8)}</div>
         ))}
         {HOURS.map(h => <HourRow key={h} hour={h} {...rest} />)}
       </div>
-      {mode === 'edit' && <p className="mt-md text-label-md text-text-secondary">{BOOKING_COPY.hint}</p>}
+      {mode === 'edit' && <p className="mt-md text-label text-carbon-gray-70">{BOOKING_COPY.hint}</p>}
     </div>
   );
 }

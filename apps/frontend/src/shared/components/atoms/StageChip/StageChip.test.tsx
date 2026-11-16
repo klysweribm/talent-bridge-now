@@ -13,18 +13,11 @@ describe('StageChip', () => {
     expect(screen.getByText('Entrevista Técnica')).toBeInTheDocument();
   });
 
-  it('should apply correct background color from STAGE_CHIP_STYLES', () => {
-    render(<StageChip stage="1ra Entrevista" />);
-    const chip = screen.getByLabelText('Etapa: 1ra Entrevista');
-    expect(chip).toHaveStyle({
-      backgroundColor: STAGE_CHIP_STYLES['1ra Entrevista'].bg,
-    });
-  });
-
-  it('should apply correct text color from STAGE_CHIP_STYLES', () => {
-    render(<StageChip stage="Cierre" />);
-    const chip = screen.getByLabelText('Etapa: Cierre');
-    expect(chip).toHaveStyle({ color: STAGE_CHIP_STYLES['Cierre'].text });
+  it.each(PROCESS_STAGES)('should apply the token classes from STAGE_CHIP_STYLES for %s', stage => {
+    render(<StageChip stage={stage} />);
+    const chip = screen.getByLabelText(`Etapa: ${STAGE_CHIP_STYLES[stage].label}`);
+    for (const cls of STAGE_CHIP_STYLES[stage].classes.split(' ')) expect(chip).toHaveClass(cls);
+    expect(chip).toHaveClass('rounded-pill');
   });
 
   it('should set aria-label with stage name', () => {

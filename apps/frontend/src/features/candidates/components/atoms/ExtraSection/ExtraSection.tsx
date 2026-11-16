@@ -10,7 +10,7 @@ export function ExtraSection({ title, children }: ExtraSectionProps): JSX.Elemen
   const headingId = useId();
   return (
     <section className="flex flex-col gap-sm" aria-labelledby={headingId}>
-      <h4 id={headingId} className="text-title-md text-text-primary">{title}</h4>
+      <h4 id={headingId} className="text-h2 text-carbon-gray-100">{title}</h4>
       <ul aria-labelledby={headingId} className="flex flex-col gap-md list-none p-0 m-0">{children}</ul>
     </section>
   );

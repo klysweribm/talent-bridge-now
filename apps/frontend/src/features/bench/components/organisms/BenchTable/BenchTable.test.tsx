@@ -62,3 +62,12 @@ describe('BenchTable', () => {
     expect(await screen.findByRole('button', { name: 'Siguiente' })).toBeDisabled();
   });
 });
+
+describe('BenchTable selection', () => {
+  it('should highlight the row of the selected resource', async () => {
+    fetchBench.mockResolvedValue(makePage([makeResource()]));
+    renderAt(<BenchTable onSelect={vi.fn()} selectedCode="BN-0001" />);
+    const row = (await screen.findByText('Lucía Fernández')).closest('tr');
+    expect(row).toHaveClass('bg-carbon-gray-20');
+  });
+});

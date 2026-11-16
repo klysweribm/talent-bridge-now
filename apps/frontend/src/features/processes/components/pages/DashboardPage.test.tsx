@@ -43,6 +43,7 @@ function setup(): void {
     <Routes>
       <Route path="/" element={<DashboardPage />} />
       <Route path="/processes/new" element={<p>wizard</p>} />
+      <Route path="/candidates/new" element={<p>new-candidate</p>} />
     </Routes>,
   );
 }
@@ -55,10 +56,23 @@ describe('DashboardPage', () => {
   });
   afterEach(() => { act(() => useAuthStore.getState().clearAuth()); });
 
-  it('should render the "Inicio" heading and a single primary action', () => {
+  // Prototipo "IBM Future Now": dos acciones (secundaria + primaria) en lugar de una sola.
+  it('should render the "Inicio" heading and the two header actions', () => {
     setup();
     expect(screen.getByRole('heading', { level: 1, name: 'Inicio' })).toBeInTheDocument();
-    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.getAllByRole('button')).toHaveLength(2);
+  });
+
+  it('should navigate to the new candidate flow from "Agregar candidato"', async () => {
+    setup();
+    await userEvent.click(screen.getByRole('button', { name: 'Agregar candidato' }));
+    expect(screen.getByText('new-candidate')).toBeInTheDocument();
+  });
+
+  it('should hide the header actions for technical_ref', () => {
+    login('technical_ref');
+    setup();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('should navigate to the wizard from "Nueva oportunidad"', async () => {

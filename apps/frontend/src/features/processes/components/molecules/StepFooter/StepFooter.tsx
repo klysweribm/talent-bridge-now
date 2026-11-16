@@ -12,8 +12,8 @@ export interface StepFooterProps {
 /** Pie común de los pasos: «Atrás» a la izquierda y las acciones a la derecha, con objetivos táctiles cómodos. */
 export function StepFooter({ backLabel, onBack, disabled = false, children }: StepFooterProps): JSX.Element {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-md">
-      <Button type="button" variant="secondary" className="min-h-11" disabled={disabled} onClick={onBack}>{backLabel}</Button>
+    <div className="sticky bottom-0 z-10 flex flex-wrap items-center justify-between gap-md border-t border-carbon-gray-20 bg-carbon-gray-10 py-base">
+      <Button type="button" variant="secondary" disabled={disabled} onClick={onBack}>{backLabel}</Button>
       <div className="flex items-center gap-md">{children}</div>
     </div>
   );

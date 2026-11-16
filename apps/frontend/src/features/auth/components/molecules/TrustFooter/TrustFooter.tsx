@@ -6,8 +6,8 @@ export function TrustFooter(): JSX.Element {
   return (
     <>
       <div className="relative flex items-center justify-center my-lg">
-        <div className="absolute w-full h-px bg-surface-highest" />
-        <span className="relative uppercase bg-surface-card px-sm text-label-sm tracking-wide text-text-secondary">
+        <div className="absolute w-full h-px bg-carbon-gray-20" />
+        <span className="relative uppercase bg-white px-sm text-label tracking-wide text-carbon-gray-70">
           {AUTH_COPY.divider}
         </span>
       </div>
@@ -15,8 +15,8 @@ export function TrustFooter(): JSX.Element {
       <SsoLoginButton />
 
       <div className="flex items-center justify-center gap-sm mt-lg pt-md">
-        <Icon name="verified_user" size={16} className="text-status-success" />
-        <span className="text-label-sm text-text-secondary">{AUTH_COPY.tlsNote}</span>
+        <Icon name="verified_user" size={16} className="text-carbon-green" />
+        <span className="text-label text-carbon-gray-70">{AUTH_COPY.tlsNote}</span>
       </div>
     </>
   );

@@ -13,11 +13,11 @@ export function ProcessListHeader({ headingId, total, query, onQueryChange, onCl
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-md">
       <div className="flex items-center gap-sm">
-        <h2 id={headingId} className="text-headline-sm text-text-primary">{PROCESS_LIST_COPY.recentTitle}</h2>
+        <h2 id={headingId} className="text-h3 text-carbon-gray-100">{PROCESS_LIST_COPY.recentTitle}</h2>
         {total !== undefined && (
           <span
             aria-label={`${PROCESS_LIST_COPY.countLabel}: ${total}`}
-            className="inline-flex items-center h-6 px-sm rounded-full bg-surface-high text-label-md text-text-primary"
+            className="inline-flex items-center h-6 px-sm rounded-pill bg-carbon-gray-20 text-label text-carbon-gray-100"
           >
             {total}
           </span>

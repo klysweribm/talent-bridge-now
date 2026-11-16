@@ -1,4 +1,5 @@
 import type { ICandidateMatches } from '@ibm-talent-bridge/shared-types';
+import { InlineNotification } from '@shared/components/molecules/InlineNotification';
 import { MATCH_COPY, MATCH_REASON_LABELS } from '../../../config/candidates.constants';
 import { AuditSummary } from '../../atoms/AuditSummary';
 
@@ -13,22 +14,24 @@ export function CandidateMatchNotice({ matches }: CandidateMatchNoticeProps): JS
   return (
     <div className="flex flex-col gap-sm">
       {exact && (
-        <div role="status" className="flex flex-col gap-xs p-md rounded border border-status-warning bg-status-warning-bg">
-          <p className="text-body-md-medium text-text-primary">{MATCH_COPY.exactTitle}</p>
-          <p className="text-body-md text-text-primary">{exact.fullName} · {exact.email}</p>
-          <AuditSummary updatedAt={exact.updatedAt} updatedBy={exact.updatedBy} updateCount={exact.updateCount} />
-          <p className="text-body-md text-text-primary">{MATCH_COPY.exactReplace}</p>
-        </div>
+        <InlineNotification kind="warning" role="status">
+          <div className="flex flex-col gap-xs">
+            <p className="font-semibold">{MATCH_COPY.exactTitle}</p>
+            <p>{exact.fullName} · {exact.email}</p>
+            <AuditSummary updatedAt={exact.updatedAt} updatedBy={exact.updatedBy} updateCount={exact.updateCount} />
+            <p>{MATCH_COPY.exactReplace}</p>
+          </div>
+        </InlineNotification>
       )}
       {similar.length > 0 && (
-        <section aria-labelledby="similar-profiles-title" className="flex flex-col gap-xs p-md rounded border border-outline-variant bg-surface-card">
-          <h3 id="similar-profiles-title" className="text-body-md-medium text-text-primary">{MATCH_COPY.similarTitle}</h3>
-          <ul className="list-disc pl-lg text-body-md text-text-primary">
+        <section aria-labelledby="similar-profiles-title" className="flex flex-col gap-xs p-base bg-white">
+          <h3 id="similar-profiles-title" className="font-semibold text-body text-carbon-gray-100">{MATCH_COPY.similarTitle}</h3>
+          <ul className="list-disc pl-lg text-body text-carbon-gray-100">
             {similar.map(match => (
               <li key={match.id}>{match.fullName} · {match.email} · {MATCH_REASON_LABELS[match.reason]}</li>
             ))}
           </ul>
-          <p className="text-body-md text-text-secondary">{MATCH_COPY.similarNonBlocking}</p>
+          <p className="text-body text-carbon-gray-70">{MATCH_COPY.similarNonBlocking}</p>
         </section>
       )}
     </div>

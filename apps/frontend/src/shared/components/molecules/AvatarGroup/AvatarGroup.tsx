@@ -26,10 +26,10 @@ function OverflowBadge({ count, size }: IOverflowBadgeProps): JSX.Element | null
     <span
       aria-label={`+${count} más`}
       className={[
-        '-ml-2 rounded-full ring-2 ring-surface-card',
+        '-ml-1 rounded-full ring-2 ring-white',
         'inline-flex items-center justify-center',
-        'bg-surface-highest text-text-secondary font-medium',
-        size === 'sm' ? 'w-6 h-6 text-[10px]' : 'w-8 h-8 text-[12px]',
+        'bg-carbon-gray-20 text-carbon-gray-70 font-medium',
+        size === 'sm' ? 'w-6 h-6 text-[10px]' : size === 'compact' ? 'w-7 h-7 text-[11px]' : 'w-8 h-8 text-[12px]',
       ].join(' ')}
     >
       +{count}
@@ -54,7 +54,7 @@ export function AvatarGroup({
       {visible.map((avatar, i) => (
         <span
           key={`${avatar.name}-${i}`}
-          className="-ml-2 first:ml-0 rounded-full ring-2 ring-surface-card"
+          className="-ml-1 first:ml-0 rounded-full ring-2 ring-white"
         >
           <Avatar name={avatar.name} imageUrl={avatar.imageUrl} size={size} />
         </span>

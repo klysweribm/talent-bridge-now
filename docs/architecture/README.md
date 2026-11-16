@@ -307,6 +307,16 @@ flowchart TB
 - **Consecuencias:** la divergencia nombre visible / nombre en código es deliberada y queda documentada; cualquier texto nuevo debe usar "Oportunidad" y cualquier identificador nuevo, `Process`. Un test o revisión debe cazar el literal "proceso" en la interfaz.
 - **Criterio de migración futura del código:** renombrar el código (tipos, rutas, colecciones) solo si se cumplen las tres: (a) el negocio valida el término de forma definitiva, (b) hay una ventana en la que el cambio de contrato de la API no rompe a ningún consumidor, y (c) existe un plan de migración de la colección con reversa. Mientras tanto, no.
 
+### ADR-017: Paleta Carbon g10 como única fuente de tokens y sidebar fijo sin colapso
+
+- **Estado:** Propuesto (2026-11-10). Pendiente de revisión visual y aceptación del usuario; el código ya está implementado en el árbol de trabajo de `feature/new-ui` (UI-REDESIGN-1).
+- **Contexto:** el rediseño «IBM Future Now» (`DESIGN/IBM Future Now - Prototipo.html`) usa Carbon g10. El frontend tenía dos familias de tokens (Material-like: `surface`, `primary`, `outline`… y `carbon-*` parcial) y un sidebar colapsable (`w-64`, `UX-GUIDELINES.md` §1).
+- **Decisión:**
+  1. `carbon-*` (`tailwind.colors.ts`, `config/design-tokens.ts`) es la única fuente de color, tipografía, radios, sombras y medidas del shell (header 48 px, sidebar 256 px). Los tokens heredados sin uso se retiran por decisión explícita (DT-066).
+  2. El sidebar es fijo de 256 px y no colapsa; se elimina `sidebarCollapsed` de `ui.store`. En móvil, BottomNav.
+  3. El mapeo de colores de estado de la oportunidad pasa a open=verde, in_progress=azul, interviewing=morado, closed=gris, cancelled=rojo (`config/processStatus.ts`).
+- **Consecuencias:** `docs/design/UX-GUIDELINES.md` §1 queda desactualizado (ver ALERTA del reporte). Los mocks de búsqueda y notificaciones quedan como deuda de backend (DT-062, DT-063). Alternativa descartada: mantener ambas paletas (duplica la fuente de verdad). No verificado visualmente.
+
 ---
 
 ## Abierto — validar con sponsor/compliance

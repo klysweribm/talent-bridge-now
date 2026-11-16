@@ -19,12 +19,12 @@ export interface TechnicalRefPickerProps {
 }
 
 function Body({ status, options, selected, max, saving, onToggle, onRetry }: TechnicalRefPickerProps): JSX.Element {
-  if (status === 'loading') return <div role="status" aria-label={COPY.loading} className="h-14 rounded bg-surface-high animate-pulse" />;
+  if (status === 'loading') return <div role="status" aria-label={COPY.loading} className="h-14 bg-carbon-gray-20 animate-pulse" />;
   if (status === 'error') return <ListErrorState message={COPY.loadError} retryLabel={COPY.retry} onRetry={onRetry} />;
-  if (status === 'empty') return <p className="text-body-md text-text-secondary">{COPY.empty}</p>;
+  if (status === 'empty') return <p className="text-body text-carbon-gray-70">{COPY.empty}</p>;
   const locked = selected.length >= max;
   return (
-    <ul className="flex flex-col divide-y divide-outline-variant rounded-lg border border-outline-variant bg-surface-card">
+    <ul className="flex flex-col divide-y divide-carbon-gray-20 border border-carbon-gray-20 bg-white">
       {options.map(option => {
         const checked = selected.includes(option.id);
         return (
@@ -43,12 +43,12 @@ export function TechnicalRefPicker(props: TechnicalRefPickerProps): JSX.Element 
   const { selected, max, saving, onSave, onCancel } = props;
   return (
     <div className="flex flex-col gap-sm" role="group" aria-label={COPY.heading}>
-      <p className="text-body-md text-text-secondary">{COPY.counter(selected.length, max)}</p>
-      {selected.length >= max && <p role="status" className="text-body-md text-status-warning">{COPY.limit(max)}</p>}
+      <p className="text-body text-carbon-gray-70">{COPY.counter(selected.length, max)}</p>
+      {selected.length >= max && <p role="status" className="text-body text-carbon-yellow-tag-text">{COPY.limit(max)}</p>}
       <Body {...props} />
       <div className="flex gap-sm">
-        <Button type="button" className="min-h-11" disabled={saving} onClick={onSave}>{saving ? COPY.saving : COPY.save}</Button>
-        <Button type="button" variant="secondary" className="min-h-11" disabled={saving} onClick={onCancel}>{COPY.cancel}</Button>
+        <Button type="button" disabled={saving} onClick={onSave}>{saving ? COPY.saving : COPY.save}</Button>
+        <Button type="button" variant="outline" disabled={saving} onClick={onCancel}>{COPY.cancel}</Button>
       </div>
     </div>
   );

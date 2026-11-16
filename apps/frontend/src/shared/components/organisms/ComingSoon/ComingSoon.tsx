@@ -14,12 +14,10 @@ export interface ComingSoonProps {
 
 export function ComingSoon({ label }: ComingSoonProps): JSX.Element {
   return (
-    <div className="flex flex-col items-center justify-center gap-base h-full px-xl py-2xl text-center">
-      <span className="w-16 h-16 rounded-full bg-surface-high flex items-center justify-center text-primary-interactive">
-        <Icon name="construction" size={32} />
-      </span>
-      <h1 className="text-headline-md text-text-primary">{label}</h1>
-      <p className="text-body-md text-text-secondary max-w-[480px]">
+    <div className="mx-auto flex w-full max-w-content-max flex-col items-start gap-base px-xl pb-3xl pt-lg">
+      <Icon name="construction" size={32} className="text-carbon-blue-60" />
+      <h1 className="text-h1 text-carbon-gray-100">{label}</h1>
+      <p className="max-w-[480px] text-body text-carbon-gray-70">
         {`Esta sección está en construcción. El equipo de ${BRAND.productFullName} está trabajando en ella — vuelve pronto.`}
       </p>
     </div>

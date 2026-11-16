@@ -12,8 +12,8 @@ export function SeniorityToggles({ selected, onChange }: SeniorityTogglesProps):
 
   return (
     <fieldset className="flex flex-col gap-xs">
-      <legend className="text-label-md text-text-secondary mb-xs">Seniority</legend>
-      <div className="flex gap-xs">
+      <legend className="text-label text-carbon-gray-70 mb-xs">Seniority</legend>
+      <div className="inline-flex self-start border border-carbon-gray-50 divide-x divide-carbon-gray-20">
         {SENIORITY_OPTIONS.map(({ value, label }) => {
           const pressed = selected.includes(value);
           return (
@@ -22,10 +22,10 @@ export function SeniorityToggles({ selected, onChange }: SeniorityTogglesProps):
               type="button"
               aria-pressed={pressed}
               onClick={() => toggle(value)}
-              className={`h-10 px-md rounded border text-body-md ${
+              className={`h-[38px] min-w-[56px] px-base text-body focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-carbon-blue-60 ${
                 pressed
-                  ? 'bg-primary-interactive text-white border-primary-interactive'
-                  : 'bg-surface-card text-text-primary border-outline-variant'}`}
+                  ? 'bg-carbon-gray-100 text-white'
+                  : 'bg-white text-carbon-gray-100 hover:bg-carbon-gray-hover'}`}
             >
               {label}
             </button>

@@ -10,7 +10,7 @@ export interface NewCandidateHeaderProps {
 export function NewCandidateHeader({ result }: NewCandidateHeaderProps): JSX.Element {
   return (
     <div className="flex flex-wrap items-center justify-between gap-sm">
-      <h2 className="text-headline-sm text-text-primary">{NEW_CANDIDATE_TITLE}</h2>
+      <h2 className="text-h3 text-carbon-gray-100">{NEW_CANDIDATE_TITLE}</h2>
       {result && <ExtractorBadge extractor={result.extractor} completedWith={result.completedWith} />}
     </div>
   );

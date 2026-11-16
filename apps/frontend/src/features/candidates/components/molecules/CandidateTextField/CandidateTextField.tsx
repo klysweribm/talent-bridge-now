@@ -1,4 +1,5 @@
 import { forwardRef, type InputHTMLAttributes } from 'react';
+import { FIELD_LABEL, FIELD_MISSING, inputClasses } from './fieldStyles';
 import { describedBy, FieldMessages } from './fieldMessages';
 import { MISSING_HINT } from './missingHint';
 
@@ -20,8 +21,8 @@ export const CandidateTextField = forwardRef<HTMLInputElement, CandidateTextFiel
     const id = `candidate-${name}`;
 
     return (
-      <div className={`flex flex-col gap-2xs ${missing ? 'border-l-4 border-status-warning pl-sm bg-status-warning-bg' : ''}`}>
-        <label htmlFor={id} className="text-body-md font-medium text-text-primary">{label}</label>
+      <div className={`flex flex-col gap-2xs ${missing ? FIELD_MISSING : ''}`}>
+        <label htmlFor={id} className={FIELD_LABEL}>{label}</label>
         <input
           {...rest}
           ref={ref}
@@ -29,8 +30,7 @@ export const CandidateTextField = forwardRef<HTMLInputElement, CandidateTextFiel
           name={name}
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy({ id, error, hint, missing, success })}
-          className={`w-full h-10 px-sm rounded text-body-md text-text-primary bg-surface-card border ${
-            error ? 'border-2 border-status-danger' : 'border-outline'}`}
+          className={inputClasses(Boolean(error))}
         />
         <FieldMessages id={id} error={error} hint={hint} missing={missing} success={success} />
       </div>

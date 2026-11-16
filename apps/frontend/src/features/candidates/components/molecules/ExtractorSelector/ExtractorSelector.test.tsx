@@ -23,4 +23,10 @@ describe('ExtractorSelector', () => {
     render(<ExtractorSelector value="ica" onChange={vi.fn()} disabled />);
     screen.getAllByRole('radio').forEach(radio => expect(radio).toBeDisabled());
   });
+
+  it('should tag only the default mode as recommended', () => {
+    render(<ExtractorSelector value="classic" onChange={vi.fn()} />);
+    expect(screen.getAllByText('Recomendado')).toHaveLength(1);
+    expect(screen.getByRole('radio', { name: /ica \(texto\)/i }).closest('label')).toHaveTextContent('Recomendado');
+  });
 });

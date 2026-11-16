@@ -9,8 +9,8 @@ export interface ListErrorStateProps {
 
 export function ListErrorState({ message, retryLabel, onRetry }: ListErrorStateProps): JSX.Element {
   return (
-    <div role="alert" className="flex flex-col items-center gap-md py-2xl text-center">
-      <p className="text-body-lg text-status-danger">{message}</p>
+    <div role="alert" className="flex flex-col items-center gap-md px-base py-2xl text-center">
+      <p className="text-body text-carbon-red">{message}</p>
       <Button variant="secondary" onClick={onRetry}>{retryLabel}</Button>
     </div>
   );

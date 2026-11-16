@@ -21,7 +21,7 @@ function PanelBody({ guard, onSuccess }: { readonly guard: IUseCandidatePanelGua
   const { forceClose } = useSidePanel();
   return (
     <>
-      <Suspense fallback={<p role="status" className="text-body-md text-text-secondary">{TEXT.loading}</p>}>
+      <Suspense fallback={<p role="status" className="text-body text-carbon-gray-70">{TEXT.loading}</p>}>
         <CandidateCreateForm stacked onSuccess={onSuccess} onStateChange={guard.onStateChange} />
       </Suspense>
       {guard.confirm && <DiscardCandidateDialog kind={guard.confirm} onKeep={guard.keepEditing} onDiscard={forceClose} />}

@@ -12,19 +12,19 @@ describe('StatusBadge', () => {
     expect(screen.getByLabelText('Rechazado')).toBeInTheDocument();
   });
 
-  it('should apply success background color', () => {
+  it('should apply success token classes', () => {
     render(<StatusBadge variant="success" label="Activo" />);
-    expect(screen.getByLabelText('Activo')).toHaveStyle({ backgroundColor: '#defbe6' });
+    expect(screen.getByLabelText('Activo')).toHaveClass('bg-carbon-green-tag-bg', 'text-carbon-green-tag-text');
   });
 
-  it('should apply danger background color', () => {
+  it('should apply danger token classes', () => {
     render(<StatusBadge variant="danger" label="Inactivo" />);
-    expect(screen.getByLabelText('Inactivo')).toHaveStyle({ backgroundColor: '#ffebeb' });
+    expect(screen.getByLabelText('Inactivo')).toHaveClass('bg-carbon-red-10', 'text-carbon-red');
   });
 
-  it('should apply warning background color', () => {
+  it('should apply warning token classes', () => {
     render(<StatusBadge variant="warning" label="Pendiente" />);
-    expect(screen.getByLabelText('Pendiente')).toHaveStyle({ backgroundColor: '#fef3d6' });
+    expect(screen.getByLabelText('Pendiente')).toHaveClass('bg-carbon-yellow-tag-bg', 'text-carbon-yellow-tag-text');
   });
 
   it('should NOT render dot indicator when dot=false', () => {

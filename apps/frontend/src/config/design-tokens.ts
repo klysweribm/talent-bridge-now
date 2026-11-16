@@ -18,17 +18,17 @@ export const PROCESS_STAGES = [
 
 export type ProcessStage = (typeof PROCESS_STAGES)[number];
 
-// ─── Colores de chips por etapa ───────────────────────────────
+// ─── Colores de chips por etapa (clases sobre tokens Carbon, nunca hex) ───
 export const STAGE_CHIP_STYLES: Record<
   ProcessStage,
-  { bg: string; text: string; label: string }
+  { classes: string; label: string }
 > = {
-  'Inicial':                { bg: '#e2e2e2', text: '#434655', label: 'Inicial' },
-  '1ra Entrevista':         { bg: '#dbeafe', text: '#1e40af', label: '1ra Entrevista' },
-  'Entrevista Técnica':     { bg: '#f3e8ff', text: '#6b21a8', label: 'Entrevista Técnica' },
-  'Entrevista con Cliente': { bg: '#ffedd5', text: '#9a3412', label: 'Con Cliente' },
-  'Cierre':                 { bg: '#defbe6', text: '#24a148', label: 'Cierre' },
-  'Retroalimentación':      { bg: '#ffebeb', text: '#da1e28', label: 'Retroalimentación' },
+  'Inicial':                { classes: 'bg-carbon-gray-20 text-carbon-gray-100', label: 'Inicial' },
+  '1ra Entrevista':         { classes: 'bg-carbon-blue-20 text-carbon-blue-80', label: '1ra Entrevista' },
+  'Entrevista Técnica':     { classes: 'bg-status-purple-bg text-status-purple-text', label: 'Entrevista Técnica' },
+  'Entrevista con Cliente': { classes: 'bg-carbon-yellow-tag-bg text-carbon-yellow-tag-text', label: 'Con Cliente' },
+  'Cierre':                 { classes: 'bg-carbon-green-tag-bg text-carbon-green-tag-text', label: 'Cierre' },
+  'Retroalimentación':      { classes: 'bg-carbon-red-10 text-carbon-red', label: 'Retroalimentación' },
 } as const;
 
 // ─── Roles del sistema ──────────────────────────────────────────
